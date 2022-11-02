@@ -1,0 +1,48 @@
+#!/bin/sh
+
+LOG_PATH='diff-project/log'
+DIR='diff-project'
+DIR_FILES='diff-project/files'
+DIF_FILE=$LOG_PATH/"different-files.log"
+
+
+DIFFERENCE='differences.log'
+DIFFERENCE_PATH="$LOG_PATH"/"$DIFFERENCE"
+
+DIFFERENCE_FILES='different-files.log'
+DIFFERENCE_FILES_PATH="$LOG_PATH"/"$DIFFERENCE_FILES"
+
+setDifferenceBteenFiles() {
+  git diff --name-only "$branchA" "$branchB" > "$DIFFERENCE_FILES_PATH"
+  while IFS= read -r line; do
+    echo "$line"
+    mkdir -p "$DIR_FILES"/"${line%.*}"
+    git show "$2":"$line" > "$DIR_FILES"/"${line%.*}"/"$(basename -- "$line")"
+  done <"$DIF_FILE"
+}
+
+setFilesDifference() {
+    git diff "$branchA" "$branchB" | ./scripts/gitdiff-with-line > "$DIFFERENCE_PATH"
+}
+
+createDiffFolder() {
+  if [ -d "$LOG_PATH" ]; then
+    rm -rf "$DIR"
+  fi
+
+  mkdir -p "$DIR_FILES"
+  mkdir -p "$LOG_PATH"
+}
+
+main() {
+  createDiffFolder
+  branchA=$1
+  branchB=$2
+
+  setFilesDifference "$branchA" "$branchB"
+  setDifferenceBteenFiles "$branchA" "$branchB"
+  echo "Parameter #1 is $branchA"
+  echo "Parameter #2 is $branchB"
+}
+
+main $1 $2
