@@ -1,0 +1,13 @@
+#!/bin/sh
+
+
+main() {
+  branchA=$1;
+  branchB=$2;
+   echo "Parameter #1 is $branchA"
+   echo "Parameter #2 is $branchB"
+   git diff $branchA $branchB | ./gitdiff-with-line > /log/elementsDiff.log
+   git diff --name-only  $branchA $branchB >  /log/filesDiff.log
+}
+
+main $1 $2
