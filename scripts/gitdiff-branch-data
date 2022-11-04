@@ -1,10 +1,10 @@
-#!/bin/sh
+#!/bin/bash
 
+## Static global with the path ot the subfolder diff-project
 LOG_PATH='diff-project/log'
 DIR='diff-project'
 DIR_FILES='diff-project/files'
 DIF_FILE=$LOG_PATH/"different-files.log"
-
 
 DIFFERENCE='differences.log'
 DIFFERENCE_PATH="$LOG_PATH"/"$DIFFERENCE"
@@ -16,8 +16,16 @@ lineContentGitAnnotation() {
   local line=$1
   SUB='@@ -'
   if [[ "$line" == "$SUB"* ]]; then
-    #    echo "It's there."
-    #    echo "$line"
+    return 0
+  fi
+  return 1
+}
+
+lineTeamAnnotationHash() {
+  local line=$1
+  line=$(echo "$1" | sed 's/[0-9]//g')
+  SUB=': ##'
+  if [[ "$line" == "$SUB"* ]]; then
     return 0
   fi
   return 1
@@ -32,31 +40,13 @@ lineContentFileName() {
   return 1
 }
 
-getModifFromFile() {
-  #    echo "line ================ > " "$line"
-  linePosition=$(echo "$line" | sed 's@^[^0-9]*\([0-9]\+\).*@\1@')
-
-  #  linePosition=$((10 + 1))
-  #  countOfLineDiff=0
-  #    echo "linePosition = " "$linePosition"
-  #    while IFS= read -r lineDiff; do
-  #      if ((countOfLineDiff < 2)); then
-  #        echo "linePosition = " "$linePosition"
-  #        echo " diff line => " "${lineDiff}"
-  #      fi
-  #      if (("$linePosition" > 0)); then
-  #        linePosition=$((linePosition - 1))
-  #      fi
-  #      countOfLineDiff=$((countOfLineDiff + 1))
-  #    done < <(tail -n "+$linePosition" $DIFFERENCE_PATH)
-
-  #  index=0
-  #  declare -a arrayFileData
-  #  while read line; do
-  #    arrayFileData[$index]="$line"
-  #      echo "${arrayFileData[0]}"
-  #    index=$(("$index" + 1))
-  #  done < $DIFFERENCE_PATH
+lineStartByHeaderHash() {
+  local line=$1
+  SUB='##'
+  if [[ ${#line} == 2 ]] && [[ "$line" == "$SUB"* ]]; then
+    return 0
+  fi
+  return 1
 }
 
 getArrayFileInfo() {
@@ -74,11 +64,63 @@ getArrayFileInfo() {
   echo "$response"
 }
 
+getModifFromFile() {
+  echo -e "\nFUNCTION getModifFromFile !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "line = > [ $line ]"
+
+  local linePosition=$(echo "$line" | sed 's@^[^0-9]*\([0-9]\+\).*@\1@')
+
+  local index=0
+  declare -a fileChangedData
+  IFS=''
+  while read lineChangeData; do
+    fileChangedData[$index]="$lineChangeData"
+    index=$(("$index" + 1))
+  done <"$fileExtractDataPath"
+
+  echo "linePosition = " "$linePosition"
+  local countOfLine=0
+  local length=${#fileChangedData[@]}
+  local firstHash=0
+  local endPosition=0
+
+  for ((l = "$linePosition" - 1; l < "$length"; )); do
+    local lineChangedData=${fileChangedData[l]}
+
+    if (("$firstHash" < 2)) && lineStartByHeaderHash "$lineChangedData"; then
+      firstHash=$((firstHash + 1))
+    fi
+
+    if (("$firstHash" == 0)); then
+      l=$((l - 1))
+    elif (("$firstHash" == 2)); then
+      echo "BREAK !!!!!!!!!!!!!!!!!!!"
+      endPosition=$((l))
+      break
+    else
+      #      echo -e "\t\t\tADD [ '$lineChangedData' ] INTO ==>  $diffFilePath"
+      echo "$lineChangedData" >>"$diffFilePath"
+      l=$((l + 1))
+      #      echo "FORWARD firstHash ==========> $l"
+    fi
+    countOfLine=$((countOfLine + 1))
+    endPosition=$((l))
+  done
+  echo -ne "END POSITION [$endPosition] ?==? LENGTH $length\n\n"
+  echo -ne "END FUNCTION getModifFromFile !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! \n\n"
+  if (("$endPosition" == "$length")); then
+    return 0
+  else
+    return 1
+  fi
+}
+
 executeAlgorithm() {
 
   local index=0
   declare -a differencesFileData
-  while read -r line; do
+  IFS=''
+  while read line; do
     differencesFileData[$index]="$line"
     index=$(("$index" + 1))
   done <$DIFFERENCE_PATH
@@ -89,21 +131,66 @@ executeAlgorithm() {
   local length=${#differencesFileData[@]}
   local diffFilePosName=3
   local FileExtractDatPos=1
-  for ((l = 0; l < "$length"; l++)); do
-    line=${differencesFileData[l]}
-    if $nextLineIsDiff; then
-      getModifFromFile "$line"
+  local passOnce=1
+  local endOfFile=1
+
+  fileExtractDataPath=''
+  for ((dl = 0; dl < "$length"; dl++)); do
+    line=${differencesFileData[dl]}
+    local previousLine=${differencesFileData[$((dl - 1))]}
+    echo -e "\n\n---------------\tPOS [ $((dl + 1)) ]"
+    echo -e "---------------\tMAIN LINE [[ $line ]]"
+    echo -e "---------------\tPREVIOUS LINE [[ $previousLine ]]"
+    echo -e "---------------\tIS_END_OF_FILE [ $endOfFile ]"
+    echo -e "---------------\tNEST_LINE_IS_DIFF [ $nextLineIsDiff ]"
+    echo -e "---------------\tFILE_TO_EXTRACT_DATA [ $fileExtractDataPath ]"
+
+    local gitAnnotation=0
+    local isTeamAnnotation=0
+    local isPrvGitAnnotation=0
+    local isPrvTeamAnnotation=0
+    local isContentFileName=0
+
+    lineContentGitAnnotation "$line"
+    gitAnnotation=$?
+    if (("$gitAnnotation" == 1)); then
+      lineTeamAnnotationHash "$line"
+      isTeamAnnotation=$?
+    fi
+
+    lineContentGitAnnotation "$previousLine"
+    isPrvGitAnnotation=$?
+    if (("$isPrvGitAnnotation" == 1)); then
+      lineTeamAnnotationHash "$previousLine"
+      isPrvTeamAnnotation=$?
+    fi
+
+    if ( (("$passOnce" == 1)) || (("$endOfFile" == 0))); then
+      lineContentFileName "$line"
+      isContentFileName=$?
+    fi
+
+    echo "gitAnnotation: $gitAnnotation isTeamAnnotation: $isTeamAnnotation"
+    echo "isPrvGitAnnotation: $isPrvGitAnnotation isPrvTeamAnnotation: $isPrvTeamAnnotation isContentFileName: $isContentFileName"
+    if (("$isContentFileName" == 0)); then
+      local fileNameParse=$previousLine
+      fileName="$(basename -- "$fileNameParse")"
+      diffFilePath=$(getArrayFileInfo "${filesList[@]}" "$fileName" "$diffFilePosName")
+      fileExtractDataPath=$(getArrayFileInfo "${filesList[@]}" "$fileName" "$FileExtractDatPos")
+      echo "diffFilePath => " "$diffFilePath"
+      echo "fileExtractDataPath => " "$fileExtractDataPath"
+      endOfFile=1
+      passOnce=0
+    elif $nextLineIsDiff && (("$endOfFile" == 1)); then
+      getModifFromFile
+      endOfFile=$?
+      echo "endOfFile => $endOfFile"
       nextLineIsDiff=false
-    elif lineContentGitAnnotation "$line"; then
+      #      read -p 'goOn ?: ' goOn
+      echo -ne "______________________________________________________________________________________________________\n\n\n"
+    elif (("$gitAnnotation" == 0)) ||
+      ( (("$dl" > 0)) && (("$isPrvGitAnnotation" == 1)) && (("$isTeamAnnotation" == 0))); then
       nextLineIsDiff=true
-      if lineContentFileName "${differencesFileData[l - 1]}"; then
-        local fileNameParse=${differencesFileData[l - 1]}
-        fileName="$(basename -- "$fileNameParse")"
-        diffFilePath=$(getArrayFileInfo "${filesList[@]}" "$fileName" "$diffFilePosName")
-        fileExtractDataPath=$(getArrayFileInfo "${filesList[@]}" "$fileName" "$FileExtractDatPos")
-        echo "diffFilePath => " "$diffFilePath"
-        echo "fileExtractDataPath => " "$fileExtractDataPath"
-      fi
     else
       nextLineIsDiff=false
     fi
@@ -111,17 +198,58 @@ executeAlgorithm() {
   done
 }
 
+printArrayOfFileInfo() {
+  printf "\n"
+  local COUNT=${#filesList[@]}
+  #   Loop and print it.  Using offset and length to extract values
+  for ((i = 0; i < "$COUNT"; i++)); do
+    echo -ne "filesList:  \t${filesList[i]}\n"
+    IFS="|" read -r -a arr <<<"${filesList[i]}"
+    echo -ne "fileName: \t${arr[0]}\n"
+    echo -ne "fileFromBPath: \t${arr[1]}\n"
+    echo -ne "diffFileName \t${arr[2]}\n"
+    echo -ne "diffFilePath \t${arr[3]}\n"
+    printf "\n"
+  done
+}
+
 setDifferenceBteenFiles() {
-  git diff --name-only "$branchA" "$branchB" > "$DIFFERENCE_FILES_PATH"
+  #execute the command git diff between the two branches and store inside a log file
+  git diff --name-only "$branchA" "$branchB" >"$DIFFERENCE_FILES_PATH"
+
+  # array will content all the files and their information
+  declare -a filesList
+  local counter=0
   while IFS= read -r line; do
-    echo "$line"
+    fileName="$(basename -- "$line")"
+    fileNameWithoutExt="${fileName%.*}"
+
+    # Create folder for each file changed
     mkdir -p "$DIR_FILES"/"${line%.*}"
-    git show "$2":"$line" > "$DIR_FILES"/"${line%.*}"/"$(basename -- "$line")"
+
+    #Upload file changed from branch A and create diff file with extension .diff with the same name file
+    diffFileName="$fileNameWithoutExt".diff.txt
+    fileFromBPath="$DIR_FILES"/"${line%.*}"/"$fileName"
+    diffFilePath="$DIR_FILES"/"${line%.*}"/"$diffFileName"
+    touch "$diffFilePath"
+    git show "$2":"$line" >"$fileFromBPath"
+
+    echo -e "UPLOAD FILE: \t\t" "$fileFromBPath"
+    echo -e "CREATE DIFF FILE: \t" "$diffFilePath"
+
+    # Concatenate all information on one string with separator '|'
+    fileInfo="$fileName|$fileFromBPath|$diffFileName|$diffFilePath"
+    # Store the information above into string
+    filesList[${counter}]=$fileInfo
+    echo -e "\n"
+    counter=$((counter + 1))
   done <"$DIF_FILE"
+  printArrayOfFileInfo "${filesList[@]}"
+  executeAlgorithm "${filesList[@]}"
 }
 
 setFilesDifference() {
-    git diff "$branchA" "$branchB" | ./scripts/gitdiff-with-line > "$DIFFERENCE_PATH"
+  git diff "$branchA" "$branchB" | ./scripts/gitdiff-with-line >"$DIFFERENCE_PATH"
 }
 
 createDiffFolder() {
@@ -133,15 +261,25 @@ createDiffFolder() {
   mkdir -p "$LOG_PATH"
 }
 
+help() {
+  echo ./gitdiff-branch-data '{ branch to compare A }' '{branch to compareB}'
+  exit 0
+}
+
 main() {
   createDiffFolder
   local branchA=$1
   local branchB=$2
 
-  setFilesDifference "$branchA" "$branchB"
-  setDifferenceBteenFiles "$branchA" "$branchB"
   echo "Parameter #1 is $branchA"
   echo "Parameter #2 is $branchB"
+
+  if [[ -z "$branchA" || -z "$branchB" ]]; then
+    help
+  fi
+
+  setFilesDifference "$branchA" "$branchB"
+  setDifferenceBteenFiles "$branchA" "$branchB"
 }
 
-main $1 $2
+main "$1" "$2"
