@@ -1,0 +1,101 @@
+##
+TAG_CHARSETHELLO=@€ιθη
+##
+FSED88
+=SQL=
+CREATE OR REPLACE PACKAGE FSED
+AS
+ FUNCTION getTypeTable(
+ p_table IN VARCHAR2)
+ RETURN VARCHAR2;
+ FUNCTION getClauseSelect(
+ p_numpac IN VARCHAR2,
+ p_nom_table_ou_alias IN VARCHAR2,
+ p_donneegxp IN VARCHAR2,
+ p_donnfiltre IN VARCHAR2,
+ p_operfiltre IN VARCHAR2,
+ p_valfiltre IN VARCHAR2,
+ p_trtparticulier IN VARCHAR2,
+ p_envoi_systematique IN VARCHAR2,
+ p_data_type IN VARCHAR2,
+ p_type_zadig IN VARCHAR2,
+ p_masque IN VARCHAR2,
+ p_occ IN VARCHAR2,
+ p_avec_balises_photo IN BOOLEAN)
+ RETURN VARCHAR2;
+ FUNCTION getLibResolu(
+ pNumPac       IN TGE_REF_VRREP.NUMERO_DE_PAC%TYPE,
+ pCodeCaisse   IN TGE_REF_CAISSE.CODECAISSE%TYPE,
+ pLibRUB       IN TGE_REF_RUBRIQUE.LIBRUB%TYPE)
+ RETURN VARCHAR2;
+ PROCEDURE FSED_ERREUR(
+ p_id      IN NUMBER,
+ p_nomproc IN VARCHAR2,
+ p_idDate  IN VARCHAR2,
+ p_erreur  IN CLOB );
+ PROCEDURE preparation_FSED_unit(
+ p_nomTable    IN VARCHAR2,
+ p_alias       IN VARCHAR2,
+ p_TABLETYPE   IN VARCHAR2,
+ p_id_trt      IN NUMBER,
+ p_numpac      IN VARCHAR2,
+ p_periode     IN VARCHAR2,
+ p_ALLERRETOUR IN VARCHAR2,
+ p_nb_mois_paie_init IN NUMBER);
+ PROCEDURE preparation_FSED(
+ p_id_trt  IN NUMBER,
+ p_numpac  IN VARCHAR2,
+ p_periode IN VARCHAR2);
+ PROCEDURE retour_Fsed(
+ p_id IN NUMBER );
+ PROCEDURE insertCart80(
+ p_id    IN NUMBER,
+ p_newId IN NUMBER);
+ PROCEDURE insertCart30(
+ p_id    IN NUMBER,
+ p_newId IN NUMBER,
+ p_table IN VARCHAR2);
+ PROCEDURE sous_insertCart80(
+ p_id    IN NUMBER,
+ p_newId IN NUMBER) ;
+ PROCEDURE sous_insertCart30(
+ p_id    IN NUMBER,
+ p_newId IN NUMBER,
+ p_table IN VARCHAR2) ;
+ PROCEDURE maj_CAD30(
+ p_id IN NUMBER) ;
+ PROCEDURE getPeriodeRecueil(
+ p_numpac  IN TGE_REF_PAC.numpac%type,
+ p_paiezad IN TGE_IMPORT_FSED_30.paiezad%type,
+ p_dateDeb IN OUT DATE,
+ p_dateFin IN OUT DATE);
+ PROCEDURE tmp_histo_fsed_30(
+ p_id  IN NUMBER ,
+ p_numpac  IN TGE_REF_MAPDO.NUMPAC%TYPE,
+ p_moi IN VARCHAR2);
+ procedure FSED_AVANCEMENT_PLSQL(
+ p_id             IN NUMBER,
+ p_typeAction     IN VARCHAR2,
+ p_detailAction   IN CLOB );
+ PROCEDURE FSED_AVANCEMENT(
+    id  IN NUMBER,
+    txt IN VARCHAR2);
+ PROCEDURE insert_gap_trt(
+ p_id          IN NUMBER ,
+ p_numpac      IN TGE_REF_PAC.numpac%type,
+ p_periode     IN TGE_REF_PAC.PERIODEENCOURS%TYPE,
+ p_type_retour IN VARCHAR2);
+ PROCEDURE insert_gap_trt_suivi(
+ p_id               IN NUMBER ,
+ p_statut           IN TGE_REF_PAC.numpac%type,
+ p_code_retour_zpp  IN TGE_REF_PAC.PERIODEENCOURS%TYPE,
+ p_login            IN VARCHAR2,
+ p_type_retour     IN VARCHAR2);
+ PROCEDURE getPeriodeRecueilEvol(
+ p_id      IN NUMBER,
+ p_numpac  IN TGE_REF_PAC.numpac%type,
+ p_periodeEnCours IN TGE_REF_PAC.periodeencours%type,
+ p_paiezad IN TGE_IMPORT_FSED_30.paiezad%type,
+ p_dateDeb IN OUT DATE,
+ p_dateFin IN OUT DATE);
+ END FSED;
