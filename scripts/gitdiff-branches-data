@@ -6,14 +6,20 @@ DIR='diff-project'
 DIR_FILES='diff-project/files'
 DIF_FILE=$LOG_PATH/"different-files.log"
 
+GIT_DIFF_BRANCHES='git-diff-branches.log'
+GIT_DIFF_BRANCH_PATH="$LOG_PATH"/"$GIT_DIFF_BRANCHES"
+
 DIFFERENCE='differences.log'
 DIFFERENCE_PATH="$LOG_PATH"/"$DIFFERENCE"
 
 DIFFERENCE_FILES='different-files.log'
 DIFFERENCE_FILES_PATH="$LOG_PATH"/"$DIFFERENCE_FILES"
 
+#Function to check if the line receive as param content the git annotation of differences:
+#@@ -
 lineContentGitAnnotation() {
   local line=$1
+
   SUB='@@ -'
   if [[ "$line" == "$SUB"* ]]; then
     return 0
@@ -21,9 +27,13 @@ lineContentGitAnnotation() {
   return 1
 }
 
+#Function to check if the line receive as param content the annotation:
+# : ##
 lineTeamAnnotationHash() {
   local line=$1
-  line=$(echo "$1" | sed 's/[0-9]//g')
+  local numberList='s/[0-9]//g'
+
+  line=$(echo "$line" | sed "$numberList")
   SUB=': ##'
   if [[ "$line" == "$SUB"* ]]; then
     return 0
@@ -31,8 +41,11 @@ lineTeamAnnotationHash() {
   return 1
 }
 
+#Function to check if the line receive as param content the annotation:
+#+++ b/
 lineContentFileName() {
   local line=$1
+
   SUB='+++ b/'
   if [[ "$line" == "$SUB"* ]]; then
     return 0
@@ -40,6 +53,8 @@ lineContentFileName() {
   return 1
 }
 
+#Function to check if the line receive as param content the annotation:
+# ##
 lineStartByHeaderHash() {
   local line=$1
   SUB='##'
@@ -49,11 +64,13 @@ lineStartByHeaderHash() {
   return 1
 }
 
+#Function browser a map which content all the information of the file to be compare
 getArrayFileInfo() {
   local num=$4
   local fileName=$3
   local response=''
   local COUNT=${#filesList[@]}
+
   for ((i = 0; i < "$COUNT"; i++)); do
     IFS="|" read -r -a arr <<<"${filesList[i]}"
     if [[ ${arr[0]} = "$fileName" ]]; then
@@ -64,21 +81,18 @@ getArrayFileInfo() {
   echo "$response"
 }
 
+#Function get the line has changed and add into .diff file
 getModifFromFile() {
-  echo -e "\nFUNCTION getModifFromFile !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  echo "line = > [ $line ]"
-
   local linePosition=$(echo "$line" | sed 's@^[^0-9]*\([0-9]\+\).*@\1@')
-
   local index=0
   declare -a fileChangedData
+
   IFS=''
   while read lineChangeData; do
     fileChangedData[$index]="$lineChangeData"
     index=$(("$index" + 1))
   done <"$fileExtractDataPath"
 
-  echo "linePosition = " "$linePosition"
   local countOfLine=0
   local length=${#fileChangedData[@]}
   local firstHash=0
@@ -94,20 +108,15 @@ getModifFromFile() {
     if (("$firstHash" == 0)); then
       l=$((l - 1))
     elif (("$firstHash" == 2)); then
-      echo "BREAK !!!!!!!!!!!!!!!!!!!"
       endPosition=$((l))
       break
     else
-      #      echo -e "\t\t\tADD [ '$lineChangedData' ] INTO ==>  $diffFilePath"
       echo "$lineChangedData" >>"$diffFilePath"
       l=$((l + 1))
-      #      echo "FORWARD firstHash ==========> $l"
     fi
     countOfLine=$((countOfLine + 1))
     endPosition=$((l))
   done
-  echo -ne "END POSITION [$endPosition] ?==? LENGTH $length\n\n"
-  echo -ne "END FUNCTION getModifFromFile !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! \n\n"
   if (("$endPosition" == "$length")); then
     return 0
   else
@@ -115,10 +124,11 @@ getModifFromFile() {
   fi
 }
 
+#Function which will browse /log/differences.log and extract the  information
 executeAlgorithm() {
-
   local index=0
   declare -a differencesFileData
+
   IFS=''
   while read line; do
     differencesFileData[$index]="$line"
@@ -138,22 +148,24 @@ executeAlgorithm() {
   for ((dl = 0; dl < "$length"; dl++)); do
     line=${differencesFileData[dl]}
     local previousLine=${differencesFileData[$((dl - 1))]}
-    echo -e "\n\n---------------\tPOS [ $((dl + 1)) ]"
-    echo -e "---------------\tMAIN LINE [[ $line ]]"
-    echo -e "---------------\tPREVIOUS LINE [[ $previousLine ]]"
-    echo -e "---------------\tIS_END_OF_FILE [ $endOfFile ]"
-    echo -e "---------------\tNEST_LINE_IS_DIFF [ $nextLineIsDiff ]"
-    echo -e "---------------\tFILE_TO_EXTRACT_DATA [ $fileExtractDataPath ]"
+    {
+      echo -e "\n\n---------------\tPOS [ $((dl + 1)) ]"
+      echo -e "---------------\tMAIN LINE [[ $line ]]"
+      echo -e "---------------\tPREVIOUS LINE [[ $previousLine ]]"
+      echo -e "---------------\tIS_END_OF_FILE [ $endOfFile ]"
+      echo -e "---------------\tNEST_LINE_IS_DIFF [ $nextLineIsDiff ]"
+      echo -e "---------------\tFILE_TO_EXTRACT_DATA [ $fileExtractDataPath ]"
+    } >>$GIT_DIFF_BRANCH_PATH
 
-    local gitAnnotation=0
-    local isTeamAnnotation=0
-    local isPrvGitAnnotation=0
-    local isPrvTeamAnnotation=0
-    local isContentFileName=0
+    local isGitAnnotation=1
+    local isTeamAnnotation=1
+    local isPrvGitAnnotation=1
+    local isPrvTeamAnnotation=1
+    local isContentFileName=1
 
     lineContentGitAnnotation "$line"
-    gitAnnotation=$?
-    if (("$gitAnnotation" == 1)); then
+    isGitAnnotation=$?
+    if (("$isGitAnnotation" == 1)); then
       lineTeamAnnotationHash "$line"
       isTeamAnnotation=$?
     fi
@@ -170,50 +182,53 @@ executeAlgorithm() {
       isContentFileName=$?
     fi
 
-    echo "gitAnnotation: $gitAnnotation isTeamAnnotation: $isTeamAnnotation"
-    echo "isPrvGitAnnotation: $isPrvGitAnnotation isPrvTeamAnnotation: $isPrvTeamAnnotation isContentFileName: $isContentFileName"
+    echo -e "--------------\tisGitAnnotation: $isGitAnnotation \tisTeamAnnotation: $isTeamAnnotation \tisPrvGitAnnotation: $isPrvGitAnnotation \tisPrvTeamAnnotation: $isPrvTeamAnnotation \tisContentFileName: $isContentFileName" >>$GIT_DIFF_BRANCH_PATH
     if (("$isContentFileName" == 0)); then
       local fileNameParse=$previousLine
       fileName="$(basename -- "$fileNameParse")"
       diffFilePath=$(getArrayFileInfo "${filesList[@]}" "$fileName" "$diffFilePosName")
       fileExtractDataPath=$(getArrayFileInfo "${filesList[@]}" "$fileName" "$FileExtractDatPos")
-      echo "diffFilePath => " "$diffFilePath"
-      echo "fileExtractDataPath => " "$fileExtractDataPath"
+      {
+        echo -e "--------------\tdiffFilePath: " "$diffFilePath"
+        echo -e "--------------\tfileExtractDataPath: " "$fileExtractDataPath"
+      } >>$GIT_DIFF_BRANCH_PATH
       endOfFile=1
       passOnce=0
     elif $nextLineIsDiff && (("$endOfFile" == 1)); then
       getModifFromFile
       endOfFile=$?
-      echo "endOfFile => $endOfFile"
       nextLineIsDiff=false
-      #      read -p 'goOn ?: ' goOn
-      echo -ne "______________________________________________________________________________________________________\n\n\n"
-    elif (("$gitAnnotation" == 0)) ||
+    elif (("$isGitAnnotation" == 0)) ||
       ( (("$dl" > 0)) && (("$isPrvGitAnnotation" == 1)) && (("$isTeamAnnotation" == 0))); then
       nextLineIsDiff=true
     else
       nextLineIsDiff=false
     fi
+
+    #    read -p 'goOn ?: ' goOn
     countOfLine=$((countOfLine + 1))
   done
+  echo -e "END OF EXTRACTOR\n" >>$GIT_DIFF_BRANCH_PATH
 }
 
 printArrayOfFileInfo() {
-  printf "\n"
+  echo -e "\n" >>$GIT_DIFF_BRANCH_PATH
   local COUNT=${#filesList[@]}
   #   Loop and print it.  Using offset and length to extract values
   for ((i = 0; i < "$COUNT"; i++)); do
-    echo -ne "filesList:  \t${filesList[i]}\n"
+    echo -ne ">>>>>>>>>>>>>>\tfilesList:  \t${filesList[i]}\n" >>$GIT_DIFF_BRANCH_PATH
     IFS="|" read -r -a arr <<<"${filesList[i]}"
-    echo -ne "fileName: \t${arr[0]}\n"
-    echo -ne "fileFromBPath: \t${arr[1]}\n"
-    echo -ne "diffFileName \t${arr[2]}\n"
-    echo -ne "diffFilePath \t${arr[3]}\n"
-    printf "\n"
+    {
+      echo -ne ">>>>>>>>>>>>>>\tfileName: \t${arr[0]}\n"
+      echo -ne ">>>>>>>>>>>>>>\tfileFromBPath: \t${arr[1]}\n"
+      echo -ne ">>>>>>>>>>>>>>\tdiffFileName \t${arr[2]}\n"
+      echo -ne ">>>>>>>>>>>>>>\tdiffFilePath \t${arr[3]}\n\n"
+    } >>$GIT_DIFF_BRANCH_PATH
   done
 }
 
-setDifferenceBteenFiles() {
+#Function will get the files changed name and create folder with their name and .diff.txt file
+setDifferenceBetweenFiles() {
   #execute the command git diff between the two branches and store inside a log file
   git diff --name-only "$branchA" "$branchB" >"$DIFFERENCE_FILES_PATH"
 
@@ -234,14 +249,16 @@ setDifferenceBteenFiles() {
     touch "$diffFilePath"
     git show "$2":"$line" >"$fileFromBPath"
 
-    echo -e "UPLOAD FILE: \t\t" "$fileFromBPath"
-    echo -e "CREATE DIFF FILE: \t" "$diffFilePath"
+    {
+      echo -e ">>>>>>>>>>>>>>\tUPLOAD FILE: \t\t" "$fileFromBPath"
+      echo -e ">>>>>>>>>>>>>>\tCREATE DIFF FILE: \t" "$diffFilePath"
+    } >>$GIT_DIFF_BRANCH_PATH
 
     # Concatenate all information on one string with separator '|'
     fileInfo="$fileName|$fileFromBPath|$diffFileName|$diffFilePath"
     # Store the information above into string
     filesList[${counter}]=$fileInfo
-    echo -e "\n"
+    echo -e "\n" >>$GIT_DIFF_BRANCH_PATH
     counter=$((counter + 1))
   done <"$DIF_FILE"
   printArrayOfFileInfo "${filesList[@]}"
@@ -249,37 +266,79 @@ setDifferenceBteenFiles() {
 }
 
 setFilesDifference() {
-  git diff "$branchA" "$branchB" | ./scripts/gitdiff-with-line >"$DIFFERENCE_PATH"
+  {
+    git diff "$branchA" "$branchB" | ./scripts/gitdiff-with-line >"$DIFFERENCE_PATH"
+  } || {
+    echo "Error: git diff $branchA $branchB having a issue, please confirm that the branches are correct"
+  }
 }
 
+#Function to create the different main folders
 createDiffFolder() {
+  local deleteDir
+  local createDirFile
+  local createLogPath
   if [ -d "$LOG_PATH" ]; then
     rm -rf "$DIR"
+    deleteDir="The folder $DIR has been deleted"
   fi
 
   mkdir -p "$DIR_FILES"
+  createDirFile="The folder $DIR_FILES has been created"
   mkdir -p "$LOG_PATH"
+  createLogPath="The folder $LOG_PATH has been created"
+
+  touch $GIT_DIFF_BRANCH_PATH
+  {
+    echo "$deleteDir"
+    echo "$createDirFile"
+    echo "$createLogPath"
+  } >>"$GIT_DIFF_BRANCH_PATH"
 }
 
 help() {
-  echo ./gitdiff-branch-data '{ branch to compare A }' '{branch to compareB}'
+  echo ./gitdiff-branch-data '{ branch to be compare A }' '{branch to compareB}'
   exit 0
 }
 
+welcome() {
+  echo -e "Welcome to Git Diff Branches this script will take two branches collect the differences between the to branches."
+  echo -e "The script will create 'diff-project' folder and add the information of each modified file into a file extension '.diff.txt'.\n"
+}
+
 main() {
+  welcome
   createDiffFolder
   local branchA=$1
   local branchB=$2
 
+  if [[ $1 == "--help" ]]; then
+      help
+    fi
+
+  # asking for the name of the branches to be compared
+  if [[ -z "$branchA" ]]; then
+    read -rp 'What is the name of the branch A ?: ' branchA
+  elif [[ -z "$branchB" ]]; then
+    read -rp 'What is the name of the branch B ?: ' branchB
+  fi
+
   echo "Parameter #1 is $branchA"
   echo "Parameter #2 is $branchB"
+
+  {
+    echo "Parameter #1 is $branchA"
+    echo "Parameter #2 is $branchB"
+  } >>$GIT_DIFF_BRANCH_PATH
+
+  sleep 1
 
   if [[ -z "$branchA" || -z "$branchB" ]]; then
     help
   fi
 
   setFilesDifference "$branchA" "$branchB"
-  setDifferenceBteenFiles "$branchA" "$branchB"
+  setDifferenceBetweenFiles "$branchA" "$branchB"
 }
 
 main "$1" "$2"
