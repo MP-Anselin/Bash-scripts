@@ -268,7 +268,7 @@ setDifferenceBetweenFiles() {
 
 setFilesDifference() {
   {
-    git diff "$branchA" "$branchB" | ./scripts/gitdiff-with-line >"$DIFFERENCE_PATH"
+    git diff "$branchA" --   "$branchB" | ./scripts/gitdiff-with-line >"$DIFFERENCE_PATH"
   } || {
     echo "Error: git diff $branchA $branchB having a issue, please confirm that the branches are correct"
   }
@@ -312,33 +312,38 @@ main() {
   createDiffFolder
   local branchA=$1
   local branchB=$2
+  local folderFilesPath=$3
 
   if [[ $1 == "--help" ]]; then
-      help
-    fi
+    help
+  fi
 
   # asking for the name of the branches to be compared
   if [[ -z "$branchA" ]]; then
     read -rp 'What is the name of the branch A ?: ' branchA
   elif [[ -z "$branchB" ]]; then
     read -rp 'What is the name of the branch B ?: ' branchB
+  elif [[ -z "$folderFilesPath" ]]; then
+    read -rp 'What is the name of the folder where there is the files ?: ' folderFilesPath
   fi
 
   echo "Parameter #1 is $branchA"
   echo "Parameter #2 is $branchB"
+  echo "Parameter #3 is $folderFilesPath"
 
   {
     echo "Parameter #1 is $branchA"
     echo "Parameter #2 is $branchB"
+    echo "Parameter #3 is $folderFilesPath"
   } >>$GIT_DIFF_BRANCH_PATH
 
   sleep 1
 
-  if [[ -z "$branchA" || -z "$branchB" ]]; then
+  if [[ -z "$branchA" || -z "$branchB" || -z "$folderFilesPath" ]]; then
     help
   fi
 
-  setFilesDifference "$branchA" "$branchB"
+  setFilesDifference "$branchA" "$branchB" "$folderFilesPath"
   setDifferenceBetweenFiles "$branchA" "$branchB"
 }
 
