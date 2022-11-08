@@ -18,8 +18,17 @@ DIFFERENCE_FILES_PATH="$LOG_PATH"/"$DIFFERENCE_FILES"
 NEW_DELETE_FILES='addDelete-files.log'
 NEW_DELETE_FILES_PATH="$LOG_PATH"/"$NEW_DELETE_FILES"
 
-MERGE_FILE='merge-file-diff.txt'
+MERGE_FILE='git-diff-merge-file-mod.txt'
 MERGE_PATH="$LOG_PATH"/"$MERGE_FILE"
+
+displayArray() {
+  local arrayInfo=("$@")
+
+  for index in "${!arrayInfo[@]}"; do
+    echo -e "ARRAY[$index] ${arrayInfo[$index]}\n'"
+  done
+  echo -e "LENGTH OF THE ARRAY ${#arrayInfo[@]}\n"
+}
 
 #Function to check if the line receive as param content the git annotation of differences:
 #@@ -
@@ -70,6 +79,33 @@ lineStartByHeaderHash() {
   return 1
 }
 
+lineContentGitAnnotationAdd() {
+  local line=$1
+  local prvLine=$2
+  SUB='--- /dev/null'
+  SUB2='+++ /dev/null'
+  if [[ ${#line} == 13 ]] && [[ "$line" == "$SUB"* || "$line" == "$SUB2"* ]]; then
+    return 0
+  elif [[ ${#prvLine} == 13 ]] && [[ "$prvLine" == "$SUB"* || "$prvLine" == "$SUB2"* ]]; then
+    return 2
+  else
+    return 1
+  fi
+}
+
+lineFileIsBranchAOrB() {
+  local fileNameParse=$1
+  SUB='--- a'
+  SUB2='+++ b'
+  if [[ ${#fileNameParse} == 5 ]] && [[ "$fileNameParse" == "$SUB"* ]]; then
+    return 0
+  elif [[ ${#fileNameParse} == 5 ]] && [[ "$fileNameParse" == "$SUB2"* ]]; then
+    return 2
+  else
+    return 1
+  fi
+}
+
 #Function browser a map which content all the information of the file to be compare
 getArrayFileInfo() {
   local num=$4
@@ -89,26 +125,18 @@ getArrayFileInfo() {
 
 #Function get the line has changed and add into .diff file
 getModifFromFile() {
+  local -n _fileContent=$1
+  local line=$2
   local specialChar='s@^[^0-9]*\([0-9]\+\).*@\1@'
   local linePosition=$(echo "$line" | sed "$specialChar")
   local index=0
-  declare -a fileChangedData
-
-  echo "LINE => $line"
-
-  IFS=''
-  while read lineChangeData; do
-    fileChangedData[$index]="$lineChangeData"
-    index=$(("$index" + 1))
-  done <"$fileExtractDataPath"
 
   local countOfLine=0
-  local length=${#fileChangedData[@]}
+  local length=${#_fileContent[@]}
   local firstHash=0
-  local endPosition=0
 
   for ((l = "$linePosition" - 1; l < "$length"; )); do
-    local lineChangedData=${fileChangedData[l]}
+    local lineChangedData=${_fileContent[l]}
 
     if (("$firstHash" < 2)) && lineStartByHeaderHash "$lineChangedData"; then
       firstHash=$((firstHash + 1))
@@ -117,100 +145,147 @@ getModifFromFile() {
     if (("$firstHash" == 0)); then
       l=$((l - 1))
     elif (("$firstHash" == 2)); then
-      endPosition=$((l))
       break
     else
-      echo "$lineChangedData" >>"$diffFilePath"
       echo "$lineChangedData" >>"$MERGE_PATH"
       l=$((l + 1))
     fi
     countOfLine=$((countOfLine + 1))
-    endPosition=$((l))
   done
-  if (("$endPosition" == "$length")); then
+
+  echo "linePosition: $((linePosition - 1)) length: $length end L: $l"
+  if (("$l" == "$length")); then
+    read -p 'isEnd ?: ' isEnd
     return 0
   else
     return 1
   fi
 }
 
-#Function which will browse /log/differences.log and extract the  information
-executeAlgorithm2() {
-  local index=0
-  declare -a differencesFileData
+printLineInfo() {
+  local args=("$@")
 
-  IFS=''
-  while read line; do
-    differencesFileData[$index]="$line"
-    index=$(("$index" + 1))
-  done <$DIFFERENCE_PATH
+  local linePosition=${args[0]}
+  local line=${args[1]}
+  local previousLine=${args[2]}
+  local endOfFile=false
+  local nextLineIsDiff=${args[4]}
+  local fileExtractDataPath=${args[5]}
+
+  if [[ ${args[3]} == 0 ]]; then
+    endOfFile=true
+  fi
+  {
+    echo -e "\n\n---------------\tPOS [>$linePosition<]"
+    echo -e "---------------\tMAIN LINE [[>$line<]]"
+    echo -e "---------------\tMAIN LINE LENGTH [[>${#line}<]]"
+    echo -e "---------------\tPREVIOUS LINE [[>$previousLine<]]"
+    echo -e "---------------\tIS_END_OF_FILE [>$endOfFile<]"
+    echo -e "---------------\tNEST_LINE_IS_DIFF [>$nextLineIsDiff<]"
+    echo -e "---------------\tFILE_TO_EXTRACT_DATA [>$fileExtractDataPath<]"
+  }
+  #    } >>"$GIT_DIFF_BRANCH_PATH"
+}
+
+getFileContentFromBBranch() {
+  local bBranch=$1
+  local filePath=$2
+  local FileContentFromBBranch=$(git show "$bBranch:$filePath")
+  echo "$FileContentFromBBranch"
+}
+
+mainLoop() {
+  local -n _addFilesArray=$1
+  local -n _modFilesArray=$2
+  local -n _differencesFileData=$3
+
+  #  echo "--------------------------"
+  #  displayArray "${_addFilesArray[@]}"
+  #  displayArray "${_modFilesArray[@]}"
+  #  echo "--------------------------"
 
   local countOfLine=0
   local nextLineIsDiff=false
   local fileNameParse=''
-  local length=${#differencesFileData[@]}
+  local length=${#_differencesFileData[@]}
   local diffFilePosName=3
   local FileExtractDatPos=1
   local passOnce=1
   local endOfFile=1
+  local fileExtractDataPath=''
+  declare -a fileContent
 
-  fileExtractDataPath=''
   for ((dl = 0; dl < "$length"; dl++)); do
-    line=${differencesFileData[dl]}
-    local previousLine=${differencesFileData[$((dl - 1))]}
-    {
-      echo -e "\n\n---------------\tPOS [ $((dl + 1)) ]"
-      echo -e "---------------\tMAIN LINE [[ $line ]]"
-      echo -e "---------------\tPREVIOUS LINE [[ $previousLine ]]"
-      echo -e "---------------\tIS_END_OF_FILE [ $endOfFile ]"
-      echo -e "---------------\tNEST_LINE_IS_DIFF [ $nextLineIsDiff ]"
-      echo -e "---------------\tFILE_TO_EXTRACT_DATA [ $fileExtractDataPath ]"
-    } >>$GIT_DIFF_BRANCH_PATH
+    line=${_differencesFileData[dl]}
+    local previousLine=${_differencesFileData[$((dl - 1))]}
+    printLineInfo $((dl + 1)) "$line" "$previousLine" "$endOfFile" "$nextLineIsDiff" "$fileExtractDataPath"
 
+    #____________________________________________________________________________________________________________________#
+
+    lineContentGitAnnotationAdd "$line" "$previousLine"
+    local isGitAnnotationAdd=$?
     local isGitAnnotation=1
+    if (("$isGitAnnotationAdd" == 1)); then
+      lineContentGitAnnotation "$line"
+      local isGitAnnotation=$?
+    fi
+
     local isTeamAnnotation=1
-    local isPrvGitAnnotation=1
+    lineContentGitAnnotation "$previousLine"
+    local isPrvGitAnnotation=$?
     local isPrvTeamAnnotation=1
     local isContentFileName=1
 
-    lineContentGitAnnotation "$line"
-    isGitAnnotation=$?
-    if (("$isGitAnnotation" == 1)); then
+    if ((endOfFile == 1)) && (("$isGitAnnotation" == 1)); then
       lineTeamAnnotationHash "$line"
       isTeamAnnotation=$?
     fi
-
-    lineContentGitAnnotation "$previousLine"
-    isPrvGitAnnotation=$?
-    if (("$isPrvGitAnnotation" == 1)); then
+    if ((endOfFile == 1)) && (("$isPrvGitAnnotation" == 1)); then
       lineTeamAnnotationHash "$previousLine"
       isPrvTeamAnnotation=$?
     fi
-
     if ( (("$passOnce" == 1)) || (("$endOfFile" == 0))); then
       lineContentFileName "$line"
       isContentFileName=$?
     fi
+    echo -e "--------------\tisGitAnnotation: $isGitAnnotation \tisTeamAnnotation: $isTeamAnnotation \tisPrvGitAnnotation: $isPrvGitAnnotation \tisPrvTeamAnnotation: $isPrvTeamAnnotation \tisContentFileName: $isContentFileName \tisGitAnnotationAdd: $isGitAnnotationAdd"
+    #____________________________________________________________________________________________________________________#
 
-    echo -e "--------------\tisGitAnnotation: $isGitAnnotation \tisTeamAnnotation: $isTeamAnnotation \tisPrvGitAnnotation: $isPrvGitAnnotation \tisPrvTeamAnnotation: $isPrvTeamAnnotation \tisContentFileName: $isContentFileName" >>$GIT_DIFF_BRANCH_PATH
-    if (("$isContentFileName" == 0)); then
+    if (("$isContentFileName" == 0)) || (("$isGitAnnotationAdd" != 1)); then
       echo "I PASS HERE"
-      local fileNameParse=$previousLine
+      local fileNameParse
+
+      if (("$isGitAnnotationAdd" == 0)); then
+        fileNameParse=$previousLine
+      elif (("$isGitAnnotationAdd" == 2)); then
+        fileNameParse=$line
+      else
+        fileNameParse=$line
+      fi
+
       fileName="$(basename -- "$fileNameParse")"
-      diffFilePath=$(getArrayFileInfo "${filesList[@]}" "$fileName" "$diffFilePosName")
-      fileExtractDataPath=$(getArrayFileInfo "${filesList[@]}" "$fileName" "$FileExtractDatPos")
-      echo "fileName > $fileName"
-      echo "fileName > $diffFilePosName"
-      echo "diffFilePath > $diffFilePath"
-      echo "fileExtractDataPath > $fileExtractDataPath"
-      {
-        echo -e "--------------\tdiffFilePath: " "$diffFilePath"
-        echo -e "--------------\tfileExtractDataPath: " "$fileExtractDataPath"
-      } >>$GIT_DIFF_BRANCH_PATH
+      filePath="${fileNameParse:6}"
+      fileExtractDataPath="$filePath"
+      echo "fileNameParse => '$fileNameParse'"
+      echo "fileName => $fileName"
+      echo "filePath => $filePath"
+
+      lineFileIsBranchAOrB fileNameParse
+      local branchNum=$?
+      if [[ "$branchNum" ==  0 ]]
+
+      local content=$(git show "$branchB:$filePath")
+      index=0
+      while read line; do
+        fileContent[$index]="$line"
+        index=$(("$index" + 1))
+      done < <(git show "$branchB:$filePath")
+
       endOfFile=1
       passOnce=0
+      read -p 'goOn ?: ' goOn
     elif $nextLineIsDiff && (("$endOfFile" == 1)); then
-      getModifFromFile
+      getModifFromFile fileContent "$line"
       endOfFile=$?
       nextLineIsDiff=false
     elif (("$isGitAnnotation" == 0)) ||
@@ -220,20 +295,9 @@ executeAlgorithm2() {
       nextLineIsDiff=false
     fi
 
-    read -p 'goOn ?: ' goOn
     countOfLine=$((countOfLine + 1))
   done
-  echo -e "END OF EXTRACTOR\n" >>$GIT_DIFF_BRANCH_PATH
-}
 
-displayArray() {
-  local arrayInfo=("$@")
-  local length=${#arrayInfo[@]}
-
-  for ((counter = 0; counter < "$length"; counter++)); do
-    printf 'ARRAY[%d] %s\n' "$counter" "${arrayInfo[counter]}"
-  done
-  printf "\n"
 }
 
 getAddFilesArray() {
@@ -244,96 +308,6 @@ getAddFilesArray() {
 getModifFilesArray() {
   modFilesString=$(git diff --name-only "$branchA" "$branchB" -- "$folderFilesPath" | tr "\n" " ")
   echo "$modFilesString"
-}
-
-printLineInfo() {
-  local args=("$@")
-
-  displayArray "${args[@]}"
-  local linePosition=${args[0]}
-  local line=${args[1]}
-  local previousLine=${args[2]}
-  local endOfFile=false
-  local nextLineIsDiff=${args[4]}
-  local fileExtractDataPath=${args[5]}
-
-    if [[ ${args[3]} == 0 ]]; then
-      endOfFile=true
-    fi
-  {
-    echo -e "\n\n---------------\tPOS [ $linePosition ]"
-    echo -e "---------------\tMAIN LINE [[ $line ]]"
-    echo -e "---------------\tPREVIOUS LINE [[ $previousLine ]]"
-    echo -e "---------------\tIS_END_OF_FILE [ $endOfFile  ]"
-    echo -e "---------------\tNEST_LINE_IS_DIFF [ $nextLineIsDiff ]"
-    echo -e "---------------\tFILE_TO_EXTRACT_DATA [ $fileExtractDataPath ]"
-  }
-  #    } >>"$GIT_DIFF_BRANCH_PATH"
-}
-
-mainLoop() {
-  local -n _addFilesArray=$1
-  local -n _modFilesArray=$2
-  local -n _differencesFileData=$3
-
-  local countOfLine=0
-  local nextLineIsDiff=false
-  local fileNameParse=''
-  local length=${#differencesFileData[@]}
-  local diffFilePosName=3
-  local FileExtractDatPos=1
-  local passOnce=1
-  local endOfFile=1
-  local fileExtractDataPath=''
-
-  for ((dl = 0; dl < "$length"; dl++)); do
-    line=${differencesFileData[dl]}
-    local previousLine=${differencesFileData[$((dl - 1))]}
-    printLineInfo $((dl + 1)) "$line" "$previousLine" "$endOfFile" "$nextLineIsDiff" "$fileExtractDataPath"
-
-    #____________________________________________________________________________________________________________________#
-    lineContentGitAnnotation "$line"
-    local isGitAnnotation=$?
-    local isTeamAnnotation=1
-    lineContentGitAnnotation "$previousLine"
-    local isPrvGitAnnotation=$?
-    local isPrvTeamAnnotation=1
-    local isContentFileName=1
-
-    if (("$isGitAnnotation" == 1)); then
-      lineTeamAnnotationHash "$line"
-      isTeamAnnotation=$?
-    fi
-    if (("$isPrvGitAnnotation" == 1)); then
-      lineTeamAnnotationHash "$previousLine"
-      isPrvTeamAnnotation=$?
-    fi
-    if ( (("$passOnce" == 1)) || (("$endOfFile" == 0))); then
-      lineContentFileName "$line"
-      isContentFileName=$?
-    fi
-    echo -e "--------------\tisGitAnnotation: $isGitAnnotation \tisTeamAnnotation: $isTeamAnnotation \tisPrvGitAnnotation: $isPrvGitAnnotation \tisPrvTeamAnnotation: $isPrvTeamAnnotation \tisContentFileName: $isContentFileName" >>$GIT_DIFF_BRANCH_PATH
-    #____________________________________________________________________________________________________________________#
-
-    if (("$isContentFileName" == 0)); then
-      echo "I PASS HERE"
-      local fileNameParse=$line
-      fileName="$(basename -- "$fileNameParse")"
-      filePath="${fileNameParse:6}"
-      echo "fileNameParse => '$fileNameParse'"
-      echo "fileName => $fileName"
-      echo "filePath => $filePath"
-
-      #HERE MAKE A GIT SHOW TO GET THE INFORMATION FROM THE FILE
-
-      endOfFile=1
-      passOnce=0
-    fi
-
-    countOfLine=$((countOfLine + 1))
-    read -p 'goOn ?: ' goOn
-  done
-
 }
 
 executeAlgorithm() {
