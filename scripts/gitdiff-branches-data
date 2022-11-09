@@ -98,14 +98,13 @@ transferAllFileContent() {
   local countOfLine=0
   local length=${#_fileContent[@]}
 
-  for ((l = 0; l <= "$length"; l++)); do
+  for ((l = 0; l < "$length"; l++)); do
     local lineChangedData=${_fileContent[l]}
     echo "$lineChangedData" >>"$MERGE_PATH"
-    #    echo "MY LINE  $lineChangedData"
     countOfLine=$((countOfLine + 1))
   done
 
-  echo "length: $length end L: $l">>"$GIT_DIFF_BRANCH_PATH"
+  echo "length: $length end L: $l" >>"$GIT_DIFF_BRANCH_PATH"
 }
 
 #Function get the line has changed and add into .diff file
@@ -141,7 +140,7 @@ getModifFromFile() {
     countOfLine=$((countOfLine + 1))
   done
 
-  echo "linePosition: $((linePosition - 1)) length: $length end L: $l">>"$GIT_DIFF_BRANCH_PATH"
+  echo "linePosition: $((linePosition - 1)) length: $length end L: $l" >>"$GIT_DIFF_BRANCH_PATH"
   if [[ $l -eq $length ]]; then
     return 0
   fi
@@ -218,7 +217,7 @@ mainLoop() {
       lineContentFileName "$line"
       isContentFileName=$?
     fi
-    echo -e "--------------\tisGitAnnotation: $isGitAnnotation \tisTeamAnnotation: $isTeamAnnotation \tisPrvGitAnnotation: $isPrvGitAnnotation \tisPrvTeamAnnotation: $isPrvTeamAnnotation \tisContentFileName: $isContentFileName \tisGitAnnotationAdd: $isGitAnnotationAdd isNewFile $isNewFile">>"$GIT_DIFF_BRANCH_PATH"
+    echo -e "--------------\tisGitAnnotation: $isGitAnnotation \tisTeamAnnotation: $isTeamAnnotation \tisPrvGitAnnotation: $isPrvGitAnnotation \tisPrvTeamAnnotation: $isPrvTeamAnnotation \tisContentFileName: $isContentFileName \tisGitAnnotationAdd: $isGitAnnotationAdd isNewFile $isNewFile" >>"$GIT_DIFF_BRANCH_PATH"
     #____________________________________________________________________________________________________________________#
 
     if [[ $isContentFileName -eq 0 && $isGitAnnotationAdd -eq 1 ]] || [[ $isGitAnnotationAdd -ne 1 && $isNewFile -eq 1 ]]; then
@@ -233,6 +232,7 @@ mainLoop() {
       filePath="${fileNameParse:6}"
       fileExtractDataPath="$filePath"
 
+
       local branchToExtractFileData=$branchB
       if [[ $isGitAnnotationAdd -eq 2 ]]; then
         branchToExtractFileData=$branchA
@@ -241,7 +241,6 @@ mainLoop() {
       git show "$branchToExtractFileData:$filePath" >"$fileName"
       index=0
       fileContent=()
-
       while read line || [ -n "$line" ]; do
         if lineEndByHeaderNewLineHash "$line"; then
           IFS=$'\n'$'\r' read -a cutLine <<<"$line"
@@ -259,10 +258,11 @@ mainLoop() {
       if [[ $isGitAnnotationAdd -ne 1 ]]; then
         isNewFile=0
       fi
+      read -p "$fileExtractDataPath  ": testInfo
     elif $nextLineIsDiff && [[ $endOfFile -eq 1 ]]; then
       if [[ $isNewFile -eq 0 ]]; then
         transferAllFileContent fileContent
-        isNewFile=2
+        isNewFile=1
         endOfFile=0
       else
         getModifFromFile fileContent "$line"
@@ -281,14 +281,22 @@ mainLoop() {
 
 }
 
-getAddFilesArray() {
-  addFilesString=$(git diff --name-only --diff-filter=AD "$branchA" "$branchB" -- "$folderFilesPath" | tr "\n" " ")
-  echo "$addFilesString"
-}
+#getAddFilesArray() {
+#  addFilesString=$(git diff --name-only --diff-filter=AD "$branchA" "$branchB" -- "$folderFilesPath" | tr "\n" " ")
+#  echo "$addFilesString"
+#}
+#
+#getModifFilesArray() {
+#  modFilesString=$(git diff --name-only "$branchA" "$branchB" -- "$folderFilesPath" | tr "\n" " ")
+#  echo "$modFilesString"
+#}
 
-getModifFilesArray() {
-  modFilesString=$(git diff --name-only "$branchA" "$branchB" -- "$folderFilesPath" | tr "\n" " ")
-  echo "$modFilesString"
+setFilesDifference() {
+  {
+    git diff "$branchA" "$branchB"  -- "$folderFilesPath" -- '*.txt' | ./scripts/gitdiff-with-line >"$DIFFERENCE_PATH"
+  } || {
+    echo "Error: git diff $branchA $branchB having a issue, please confirm that the branches are correct"
+  }
 }
 
 executeAlgorithm() {
@@ -303,14 +311,6 @@ executeAlgorithm() {
   done <$DIFFERENCE_PATH
 
   mainLoop differencesFileData
-}
-
-setFilesDifference() {
-  {
-    git diff "$branchA" "$branchB" -- "$folderFilesPath" -- '*.txt' | ./scripts/gitdiff-with-line >"$DIFFERENCE_PATH"
-  } || {
-    echo "Error: git diff $branchA $branchB having a issue, please confirm that the branches are correct"
-  }
 }
 
 #Function to create the different main folders
