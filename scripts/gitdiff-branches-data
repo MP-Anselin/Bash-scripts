@@ -3,7 +3,6 @@
 ## Static global with the path ot the subfolder diff-project
 LOG_PATH='diff-project/log'
 DIR='diff-project'
-DIR_FILES='diff-project/files'
 
 GIT_DIFF_BRANCHES='git-diff-branches.log'
 GIT_DIFF_BRANCH_PATH="$LOG_PATH"/"$GIT_DIFF_BRANCHES"
@@ -12,7 +11,7 @@ DIFFERENCE='differences.log'
 DIFFERENCE_PATH="$LOG_PATH"/"$DIFFERENCE"
 
 MERGE_FILE='git-diff-merge-file-mod.txt'
-MERGE_PATH="$LOG_PATH"/"$MERGE_FILE"
+MERGE_PATH="$DIR"/"$MERGE_FILE"
 
 #Function to check if the line receive as param content the git annotation of differences:
 #@@ -
@@ -173,6 +172,7 @@ printLineInfo() {
 
 mainLoop() {
   local -n _differencesFileData=$1
+  local folderFilesPath=$2
 
   local countOfLine=0
   local nextLineIsDiff=false
@@ -230,35 +230,39 @@ mainLoop() {
 
       fileName="$(basename -- "$fileNameParse")"
       filePath="${fileNameParse:6}"
+      local folderName=${filePath%/*}
       fileExtractDataPath="$filePath"
 
-
-      local branchToExtractFileData=$branchB
-      if [[ $isGitAnnotationAdd -eq 2 ]]; then
-        branchToExtractFileData=$branchA
-      fi
-
-      git show "$branchToExtractFileData:$filePath" >"$fileName"
-      index=0
-      fileContent=()
-      while read line || [ -n "$line" ]; do
-        if lineEndByHeaderNewLineHash "$line"; then
-          IFS=$'\n'$'\r' read -a cutLine <<<"$line"
-          fileContent[$index]=${cutLine[0]}
-          index=$(("$index" + 1))
-          fileContent[$index]=${cutLine[1]}
-        else
-          fileContent[$index]="$line"
+      if [[ "$folderName" != "$folderFilesPath" ]]; then
+        :
+      else
+        local branchToExtractFileData=$branchB
+        if [[ $isGitAnnotationAdd -eq 2 ]]; then
+          branchToExtractFileData=$branchA
         fi
-        index=$(("$index" + 1))
-      done < <(git show "$branchToExtractFileData:$filePath")
 
-      endOfFile=1
-      passOnce=0
-      if [[ $isGitAnnotationAdd -ne 1 ]]; then
-        isNewFile=0
+        index=0
+        fileContent=()
+        while read line || [ -n "$line" ]; do
+          if lineEndByHeaderNewLineHash "$line"; then
+            IFS=$'\n'$'\r' read -a cutLine <<<"$line"
+            fileContent[$index]=${cutLine[0]}
+            index=$(("$index" + 1))
+            fileContent[$index]=${cutLine[1]}
+          else
+            fileContent[$index]="$line"
+          fi
+          index=$(("$index" + 1))
+        done < <(git show "$branchToExtractFileData:$filePath")
+
+        endOfFile=1
+        passOnce=0
+        if [[ $isGitAnnotationAdd -ne 1 ]]; then
+          isNewFile=0
+        fi
+        echo "Parse file: $fileExtractDataPath">>"$GIT_DIFF_BRANCH_PATH"
+        echo "Parse file: $fileExtractDataPath"
       fi
-      read -p "$fileExtractDataPath  ": testInfo
     elif $nextLineIsDiff && [[ $endOfFile -eq 1 ]]; then
       if [[ $isNewFile -eq 0 ]]; then
         transferAllFileContent fileContent
@@ -281,19 +285,9 @@ mainLoop() {
 
 }
 
-#getAddFilesArray() {
-#  addFilesString=$(git diff --name-only --diff-filter=AD "$branchA" "$branchB" -- "$folderFilesPath" | tr "\n" " ")
-#  echo "$addFilesString"
-#}
-#
-#getModifFilesArray() {
-#  modFilesString=$(git diff --name-only "$branchA" "$branchB" -- "$folderFilesPath" | tr "\n" " ")
-#  echo "$modFilesString"
-#}
-
 setFilesDifference() {
   {
-    git diff "$branchA" "$branchB"  -- "$folderFilesPath" -- '*.txt' | ./scripts/gitdiff-with-line >"$DIFFERENCE_PATH"
+    git diff "$branchA" "$branchB" -- "$folderFilesPath" -- '*.txt' | ./scripts/gitdiff-with-line >"$DIFFERENCE_PATH"
   } || {
     echo "Error: git diff $branchA $branchB having a issue, please confirm that the branches are correct"
   }
@@ -310,7 +304,7 @@ executeAlgorithm() {
     index=$(("$index" + 1))
   done <$DIFFERENCE_PATH
 
-  mainLoop differencesFileData
+  mainLoop differencesFileData "$folderFilesPath"
 }
 
 #Function to create the different main folders
@@ -323,8 +317,6 @@ createDiffFolder() {
     deleteDir="The folder $DIR has been deleted"
   fi
 
-  mkdir -p "$DIR_FILES"
-  createDirFile="The folder $DIR_FILES has been created"
   mkdir -p "$LOG_PATH"
   createLogPath="The folder $LOG_PATH has been created"
   touch "$MERGE_PATH"
