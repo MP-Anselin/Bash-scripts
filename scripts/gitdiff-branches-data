@@ -73,7 +73,7 @@ lineContentFileName() {
 lineStartByHeaderHash() {
   local line=$1
   SUB='##'
-  if [[ ${#line} == 2 ]] && [[ "$line" == "$SUB"* ]]; then
+  if [[ ${#line} -eq 2 ]] && [[ "$line" == "$SUB"* ]]; then
     return 0
   fi
   return 1
@@ -84,9 +84,9 @@ lineContentGitAnnotationAdd() {
   local prvLine=$2
   SUB='--- /dev/null'
   SUB2='+++ /dev/null'
-  if [[ ${#line} == 13 ]] && [[ "$line" == "$SUB"* || "$line" == "$SUB2"* ]]; then
+  if [[ ${#line} -eq 13 ]] && [[ "$line" == "$SUB"* || "$line" == "$SUB2"* ]]; then
     return 0
-  elif [[ ${#prvLine} == 13 ]] && [[ "$prvLine" == "$SUB"* || "$prvLine" == "$SUB2"* ]]; then
+  elif [[ ${#prvLine} -eq 13 ]] && [[ "$prvLine" == "$SUB"* || "$prvLine" == "$SUB2"* ]]; then
     return 2
   else
     return 1
@@ -97,9 +97,9 @@ lineFileIsBranchAOrB() {
   local fileNameParse=$1
   SUB='--- a'
   SUB2='+++ b'
-  if [[ ${#fileNameParse} == 5 ]] && [[ "$fileNameParse" == "$SUB"* ]]; then
+  if [[ ${#fileNameParse} -eq 5 ]] && [[ "$fileNameParse" == "$SUB"* ]]; then
     return 0
-  elif [[ ${#fileNameParse} == 5 ]] && [[ "$fileNameParse" == "$SUB2"* ]]; then
+  elif [[ ${#fileNameParse} -eq 5 ]] && [[ "$fileNameParse" == "$SUB2"* ]]; then
     return 2
   else
     return 1
@@ -128,23 +128,27 @@ getModifFromFile() {
   local -n _fileContent=$1
   local line=$2
   local specialChar='s@^[^0-9]*\([0-9]\+\).*@\1@'
-  local linePosition=$(echo "$line" | sed "$specialChar")
-  local index=0
+  if [[ $line == "" ]]; then
+    local linePosition=1
+  else
+    local linePosition=$(echo "$line" | sed "$specialChar")
+  fi
 
   local countOfLine=0
   local length=${#_fileContent[@]}
   local firstHash=0
 
+  echo "LINE POSITION +> $linePosition"
   for ((l = "$linePosition" - 1; l < "$length"; )); do
     local lineChangedData=${_fileContent[l]}
 
-    if (("$firstHash" < 2)) && lineStartByHeaderHash "$lineChangedData"; then
+    if [[ $firstHash -lt 2 ]] && lineStartByHeaderHash "$lineChangedData"; then
       firstHash=$((firstHash + 1))
     fi
 
-    if (("$firstHash" == 0)); then
+    if [[ $firstHash -eq 0 ]]; then
       l=$((l - 1))
-    elif (("$firstHash" == 2)); then
+    elif [[ $firstHash -eq 2 ]]; then
       break
     else
       echo "$lineChangedData" >>"$MERGE_PATH"
@@ -154,12 +158,11 @@ getModifFromFile() {
   done
 
   echo "linePosition: $((linePosition - 1)) length: $length end L: $l"
-  if (("$l" == "$length")); then
+  if [[ $l -eq $length ]]; then
     read -p 'isEnd ?: ' isEnd
     return 0
-  else
-    return 1
   fi
+  return 1
 }
 
 printLineInfo() {
@@ -190,8 +193,8 @@ printLineInfo() {
 getFileContentFromBBranch() {
   local bBranch=$1
   local filePath=$2
-  local FileContentFromBBranch=$(git show "$bBranch:$filePath")
-  echo "$FileContentFromBBranch"
+  local fileContentFromBBranch=$(git show "$bBranch:$filePath")
+  echo "$fileContentFromBBranch"
 }
 
 mainLoop() {
@@ -213,6 +216,7 @@ mainLoop() {
   local passOnce=1
   local endOfFile=1
   local fileExtractDataPath=''
+  local isNewFile=1
   declare -a fileContent
 
   for ((dl = 0; dl < "$length"; dl++)); do
@@ -225,7 +229,7 @@ mainLoop() {
     lineContentGitAnnotationAdd "$line" "$previousLine"
     local isGitAnnotationAdd=$?
     local isGitAnnotation=1
-    if (("$isGitAnnotationAdd" == 1)); then
+    if [[ $isGitAnnotationAdd -eq 1 ]]; then
       lineContentGitAnnotation "$line"
       local isGitAnnotation=$?
     fi
@@ -236,22 +240,22 @@ mainLoop() {
     local isPrvTeamAnnotation=1
     local isContentFileName=1
 
-    if ((endOfFile == 1)) && (("$isGitAnnotation" == 1)); then
+    if [[ endOfFile -eq 1 ]] && [[ "$isGitAnnotation" == 1 ]]; then
       lineTeamAnnotationHash "$line"
       isTeamAnnotation=$?
     fi
-    if ((endOfFile == 1)) && (("$isPrvGitAnnotation" == 1)); then
+    if [[ endOfFile -eq 1 ]] && [[ "$isPrvGitAnnotation" == 1 ]]; then
       lineTeamAnnotationHash "$previousLine"
       isPrvTeamAnnotation=$?
     fi
-    if ( (("$passOnce" == 1)) || (("$endOfFile" == 0))); then
+    if [[ $passOnce -eq 1 ]] || [[ "$endOfFile" == 0 ]]; then
       lineContentFileName "$line"
       isContentFileName=$?
     fi
     echo -e "--------------\tisGitAnnotation: $isGitAnnotation \tisTeamAnnotation: $isTeamAnnotation \tisPrvGitAnnotation: $isPrvGitAnnotation \tisPrvTeamAnnotation: $isPrvTeamAnnotation \tisContentFileName: $isContentFileName \tisGitAnnotationAdd: $isGitAnnotationAdd"
     #____________________________________________________________________________________________________________________#
 
-    if (("$isContentFileName" == 0)) || (("$isGitAnnotationAdd" != 1)); then
+    if [[ $isContentFileName -eq 0 && $isGitAnnotationAdd -eq 1 ]] || [[ $isGitAnnotationAdd -ne 1 && $isNewFile -eq 1 ]]; then
       echo "I PASS HERE"
       local fileNameParse
 
@@ -272,24 +276,37 @@ mainLoop() {
 
       lineFileIsBranchAOrB fileNameParse
       local branchNum=$?
-      if [[ "$branchNum" ==  0 ]]
+      local branchToExtractFileData=$branchA
+      if [[ "$branchNum" == 2 ]]; then
+        branchToExtractFileData=$branchB
+      fi
+      echo "branchToExtractFileData => $branchToExtractFileData"
 
-      local content=$(git show "$branchB:$filePath")
       index=0
+      fileContent=()
       while read line; do
         fileContent[$index]="$line"
         index=$(("$index" + 1))
-      done < <(git show "$branchB:$filePath")
+      done < <(git show "$branchToExtractFileData:$filePath")
 
       endOfFile=1
       passOnce=0
+      isNewFile=0
       read -p 'goOn ?: ' goOn
-    elif $nextLineIsDiff && (("$endOfFile" == 1)); then
-      getModifFromFile fileContent "$line"
+    elif $nextLineIsDiff && [[ $endOfFile -eq 1 ]]; then
+      local lineParam="$line"
+      if [[ $isNewFile -eq 0 ]]; then
+        lineParam=""
+      fi
+
+      getModifFromFile fileContent "$lineParam"
       endOfFile=$?
+      if [[ $isNewFile -eq 0 ]]; then
+        isNewFile="$endOfFile"
+      fi
       nextLineIsDiff=false
-    elif (("$isGitAnnotation" == 0)) ||
-      ( (("$dl" > 0)) && (("$isPrvGitAnnotation" == 1)) && (("$isTeamAnnotation" == 0))); then
+    elif [[ $isGitAnnotation -eq 0 || $isNewFile -eq 0 ]] ||
+      [[ $dl -ge 0 && $isPrvGitAnnotation -eq 1 && $isTeamAnnotation -eq 0 ]]; then
       nextLineIsDiff=true
     else
       nextLineIsDiff=false
