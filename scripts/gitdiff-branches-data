@@ -4,7 +4,6 @@
 LOG_PATH='diff-project/log'
 DIR='diff-project'
 DIR_FILES='diff-project/files'
-#DIF_FILE=$LOG_PATH/"different-files.log"
 
 GIT_DIFF_BRANCHES='git-diff-branches.log'
 GIT_DIFF_BRANCH_PATH="$LOG_PATH"/"$GIT_DIFF_BRANCHES"
@@ -12,23 +11,8 @@ GIT_DIFF_BRANCH_PATH="$LOG_PATH"/"$GIT_DIFF_BRANCHES"
 DIFFERENCE='differences.log'
 DIFFERENCE_PATH="$LOG_PATH"/"$DIFFERENCE"
 
-DIFFERENCE_FILES='different-files.log'
-DIFFERENCE_FILES_PATH="$LOG_PATH"/"$DIFFERENCE_FILES"
-
-NEW_DELETE_FILES='addDelete-files.log'
-NEW_DELETE_FILES_PATH="$LOG_PATH"/"$NEW_DELETE_FILES"
-
 MERGE_FILE='git-diff-merge-file-mod.txt'
 MERGE_PATH="$LOG_PATH"/"$MERGE_FILE"
-
-displayArray() {
-  local arrayInfo=("$@")
-
-  for index in "${!arrayInfo[@]}"; do
-    echo -e "ARRAY[$index] ${arrayInfo[$index]}\n'"
-  done
-  echo -e "LENGTH OF THE ARRAY ${#arrayInfo[@]}\n"
-}
 
 #Function to check if the line receive as param content the git annotation of differences:
 #@@ -
@@ -68,12 +52,26 @@ lineContentFileName() {
   return 1
 }
 
+lineEndByHeaderNewLineHash() {
+  local line=$1
+  local length=${#line}
+  SUB=$'\n'"##"
+  SUB2=$'\r'"##"
+
+  if [[ "$line" == *"$SUB" || "$line" == *"$SUB2" ]]; then
+    return 0
+  fi
+  return 1
+}
+
 #Function to check if the line receive as param content the annotation:
 # ##
 lineStartByHeaderHash() {
   local line=$1
+  local length=${#line}
   SUB='##'
-  if [[ ${#line} -eq 2 ]] && [[ "$line" == "$SUB"* ]]; then
+
+  if [[ $length -eq 2 && "$line" == "$SUB"* ]]; then
     return 0
   fi
   return 1
@@ -81,46 +79,33 @@ lineStartByHeaderHash() {
 
 lineContentGitAnnotationAdd() {
   local line=$1
-  local prvLine=$2
   SUB='--- /dev/null'
   SUB2='+++ /dev/null'
-  if [[ ${#line} -eq 13 ]] && [[ "$line" == "$SUB"* || "$line" == "$SUB2"* ]]; then
+
+  if [[ ${#line} -eq 13 ]] && [[ "$line" == "$SUB"* ]]; then
     return 0
-  elif [[ ${#prvLine} -eq 13 ]] && [[ "$prvLine" == "$SUB"* || "$prvLine" == "$SUB2"* ]]; then
+  elif [[ ${#line} -eq 13 ]] && [[ "$line" == "$SUB2"* ]]; then
     return 2
   else
     return 1
   fi
 }
 
-lineFileIsBranchAOrB() {
-  local fileNameParse=$1
-  SUB='--- a'
-  SUB2='+++ b'
-  if [[ ${#fileNameParse} -eq 5 ]] && [[ "$fileNameParse" == "$SUB"* ]]; then
-    return 0
-  elif [[ ${#fileNameParse} -eq 5 ]] && [[ "$fileNameParse" == "$SUB2"* ]]; then
-    return 2
-  else
-    return 1
-  fi
-}
+#Function get the line has changed and add into .diff file
+transferAllFileContent() {
+  local -n _fileContent=$1
 
-#Function browser a map which content all the information of the file to be compare
-getArrayFileInfo() {
-  local num=$4
-  local fileName=$3
-  local response=''
-  local COUNT=${#filesList[@]}
+  local countOfLine=0
+  local length=${#_fileContent[@]}
 
-  for ((i = 0; i < "$COUNT"; i++)); do
-    IFS="|" read -r -a arr <<<"${filesList[i]}"
-    if [[ ${arr[0]} = "$fileName" ]]; then
-      response="${arr[num]}"
-      break
-    fi
+  for ((l = 0; l <= "$length"; l++)); do
+    local lineChangedData=${_fileContent[l]}
+    echo "$lineChangedData" >>"$MERGE_PATH"
+    #    echo "MY LINE  $lineChangedData"
+    countOfLine=$((countOfLine + 1))
   done
-  echo "$response"
+
+  echo "length: $length end L: $l">>"$GIT_DIFF_BRANCH_PATH"
 }
 
 #Function get the line has changed and add into .diff file
@@ -128,7 +113,7 @@ getModifFromFile() {
   local -n _fileContent=$1
   local line=$2
   local specialChar='s@^[^0-9]*\([0-9]\+\).*@\1@'
-  if [[ $line == "" ]]; then
+  if [[ "$line" == "" ]]; then
     local linePosition=1
   else
     local linePosition=$(echo "$line" | sed "$specialChar")
@@ -138,7 +123,6 @@ getModifFromFile() {
   local length=${#_fileContent[@]}
   local firstHash=0
 
-  echo "LINE POSITION +> $linePosition"
   for ((l = "$linePosition" - 1; l < "$length"; )); do
     local lineChangedData=${_fileContent[l]}
 
@@ -157,9 +141,8 @@ getModifFromFile() {
     countOfLine=$((countOfLine + 1))
   done
 
-  echo "linePosition: $((linePosition - 1)) length: $length end L: $l"
+  echo "linePosition: $((linePosition - 1)) length: $length end L: $l">>"$GIT_DIFF_BRANCH_PATH"
   if [[ $l -eq $length ]]; then
-    read -p 'isEnd ?: ' isEnd
     return 0
   fi
   return 1
@@ -186,33 +169,16 @@ printLineInfo() {
     echo -e "---------------\tIS_END_OF_FILE [>$endOfFile<]"
     echo -e "---------------\tNEST_LINE_IS_DIFF [>$nextLineIsDiff<]"
     echo -e "---------------\tFILE_TO_EXTRACT_DATA [>$fileExtractDataPath<]"
-  }
-  #    } >>"$GIT_DIFF_BRANCH_PATH"
-}
-
-getFileContentFromBBranch() {
-  local bBranch=$1
-  local filePath=$2
-  local fileContentFromBBranch=$(git show "$bBranch:$filePath")
-  echo "$fileContentFromBBranch"
+  } >>"$GIT_DIFF_BRANCH_PATH"
 }
 
 mainLoop() {
-  local -n _addFilesArray=$1
-  local -n _modFilesArray=$2
-  local -n _differencesFileData=$3
-
-  #  echo "--------------------------"
-  #  displayArray "${_addFilesArray[@]}"
-  #  displayArray "${_modFilesArray[@]}"
-  #  echo "--------------------------"
+  local -n _differencesFileData=$1
 
   local countOfLine=0
   local nextLineIsDiff=false
   local fileNameParse=''
   local length=${#_differencesFileData[@]}
-  local diffFilePosName=3
-  local FileExtractDatPos=1
   local passOnce=1
   local endOfFile=1
   local fileExtractDataPath=''
@@ -252,17 +218,13 @@ mainLoop() {
       lineContentFileName "$line"
       isContentFileName=$?
     fi
-    echo -e "--------------\tisGitAnnotation: $isGitAnnotation \tisTeamAnnotation: $isTeamAnnotation \tisPrvGitAnnotation: $isPrvGitAnnotation \tisPrvTeamAnnotation: $isPrvTeamAnnotation \tisContentFileName: $isContentFileName \tisGitAnnotationAdd: $isGitAnnotationAdd"
+    echo -e "--------------\tisGitAnnotation: $isGitAnnotation \tisTeamAnnotation: $isTeamAnnotation \tisPrvGitAnnotation: $isPrvGitAnnotation \tisPrvTeamAnnotation: $isPrvTeamAnnotation \tisContentFileName: $isContentFileName \tisGitAnnotationAdd: $isGitAnnotationAdd isNewFile $isNewFile">>"$GIT_DIFF_BRANCH_PATH"
     #____________________________________________________________________________________________________________________#
 
     if [[ $isContentFileName -eq 0 && $isGitAnnotationAdd -eq 1 ]] || [[ $isGitAnnotationAdd -ne 1 && $isNewFile -eq 1 ]]; then
-      echo "I PASS HERE"
       local fileNameParse
-
-      if (("$isGitAnnotationAdd" == 0)); then
+      if [[ $isGitAnnotationAdd -eq 2 ]]; then
         fileNameParse=$previousLine
-      elif (("$isGitAnnotationAdd" == 2)); then
-        fileNameParse=$line
       else
         fileNameParse=$line
       fi
@@ -270,39 +232,41 @@ mainLoop() {
       fileName="$(basename -- "$fileNameParse")"
       filePath="${fileNameParse:6}"
       fileExtractDataPath="$filePath"
-      echo "fileNameParse => '$fileNameParse'"
-      echo "fileName => $fileName"
-      echo "filePath => $filePath"
 
-      lineFileIsBranchAOrB fileNameParse
-      local branchNum=$?
-      local branchToExtractFileData=$branchA
-      if [[ "$branchNum" == 2 ]]; then
-        branchToExtractFileData=$branchB
+      local branchToExtractFileData=$branchB
+      if [[ $isGitAnnotationAdd -eq 2 ]]; then
+        branchToExtractFileData=$branchA
       fi
-      echo "branchToExtractFileData => $branchToExtractFileData"
 
+      git show "$branchToExtractFileData:$filePath" >"$fileName"
       index=0
       fileContent=()
-      while read line; do
-        fileContent[$index]="$line"
+
+      while read line || [ -n "$line" ]; do
+        if lineEndByHeaderNewLineHash "$line"; then
+          IFS=$'\n'$'\r' read -a cutLine <<<"$line"
+          fileContent[$index]=${cutLine[0]}
+          index=$(("$index" + 1))
+          fileContent[$index]=${cutLine[1]}
+        else
+          fileContent[$index]="$line"
+        fi
         index=$(("$index" + 1))
       done < <(git show "$branchToExtractFileData:$filePath")
 
       endOfFile=1
       passOnce=0
-      isNewFile=0
-      read -p 'goOn ?: ' goOn
-    elif $nextLineIsDiff && [[ $endOfFile -eq 1 ]]; then
-      local lineParam="$line"
-      if [[ $isNewFile -eq 0 ]]; then
-        lineParam=""
+      if [[ $isGitAnnotationAdd -ne 1 ]]; then
+        isNewFile=0
       fi
-
-      getModifFromFile fileContent "$lineParam"
-      endOfFile=$?
+    elif $nextLineIsDiff && [[ $endOfFile -eq 1 ]]; then
       if [[ $isNewFile -eq 0 ]]; then
-        isNewFile="$endOfFile"
+        transferAllFileContent fileContent
+        isNewFile=2
+        endOfFile=0
+      else
+        getModifFromFile fileContent "$line"
+        endOfFile=$?
       fi
       nextLineIsDiff=false
     elif [[ $isGitAnnotation -eq 0 || $isNewFile -eq 0 ]] ||
@@ -330,9 +294,6 @@ getModifFilesArray() {
 executeAlgorithm() {
   setFilesDifference "$branchA" "$branchB" "$folderFilesPath"
 
-  declare -a addFilesArray=($(getAddFilesArray))
-  declare -a modFilesArray=($(getModifFilesArray))
-
   local index=0
   declare -a differencesFileData
   IFS=''
@@ -341,12 +302,12 @@ executeAlgorithm() {
     index=$(("$index" + 1))
   done <$DIFFERENCE_PATH
 
-  mainLoop addFilesArray modFilesArray differencesFileData
+  mainLoop differencesFileData
 }
 
 setFilesDifference() {
   {
-    git diff "$branchA" "$branchB" -- "$folderFilesPath" | ./scripts/gitdiff-with-line >"$DIFFERENCE_PATH"
+    git diff "$branchA" "$branchB" -- "$folderFilesPath" -- '*.txt' | ./scripts/gitdiff-with-line >"$DIFFERENCE_PATH"
   } || {
     echo "Error: git diff $branchA $branchB having a issue, please confirm that the branches are correct"
   }
@@ -377,7 +338,7 @@ createDiffFolder() {
 }
 
 help() {
-  echo ./gitdiff-branch-data '{ branch to be compare A }' '{branch to compareB}'
+  echo ./gitdiff-branch-data '{ branch to be compare A }' '{branch to compareB}  {folder where are the file}'
   exit 0
 }
 
