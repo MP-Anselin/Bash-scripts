@@ -1,8 +1,8 @@
 #!/bin/bash
 
 ## Static global with the path ot the subfolder diff-project
-LOG_PATH='diff-project/log'
-DIR='diff-project'
+DIR='myGitDiffBranches'
+LOG_PATH="$DIR"'/log'
 
 GIT_DIFF_BRANCHES='git-diff-branches.log'
 GIT_DIFF_BRANCH_PATH="$LOG_PATH"/"$GIT_DIFF_BRANCHES"
@@ -12,6 +12,8 @@ DIFFERENCE_PATH="$LOG_PATH"/"$DIFFERENCE"
 
 MERGE_FILE='git-diff-merge-file-mod.txt'
 MERGE_PATH="$DIR"/"$MERGE_FILE"
+
+PATH_FIRST_SCRIPT="./scripts/gitdiff-with-line"
 
 #Function to check if the line receive as param content the git annotation of differences:
 #@@ -
@@ -51,6 +53,7 @@ lineContentFileName() {
   return 1
 }
 
+##Function to check breaking line.
 lineEndByHeaderNewLineHash() {
   local line=$1
   local length=${#line}
@@ -76,6 +79,7 @@ lineStartByHeaderHash() {
   return 1
 }
 
+##Function to check if the file is a new file on git.
 lineContentGitAnnotationAdd() {
   local line=$1
   SUB='--- /dev/null'
@@ -90,7 +94,7 @@ lineContentGitAnnotationAdd() {
   fi
 }
 
-#Function get the line has changed and add into .diff file
+#Function get the line has changed and add into .diff file.
 transferAllFileContent() {
   local -n _fileContent=$1
 
@@ -106,15 +110,15 @@ transferAllFileContent() {
   echo "length: $length end L: $l" >>"$GIT_DIFF_BRANCH_PATH"
 }
 
-#Function get the line has changed and add into .diff file
+#Function get the line has changed and add into .diff file.
 getModifFromFile() {
   local -n _fileContent=$1
   local line=$2
   local specialChar='s@^[^0-9]*\([0-9]\+\).*@\1@'
-  if [[ "$line" == "" ]]; then
-    local linePosition=1
-  else
-    local linePosition=$(echo "$line" | sed "$specialChar")
+  local linePosition=1
+
+  if [[ "$line" != "" ]]; then
+    linePosition=$(echo "$line" | sed "$specialChar")
   fi
 
   local countOfLine=0
@@ -124,6 +128,7 @@ getModifFromFile() {
   for ((l = "$linePosition" - 1; l < "$length"; )); do
     local lineChangedData=${_fileContent[l]}
 
+    ## check if we fund '##' 2 to stop the loop 0 to check on the lines above 1 to go to look for a second line with '##'
     if [[ $firstHash -lt 2 ]] && lineStartByHeaderHash "$lineChangedData"; then
       firstHash=$((firstHash + 1))
     fi
@@ -133,6 +138,7 @@ getModifFromFile() {
     elif [[ $firstHash -eq 2 ]]; then
       break
     else
+      ## If firstHash == 1 mean we have found one line with '##' and we add the content between the line of '##'
       echo "$lineChangedData" >>"$MERGE_PATH"
       l=$((l + 1))
     fi
@@ -140,12 +146,14 @@ getModifFromFile() {
   done
 
   echo "linePosition: $((linePosition - 1)) length: $length end L: $l" >>"$GIT_DIFF_BRANCH_PATH"
+  ## if the l is equal to the number of line of the file we inform we have finished to read the file.
   if [[ $l -eq $length ]]; then
     return 0
   fi
   return 1
 }
 
+##Function to store on log the information what the scripts is doing.
 printLineInfo() {
   local args=("$@")
 
@@ -184,13 +192,14 @@ mainLoop() {
   local isNewFile=1
   declare -a fileContent
 
+  ## Read the file differences.log line.
   for ((dl = 0; dl < "$length"; dl++)); do
     line=${_differencesFileData[dl]}
     local previousLine=${_differencesFileData[$((dl - 1))]}
     printLineInfo $((dl + 1)) "$line" "$previousLine" "$endOfFile" "$nextLineIsDiff" "$fileExtractDataPath"
 
     #____________________________________________________________________________________________________________________#
-
+    ## Analyze the line to thing what is content
     lineContentGitAnnotationAdd "$line" "$previousLine"
     local isGitAnnotationAdd=$?
     local isGitAnnotation=1
@@ -221,6 +230,7 @@ mainLoop() {
     #____________________________________________________________________________________________________________________#
 
     if [[ $isContentFileName -eq 0 && $isGitAnnotationAdd -eq 1 ]] || [[ $isGitAnnotationAdd -ne 1 && $isNewFile -eq 1 ]]; then
+      ## If to get the path of the file to extract
       local fileNameParse
       if [[ $isGitAnnotationAdd -eq 2 ]]; then
         fileNameParse=$previousLine
@@ -228,7 +238,6 @@ mainLoop() {
         fileNameParse=$line
       fi
 
-      fileName="$(basename -- "$fileNameParse")"
       filePath="${fileNameParse:6}"
       local folderName=${filePath%/*}
       fileExtractDataPath="$filePath"
@@ -260,10 +269,11 @@ mainLoop() {
         if [[ $isGitAnnotationAdd -ne 1 ]]; then
           isNewFile=0
         fi
-        echo "Parse file: $fileExtractDataPath">>"$GIT_DIFF_BRANCH_PATH"
+        echo "Parse file: $fileExtractDataPath" >>"$GIT_DIFF_BRANCH_PATH"
         echo "Parse file: $fileExtractDataPath"
       fi
     elif $nextLineIsDiff && [[ $endOfFile -eq 1 ]]; then
+      ## File to extract the information from the file changed
       if [[ $isNewFile -eq 0 ]]; then
         transferAllFileContent fileContent
         isNewFile=1
@@ -279,7 +289,6 @@ mainLoop() {
     else
       nextLineIsDiff=false
     fi
-
     countOfLine=$((countOfLine + 1))
   done
 
@@ -287,12 +296,13 @@ mainLoop() {
 
 setFilesDifference() {
   {
-    git diff "$branchA" "$branchB" -- "$folderFilesPath" -- '*.txt' | ./scripts/gitdiff-with-line >"$DIFFERENCE_PATH"
+    git diff "$branchA" "$branchB" -- "$folderFilesPath" -- '*.txt' | $PATH_FIRST_SCRIPT &>"$DIFFERENCE_PATH"
   } || {
     echo "Error: git diff $branchA $branchB having a issue, please confirm that the branches are correct"
   }
 }
 
+#Function read the file from differences.log
 executeAlgorithm() {
   setFilesDifference "$branchA" "$branchB" "$folderFilesPath"
 
@@ -336,7 +346,8 @@ help() {
 
 welcome() {
   echo -e "Welcome to Git Diff Branches this script will take two branches collect the differences between the to branches."
-  echo -e "The script will create 'diff-project' folder and add the information of each modified file into a file extension '.diff.txt'.\n"
+  echo -e "The script will create 'diff-project' folder and add the information of each modified file into a file extension '.diff.txt'."
+  echo -e "run the script with --help to have more information.\n"
 }
 
 main() {
@@ -359,14 +370,14 @@ main() {
     read -rp 'What is the name of the folder where there is the files ?: ' folderFilesPath
   fi
 
-  echo "Parameter #1 is $branchA"
-  echo "Parameter #2 is $branchB"
-  echo "Parameter #3 is $folderFilesPath"
+  echo -e "\tParameter #1 branch A is: $branchA"
+  echo -e "\tParameter #2 branch B is: $branchB"
+  echo -e "\tParameter #3 the folder is: $folderFilesPath\n"
 
   {
-    echo "Parameter #1 is $branchA"
-    echo "Parameter #2 is $branchB"
-    echo "Parameter #3 is $folderFilesPath"
+    echo -e "\tParameter #1 branch A is: $branchA"
+    echo -e "\tParameter #2 branch B is: $branchB"
+    echo -e "\tParameter #3 folder is: $folderFilesPath\n"
   } >>$GIT_DIFF_BRANCH_PATH
 
   sleep 1
