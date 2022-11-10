@@ -24,7 +24,7 @@ PATH_FIRST_SCRIPT="$CURRENT_FOLDER/bash/gitdiff-with-line"
 lineContentGitAnnotation() {
   local line=$1
 
-  SUB='@@ -'
+  local SUB='@@ -'
   if [[ "$line" == "$SUB"* ]]; then
     return 0
   fi
@@ -38,7 +38,7 @@ lineTeamAnnotationHash() {
   local numberList='s/[0-9]//g'
 
   line=$(echo "$line" | sed "$numberList")
-  SUB=': ##'
+  local SUB=': ##'
   if [[ "$line" == "$SUB"* ]]; then
     return 0
   fi
@@ -47,10 +47,22 @@ lineTeamAnnotationHash() {
 
 #Function to check if the line receive as param content the annotation:
 #+++ b/
-lineContentFileName() {
+lineContentFileNameB() {
   local line=$1
+  local SUB='+++ b/'
 
-  SUB='+++ b/'
+  if [[ "$line" == "$SUB"* ]]; then
+    return 0
+  fi
+  return 1
+}
+
+#Function to check if the line receive as param content the annotation:
+#--- a/
+lineContentFileNameA() {
+  local line=$1
+  local SUB='--- a/'
+
   if [[ "$line" == "$SUB"* ]]; then
     return 0
   fi
@@ -61,8 +73,8 @@ lineContentFileName() {
 lineEndByHeaderNewLineHash() {
   local line=$1
   local length=${#line}
-  SUB=$'\n'"##"
-  SUB2=$'\r'"##"
+  local SUB=$'\n'"##"
+  local SUB2=$'\r'"##"
 
   if [[ "$line" == *"$SUB" || "$line" == *"$SUB2" ]]; then
     return 0
@@ -75,7 +87,7 @@ lineEndByHeaderNewLineHash() {
 lineStartByHeaderHash() {
   local line=$1
   local length=${#line}
-  SUB='##'
+  local SUB='##'
 
   if [[ $length -eq 2 && "$line" == "$SUB"* ]]; then
     return 0
@@ -86,13 +98,24 @@ lineStartByHeaderHash() {
 ##Function to check if the file is a new file on git.
 lineContentGitAnnotationAdd() {
   local line=$1
-  SUB='--- /dev/null'
-  SUB2='+++ /dev/null'
+  local prvLine=$2
+  local nextLine=$3
+  local isPrv=1
+  local SUB='--- /dev/null'
+  local SUB2='+++ /dev/null'
 
   if [[ ${#line} -eq 13 ]] && [[ "$line" == "$SUB"* ]]; then
-    return 0
+    lineContentFileNameB "$nextLine"
+    isPrv=$?
+    if [[ isPrv -eq 0 ]]; then
+      return 0
+    fi
   elif [[ ${#line} -eq 13 ]] && [[ "$line" == "$SUB2"* ]]; then
-    return 2
+    lineContentFileNameA "$prvLine"
+    isPrv=$?
+    if [[ isPrv -eq 0 ]]; then
+      return 2
+    fi
   else
     return 1
   fi
@@ -138,9 +161,7 @@ getModifFromFile() {
   if [[ "$line" != "" ]]; then
     line=$(tr -dc "$specialCharNotPrint" <<<"$line")
     line=$(echo "$line" | sed "$specialCharBeforeDoteDote")
-    echo -e "line: \t>$line<" >>myInfo.txt
     linePosition=$(echo "$line" | sed "$specialCharGetNum")
-    echo -e "linePosition: \t>$linePosition<" >>myInfo.txt
   fi
 
   local countOfLine=0
@@ -182,11 +203,12 @@ printLineInfo() {
   local linePosition=${args[0]}
   local line=${args[1]}
   local previousLine=${args[2]}
+  local nextLine=${args[3]}
   local endOfFile=false
-  local nextLineIsDiff=${args[4]}
-  local fileExtractDataPath=${args[5]}
+  local nextLineIsDiff=${args[5]}
+  local fileExtractDataPath=${args[6]}
 
-  if [[ ${args[3]} == 0 ]]; then
+  if [[ ${args[4]} == 0 ]]; then
     endOfFile=true
   fi
   {
@@ -194,6 +216,7 @@ printLineInfo() {
     echo -e "---------------\tMAIN LINE [[>$line<]]"
     echo -e "---------------\tMAIN LINE LENGTH [[>${#line}<]]"
     echo -e "---------------\tPREVIOUS LINE [[>$previousLine<]]"
+    echo -e "---------------\NEXT LINE [[>$nextLine<]]"
     echo -e "---------------\tIS_END_OF_FILE [>$endOfFile<]"
     echo -e "---------------\tNEST_LINE_IS_DIFF [>$nextLineIsDiff<]"
     echo -e "---------------\tFILE_TO_EXTRACT_DATA [>$fileExtractDataPath<]"
@@ -214,6 +237,7 @@ mainLoop() {
   local isNewFile=1
   declare -a fileContent
   local previousLine=""
+  local nextLine=""
 
   ## Read the file differences.log line.
   for ((dl = 0; dl < "$length"; dl++)); do
@@ -221,7 +245,10 @@ mainLoop() {
     if [[ $((dl - 1)) -gt 0 ]]; then
       previousLine=${_differencesFileData[$((dl - 1))]}
     fi
-    printLineInfo $((dl + 1)) "$line" "$previousLine" "$endOfFile" "$nextLineIsDiff" "$fileExtractDataPath"
+    if [[ $((dl + 1)) -lt $length ]]; then
+      nextLine=${_differencesFileData[$((dl + 1))]}
+    fi
+    printLineInfo $((dl + 1)) "$line" "$previousLine" "$nextLine" "$endOfFile" "$nextLineIsDiff" "$fileExtractDataPath"
 
     #____________________________________________________________________________________________________________________#
     ## Analyze the line to thing what is content
@@ -248,7 +275,7 @@ mainLoop() {
       isPrvTeamAnnotation=$?
     fi
     if [[ $passOnce -eq 1 ]] || [[ "$endOfFile" == 0 ]]; then
-      lineContentFileName "$line"
+      lineContentFileNameB "$line"
       isContentFileName=$?
     fi
     echo -e "--------------\tisGitAnnotation: $isGitAnnotation \tisTeamAnnotation: $isTeamAnnotation \tisPrvGitAnnotation: $isPrvGitAnnotation \tisPrvTeamAnnotation: $isPrvTeamAnnotation \tisContentFileName: $isContentFileName \tisGitAnnotationAdd: $isGitAnnotationAdd isNewFile $isNewFile" >>"$GIT_DIFF_BRANCH_PATH"
@@ -259,6 +286,8 @@ mainLoop() {
       local fileNameParse
       if [[ $isGitAnnotationAdd -eq 2 ]]; then
         fileNameParse=$previousLine
+      elif [[ $isGitAnnotationAdd -eq 0 ]]; then
+        fileNameParse=$nextLine
       else
         fileNameParse=$line
       fi
@@ -266,13 +295,6 @@ mainLoop() {
       filePath="${fileNameParse:6}"
       local folderName=${filePath%/*}
       fileExtractDataPath="$filePath"
-
-      if [[ $dl -eq 4 ]]; then
-        echo " LINE: $line"
-        echo "PRVLINE: $previousLine"
-        echo "folderName: $folderName"
-        echo "folderFilesPath: $folderFilesPath"
-      fi
 
       if [[ "$folderName" =~ .*"$folderFilesPath".* ]]; then
         local branchToExtractFileData=$branchB
