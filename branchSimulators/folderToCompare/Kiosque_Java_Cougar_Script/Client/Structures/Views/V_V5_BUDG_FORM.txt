@@ -1,0 +1,107 @@
+##
+V_V5_BUDG_FORM
+=SQL=
+ CREATE OR REPLACE VIEW V_V5_BUDG_FORM AS 
+((select  distinct bg.ID_BUDGET,
+  (nvl((
+select 
+sum(case when fo.COLLECTIF = '1' and fo.TYPE_COUT = 'I'
+    then (nvl(cp.COUT, 0) + nvl(cp.COUT_HEBERGEMENT, 0) + nvl(cp.COUT_TRANSPORT, 0) + nvl(cp.COUT_TUTEUR, 0) 
+      + nvl(cp.COUT_SAL_FORMATEUR, 0) + nvl(cp.COUT_SALARIAL, 0)) * fo.NBRE_COLLECTIF
+else (nvl(cp.COUT, 0) + nvl(cp.COUT_HEBERGEMENT, 0) + nvl(cp.COUT_TRANSPORT, 0) + nvl(cp.COUT_TUTEUR, 0) 
+     +nvl(cp.COUT_SAL_FORMATEUR, 0) + nvl(cp.COUT_SALARIAL, 0))
+end)
+from T_V5_KRHEF_BUDGET bdg2 join V_V5_KRHEF_FORM_PLAN fp on (nvl(bdg2.ID_BUDGET_INI, bdg2.ID_BUDGET) = fp.ID_BUDGET)
+join V_V5_KRHEF_FORM_DEMANDE fo on (fo.ID_FORMATION_DEMANDE = fp.ID_FORMATION_DEMANDE
+and fo.STATUT_EXPERT != 4 and fo.STATUT_EXPERT != 2) join V_V5_KRHEF_FORM_COUT_PLAN cp on (fp.ID_FORM_PLAN = cp.ID_FORM_PLAN)
+left join T_V5_KRHEF_PLAN pl on (cp.ID_PLAN = pl.ID_PLAN) where bdg2.ID_BUDGET = bg.ID_BUDGET
+and (fo.COLLECTIF is null
+or (fo.COLLECTIF = 0
+and fo.ID_REF_COLLECTIF IS NULL
+and fo.COLLABORATEUR IS NOT NULL)
+or (fo.COLLECTIF = 1
+and pl.DEMANDE_COLL = 1))), 0) )as SOLDEDEM,
+  bgc.LIBELLE as CATEGORIE,
+ CASE
+ WHEN length (TO_CHAR(bg.CODE))+length (TO_CHAR(bg.DESCRIPTION))>50 and length (TO_CHAR(bg.CODE))<=25  THEN
+ TO_CHAR(bg.CODE)
+ WHEN length (TO_CHAR(bg.CODE))+length (TO_CHAR(bg.DESCRIPTION))>50 and length (TO_CHAR(bg.DESCRIPTION))<=25  THEN
+ substr (TO_CHAR(bg.code),0,(length (TO_CHAR(bg.code))-(length (TO_CHAR(bg.code))-50+length (TO_CHAR(bg.DESCRIPTION))))) ||'...'
+ WHEN length (TO_CHAR(bg.CODE))+length (TO_CHAR(bg.DESCRIPTION))>50 and length (TO_CHAR(bg.DESCRIPTION))>25 and length (TO_CHAR(bg.code))>25 THEN
+ substr (TO_CHAR(bg.code),0,25) ||'...'
+ ELSE  TO_CHAR(bg.CODE) END CODE,
+ bg.ANNEE_PLAN,
+ CASE
+ WHEN length (TO_CHAR(bg.CODE))+ length (TO_CHAR(bg.DESCRIPTION))>50 and length (TO_CHAR(bg.DESCRIPTION))<=25  THEN
+ TO_CHAR(bg.DESCRIPTION)
+ WHEN length (TO_CHAR(bg.CODE))+ length (TO_CHAR(bg.DESCRIPTION))>50 and length (TO_CHAR(bg.CODE))<=25  THEN
+ substr (TO_CHAR(bg.DESCRIPTION),0,(length (TO_CHAR(bg.DESCRIPTION))-(length (TO_CHAR(bg.DESCRIPTION))-50 + length (TO_CHAR(bg.code))))) ||'...'
+ WHEN length (TO_CHAR(bg.CODE))+length (TO_CHAR(bg.DESCRIPTION))>50 and length (TO_CHAR(bg.DESCRIPTION))>25 and length (TO_CHAR(bg.code))>25 THEN
+ substr (TO_CHAR(bg.DESCRIPTION),0,25) ||'...'
+ ELSE  TO_CHAR(bg.DESCRIPTION) END LIBELLE,
+ DECODE(TO_NUMBER(replace(bg.MONTANT,'.',',')), '', 0, TO_NUMBER(replace(bg.MONTANT,'.',','))) as MONTANT,
+ bg.ACTIF, CASE when man.matricule is null THEN '-'
+ when (select count(matricule) from T_V5_KRHEF_BUDGET_MANAGER where ID_BUDGET= man.ID_BUDGET)=1 THEN VSU.NOM||' ' ||VSU.PRENOM ||' ' ||VSU.matricule
+ when (select count(matricule) from T_V5_KRHEF_BUDGET_MANAGER where ID_BUDGET= man.ID_BUDGET)>1 THEN 'Multiple'
+ END RESP,
+ bg.VU_MANAGER, bg.DATE_ARCHIVAGE,bg.HISTORISE, 
+ 'N' AFFICHE_BTN_SUPP
+ from T_V5_KRHEF_BUDGET bg
+ left join T_V5_KRHEF_BUDGET_CATEGORIE bgc on bgc.ID_CATEGORIE = bg.ID_CATEGORIE
+ left join T_V5_KRHEF_BUDGET_MANAGER man  on man.ID_BUDGET = bg.ID_BUDGET
+ left join v_v5_krh_user VSU  on VSU.MATRICULE = man.MATRICULE
+ where ( EXISTS
+ (select 1 from  T_V5_KRHEF_FORM_PLAN pl WHERE pl.ID_BUDGET = bg.ID_BUDGET)
+ ) )
+ union all
+ (select  distinct bg.ID_BUDGET, 
+ (nvl((
+select 
+sum(case when fo.COLLECTIF = '1' and fo.TYPE_COUT = 'I'
+    then (nvl(cp.COUT, 0) + nvl(cp.COUT_HEBERGEMENT, 0) + nvl(cp.COUT_TRANSPORT, 0) + nvl(cp.COUT_TUTEUR, 0) 
+      + nvl(cp.COUT_SAL_FORMATEUR, 0) + nvl(cp.COUT_SALARIAL, 0)) * fo.NBRE_COLLECTIF
+else (nvl(cp.COUT, 0) + nvl(cp.COUT_HEBERGEMENT, 0) + nvl(cp.COUT_TRANSPORT, 0) + nvl(cp.COUT_TUTEUR, 0) 
+     +nvl(cp.COUT_SAL_FORMATEUR, 0) + nvl(cp.COUT_SALARIAL, 0))
+end)
+from T_V5_KRHEF_BUDGET bdg2 join V_V5_KRHEF_FORM_PLAN fp on (nvl(bdg2.ID_BUDGET_INI, bdg2.ID_BUDGET) = fp.ID_BUDGET)
+join V_V5_KRHEF_FORM_DEMANDE fo on (fo.ID_FORMATION_DEMANDE = fp.ID_FORMATION_DEMANDE
+and fo.STATUT_EXPERT != 4 and fo.STATUT_EXPERT != 2) join V_V5_KRHEF_FORM_COUT_PLAN cp on (fp.ID_FORM_PLAN = cp.ID_FORM_PLAN)
+left join T_V5_KRHEF_PLAN pl on (cp.ID_PLAN = pl.ID_PLAN) where bdg2.ID_BUDGET = bg.ID_BUDGET
+and (fo.COLLECTIF is null
+or (fo.COLLECTIF = 0
+and fo.ID_REF_COLLECTIF IS NULL
+and fo.COLLABORATEUR IS NOT NULL)
+or (fo.COLLECTIF = 1
+and pl.DEMANDE_COLL = 1))), 0) )as SOLDEDEM,bgc.LIBELLE as CATEGORIE,
+ CASE
+ WHEN length (TO_CHAR(bg.CODE))+length (TO_CHAR(bg.DESCRIPTION))>50 and length (TO_CHAR(bg.CODE))<=25  THEN
+ TO_CHAR(bg.CODE)
+ WHEN length (TO_CHAR(bg.CODE))+length (TO_CHAR(bg.DESCRIPTION))>50 and length (TO_CHAR(bg.DESCRIPTION))<=25  THEN
+ substr (TO_CHAR(bg.code),0,(length (TO_CHAR(bg.code))-(length (TO_CHAR(bg.code))-50+length (TO_CHAR(bg.DESCRIPTION))))) ||'...'
+ WHEN length (TO_CHAR(bg.CODE))+length (TO_CHAR(bg.DESCRIPTION))>50 and length (TO_CHAR(bg.DESCRIPTION))>25 and length (TO_CHAR(bg.code))>25 THEN
+ substr (TO_CHAR(bg.code),0,25) ||'...'
+ ELSE  TO_CHAR(bg.CODE) END CODE,
+ bg.ANNEE_PLAN,
+ CASE
+ WHEN length (TO_CHAR(bg.CODE))+ length (TO_CHAR(bg.DESCRIPTION))>50 and length (TO_CHAR(bg.DESCRIPTION))<=25  THEN
+ TO_CHAR(bg.DESCRIPTION)
+ WHEN length (TO_CHAR(bg.CODE))+ length (TO_CHAR(bg.DESCRIPTION))>50 and length (TO_CHAR(bg.CODE))<=25  THEN
+ substr (TO_CHAR(bg.DESCRIPTION),0,(length (TO_CHAR(bg.DESCRIPTION))-(length (TO_CHAR(bg.DESCRIPTION))-50 + length (TO_CHAR(bg.code))))) ||'...'
+ WHEN length (TO_CHAR(bg.CODE))+length (TO_CHAR(bg.DESCRIPTION))>50 and length (TO_CHAR(bg.DESCRIPTION))>25 and length (TO_CHAR(bg.code))>25 THEN
+ substr (TO_CHAR(bg.DESCRIPTION),0,25) ||'...'
+ ELSE  TO_CHAR(bg.DESCRIPTION) END LIBELLE,
+ DECODE(TO_NUMBER(replace(bg.MONTANT,'.',',')), '', 0,TO_NUMBER(replace(bg.MONTANT,'.',','))) as MONTANT,
+ bg.ACTIF, CASE when man.matricule is null THEN '-'
+ when (select count(matricule) from T_V5_KRHEF_BUDGET_MANAGER where ID_BUDGET= man.ID_BUDGET)=1 THEN VSU.NOM||' ' ||VSU.PRENOM ||' ' ||VSU.matricule
+ when (select count(matricule) from T_V5_KRHEF_BUDGET_MANAGER where ID_BUDGET= man.ID_BUDGET)>1 THEN 'Multiple'
+ END RESP,
+ 
+ bg.VU_MANAGER, bg.DATE_ARCHIVAGE,bg.HISTORISE, 'O' AFFICHE_BTN_SUPP
+ from T_V5_KRHEF_BUDGET bg
+ left join T_V5_KRHEF_BUDGET_CATEGORIE bgc on bgc.ID_CATEGORIE = bg.ID_CATEGORIE
+ left join T_V5_KRHEF_BUDGET_MANAGER man  on man.ID_BUDGET = bg.ID_BUDGET
+ left join v_v5_krh_user VSU  on VSU.MATRICULE = man.MATRICULE
+ where  ( NOT EXISTS (select 1 from  T_V5_KRHEF_FORM_PLAN pl WHERE pl.ID_BUDGET = bg.ID_BUDGET)
+ )
+ ))
+ 

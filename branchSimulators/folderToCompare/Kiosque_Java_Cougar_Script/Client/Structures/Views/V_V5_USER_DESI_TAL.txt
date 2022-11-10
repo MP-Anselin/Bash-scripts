@@ -1,0 +1,176 @@
+##
+V_V5_USER_DESI_TAL
+=SQL=
+CREATE OR REPLACE VIEW V_V5_USER_DESI_TAL AS 
+  WITH List_USR as (
+ select     /*+ FULL(sal_responsable_u) */   vsu.matricule,
+            vsu.NOM||' ' ||vsu.PRENOM NP,
+            profil.matricule_paie,
+            vsu.date_sortie,
+         --   erreur.designation_erreur,
+            sal_responsable_u.nom||' ' ||sal_responsable_u.prenom                                                                                                                             AS
+            nom_prenom_responsable,
+            coalesce( sal_directeur_rh_tal_u.nom, group_directeur_rh_tal_u.libelle, sal_directeur_rh_tal_p.nom, group_directeur_rh_tal_p.libelle)||' ' ||coalesce(sal_directeur_rh_tal_u.prenom, sal_directeur_rh_tal_p.prenom) 
+         AS nom_prenom_directeur_rh,
+            coalesce(sal_acteur_indirect_tal_u.nom, group_acteur_indirect_tal_u.libelle, sal_acteur_indirect_tal_p.nom, group_acteur_indirect_tal_p.
+            libelle) ||' ' || coalesce(sal_acteur_indirect_tal_u.prenom, sal_acteur_indirect_tal_p.prenom)                                                                       AS
+            nom_prenom_acteur_indirect,
+
+            coalesce(sal_responsable_rh_tal_u.nom, group_responsable_rh_tal_u.libelle, sal_responsable_rh_tal_p.nom, group_responsable_rh_tal_p.
+            libelle)  ||' ' || coalesce(sal_responsable_rh_tal_u.prenom, sal_responsable_rh_tal_p.prenom)                                                                         AS
+            nom_prenom_responsable_rh,
+            coalesce(sal_gestionnaire_tal_u.nom, group_gestionnaire_tal_u.libelle, sal_gestionnaire_tal_p.nom, group_gestionnaire_tal_p.
+            libelle)  ||' ' || coalesce(sal_gestionnaire_tal_u.prenom, sal_gestionnaire_tal_p.prenom)                                                                             AS
+            nom_prenom_gestionnaire,
+            
+            coalesce(sal_expert_tal_u.nom, group_expert_tal_u.libelle, sal_expert_tal_p.nom, group_expert_tal_p.libelle) ||' ' ||coalesce(sal_expert_tal_u.prenom, sal_expert_tal_p.prenom)                                                                                         AS
+            nom_prenom_expert ,
+            usr_responsable_u.est_responsable_tal  est_responsable_tal_usr_responsable_u,
+            sal_responsable_u.date_sortie date_sortie_responsable_u,
+            sal_directeur_rh_tal_u.date_sortie date_sortie_directeur_rh_tal_u,
+sal_directeur_rh_tal_u.matricule                         matricule_sal_directeur_rh_tal_u                        ,
+sal_directeur_rh_tal_p.date_sortie                       date_sortie_directeur_rh_tal_p                      ,
+sal_acteur_indirect_tal_u.date_sortie                    date_sortie_acteur_indirect_tal_u                   ,
+sal_acteur_indirect_tal_u.matricule                      matricule_sal_acteur_indirect_tal_u                     ,
+sal_acteur_indirect_tal_p.date_sortie                    date_sortie_acteur_indirect_tal_p                   ,
+sal_responsable_rh_tal_u.date_sortie                     date_sortie_responsable_rh_tal_u                     ,
+sal_responsable_rh_tal_u.matricule                       matricule_sal_responsable_rh_tal_u                      ,
+sal_responsable_rh_tal_p.date_sortie                     date_sortie_responsable_rh_tal_p                    ,
+sal_gestionnaire_tal_u.date_sortie                       date_sortie_gestionnaire_tal_u                      ,
+sal_gestionnaire_tal_u.matricule                         matricule_sal_gestionnaire_tal_u                        ,
+sal_gestionnaire_tal_p.date_sortie                       date_sortie_gestionnaire_tal_p                      ,
+sal_expert_tal_u.date_sortie                             date_sortie_expert_tal_u                            ,
+sal_expert_tal_u.matricule                               matricule_sal_expert_tal_u                              ,
+sal_expert_tal_p.date_sortie                             date_sortie_expert_tal_p                            ,
+usr_directeur_rh_tal_u.est_directeur_rh_tal             est_directeur_rh_tal_directeur_rh_tal_u             ,
+usr_directeur_rh_tal_u.matricule                         matricule_directeur_rh_tal_u                    ,
+usr_directeur_rh_tal_p.est_directeur_rh_tal             est_directeur_rh_tal_directeur_rh_tal_p         ,
+usr_acteur_indirect_tal_u.est_acteur_indirect_tal       est_acteur_indirect_tal_acteur_indirect_tal_u      ,
+usr_acteur_indirect_tal_u.matricule                      matricule_acteur_indirect_tal_u                     ,
+usr_acteur_indirect_tal_p.est_acteur_indirect_tal       est_acteur_indirect_tal_acteur_indirect_tal_p      ,
+usr_responsable_rh_tal_u.est_responsable_rh_tal         est_responsable_rh_tal_responsable_rh_tal_u        ,
+usr_responsable_rh_tal_u.matricule                       matricule_responsable_rh_tal_u                      ,
+usr_responsable_rh_tal_p.est_responsable_rh_tal         est_responsable_rh_tal_responsable_rh_tal_p        ,
+usr_gestionnaire_tal_u.est_gestionnaire_tal             est_gestionnaire_tal_gestionnaire_tal_u            ,
+usr_gestionnaire_tal_u.matricule                         matricule_gestionnaire_tal_u                        ,
+usr_gestionnaire_tal_p.est_gestionnaire_tal             est_gestionnaire_tal_gestionnaire_tal_p            ,
+usr_expert_tal_u.est_expert_tal                         est_expert_tal_expert_tal_u                         ,
+usr_expert_tal_u.matricule                               matricule_expert_tal_u                              ,
+usr_expert_tal_p.est_expert_tal                         est_expert_tal_expert_tal_p                        ,
+group_directeur_rh_tal_u.actif                           actif_group_directeur_rh_tal_u                      ,
+group_directeur_rh_tal_p.actif                           actif_group_directeur_rh_tal_p                      ,
+group_acteur_indirect_tal_u.actif                        actif_group_acteur_indirect_tal_u                   ,
+group_acteur_indirect_tal_p.actif                        actif_group_acteur_indirect_tal_p                   ,
+group_responsable_rh_tal_u.actif                         actif_group_responsable_rh_tal_u                    ,
+group_responsable_rh_tal_p.actif                         actif_group_responsable_rh_tal_p                    ,
+group_gestionnaire_tal_u.actif                           actif_group_gestionnaire_tal_u                      ,
+group_gestionnaire_tal_p.actif                           actif_group_gestionnaire_tal_p                      ,
+group_expert_tal_u.actif                                 actif_group_expert_tal_u                            ,
+group_expert_tal_p.actif                                 actif_group_expert_tal_p                            
+
+FROM     t_v5_krh_salarie vsu 
+            INNER JOIN t_v5_krh_user           usr ON usr.matricule = vsu.matricule
+            INNER JOIN t_v5_krh_profil_user    profil ON profil.matricule = vsu.matricule
+            LEFT JOIN t_v5_krh_user           usr_responsable_u ON usr_responsable_u.matricule = usr.responsable_tal
+            LEFT JOIN t_v5_krh_salarie        sal_responsable_u ON sal_responsable_u.matricule = usr_responsable_u.matricule
+            LEFT JOIN t_v5_krh_user_alias_ref ref_directeur_rh_tal_u ON ref_directeur_rh_tal_u.id_user_alias_ref = usr.directeur_rh_tal
+            LEFT JOIN t_v5_krh_user           usr_directeur_rh_tal_u ON usr_directeur_rh_tal_u.matricule = ref_directeur_rh_tal_u.
+            matricule
+            LEFT JOIN t_v5_alias_def          group_directeur_rh_tal_u ON group_directeur_rh_tal_u.id_alias = ref_directeur_rh_tal_u.
+            id_alias
+            LEFT JOIN t_v5_krh_salarie        sal_directeur_rh_tal_u ON sal_directeur_rh_tal_u.matricule = ref_directeur_rh_tal_u.
+            matricule
+            LEFT JOIN t_v5_krh_user_alias_ref ref_directeur_rh_tal_p ON ref_directeur_rh_tal_p.id_user_alias_ref = profil.directeur_rh_tal
+            LEFT JOIN t_v5_krh_user           usr_directeur_rh_tal_p ON usr_directeur_rh_tal_p.matricule = ref_directeur_rh_tal_p.
+            matricule
+            LEFT JOIN t_v5_alias_def          group_directeur_rh_tal_p ON group_directeur_rh_tal_p.id_alias = ref_directeur_rh_tal_p.
+            id_alias
+            LEFT JOIN t_v5_krh_salarie        sal_directeur_rh_tal_p ON sal_directeur_rh_tal_p.matricule = ref_directeur_rh_tal_p.
+            matricule
+            LEFT JOIN t_v5_krh_user_alias_ref ref_acteur_indirect_tal_u ON ref_acteur_indirect_tal_u.id_user_alias_ref = usr.acteur_indirect_tal
+            LEFT JOIN t_v5_krh_user           usr_acteur_indirect_tal_u ON usr_acteur_indirect_tal_u.matricule = ref_acteur_indirect_tal_u.
+            matricule
+            LEFT JOIN t_v5_alias_def          group_acteur_indirect_tal_u ON group_acteur_indirect_tal_u.id_alias = ref_acteur_indirect_tal_u.
+            id_alias
+            LEFT JOIN t_v5_krh_salarie        sal_acteur_indirect_tal_u ON sal_acteur_indirect_tal_u.matricule = ref_acteur_indirect_tal_u.
+            matricule
+            LEFT JOIN t_v5_krh_user_alias_ref ref_acteur_indirect_tal_p ON ref_acteur_indirect_tal_p.id_user_alias_ref = profil.acteur_indirect_tal
+            LEFT JOIN t_v5_krh_user           usr_acteur_indirect_tal_p ON usr_acteur_indirect_tal_p.matricule = ref_acteur_indirect_tal_p.
+            matricule
+            LEFT JOIN t_v5_alias_def          group_acteur_indirect_tal_p ON group_acteur_indirect_tal_p.id_alias = ref_acteur_indirect_tal_p.
+            id_alias
+            LEFT JOIN t_v5_krh_salarie        sal_acteur_indirect_tal_p ON sal_acteur_indirect_tal_p.matricule = ref_acteur_indirect_tal_p.
+            matricule
+            LEFT JOIN t_v5_krh_user_alias_ref ref_responsable_rh_tal_u ON ref_responsable_rh_tal_u.id_user_alias_ref = usr.responsable_rh_tal
+            LEFT JOIN t_v5_krh_user           usr_responsable_rh_tal_u ON usr_responsable_rh_tal_u.matricule = ref_responsable_rh_tal_u.
+            matricule
+            LEFT JOIN t_v5_alias_def          group_responsable_rh_tal_u ON group_responsable_rh_tal_u.id_alias = ref_responsable_rh_tal_u.
+            id_alias
+            LEFT JOIN t_v5_krh_salarie        sal_responsable_rh_tal_u ON sal_responsable_rh_tal_u.matricule = ref_responsable_rh_tal_u.
+            matricule
+            LEFT JOIN t_v5_krh_user_alias_ref ref_responsable_rh_tal_p ON ref_responsable_rh_tal_p.id_user_alias_ref = profil.responsable_rh_tal
+            LEFT JOIN t_v5_krh_user           usr_responsable_rh_tal_p ON usr_responsable_rh_tal_p.matricule = ref_responsable_rh_tal_p.
+            matricule
+            LEFT JOIN t_v5_alias_def          group_responsable_rh_tal_p ON group_responsable_rh_tal_p.id_alias = ref_responsable_rh_tal_p.
+            id_alias
+            LEFT JOIN t_v5_krh_salarie        sal_responsable_rh_tal_p ON sal_responsable_rh_tal_p.matricule = ref_responsable_rh_tal_p.
+            matricule
+            LEFT JOIN t_v5_krh_user_alias_ref ref_gestionnaire_tal_u ON ref_gestionnaire_tal_u.id_user_alias_ref = usr.gestionnaire_tal
+            LEFT JOIN t_v5_krh_user           usr_gestionnaire_tal_u ON usr_gestionnaire_tal_u.matricule = ref_gestionnaire_tal_u.
+            matricule
+            LEFT JOIN t_v5_alias_def          group_gestionnaire_tal_u ON group_gestionnaire_tal_u.id_alias = ref_gestionnaire_tal_u.
+            id_alias
+            LEFT JOIN t_v5_krh_salarie        sal_gestionnaire_tal_u ON sal_gestionnaire_tal_u.matricule = ref_gestionnaire_tal_u.
+            matricule
+            LEFT JOIN t_v5_krh_user_alias_ref ref_gestionnaire_tal_p ON ref_gestionnaire_tal_p.id_user_alias_ref = profil.gestionnaire_tal
+            LEFT JOIN t_v5_krh_user           usr_gestionnaire_tal_p ON usr_gestionnaire_tal_p.matricule = ref_gestionnaire_tal_p.
+            matricule
+            LEFT JOIN t_v5_alias_def          group_gestionnaire_tal_p ON group_gestionnaire_tal_p.id_alias = ref_gestionnaire_tal_p.
+            id_alias
+            LEFT JOIN t_v5_krh_salarie        sal_gestionnaire_tal_p ON sal_gestionnaire_tal_p.matricule = ref_gestionnaire_tal_p.
+            matricule
+            LEFT JOIN t_v5_krh_user_alias_ref ref_expert_tal_u ON ref_expert_tal_u.id_user_alias_ref = usr.expert_tal
+            LEFT JOIN t_v5_krh_user           usr_expert_tal_u ON usr_expert_tal_u.matricule = ref_expert_tal_u.matricule
+            LEFT JOIN t_v5_alias_def          group_expert_tal_u ON group_expert_tal_u.id_alias = ref_expert_tal_u.id_alias
+            LEFT JOIN t_v5_krh_salarie        sal_expert_tal_u ON sal_expert_tal_u.matricule = ref_expert_tal_u.matricule
+            LEFT JOIN t_v5_krh_user_alias_ref ref_expert_tal_p ON ref_expert_tal_p.id_user_alias_ref = profil.expert_tal
+            LEFT JOIN t_v5_krh_user           usr_expert_tal_p ON usr_expert_tal_p.matricule = ref_expert_tal_p.matricule
+            LEFT JOIN t_v5_alias_def          group_expert_tal_p ON group_expert_tal_p.id_alias = ref_expert_tal_p.id_alias
+            LEFT JOIN t_v5_krh_salarie        sal_expert_tal_p ON sal_expert_tal_p.matricule = ref_expert_tal_p.matricule 
+            ,( SELECT valeur FROM T_V5_INFO where code ='OPT_ARBRES_CONFONDUS') a
+            where ((((usr.est_utilisateur_tal = 1 OR usr.est_responsable_tal = 1) and (a.valeur='0'))or((usr.est_utilisateur = 1 OR usr.est_responsable = 1) and (a.valeur='1')) ) ))
+select ls."MATRICULE",ls."NP",ls."MATRICULE_PAIE",ls."DATE_SORTIE",ls."NOM_PRENOM_RESPONSABLE",ls."NOM_PRENOM_DIRECTEUR_RH",ls."NOM_PRENOM_ACTEUR_INDIRECT",ls."NOM_PRENOM_RESPONSABLE_RH",ls."NOM_PRENOM_GESTIONNAIRE",ls."NOM_PRENOM_EXPERT",ls."EST_RESPONSABLE_TAL_USR_RESPONSABLE_U",ls."DATE_SORTIE_RESPONSABLE_U",ls."DATE_SORTIE_DIRECTEUR_RH_TAL_U",ls."MATRICULE_SAL_DIRECTEUR_RH_TAL_U",ls."DATE_SORTIE_DIRECTEUR_RH_TAL_P",ls."DATE_SORTIE_ACTEUR_INDIRECT_TAL_U",ls."MATRICULE_SAL_ACTEUR_INDIRECT_TAL_U",ls."DATE_SORTIE_ACTEUR_INDIRECT_TAL_P",ls."DATE_SORTIE_RESPONSABLE_RH_TAL_U",ls."MATRICULE_SAL_RESPONSABLE_RH_TAL_U",ls."DATE_SORTIE_RESPONSABLE_RH_TAL_P",ls."DATE_SORTIE_GESTIONNAIRE_TAL_U",ls."MATRICULE_SAL_GESTIONNAIRE_TAL_U",ls."DATE_SORTIE_GESTIONNAIRE_TAL_P",ls."DATE_SORTIE_EXPERT_TAL_U",ls."MATRICULE_SAL_EXPERT_TAL_U",ls."DATE_SORTIE_EXPERT_TAL_P",ls."EST_DIRECTEUR_RH_TAL_DIRECTEUR_RH_TAL_U",ls."MATRICULE_DIRECTEUR_RH_TAL_U",ls."EST_DIRECTEUR_RH_TAL_DIRECTEUR_RH_TAL_P",ls."EST_ACTEUR_INDIRECT_TAL_ACTEUR_INDIRECT_TAL_U",ls."MATRICULE_ACTEUR_INDIRECT_TAL_U",ls."EST_ACTEUR_INDIRECT_TAL_ACTEUR_INDIRECT_TAL_P",ls."EST_RESPONSABLE_RH_TAL_RESPONSABLE_RH_TAL_U",ls."MATRICULE_RESPONSABLE_RH_TAL_U",ls."EST_RESPONSABLE_RH_TAL_RESPONSABLE_RH_TAL_P",ls."EST_GESTIONNAIRE_TAL_GESTIONNAIRE_TAL_U",ls."MATRICULE_GESTIONNAIRE_TAL_U",ls."EST_GESTIONNAIRE_TAL_GESTIONNAIRE_TAL_P",ls."EST_EXPERT_TAL_EXPERT_TAL_U",ls."MATRICULE_EXPERT_TAL_U",ls."EST_EXPERT_TAL_EXPERT_TAL_P",ls."ACTIF_GROUP_DIRECTEUR_RH_TAL_U",ls."ACTIF_GROUP_DIRECTEUR_RH_TAL_P",ls."ACTIF_GROUP_ACTEUR_INDIRECT_TAL_U",ls."ACTIF_GROUP_ACTEUR_INDIRECT_TAL_P",ls."ACTIF_GROUP_RESPONSABLE_RH_TAL_U",ls."ACTIF_GROUP_RESPONSABLE_RH_TAL_P",ls."ACTIF_GROUP_GESTIONNAIRE_TAL_U",ls."ACTIF_GROUP_GESTIONNAIRE_TAL_P",ls."ACTIF_GROUP_EXPERT_TAL_U",ls."ACTIF_GROUP_EXPERT_TAL_P",
+case  when est_responsable_tal_usr_responsable_u= 0 then  1
+            when date_sortie_responsable_u < sysdate then 1 
+            when date_sortie_directeur_rh_tal_u < sysdate then 1 
+            when matricule_sal_directeur_rh_tal_u IS NULL AND date_sortie_directeur_rh_tal_p < sysdate then 1
+            when nvl(actif_group_gestionnaire_tal_p,1)<>1 then 1 
+			when date_sortie_acteur_indirect_tal_u < sysdate then 1
+            when  matricule_sal_acteur_indirect_tal_u IS NULL AND date_sortie_acteur_indirect_tal_p < sysdate then 1
+            when date_sortie_responsable_rh_tal_u < sysdate then 1
+            when  matricule_sal_responsable_rh_tal_u IS NULL  AND date_sortie_responsable_rh_tal_p < sysdate then 1
+			when date_sortie_gestionnaire_tal_u < sysdate then 1
+            when matricule_sal_gestionnaire_tal_u IS NULL AND date_sortie_gestionnaire_tal_p < sysdate  then 1
+            when date_sortie_expert_tal_u < sysdate then 1
+            when  matricule_sal_expert_tal_u IS NULL AND date_sortie_expert_tal_p < sysdate then 1
+            when est_directeur_rh_tal_directeur_rh_tal_u = 0 then 1
+			when matricule_directeur_rh_tal_u IS NULL   AND est_directeur_rh_tal_directeur_rh_tal_p = 0 then 1
+            when est_acteur_indirect_tal_acteur_indirect_tal_u = 0 then 1
+            when  matricule_acteur_indirect_tal_u IS NULL   AND est_acteur_indirect_tal_acteur_indirect_tal_p = 0 then 1
+            when est_responsable_rh_tal_responsable_rh_tal_u = 0 then 1
+            when  matricule_responsable_rh_tal_u IS NULL  AND est_responsable_rh_tal_responsable_rh_tal_p = 0  then 1
+            when est_gestionnaire_tal_gestionnaire_tal_u = 0 then 1
+			when est_expert_tal_expert_tal_u = 0 then 1
+            when  matricule_expert_tal_u IS NULL AND est_expert_tal_expert_tal_p = 0  then 1
+            when nvl(actif_group_directeur_rh_tal_u,1) <> 1 then 1 
+            when  actif_group_directeur_rh_tal_u IS NULL AND nvl(actif_group_directeur_rh_tal_p,1 ) <> 1  then 1
+            when nvl(actif_group_acteur_indirect_tal_u,1)<> 1 then 1
+            when  actif_group_acteur_indirect_tal_u IS NULL AND nvl( actif_group_acteur_indirect_tal_p,1 )<> 1 then 1
+            when nvl( actif_group_responsable_rh_tal_u ,1) <> 1 then 1
+            when actif_group_responsable_rh_tal_u IS NULL AND nvl( actif_group_responsable_rh_tal_p,1) <> 1 then 1
+            when nvl( actif_group_gestionnaire_tal_u,1) <> 1 then 1
+			when actif_group_gestionnaire_tal_u IS NULL AND nvl(actif_group_gestionnaire_tal_p,1) <> 1  then 1
+            when nvl( actif_group_expert_tal_u,1) <> 1  then 1
+            when actif_group_expert_tal_u IS NULL AND nvl(actif_group_expert_tal_p,1) <> 1  then 1
+            when  matricule_gestionnaire_tal_u IS NULL AND est_gestionnaire_tal_gestionnaire_tal_p = 0  then 1
+             else null end as designation_erreur   from List_USR ls

@@ -1,0 +1,14 @@
+##
+TAG_CHARSET=@€ιθη
+##
+KRHEF_AFF_USER_HP
+=SQL=
+create or replace TYPE KRHEF_AFF_USER_HP FORCE AS OBJECT 
+(
+matricule NUMBER(38),
+ np                  VARCHAR2(256),
+matricule_paie VARCHAR2(256),
+DATE_ENTREE  DATE,
+DATE_SORTIE    DATE,
+actif number 
+)

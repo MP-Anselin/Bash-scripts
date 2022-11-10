@@ -1,0 +1,551 @@
+{
+  code : "HAB_UTI_GRIL_POP_M",
+  element : "ecran",
+  groupe : {
+    code : "HAB_UTILGRIL_MODIF",
+    donnees : [ {
+      code : "HAB_MATRICULE",
+      element : "donnee",
+      entier : 50,
+      libelle : "Matricule",
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "N"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Collaborateur : ",
+      style : "FormTitre"
+    }, {
+      code : "HAB_NOMCOLLAB",
+      element : "donnee",
+      libelle : "NomPrenom",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "",
+      style : "BoxLabel"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Formation",
+      style : "FDonneeG"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Entretien",
+      style : "FDonneeG"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Revue des talents",
+      style : "FDonneeG"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Sécurité",
+      style : "FDonneeG"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Utilisateur",
+      memeColonne : true,
+      style : "FDonneeG"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "",
+      style : "BoxLabel"
+    }, {
+      code : "HAB_FORM_UTIL",
+      element : "donnee",
+      libelle : "Utilisateur",
+      longueur : 1,
+      masquerLibelle : true,
+      memeColonne : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "",
+      style : "BoxLabel"
+    }, {
+      code : "HAB_ENTR_UTIL",
+      element : "donnee",
+      libelle : "Utilisateur",
+      longueur : 1,
+      masquerLibelle : true,
+      memeColonne : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "",
+      style : "BoxLabel"
+    }, {
+      code : "HAB_TALENT_UTIL",
+      element : "donnee",
+      libelle : "Utilisateur",
+      longueur : 1,
+      masquerLibelle : true,
+      memeColonne : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "",
+      style : "BoxLabel"
+    }, {
+      code : "HAB_SEC_UTIL",
+      element : "donnee",
+      libelle : "Utilisateur",
+      longueur : 1,
+      masquerLibelle : true,
+      memeColonne : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Responsable",
+      style : "FDonneeG"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "",
+      style : "BoxLabel"
+    }, {
+      code : "HAB_FORM_RESP",
+      element : "donnee",
+      libelle : "Responsable",
+      longueur : 1,
+      masquerLibelle : true,
+      memeColonne : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "",
+      style : "BoxLabel"
+    }, {
+      code : "HAB_ENTR_RESP",
+      element : "donnee",
+      libelle : "Responsable",
+      longueur : 1,
+      masquerLibelle : true,
+      memeColonne : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "",
+      style : "BoxLabel"
+    }, {
+      code : "HAB_TALENT_RESP",
+      element : "donnee",
+      libelle : "Responsable",
+      longueur : 1,
+      masquerLibelle : true,
+      memeColonne : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "",
+      style : "BoxLabel"
+    }, {
+      code : "HAB_SEC_RESP",
+      element : "donnee",
+      libelle : "Responsable",
+      longueur : 1,
+      masquerLibelle : true,
+      memeColonne : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "",
+      style : "BoxLabel"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Gestionnaire",
+      style : "FDonneeG"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "",
+      style : "BoxLabel"
+    }, {
+      code : "HAB_FORM_GEST",
+      element : "donnee",
+      libelle : "Gestionnaire",
+      longueur : 1,
+      masquerLibelle : true,
+      memeColonne : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "",
+      style : "BoxLabel"
+    }, {
+      code : "HAB_ENTR_GEST",
+      element : "donnee",
+      libelle : "Gestionnaire",
+      longueur : 1,
+      masquerLibelle : true,
+      memeColonne : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "",
+      style : "BoxLabel"
+    }, {
+      code : "HAB_TAL_GEST",
+      element : "donnee",
+      libelle : "Gestionnaire",
+      longueur : 1,
+      masquerLibelle : true,
+      memeColonne : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "",
+      style : "BoxLabel"
+    }, {
+      code : "HAB_SEC_GEST",
+      element : "donnee",
+      libelle : "Gestionnaire",
+      longueur : 1,
+      masquerLibelle : true,
+      memeColonne : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Expert",
+      style : "FDonneeG"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "",
+      style : "BoxLabel"
+    }, {
+      code : "HAB_FORM_EXP",
+      element : "donnee",
+      libelle : "Expert",
+      longueur : 1,
+      masquerLibelle : true,
+      memeColonne : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "",
+      style : "BoxLabel"
+    }, {
+      code : "HAB_ENTR_EXP",
+      element : "donnee",
+      libelle : "Expert",
+      longueur : 1,
+      masquerLibelle : true,
+      memeColonne : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "",
+      style : "BoxLabel"
+    }, {
+      code : "HAB_TALENT_EXP",
+      element : "donnee",
+      libelle : "Expert",
+      longueur : 1,
+      masquerLibelle : true,
+      memeColonne : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "",
+      style : "BoxLabel"
+    }, {
+      code : "HAB_FORM_SEC",
+      element : "donnee",
+      libelle : "Expert",
+      longueur : 1,
+      masquerLibelle : true,
+      memeColonne : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Responsable RH",
+      style : "FDonneeG"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "",
+      style : "BoxLabel"
+    }, {
+      code : "HAB_FORM_RRH",
+      element : "donnee",
+      libelle : "Responsable RH",
+      longueur : 1,
+      masquerLibelle : true,
+      memeColonne : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "",
+      style : "BoxLabel"
+    }, {
+      code : "HAB_ENTR_RRH",
+      element : "donnee",
+      libelle : "Responsable RH",
+      longueur : 1,
+      masquerLibelle : true,
+      memeColonne : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "",
+      style : "BoxLabel"
+    }, {
+      code : "HAB_TALENT_RRH",
+      element : "donnee",
+      libelle : "Responsable RH",
+      longueur : 1,
+      masquerLibelle : true,
+      memeColonne : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "",
+      style : "BoxLabel"
+    }, {
+      code : "HAB_SEC_RRH",
+      element : "donnee",
+      libelle : "Responsable RH",
+      longueur : 1,
+      masquerLibelle : true,
+      memeColonne : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Directeur RH",
+      style : "FDonneeG"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "",
+      style : "BoxLabel"
+    }, {
+      code : "HAB_FORM_DRH",
+      element : "donnee",
+      libelle : "Directeur RH",
+      longueur : 1,
+      masquerLibelle : true,
+      memeColonne : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "",
+      style : "BoxLabel"
+    }, {
+      code : "HAB_ENTR_DRH",
+      element : "donnee",
+      libelle : "Directeur RH",
+      longueur : 1,
+      masquerLibelle : true,
+      memeColonne : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "",
+      style : "BoxLabel"
+    }, {
+      code : "HAB_TALENT_DRH",
+      element : "donnee",
+      libelle : "Directeur RH",
+      longueur : 1,
+      masquerLibelle : true,
+      memeColonne : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "",
+      style : "BoxLabel"
+    }, {
+      code : "HAB_SEC_DRH",
+      element : "donnee",
+      libelle : "Directeur RH",
+      longueur : 1,
+      masquerLibelle : true,
+      memeColonne : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Acteur indirect",
+      style : "FDonneeG"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "",
+      style : "BoxLabel"
+    }, {
+      code : "HAB_FORM_ACT",
+      element : "donnee",
+      libelle : "Acteur indirect",
+      longueur : 1,
+      masquerLibelle : true,
+      memeColonne : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "",
+      style : "BoxLabel"
+    }, {
+      code : "HAB_ENTR_ACT",
+      element : "donnee",
+      libelle : "Acteur indirect",
+      longueur : 1,
+      masquerLibelle : true,
+      memeColonne : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "",
+      style : "BoxLabel"
+    }, {
+      code : "HAB_TALENT_ACT",
+      element : "donnee",
+      libelle : "Acteiu indirect",
+      longueur : 1,
+      masquerLibelle : true,
+      memeColonne : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "",
+      style : "BoxLabel"
+    }, {
+      code : "HAB_SEC_ACT",
+      element : "donnee",
+      libelle : "Acteur indirect",
+      longueur : 1,
+      masquerLibelle : true,
+      memeColonne : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    } ],
+    element : "groupe",
+    libelle : "modifier les habilitations d'un utilisateur"
+  },
+  libelle : "Modifier les habilitations",
+  servicelet : "HabilitationUtilsateurJsonServlet",
+  type : "P"
+}

@@ -1,0 +1,14 @@
+##
+V_V5_USER_ALIAS_REF_MATRICULE
+=SQL=
+CREATE OR REPLACE VIEW V_V5_USER_ALIAS_REF_MATRICULE ("ID_USER_ALIAS_REF","MATRICULE") AS 
+select uaref.ID_USER_ALIAS_REF,
+           nvl(uaref.MATRICULE, alias.MATRICULE) as MATRICULE
+    from T_V5_KRH_USER_ALIAS_REF uaref
+    left join T_V5_ALIAS alias
+      on (
+            alias.ID_ALIAS = uaref.ID_ALIAS
+            and alias.MATRICULE is not null
+            and sysdate between alias.DATE_DEBUT and nvl(alias.DATE_FIN, sysdate)
+         )
+   where nvl(uaref.MATRICULE, alias.MATRICULE) is not null

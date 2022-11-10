@@ -1,0 +1,16 @@
+{
+  code : "DEM_FORM_N_M",
+  element : "ecran",
+  groupe : {
+    code : "DEM_FORM_N_M_GRP",
+    donnees : [ {
+      code : "#EOL",
+      element : "donnee"
+    } ],
+    element : "groupe",
+    libelle : "Modifier une demande de formation nominative"
+  },
+  libelle : "Modifier une demande de formation nominative",
+  servicelet : "FormationDemandesJsonServlet",
+  type : "P"
+}

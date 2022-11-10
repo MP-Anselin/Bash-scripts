@@ -1,0 +1,15 @@
+##
+V_V5_GDE_PARAMS_IDR_TAC_R1
+=SQL=
+CREATE OR REPLACE VIEW V_V5_GDE_PARAMS_IDR_TAC_R1 ("ID_SIMULATION","MATRICULE","P_TPS_REST_DE","P_TPS_REST_A","P_TX_ACTU") AS 
+SELECT sim.ID AS id_simulation, params_adp.matricule, p_tps_rest_de, p_tps_rest_a, p_tx_actu
+FROM t_v5_gde_params params, t_v5_gde_salarie_pop sal_pop, t_v5_gde_simulation sim, v_v5_gde_params_adp_r1 params_adp
+WHERE params.p_pop_de = sal_pop.sal_pop_tac
+    AND params.p_pop_a = sal_pop.sal_pop_tac
+    AND params.p_nature = 'TAC'
+    AND sal_pop.id_simulation = sim.ID
+    AND params_adp.id_simulation = sim.ID
+    AND sal_pop.matricule = params_adp.matricule
+    AND params.id_params = sim.id_params_hypothese
+    AND TPS_REST >= params.P_TPS_REST_DE
+    AND TPS_REST < params.P_TPS_REST_A

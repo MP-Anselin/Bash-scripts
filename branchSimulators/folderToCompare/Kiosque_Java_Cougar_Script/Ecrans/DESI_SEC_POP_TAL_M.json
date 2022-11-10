@@ -1,0 +1,536 @@
+{
+  code : "DESI_SEC_POP_TAL_M",
+  element : "ecran",
+  groupe : {
+    code : "DESI_SEC_POP_TAL_GRP",
+    donnees : [ {
+      code : "DESI_SEC_MSG",
+      element : "donnee",
+      libelle : "DESI_SEC_MSG",
+      longueur : 200,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "DESI_SEC_COLL",
+      element : "donnee",
+      libelle : "Collaborateur",
+      longueur : 50,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "DESI_SEC_MAT",
+      element : "donnee",
+      libelle : "Matricule",
+      longueur : 50,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "DESI_SEC_COMP",
+      element : "donnee",
+      libelle : "Composant",
+      longueur : 50,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "DESI_SEC_MSGF1",
+      element : "donnee",
+      libelle : "DESI_SEC_MSG1",
+      longueur : 200,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "ID_MAT",
+      element : "donnee",
+      libelle : "ID_MAT",
+      longueur : 50,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Valeurs du profil",
+      style : "TTitreG"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "",
+      style : "FDonneeG"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "",
+      style : "FDonneeG"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Valeurs surchargées",
+      style : "TTitreG"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Responsable",
+      style : "FormTitreItalic"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "",
+      style : "FDonneeG"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "",
+      style : "FDonneeG"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "",
+      style : "FDonneeG"
+    }, {
+      affichage : "RG_DESI_SEC_RESP",
+      code : "DESI_SEC_RESP",
+      element : "donnee",
+      libelle : "Les responsables",
+      longueur : 1,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      affichage : "RG_DESI_SEC_LST_RESP",
+      code : "DESI_SEC_LST_RESP",
+      element : "donnee",
+      libelle : "DESI_SEC_LST_RESP",
+      longueur : 50,
+      masquerLibelle : true,
+      requete : "DESI_SEC_24",
+      saisie : "select",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Gestionnaire",
+      style : "FormTitreItalic"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      affichage : "DESI_SEC_VPGEST",
+      code : "DESI_SEC_VPGEST",
+      element : "donnee",
+      libelle : "Valeur du profil",
+      longueur : 1,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      affichage : "DESI_SEC_GEST_VPLST",
+      code : "DESI_SEC_GEST_VPLAFF",
+      element : "donnee",
+      libelle : "Les groupes",
+      longueur : 1,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "DESI_SEC_GEST_VPLST",
+      element : "donnee",
+      libelle : "Les groupes",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      affichage : "DESI_SEC_GEST_GRP",
+      code : "DESI_SEC_GEST_GRP",
+      element : "donnee",
+      libelle : "Les groupes",
+      longueur : 1,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      affichage : "RG_DESI_SEC_GEST_GRPLST",
+      code : "DESI_SEC_GEST_GRPLST",
+      element : "donnee",
+      libelle : "Liste gest grp",
+      longueur : 50,
+      masquerLibelle : true,
+      requete : "DESI_SEC_12",
+      saisie : "select",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      affichage : "RG_DESI_SEC_GEST",
+      code : "DESI_SEC_GEST",
+      element : "donnee",
+      libelle : "Les gestionnaires",
+      longueur : 1,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      affichage : "RG_DESI_SEC_GEST_LST",
+      code : "DESI_SEC_GEST_LST",
+      element : "donnee",
+      libelle : "Liste gest ",
+      longueur : 50,
+      masquerLibelle : true,
+      requete : "DESI_SEC_26",
+      saisie : "select",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Expert",
+      style : "FormTitreItalic"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      affichage : "DESI_SEC_VPEXP",
+      code : "DESI_SEC_VPEXP",
+      element : "donnee",
+      libelle : "Valeur du profil",
+      longueur : 1,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      affichage : "DESI_SEC_VPEXP_LST",
+      code : "DESI_SEC_VPEXP_LSTAFF",
+      element : "donnee",
+      libelle : "Liste EXPVP LST",
+      longueur : 50,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "DESI_SEC_VPEXP_LST",
+      element : "donnee",
+      libelle : "Liste EXPVP LST",
+      longueur : 50,
+      masquerLibelle : true,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      affichage : "DESI_SEC_EXP_GRP",
+      code : "DESI_SEC_EXP_GRP",
+      element : "donnee",
+      libelle : "Les groupes",
+      longueur : 1,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      affichage : "DESI_SEC_EXP_GRPLST",
+      code : "DESI_SEC_EXP_GRPLST",
+      element : "donnee",
+      libelle : "Liste EXP LST",
+      longueur : 50,
+      masquerLibelle : true,
+      requete : "DESI_SEC_12",
+      saisie : "select",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      affichage : "DESI_SEC_EXP",
+      code : "DESI_SEC_EXP",
+      element : "donnee",
+      libelle : "Les experts",
+      longueur : 1,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      affichage : "DESI_SEC_EXP_LST",
+      code : "DESI_SEC_EXP_LST",
+      element : "donnee",
+      libelle : "Liste EXP LST",
+      longueur : 50,
+      masquerLibelle : true,
+      requete : "DESI_SEC_28",
+      saisie : "select",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Directeur RH",
+      style : "FormTitreItalic"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      affichage : "DESI_SEC_VPDRH",
+      code : "DESI_SEC_VPDRH",
+      element : "donnee",
+      libelle : "Valeur du profil",
+      longueur : 1,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      affichage : "DESI_SEC_DIRH_VP",
+      code : "DESI_SEC_DIRH_VPAFF",
+      element : "donnee",
+      libelle : "Les groupes",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "DESI_SEC_DIRH_VP",
+      element : "donnee",
+      libelle : "Les groupes",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      affichage : "DESI_SEC_DIRH_GRP",
+      code : "DESI_SEC_DIRH_GRP",
+      element : "donnee",
+      libelle : "Les groupes",
+      longueur : 1,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      affichage : "DESI_SEC_DIRH_GRPLST",
+      code : "DESI_SEC_DIRH_GRPLST",
+      element : "donnee",
+      libelle : "Liste DIRH",
+      longueur : 50,
+      masquerLibelle : true,
+      requete : "DESI_SEC_12",
+      saisie : "select",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      affichage : "DESI_SEC_DIRH",
+      code : "DESI_SEC_DIRH",
+      element : "donnee",
+      libelle : "Les directeurs RH",
+      longueur : 1,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      affichage : "DESI_SEC_DIRH_LST",
+      code : "DESI_SEC_DIRH_LST",
+      element : "donnee",
+      libelle : "Liste DIRH",
+      longueur : 50,
+      masquerLibelle : true,
+      requete : "DESI_SEC_30",
+      saisie : "select",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Responsable RH",
+      style : "FormTitreItalic"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      affichage : "DESI_SEC_VPREPRH",
+      code : "DESI_SEC_VPREPRH",
+      element : "donnee",
+      libelle : "Valeur du profil",
+      longueur : 1,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      affichage : "DESI_SEC_RESPRH_VP",
+      code : "DESI_SEC_RESPRH_VPAFF",
+      element : "donnee",
+      libelle : "Les groupes",
+      longueur : 1,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "DESI_SEC_RESPRH_VP",
+      element : "donnee",
+      libelle : "Les groupes",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      affichage : "DESI_SEC_RESPRH_GRP",
+      code : "DESI_SEC_RESPRH_GRP",
+      element : "donnee",
+      libelle : "Les groupes",
+      longueur : 1,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      affichage : "DESI_SEC_RSRH_GRPLST",
+      code : "DESI_SEC_RSRH_GRPLST",
+      element : "donnee",
+      libelle : "Liste RESRH",
+      longueur : 50,
+      masquerLibelle : true,
+      requete : "DESI_SEC_12",
+      saisie : "select",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      affichage : "DESI_SEC_RESPRH",
+      code : "DESI_SEC_RESPRH",
+      element : "donnee",
+      libelle : "Les responsables RH",
+      longueur : 1,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      affichage : "DESI_SEC_RESPRH_LST",
+      code : "DESI_SEC_RESPRH_LST",
+      element : "donnee",
+      libelle : "Liste RESRH",
+      longueur : 50,
+      masquerLibelle : true,
+      requete : "DESI_SEC_32",
+      saisie : "select",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Acteur indirect",
+      style : "FormTitreItalic"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      affichage : "DESI_SEC_VPACTINF",
+      code : "DESI_SEC_VPACTINF",
+      element : "donnee",
+      libelle : "Valeur du profil",
+      longueur : 1,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      affichage : "DESI_SEC_ACTIND_VP",
+      code : "DESI_SEC_ACTIND_VPAFF",
+      element : "donnee",
+      libelle : "Les groupes",
+      longueur : 1,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "DESI_SEC_ACTIND_VP",
+      element : "donnee",
+      libelle : "Les groupes",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      affichage : "DESI_SEC_ACTIND_GRP",
+      code : "DESI_SEC_ACTIND_GRP",
+      element : "donnee",
+      libelle : "Les groupes",
+      longueur : 1,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      affichage : "DESI_SEC_ATID_GRPLST",
+      code : "DESI_SEC_ATID_GRPLST",
+      element : "donnee",
+      libelle : "Liste ACTIND",
+      longueur : 50,
+      masquerLibelle : true,
+      requete : "DESI_SEC_12",
+      saisie : "select",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      affichage : "DESI_SEC_ACTIND",
+      code : "DESI_SEC_ACTIND",
+      element : "donnee",
+      libelle : "Les acteurs indirects RH",
+      longueur : 1,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      affichage : "DESI_SEC_ACTIND_LST",
+      code : "DESI_SEC_ACTIND_LST",
+      element : "donnee",
+      libelle : "Liste ACTIND",
+      longueur : 50,
+      masquerLibelle : true,
+      requete : "DESI_SEC_34",
+      saisie : "select",
+      style : "FDonneeG",
+      type : "X"
+    } ],
+    element : "groupe",
+    libelle : "Modifier les désignations d'un utilisateur"
+  },
+  libelle : "Modifier les désignations d'un utilisateur",
+  servicelet : "DesignationSecuriteJsonServlet",
+  type : "P"
+}

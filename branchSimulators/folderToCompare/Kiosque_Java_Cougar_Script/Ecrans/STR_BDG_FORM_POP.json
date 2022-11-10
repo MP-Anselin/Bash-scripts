@@ -1,0 +1,77 @@
+{
+  code : "STR_BDG_FORM_POP",
+  element : "ecran",
+  groupe : {
+    code : "STR_BDG_FORM_POP_GRP",
+    donnees : [ {
+      code : "STR_BDG_FORM_ID",
+      element : "donnee",
+      libelle : "ID",
+      longueur : 50,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "STR_BDG_FORM_CODE",
+      element : "donnee",
+      libelle : "Code",
+      longueur : 50,
+      obligatoire : true,
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "STR_BDG_FORM_ANNEE",
+      element : "donnee",
+      libelle : "Année",
+      longueur : 50,
+      obligatoire : true,
+      requete : "STR_BDG_FORM_3",
+      saisie : "select",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "STR_BDG_FORM_LIB",
+      element : "donnee",
+      libelle : "Libellé",
+      longueur : 256,
+      obligatoire : true,
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "STR_BDG_FORM_ACTIF",
+      element : "donnee",
+      libelle : "Actif",
+      longueur : 1,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "STR_BDG_FORM_HISTO",
+      element : "donnee",
+      libelle : "Historiser",
+      longueur : 1,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    } ],
+    element : "groupe",
+    libelle : "Ajouter un groupe de structures budgétaires"
+  },
+  libelle : "Ajouter un groupe de structures budgétaire",
+  servicelet : "FormationStructureBudgetaire",
+  type : "P"
+}

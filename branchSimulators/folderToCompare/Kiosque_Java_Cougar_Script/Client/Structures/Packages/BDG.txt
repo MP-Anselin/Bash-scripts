@@ -1,0 +1,126 @@
+##
+BDG
+=SQL=
+CREATE OR REPLACE PACKAGE BDG AS 
+
+	FUNCTION get_BDG_GROUPE RETURN TABLE_KRHEF_AFF_BDG_GROUPE;
+
+END BDG;
+##
+BDG
+=SQL=
+CREATE OR REPLACE PACKAGE BODY BDG AS
+
+	  FUNCTION get_BDG_GROUPE
+	 RETURN TABLE_KRHEF_AFF_BDG_GROUPE
+	 AS
+	 
+	 w_BDG_GROUPE TABLE_KRHEF_AFF_BDG_GROUPE:=TABLE_KRHEF_AFF_BDG_GROUPE();
+	 numlig  NUMBER:=0;
+	 
+	 cursor cur IS
+	 select abg.ID_AFF_BDG_GROUPE,
+	 abg.CODE,
+	 abg.ANNEE_PLAN,
+	 abg.DESCRIPTION,
+	 abg.DATE_MAJ,
+	 abg.ACTIF,
+	 abg.HISTORISE,
+	 (select sum(nvl(MONTANT, 0))
+	 from T_V5_KRHEF_AFF_BDG_DETAIL abd
+	 where abd.ID_AFF_BDG_GROUPE = abg.ID_AFF_BDG_GROUPE) as MONTANT,
+	 (case when (select sum(case when fo.COLLECTIF = 1
+	 and fo.TYPE_COUT = 'I'
+	 then (nvl(cp.COUT, 0) +
+	 nvl(cp.COUT_HEBERGEMENT, 0) +
+	 nvl(cp.COUT_TRANSPORT, 0) +
+	 nvl(cp.COUT_TUTEUR, 0) +
+	 nvl(cp.COUT_SAL_FORMATEUR, 0) +
+	 nvl(cp.COUT_SALARIAL, 0)) * fo.NBRE_COLLECTIF
+	 else (nvl(cp.COUT, 0) +
+	 nvl(cp.COUT_HEBERGEMENT, 0) +
+	 nvl(cp.COUT_TRANSPORT, 0) +
+	 nvl(cp.COUT_TUTEUR, 0) +
+	 nvl(cp.COUT_SAL_FORMATEUR, 0) +
+	 nvl(cp.COUT_SALARIAL, 0))
+	 end)
+	 from T_V5_KRHEF_AFF_BDG_DETAIL abd
+	 join V_V5_KRHEF_FORM_COUT_PLAN cp on
+	 (abd.ID_AFF_BDG_DETAIL = cp.ID_AFF_BDG_DETAIL)
+	 join V_V5_KRHEF_FORM_DEMANDE fo on
+	 (cp.ID_FORMATION_DEMANDE = fo.ID_FORMATION_DEMANDE
+	 and fo.STATUT_EXPERT != 2
+	 and fo.STATUT_EXPERT != 4)
+	 
+	 left join T_V5_KRHEF_PLAN pl on
+	 (cp.ID_PLAN = pl.ID_PLAN)
+	 where (fo.COLLECTIF is null
+	 or (fo.COLLECTIF = 0
+	 and fo.ID_REF_COLLECTIF IS NULL
+	 and fo.COLLABORATEUR IS NOT NULL)
+	 or (fo.COLLECTIF =1
+	 and pl.DEMANDE_COLL = 1)) and abd.ID_AFF_BDG_GROUPE = abg.ID_AFF_BDG_GROUPE
+	 and abd.MONTANT is not null) is null
+	 then 0
+	 else (select sum(case when fo.COLLECTIF = 1
+	 and fo.TYPE_COUT = 'I'
+	 then (nvl(cp.COUT, 0) +
+	 nvl(cp.COUT_HEBERGEMENT, 0) +
+	 nvl(cp.COUT_TRANSPORT, 0) +
+	 nvl(cp.COUT_TUTEUR, 0) +
+	 nvl(cp.COUT_SAL_FORMATEUR, 0) +
+	 nvl(cp.COUT_SALARIAL, 0)) * fo.NBRE_COLLECTIF
+	 else (nvl(cp.COUT, 0) +
+	 nvl(cp.COUT_HEBERGEMENT, 0) +
+	 nvl(cp.COUT_TRANSPORT, 0) +
+	 nvl(cp.COUT_TUTEUR, 0) +
+	 nvl(cp.COUT_SAL_FORMATEUR, 0) +
+	 nvl(cp.COUT_SALARIAL, 0))
+	 end)
+	 from T_V5_KRHEF_AFF_BDG_DETAIL abd
+	 join V_V5_KRHEF_FORM_COUT_PLAN cp on
+	 (abd.ID_AFF_BDG_DETAIL = cp.ID_AFF_BDG_DETAIL)
+	 join V_V5_KRHEF_FORM_DEMANDE fo on
+	 (cp.ID_FORMATION_DEMANDE = fo.ID_FORMATION_DEMANDE
+	 and fo.STATUT_EXPERT != 2
+	 and fo.STATUT_EXPERT != 4)
+	 
+	 left join T_V5_KRHEF_PLAN pl on
+	 (cp.ID_PLAN = pl.ID_PLAN)
+	 where (fo.COLLECTIF is null or (fo.COLLECTIF = 0
+	 and fo.ID_REF_COLLECTIF IS NULL and fo.COLLABORATEUR IS NOT NULL)or (fo.COLLECTIF =1 and pl.DEMANDE_COLL = 1)) and abd.ID_AFF_BDG_GROUPE = abg.ID_AFF_BDG_GROUPE and abd.MONTANT is not null)end) as SOLDE,
+	 
+	 (select count(*)from T_V5_KRHEF_AFF_BDG_DETAIL abd where abd.ID_AFF_BDG_GROUPE = abg.ID_AFF_BDG_GROUPE) as NB_AFF_BDG_LIES,
+	 
+	 
+	 (case when (select count(*) from T_V5_KRHEF_FORM_COUT_PLAN cp where cp.ID_AFF_BDG_DETAIL in (select abd.ID_AFF_BDG_DETAIL from T_V5_KRHEF_AFF_BDG_DETAIL abd  where abd.ID_AFF_BDG_GROUPE = abg.ID_AFF_BDG_GROUPE)) > 0 then 'N' else 'O' end) as AFFICHE_BTN_SUPP
+	 
+	 --  BULK COLLECT INTO w_BDG_GROUPE
+	 FROM  T_V5_KRHEF_AFF_BDG_GROUPE abg ;
+	 
+	 lig cur%rowtype;
+	 BEGIN
+	 OPEN cur;
+	 LOOP
+	 FETCH cur INTO lig;
+	 EXIT
+	 WHEN cur%NOTFOUND ;
+	 
+	 numlig                          :=numlig+1;
+	 w_BDG_GROUPE.extend;
+	 w_BDG_GROUPE(numlig)                        :=KRHEF_AFF_BDG_GROUPE(NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+	 w_BDG_GROUPE(numlig).ID_AFF_BDG_GROUPE     := lig.ID_AFF_BDG_GROUPE  ;
+	 w_BDG_GROUPE(numlig).CODE                  := lig.CODE               ;
+	 w_BDG_GROUPE(numlig).ANNEE_PLAN            := lig.ANNEE_PLAN         ;
+	 w_BDG_GROUPE(numlig).DESCRIPTION           := lig.DESCRIPTION        ;
+	 w_BDG_GROUPE(numlig).DATE_MAJ              := lig.DATE_MAJ           ;
+	 w_BDG_GROUPE(numlig).ACTIF                 := lig.ACTIF              ;
+	 w_BDG_GROUPE(numlig).HISTORISE             := lig.HISTORISE          ;
+	 w_BDG_GROUPE(numlig).MONTANT               := lig.MONTANT            ;
+	 w_BDG_GROUPE(numlig).SOLDE                 := lig.SOLDE              ;
+	 w_BDG_GROUPE(numlig).NB_AFF_BDG_LIES       := lig.NB_AFF_BDG_LIES    ;
+	 w_BDG_GROUPE(numlig).AFFICHE_BTN_SUPP                := lig.AFFICHE_BTN_SUPP             ;
+	 END LOOP;
+	 RETURN w_BDG_GROUPE;
+	 END get_BDG_GROUPE;
+END BDG;

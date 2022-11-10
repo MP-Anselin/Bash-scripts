@@ -1,0 +1,54 @@
+{
+  code : "VARSYS",
+  element : "ecran",
+  groupe : {
+	element: "groupe",
+	code: "VARSYS_GRP",
+	libelle: "Générer les écrans groupe",
+	donnees: [{
+		element: "donnee",
+		code: "#BOUTONPERSO",
+		libelle: "Recharger",
+		operation: "Recharger",
+		icon: "fa fa-refresh"
+	},{
+		element: "groupe",
+		code: "VARSYS_MOD_GRP",
+		libelle: "Variables modèles",
+		onglet: "true",
+		donnees: [{
+			element: "donnee",
+			code: "#TABLEAU",
+			requete : "VARSYS_1",
+			pageModif: "VARSYS_MOD_POP"
+		}]
+	},{
+		element: "groupe",
+		code: "VARSYS_CLI_GRP",
+		libelle: "Variables clientes",
+		onglet: "true",
+		donnees: [{
+			element: "donnee",
+			code: "#TABLEAU",
+			requete : "VARSYS_2",
+			pageAjout: "VARSYS_CLI_POP",
+			pageModif: "VARSYS_CLI_POP"
+		}]
+	},{
+		element: "groupe",
+		code: "VARSYS_USR_GRP",
+		libelle: "Variables utilisateurs",
+		onglet: "true",
+		donnees: [{
+			element: "donnee",
+			code: "#TABLEAU",
+			requete : "VARSYS_3",
+			pageAjout: "VARSYS_USR_POP",
+			pageModif: "VARSYS_USR_POP"
+		}]
+	}]
+  },
+  libelle : "Variables systèmes",
+  servicelet : "VarsysJsonServlet",
+  type : "U"
+}

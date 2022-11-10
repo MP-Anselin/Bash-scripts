@@ -1,0 +1,34 @@
+##
+V_V5_KRH_MOTIF_KRH_SALARIE
+=SQL=
+CREATE OR REPLACE VIEW V_V5_KRH_MOTIF_KRH_SALARIE ("MATRICULE","MOTIF","ORDRE","ID_FILTRE","VISIBLE_COLL","VISIBLE_RESP","VISIBLE_GEST","NUM_RULE_VALIDATION","NUM_RULE_ANNULATION","NUM_RULE_VALIDATION_SIGNATAIRE") AS 
+SELECT sal.matricule, sal.motif, sal.ordre, sal.id_filtre, visible_coll, visible_resp, visible_gest,
+case when usr.EST_AUTOVALIDE_PAIE = 1 and flt.NUM_RULE_VALIDATION_AV is not null
+  then
+     flt.NUM_RULE_VALIDATION_AV
+  else
+     flt.NUM_RULE_VALIDATION
+  end AS
+num_rule_validation,
+case when usr.EST_AUTOVALIDE_PAIE = 1 and flt.NUM_RULE_ANNULATION_AV is not null
+  then
+     flt.NUM_RULE_ANNULATION_AV
+  else
+     flt.NUM_RULE_ANNULATION
+  end AS
+num_rule_annulation,
+case when flt.NUM_RULE_VALIDATION_AV is not null
+  then
+     flt.NUM_RULE_VALIDATION_AV
+  else
+     flt.NUM_RULE_VALIDATION
+  end AS
+num_rule_validation_signataire
+FROM V_V5_KRH_MOTIFS_KRH_SALARIE sal, V_V5_KRH_MOTIFS_KRH_FILTRE flt, T_V5_KRH_USER usr
+WHERE sal.ordre = (SELECT MIN(salo.ordre) FROM V_V5_KRH_MOTIFS_KRH_SALARIE salo
+               WHERE salo.matricule = sal.matricule
+               AND salo.motif = sal.motif)
+AND flt.id_filtre = sal.id_filtre
+and usr.MATRICULE = sal.MATRICULE
+AND flt.motif = sal.motif
+ORDER BY sal.matricule, sal.motif, sal.ordre

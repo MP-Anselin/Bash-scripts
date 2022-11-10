@@ -1,0 +1,14 @@
+##
+V_V5_USER_ALIAS_REF_AOID
+=SQL=
+CREATE OR REPLACE VIEW V_V5_USER_ALIAS_REF_AOID ("ID_USER_ALIAS_REF","AOID") AS 
+select uaref.ID_USER_ALIAS_REF,
+           lower(nvl(uaref.LOGON, alias.LOGON)) as AOID
+    from T_V5_KRH_USER_ALIAS_REF uaref
+    left join T_V5_ALIAS alias
+      on (
+            alias.ID_ALIAS = uaref.ID_ALIAS
+            and alias.LOGON is not null
+            and sysdate between alias.DATE_DEBUT and nvl(alias.DATE_FIN, sysdate)
+         )
+   where nvl(uaref.LOGON, alias.LOGON) is not null

@@ -1,0 +1,38 @@
+##
+TAG_CHARSET=@€éèç
+##
+TRG_ALTER_META
+=SQL=
+CREATE OR REPLACE TRIGGER TRG_ALTER_META
+AFTER ALTER ON SCHEMA
+DECLARE
+  nomTableAlter VARCHAR2(128);
+  suffixTableAlter VARCHAR2(128);
+  doTest NUMBER;
+  listePrefix TAB_VARCHAR:=META_LISTE_PREFIX_TABLE();
+  existeTable NUMBER;
+  nbTables NUMBER;
+BEGIN
+  nomTableAlter := UPPER(ORA_DICT_OBJ_NAME);
+  doTest := 0;
+  FOR i IN listePrefix.first..listePrefix.last
+  LOOP
+    IF INSTR(nomTableAlter,listePrefix(i)||'_')=1 THEN
+      suffixTableAlter := SUBSTR(nomTableAlter,LENGTH(listePrefix(i))+1);
+      doTest := 1;
+    END IF;
+    EXIT WHEN doTest=1;
+  END LOOP;
+  IF doTest=1 THEN
+    nbTables := 0;
+    FOR i IN listePrefix.first..listePrefix.last
+    LOOP
+      SELECT COUNT(*) INTO existeTable FROM USER_TABLES WHERE TABLE_NAME=listePrefix(i)||suffixTableAlter;
+      nbTables := nbTables+existeTable;
+      EXIT WHEN existeTable=0;
+    END LOOP;
+    IF nbTables=listePrefix.last THEN
+      RAISE_APPLICATION_ERROR(-20000,'Pour mettre à jour la structure d''une table META ou d''une table devant avoir la même structure qu''une table META, merci d''utiliser la procédure META_MODIF_STRUCTURE (pour supprimer une colonne, passez le 3ème paramètre à NULL)');    
+    END IF;
+  END IF;
+END TRG_ALTER_META;

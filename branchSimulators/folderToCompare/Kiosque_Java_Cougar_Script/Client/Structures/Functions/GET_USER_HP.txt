@@ -1,0 +1,102 @@
+##
+TAG_CHARSET=@€ιθη
+##
+GET_USER_HP
+=SQL=
+create or replace FUNCTION GET_USER_HP RETURN table_krhef_aff_user_hp AS user_hp table_krhef_aff_user_hp := table_krhef_aff_user_hp();
+ numlig                  NUMBER := 0;
+ x number;
+ ret_code boolean ;
+ CURSOR cur IS
+ select vsu.NOM|| ' '|| VSU.PRENOM np,vsu.matricule as matricule,vsu.DATE_ENTREE as DATE_ENTREE,vsu.DATE_SORTIE as DATE_SORTIE,iot.valeur as matricule_paie ,case when vsu.IS_SORTI = 0 and( vsu.EST_UTILISATEUR_PAIE = 1
+ or vsu.EST_UTILISATEUR_GTAWEB = 1
+ or vsu.EST_UTILISATEUR_ENTR = 1
+ and NVL(vsu.HORS_PAIE, 0) = 0
+ or vsu.EST_UTILISATEUR_FORM = 1
+ or vsu.EST_UTILISATEUR_TAL = 1 or vsu.EST_GESTIONNAIRE_PAIE = 1
+ or vsu.EST_GESTIONNAIRE_GTAWEB = 1
+ or vsu.EST_GESTIONNAIRE_ENTR = 1
+ or vsu.EST_GESTIONNAIRE_FORM = 1
+ or vsu.EST_GESTIONNAIRE_TAL = 1
+ or vsu.EST_GESTIONNAIRE_ATTESTATION = 1 or vsu.EST_EXPERT_SECURITE = 1
+ or vsu.EST_EXPERT_PAIE = 1
+ or vsu.EST_EXPERT_GTAWEB = 1
+ or vsu.EST_EXPERT_ENTR = 1
+ or vsu.EST_EXPERT_FORM = 1
+ or vsu.EST_EXPERT_TAL = 1 or vsu.EST_RESPONSABLE = 1
+ or vsu.EST_RESPONSABLE_PAIE = 1
+ or vsu.EST_RESPONSABLE_GTAWEB = 1
+ or vsu.EST_RESPONSABLE_ENTR = 1
+ or vsu.EST_RESPONSABLE_FORM = 1
+ or vsu.EST_RESPONSABLE_TAL = 1 )  then 1 else 0 end as actif from V_V5_KRH_SALARIE_USER vsu  LEFT JOIN T_V5_KRH_SALARIE_IO_TYPE iot on iot.MATRICULE = vsu.MATRICULE  where hors_paie=1;
+ 
+ CURSOR cur1 IS
+ select vsu.NOM|| ' '|| VSU.PRENOM np,vsu.matricule as matricule,DATE_ENTREE as DATE_ENTREE,DATE_SORTIE as DATE_SORTIE,iot.valeur as matricule_paie ,case when vsu.IS_SORTI = 0 and( vsu.EST_UTILISATEUR_PAIE = 1
+ or vsu.EST_UTILISATEUR_GTAWEB = 1
+ or vsu.EST_UTILISATEUR_ENTR = 1
+ or vsu.EST_UTILISATEUR_FORM = 1
+ or vsu.EST_UTILISATEUR_TAL = 1 or vsu.EST_GESTIONNAIRE_PAIE = 1
+ or vsu.EST_GESTIONNAIRE_GTAWEB = 1
+ or vsu.EST_GESTIONNAIRE_ENTR = 1
+ or vsu.EST_GESTIONNAIRE_FORM = 1
+ or vsu.EST_GESTIONNAIRE_TAL = 1
+ or vsu.EST_GESTIONNAIRE_ATTESTATION = 1 or vsu.EST_EXPERT_SECURITE = 1
+ or vsu.EST_EXPERT_PAIE = 1
+ or vsu.EST_EXPERT_GTAWEB = 1
+ or vsu.EST_EXPERT_ENTR = 1
+ or vsu.EST_EXPERT_FORM = 1
+ or vsu.EST_EXPERT_TAL = 1 or vsu.EST_RESPONSABLE = 1
+ or vsu.EST_RESPONSABLE_PAIE = 1
+ or vsu.EST_RESPONSABLE_GTAWEB = 1
+ or vsu.EST_RESPONSABLE_ENTR = 1
+ or vsu.EST_RESPONSABLE_FORM = 1
+ or vsu.EST_RESPONSABLE_TAL = 1) then 1 else 0 end as actif from V_V5_KRH_SALARIE_USER vsu  LEFT JOIN T_V5_KRH_SALARIE_IO_TYPE iot on iot.MATRICULE = vsu.MATRICULE  where hors_paie=1;
+ lig                     cur%rowtype;
+ BEGIN
+ 
+ 
+ select decode( valeur ,2,1,0) INTO x  from T_V5_INFO where code='OPT_UTIL_HORSPAIE_HABILITATION' ;
+ if(x=0) then
+ ret_code:=true;
+ else ret_code:=false;
+ end if;
+ if (ret_code=true) then
+ OPEN cur;
+ LOOP
+ FETCH cur INTO lig;
+ EXIT WHEN cur%notfound;
+ numlig := numlig + 1;
+ user_hp.extend;
+ user_hp(numlig) := krhef_aff_user_hp(NULL, NULL, NULL, NULL,NULL,NULL);
+ user_hp(numlig).matricule:= lig.matricule;
+ user_hp(numlig).np := lig.np;
+ user_hp(numlig).DATE_ENTREE := lig.DATE_ENTREE;
+ user_hp(numlig).DATE_SORTIE := lig.DATE_SORTIE;
+ user_hp(numlig).matricule_paie:= lig.matricule_paie;
+ user_hp(numlig).actif:= lig.actif;
+ 
+ 
+ 
+ END LOOP;
+ else
+ OPEN cur1;
+ LOOP
+ FETCH cur1 INTO lig;
+ EXIT WHEN cur1%notfound;
+ numlig := numlig + 1;
+ user_hp.extend;
+ user_hp(numlig) := krhef_aff_user_hp(NULL, NULL, NULL, NULL,NULL,NULL);
+ 
+ user_hp(numlig).np := lig.np;
+ user_hp(numlig).matricule:= lig.matricule;
+ user_hp(numlig).DATE_ENTREE := lig.DATE_ENTREE;
+ user_hp(numlig).DATE_SORTIE := lig.DATE_SORTIE;
+ user_hp(numlig).matricule_paie:= lig.matricule_paie;
+ user_hp(numlig).actif:= lig.actif;
+ 
+ 
+ 
+ END LOOP;
+ end if;
+ RETURN user_hp;
+ END GET_USER_HP;

@@ -1,0 +1,10 @@
+##
+WKF_FCTUSER
+=SQL IFNOTEXIST=WKF_FCTUSER=
+CREATE TABLE WKF_FCTUSER ( FCT_NUM NUMBER(*,3) NOT NULL ENABLE, FCT_CLASS VARCHAR2(150), FCT_DESC VARCHAR2(255), PRIMARY KEY (FCT_NUM) ) 
+##
+WKF_FCTUSER
+==
+DELETE FROM WKF_FCTUSER WHERE FCT_NUM IN (1,2)
+'1','fr.adp.com.gxp.std.mot_met.lib.objects.workflow.outservices.MemeUser','Même utilisateur'
+'2','fr.adp.com.gxp.std.mot_met.lib.objects.workflow.Retour_Initiateur','Initiateur du workflow'

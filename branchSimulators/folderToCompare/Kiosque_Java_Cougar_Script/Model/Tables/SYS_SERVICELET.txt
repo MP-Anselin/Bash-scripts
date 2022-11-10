@@ -1,0 +1,248 @@
+##
+SYS_SERVICELET
+=SQL IFNOTEXIST=SYS_SERVICELET=
+CREATE TABLE SYS_SERVICELET ( TYP VARCHAR2(1), SYNONYME VARCHAR2(100), CLASS_NAME VARCHAR2(255), ACTIF VARCHAR2(1), PRIMARY KEY (TYP, SYNONYME) ) 
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME IN ('AccueilDynamiqueServiceLet', 'AccueilDynamiqueSsLiensServiceLet', 'AccueilJsonServlet', 'AutomationJsonServlet', 'DeskJsonServlet', 'GenericJsonServlet', 'GenericServiceLet', 'GenericSuppJsonServiceLet', 'GestionAideEnLigneJsonServlet', 'GestionAppelsTableServiceLet', 'GestionDelegationAdminJsonServlet', 'GestionChartsJsonServlet', 'GestionDelegationAdminJsonServlet', 'GestionDelegationExpertJsonServlet', 'GestionDelegationManagerJsonServlet', 'GraphJsonServlet', 'InfoMatriculeCourantJsonServlet', 'LookAndFeelServiceLet', 'SlidePreferenceJsonServlet', 'ThemeJsonServlet', 'Traitement_InitAoid', 'Traitement_LancementBatchCFT','UserServiceLet','NewsJsonServlet')
+'J','AccueilJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.accueil.AccueilJsonServlet','O'
+'J','AutomationJsonServlet','fr.adp.com.gxp.std.modules.lib.servicelet.automation.AutomationJsonServlet','O'
+'J','DeskJsonServlet','fr.adp.com.gxp.std.modules.lib.servicelet.bureau.DeskJsonServlet','O'
+'J','GenericJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.GenericJsonServlet','O'
+'J','GenericSuppJsonServiceLet','fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.interpreteur.GenericSuppJsonServiceLet','O'
+'J','GestionAideEnLigneJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.GestionAideEnLigneJsonServlet','O'
+'J','GestionChartsJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.GestionChartsJsonServlet','O'
+'J','GestionDelegationAdminJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.delegation.GestionDelegationAdminJsonServlet','O'
+'J','GestionDelegationExpertJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.delegation.GestionDelegationExpertJsonServlet','O'
+'J','GestionDelegationManagerJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.delegation.GestionDelegationManagerJsonServlet','O'
+'J','GraphJsonServlet','fr.adp.com.gxp.std.modules.lib.graph.GraphJsonServlet','O'
+'J','InfoMatriculeCourantJsonServlet','fr.adp.com.gxp.std.modules.lib.servicelet.InfoMatriculeCourantModulesJsonServlet','O'
+'J','SlidePreferenceJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.SlidePreferenceJsonServlet','O'
+'J','ThemeJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.theme.ThemeJsonServlet','O'
+'S','AccueilDynamiqueServiceLet','fr.adp.com.gxp.std.mot_met.lib.servicelet.accueil.AccueilDynamiqueServiceLet','O'
+'S','AccueilDynamiqueSsLiensServiceLet','fr.adp.com.gxp.std.mot_met.lib.servicelet.accueil.AccueilDynamiqueSsLiensServiceLet','O'
+'S','GenericServiceLet','fr.adp.com.gxp.std.mot_met.lib.servicelet.GenericServiceLet','O'
+'S','GestionAppelsTableServiceLet','fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.GestionAppelsTableServiceLet','O'
+'S','LookAndFeelServiceLet','fr.adp.com.gxp.std.mot_met.lib.servicelet.LookAndFeelServiceLet','O'
+'T','Traitement_InitAoid','fr.adp.com.gxp.std.mot_met.lib.objects.Traitement_InitAoid','O'
+'T','Traitement_LancementBatchCFT','fr.adp.com.gxp.std.mot_met.lib.objects.traitements.Traitement_LancementBatchCFT','O'
+'S','UserServiceLet','fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.UserServiceLet','O'
+'J','NewsJsonServlet','fr.adp.com.gxp.std.modules.lib.news.NewsJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME = 'VarSysJsonServlet'
+'J','VarSysJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.VarSysJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME = 'AppelTableJsonServlet'
+'J','AppelTableJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.common.recherche.AppelTableJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME IN ('ParametrageDonneesJsonServlet', 'ParametrageEcransJsonServlet', 'ParametrageGroupesDonneesJsonServlet')
+'J','ParametrageDonneesJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.paramecrandyn.ParametrageDonneesJsonServlet','O'
+'J','ParametrageEcransJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.paramecrandyn.ParametrageEcransJsonServlet','O'
+'J','ParametrageGroupesDonneesJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.paramecrandyn.ParametrageGroupesDonneesJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME = 'GestionProjetJsonServlet'
+'J','GestionProjetJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.paramecrandyn.GestionProjetJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME = 'CreationSysRequetesJspJsonServlet'
+'J','CreationSysRequetesJspJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.paramecrandyn.CreationSysRequetesJspJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME = 'ParametrageReglesGestionJsonServicelet'
+'J','ParametrageReglesGestionJsonServicelet','fr.adp.com.gxp.std.mot_met.lib.servicelet.paramecrandyn.ParametrageReglesGestionJsonServicelet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME = 'ParametrageReglesGestionServiceLet'
+'S','ParametrageReglesGestionServiceLet','fr.adp.com.gxp.std.mot_met.lib.servicelet.paramecrandyn.ParametrageReglesGestionServiceLet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME IN ('FormationAxesStrategiquesJsonServlet','FormationOrganismesJsonServlet','FormationFinanceursJsonServlet','DomaineFormationJsonServlet','FormationActeurJsonServlet','FormationLieuJsonServlet')
+'J','DomaineFormationJsonServlet','fr.adp.com.kiosque.jsonservlet.exp.form.ref.DomaineFormationJsonServlet','O'
+'J','FormationFinanceursJsonServlet','fr.adp.com.kiosque.jsonservlet.exp.form.ref.FormationFinanceursJsonServlet','O'
+'J','FormationLieuJsonServlet','fr.adp.com.kiosque.jsonservlet.exp.form.ref.FormationLieuJsonServlet','O'
+'J','FormationActeurJsonServlet','fr.adp.com.kiosque.jsonservlet.exp.form.ref.FormationActeurJsonServlet','O'
+'J','FormationAxesStrategiquesJsonServlet','fr.adp.com.kiosque.jsonservlet.exp.form.ref.FormationAxesStrategiquesJsonServlet','O'
+'J','FormationOrganismesJsonServlet','fr.adp.com.kiosque.jsonservlet.exp.form.ref.FormationOrganismesJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME IN ('RechercheCollaborateurJsonServlet', 'GenericEphemereServiceLet', 'InfoProjetCourantJsonServlet', 'ConnexionStatutServiceLet', 'InterpreteurEcranJsonServlet', 'AppelTableToolsJsonServlet', 'StdErreurServiceLetCMS', 'Tools_ExtJSJsonServlet', 'StdErreurServiceLet', 'UserActifServiceLet')
+'J','InterpreteurEcranJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.interpreteur.InterpreteurEcranJsonServlet','O'
+'J','InfoProjetCourantJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.paramecrandyn.InfoProjetCourantJsonServlet','O'
+'J','AppelTableToolsJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.paramecrandyn.AppelTableToolsJsonServlet','O'
+'J','RechercheCollaborateurJsonServlet','fr.adp.com.kiosque.jsonservlet.common.RechercheCollaborateurJsonServlet','O'
+'S','GenericEphemereServiceLet','fr.adp.com.gxp.std.mot_met.lib.servicelet.GenericEphemereServiceLet','O'
+'S','StdErreurServiceLet','fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.StdErreurServiceLet','O'
+'S','UserActifServiceLet','fr.adp.com.gxp.std.mot_met.lib.servicelet.UserActifServiceLet','O'
+'S','ConnexionStatutServiceLet','fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.ConnexionStatutServiceLet','O'
+'S','StdErreurServiceLetCMS','fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.StdErreurServiceLetCMS','O'
+'J','Tools_ExtJSJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.Tools_ExtJSJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME='FormationPlanJsonServlet'
+'J','FormationPlanJsonServlet','fr.adp.com.kiosque.jsonservlet.exp.form.ref.FormationPlanJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME like 'FormationCategorieBudgetJsonServlet'
+'J','FormationCategorieBudgetJsonServlet','fr.adp.com.kiosque.jsonservlet.exp.form.ref.FormationCategorieBudgetJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME like 'FormationStructureBudgetaireJsonServlet'
+'J','FormationStructureBudgetaireJsonServlet','fr.adp.com.kiosque.jsonservlet.exp.form.ref.FormationStructureBudgetaireJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME='HabilitationUtilsateurJsonServlet'
+'J','HabilitationUtilsateurJsonServlet','fr.adp.com.kiosque.jsonservlet.expsecu.secu.adm.HabilitationUtilsateurJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME='ParamPacClientJsonServlet'
+'J','ParamPacClientJsonServlet','fr.adp.com.kiosque.jsonservlet.admin.param.adm.ParamPacClientJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME='FormationTypeDespositifJsonServlet'
+'J','FormationTypeDespositifJsonServlet','fr.adp.com.kiosque.jsonservlet.exp.form.ref.FormationTypeDespositifJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME='UtilisateurHorsPaieJsonServlet'
+'J','UtilisateurHorsPaieJsonServlet','fr.adp.com.kiosque.jsonservlet.exp.form.ref.UtilisateurHorsPaieJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME = 'ReordonnerJsonServlet'
+'J','ReordonnerJsonServlet','fr.adp.com.kiosque.jsonservlet.exp.form.ReordonnerJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME = 'GroupeJsonServlet'
+'J','GroupeJsonServlet','fr.adp.com.kiosque.jsonservlet.admin.param.adm.GroupeJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME='DesignationSecuriteJsonServlet'
+'J','DesignationSecuriteJsonServlet','fr.adp.com.kiosque.jsonservlet.expsecu.secu.adm.DesignationSecuriteJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME = 'GenerateScreenJsonServlet'
+'J','GenerateScreenJsonServlet','fr.adp.com.kiosque.jsonservlet.admin.param.gen.GenerateScreenJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME = 'FormationBudgetsJsonServlet'
+'J','FormationBudgetsJsonServlet','fr.adp.com.kiosque.jsonservlet.exp.form.ref.FormationBudgetsJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME = 'PopulationsJsonServlet'
+'J','PopulationsJsonServlet','fr.adp.com.kiosque.jsonservlet.exp.form.adm.PopulationsJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME = 'VarsysJsonServlet'
+'J','VarsysJsonServlet','fr.adp.com.kiosque.jsonservlet.admin.param.adm.VarsysJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME = 'WkfProcessusJsonServlet'
+'J','WkfProcessusJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.workflow.admin.WkfProcessusJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME = 'WkfOperationJsonServlet'
+'J','WkfOperationJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.workflow.admin.WkfOperationJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME = 'WkfBranchesJsonServlet'
+'J','WkfBranchesJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.workflow.admin.WkfBranchesJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME = 'WkfOperationEcransJsonServlet'
+'J','WkfOperationEcransJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.paramecrandyn.WkfOperationEcransJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME = 'BridgingJsonServlet'
+'J','BridgingJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.paramecrandyn.BridgingJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME = 'WorkflowJsonServlet'
+'J','WorkflowJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.workflow.WorkflowJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME = 'AppelTableWkfJsonServlet'
+'J','AppelTableWkfJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.common.recherche.AppelTableWkfJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME = 'WorkboxJsonServlet'
+'J','WorkboxJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.WorkboxJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME = 'WkfSortieServiceLet'
+'S','WkfSortieServiceLet','fr.adp.com.gxp.std.mot_met.lib.servicelet.workflow.WkfSortieServiceLet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME IN ('MesDemandesExpertJsonServlet','WorkboxJsonServlet')
+'J','MesDemandesExpertJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.workbox.MesDemandesExpertJsonServlet','O'
+'J','WorkboxJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.WorkboxJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME = 'MesDemandesExpertJsonServlet'
+'J','MesDemandesExpertJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.workbox.MesDemandesExpertJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME ='FormationPilotagePlanJsonServlet'
+'J','FormationPilotagePlanJsonServlet','fr.adp.com.kiosque.jsonservlet.exp.form.ref.FormationPilotagePlanJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME = 'FormationCatalogueJsonServlet'
+'J','FormationCatalogueJsonServlet','fr.adp.com.kiosque.jsonservlet.exp.form.ref.FormationCatalogueJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME='ProfilsJsonServlet'
+'J','ProfilsJsonServlet','fr.adp.com.kiosque.jsonservlet.admin.param.adm.ProfilsJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME='FormationDemandesJsonServlet'
+'J','FormationDemandesJsonServlet','fr.adp.com.kiosque.jsonservlet.exp.form.gererform.FormationDemandesJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME = 'RechercheFormationJsonServlet'
+'J','RechercheFormationJsonServlet','fr.adp.com.kiosque.jsonservlet.exp.form.inforh.RechercheFormationJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME = 'FormationDemandeWkf'
+'J','FormationDemandeWkf','fr.adp.com.kiosque.jsonservlet.exp.form.gererform.FormationDemandeWkf','O'

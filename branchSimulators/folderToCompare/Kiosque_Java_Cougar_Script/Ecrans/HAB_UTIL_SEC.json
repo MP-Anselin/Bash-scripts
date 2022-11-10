@@ -1,0 +1,146 @@
+{
+  boutons : "INT",
+  code : "HAB_UTIL_SEC",
+  element : "ecran",
+  groupe : {
+    code : "HABILITATIONS_GRP",
+    donnees : [ {
+      code : "#BOUTONPERSO",
+      element : "donnee",
+      icon : "icon-file-type-xlsx",
+      libelle : "Exporter",
+      operation : "Exporter"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "HAB_COLLAB_FILTRE",
+      element : "donnee",
+      libelle : "Collaborateur",
+      longueur : 50,
+      requete : "HAB_UTIL_SEC_5",
+      retour : "HAB_COLLAB_FILTRE, #NON, #NON, ID_HAB_COLLAB_FILTRE",
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "",
+      style : "BoxLabel"
+    }, {
+      code : "HAB_POP_FILTRE",
+      element : "donnee",
+      libelle : "Population",
+      longueur : 50,
+      requete : "HAB_UTIL_SEC_6",
+      retour : "HAB_POP_FILTRE, #NON, #NON, ID_HAB_POP_FILTRE",
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "HAB_AOID",
+      element : "donnee",
+      libelle : "L'AOID du collab",
+      longueur : 50,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "ID_HAB_POP_FILTRE",
+      element : "donnee",
+      libelle : "Population",
+      longueur : 50,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "ID_HAB_COLLAB_FILTRE",
+      element : "donnee",
+      libelle : "id collab",
+      longueur : 50,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "HAB_ISADP",
+      element : "donnee",
+      libelle : "collab ISADP",
+      longueur : 50,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "HAB_ROLES",
+      element : "donnee",
+      libelle : "collab Roles",
+      longueur : 100,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "HABILITATIONS_GENARAL_CONFONDUS",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        pageModif : "HAB_UTI_CONF_POP_M",
+        requete : "HAB_UTIL_SEC_8"
+      } ],
+      element : "groupe",
+      libelle : "Informations générales",
+      onglet : true
+    }, {
+      code : "HABILITATIONS_ENTR",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        pageModif : "HAB_ENT_POP_M",
+        requete : "HAB_UTIL_SEC_2"
+      } ],
+      element : "groupe",
+      libelle : "Entretien",
+      onglet : true
+    }, {
+      code : "HABILITATIONS_FORM",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        pageModif : "HAB_FORM_POP_M",
+        requete : "HAB_UTIL_SEC_3"
+      } ],
+      element : "groupe",
+      libelle : "Formation",
+      onglet : true
+    }, {
+      code : "HABILITATIONS_TALENTS",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        pageModif : "HAB_TALENT_POP_M",
+        requete : "HAB_UTIL_SEC_4"
+      } ],
+      element : "groupe",
+      libelle : "Revue des talents",
+      onglet : true
+    }, {
+      code : "HABILITATIONS_SECURITE",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        pageModif : "HAB_SEC_POP_M",
+        requete : "HAB_UTIL_SEC_7"
+      } ],
+      element : "groupe",
+      libelle : "Sécurité",
+      onglet : true
+    } ],
+    element : "groupe",
+    libelle : "Habilitations"
+  },
+  libelle : "Habilitations",
+  servicelet : "HabilitationUtilsateurJsonServlet",
+  type : "U"
+}

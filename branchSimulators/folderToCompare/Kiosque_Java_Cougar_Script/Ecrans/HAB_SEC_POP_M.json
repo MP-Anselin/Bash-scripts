@@ -1,0 +1,63 @@
+{
+  code : "HAB_SEC_POP_M",
+  element : "ecran",
+  groupe : {
+    code : "HAB_SEC_MODIF",
+    donnees : [ {
+      code : "HAB_MATRICULE",
+      element : "donnee",
+      entier : 50,
+      libelle : "Matricule",
+      masquerLibelle : true,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "N"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Collaborateur : ",
+      style : "FormTitre"
+    }, {
+      code : "HAB_NOMCOLLAB",
+      element : "donnee",
+      libelle : "NomPrenom",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "HAB_FORM_SEC",
+      element : "donnee",
+      libelle : "Expert",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      suffixe : "Expert",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "HAB_SEC_ONG",
+      element : "donnee",
+      libelle : "Onglet Securité",
+      longueur : 1,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    } ],
+    element : "groupe",
+    libelle : "modifier les habilitations sécurité"
+  },
+  libelle : "Modifier les habilitations sécurité",
+  servicelet : "HabilitationUtilsateurJsonServlet",
+  type : "P"
+}

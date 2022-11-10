@@ -1,0 +1,63 @@
+##
+V_V5_BUDG_RESP
+=SQL=
+  CREATE OR REPLACE VIEW V_V5_BUDG_RESP AS 
+  ((select  distinct bg.ID_BUDGET,
+  CASE WHEN length (TO_CHAR(bg.CODE))+length (TO_CHAR(bg.DESCRIPTION))>50 and length (TO_CHAR(bg.CODE))<=25  THEN
+ TO_CHAR(bg.CODE)
+ WHEN length (TO_CHAR(bg.CODE))+length (TO_CHAR(bg.DESCRIPTION))>50 and length (TO_CHAR(bg.DESCRIPTION))<=25  THEN
+ substr (TO_CHAR(bg.code),0,(length (TO_CHAR(bg.code))-(length (TO_CHAR(bg.code))-50+length (TO_CHAR(bg.DESCRIPTION))))) ||'...'
+ WHEN length (TO_CHAR(bg.CODE))+length (TO_CHAR(bg.DESCRIPTION))>50 and length (TO_CHAR(bg.DESCRIPTION))>25 and length (TO_CHAR(bg.code))>25 THEN substr (TO_CHAR(bg.code),0,25) ||'...'
+ ELSE  TO_CHAR(bg.CODE) END CODE,
+    bg.ANNEE_PLAN,
+  CASE
+ WHEN length (TO_CHAR(bg.CODE))+ length (TO_CHAR(bg.DESCRIPTION))>50 and length (TO_CHAR(bg.DESCRIPTION))<=25  THEN
+ TO_CHAR(bg.DESCRIPTION)
+ WHEN length (TO_CHAR(bg.CODE))+ length (TO_CHAR(bg.DESCRIPTION))>50 and length (TO_CHAR(bg.CODE))<=25  THEN
+ substr (TO_CHAR(bg.DESCRIPTION),0,(length (TO_CHAR(bg.DESCRIPTION))-(length (TO_CHAR(bg.DESCRIPTION))-50 + length (TO_CHAR(bg.code))))) ||'...'
+ WHEN length (TO_CHAR(bg.CODE))+length (TO_CHAR(bg.DESCRIPTION))>50 and length (TO_CHAR(bg.DESCRIPTION))>25 and length (TO_CHAR(bg.code))>25 THEN
+ substr (TO_CHAR(bg.DESCRIPTION),0,25) ||'...'
+ ELSE  TO_CHAR(bg.DESCRIPTION) END LIBELLE,
+ CASE when man.matricule is null THEN '-'
+      when man.matricule is not null THEN VSU.NOM||' ' ||VSU.PRENOM
+ END RESPNOM,
+ CASE when man.matricule is null THEN '-'
+      when man.matricule is not null THEN to_char(VSU.matricule)
+ END RESPMAT,vbudg.soldedem,(round(nvl(vbudg.MONTANT, 0) - nvl((vbudg.soldedem), 0), 2)) as reste,
+ bg.ACTIF,vbudg.MONTANT ,'O' AFFICHE_BTN_SUPP    
+ from T_V5_KRHEF_BUDGET bg
+ Left join V_V5_BUDG_FORM  vbudg on  vbudg.id_budget=bg.ID_BUDGET
+ left join T_V5_KRHEF_BUDGET_CATEGORIE bgc on bgc.ID_CATEGORIE = bg.ID_CATEGORIE
+ left join T_V5_KRHEF_BUDGET_MANAGER man  on man.ID_BUDGET = bg.ID_BUDGET
+ left join v_v5_krh_user VSU  on VSU.MATRICULE = man.MATRICULE
+ where bg.historise=0)
+ union all
+ (select  distinct bg.ID_BUDGET,
+  CASE WHEN length (TO_CHAR(bg.CODE))+length (TO_CHAR(bg.DESCRIPTION))>50 and length (TO_CHAR(bg.CODE))<=25  THEN
+ TO_CHAR(bg.CODE)
+ WHEN length (TO_CHAR(bg.CODE))+length (TO_CHAR(bg.DESCRIPTION))>50 and length (TO_CHAR(bg.DESCRIPTION))<=25  THEN
+ substr (TO_CHAR(bg.code),0,(length (TO_CHAR(bg.code))-(length (TO_CHAR(bg.code))-50+length (TO_CHAR(bg.DESCRIPTION))))) ||'...'
+ WHEN length (TO_CHAR(bg.CODE))+length (TO_CHAR(bg.DESCRIPTION))>50 and length (TO_CHAR(bg.DESCRIPTION))>25 and length (TO_CHAR(bg.code))>25 THEN substr (TO_CHAR(bg.code),0,25) ||'...'
+ ELSE  TO_CHAR(bg.CODE) END CODE,
+    bg.ANNEE_PLAN,
+  CASE
+ WHEN length (TO_CHAR(bg.CODE))+ length (TO_CHAR(bg.DESCRIPTION))>50 and length (TO_CHAR(bg.DESCRIPTION))<=25  THEN
+ TO_CHAR(bg.DESCRIPTION)
+ WHEN length (TO_CHAR(bg.CODE))+ length (TO_CHAR(bg.DESCRIPTION))>50 and length (TO_CHAR(bg.CODE))<=25  THEN
+ substr (TO_CHAR(bg.DESCRIPTION),0,(length (TO_CHAR(bg.DESCRIPTION))-(length (TO_CHAR(bg.DESCRIPTION))-50 + length (TO_CHAR(bg.code))))) ||'...'
+ WHEN length (TO_CHAR(bg.CODE))+length (TO_CHAR(bg.DESCRIPTION))>50 and length (TO_CHAR(bg.DESCRIPTION))>25 and length (TO_CHAR(bg.code))>25 THEN
+ substr (TO_CHAR(bg.DESCRIPTION),0,25) ||'...'
+ ELSE  TO_CHAR(bg.DESCRIPTION) END LIBELLE,
+ CASE when man.matricule is null THEN '-'
+      when man.matricule is not null THEN VSU.NOM||' ' ||VSU.PRENOM
+ END RESPNOM,
+ CASE when man.matricule is null THEN '-'
+      when man.matricule is not null THEN to_char(VSU.matricule)
+ END RESPMAT,vbudg.soldedem,(round(nvl(vbudg.MONTANT, 0) - nvl((vbudg.soldedem), 0), 2)) as reste,
+ bg.ACTIF,vbudg.MONTANT ,'N' AFFICHE_BTN_SUPP    
+ from T_V5_KRHEF_BUDGET bg
+ Left join V_V5_BUDG_FORM  vbudg on  vbudg.id_budget=bg.ID_BUDGET
+ left join T_V5_KRHEF_BUDGET_CATEGORIE bgc on bgc.ID_CATEGORIE = bg.ID_CATEGORIE
+ left join T_V5_KRHEF_BUDGET_MANAGER man  on man.ID_BUDGET = bg.ID_BUDGET
+ left join v_v5_krh_user VSU  on VSU.MATRICULE = man.MATRICULE
+ where bg.historise=1))

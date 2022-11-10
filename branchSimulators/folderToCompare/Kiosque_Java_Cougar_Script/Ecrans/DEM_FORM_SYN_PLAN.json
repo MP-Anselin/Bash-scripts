@@ -1,0 +1,1979 @@
+{
+  code : "DEM_FORM_SYN_PLAN",
+  element : "ecran",
+  groupe : {
+    code : "DEM_FORM_SYN_PLAN_GRP",
+    donnees : [ {
+      code : "DEM_FORM_SYN_PLAN_AFFBUDG_GRP",
+      donnees : [ {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Affectation budgétaire -  PLAN 1",
+        style : "FormTitre"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_PLAN",
+        element : "donnee",
+        libelle : "Plan",
+        longueur : 255,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Affectation principale",
+        style : "BoxLabel"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Affectation secondaire",
+        style : "BoxLabel"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_CGA",
+        element : "donnee",
+        libelle : "CODE GROUPE - ANNÉE",
+        longueur : 128,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_CGAS",
+        element : "donnee",
+        libelle : "CODE GROUPE - ANNÉE",
+        longueur : 128,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_CBL",
+        element : "donnee",
+        libelle : "Code budgétaire - Libellé",
+        longueur : 128,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_CBLS",
+        element : "donnee",
+        libelle : "Code budgétaire - Libellé",
+        longueur : 128,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_TYPE",
+        element : "donnee",
+        libelle : "Type",
+        longueur : 128,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_TYPES",
+        element : "donnee",
+        libelle : "Type",
+        longueur : 128,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_DISPOSITIF",
+        element : "donnee",
+        libelle : "Dispositif",
+        longueur : 128,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_DISPOSITIFS",
+        element : "donnee",
+        libelle : "Dispositif",
+        longueur : 128,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Affectation budgétaire -  PLAN 2",
+        style : "FormTitre"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_P2",
+        element : "donnee",
+        libelle : "Libellé du plan",
+        longueur : 255,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_CGAP2",
+        element : "donnee",
+        libelle : "CODE GROUPE - ANNÉE",
+        longueur : 128,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_CGASP2",
+        element : "donnee",
+        libelle : "CODE GROUPE - ANNÉE",
+        longueur : 128,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_CBLP2",
+        element : "donnee",
+        libelle : "Code budgétaire - Libellé",
+        longueur : 128,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_CBLSP2",
+        element : "donnee",
+        libelle : "Code budgétaire - Libellé",
+        longueur : 128,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_TYPEP2",
+        element : "donnee",
+        libelle : "Type",
+        longueur : 128,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_TYPESP2",
+        element : "donnee",
+        libelle : "Type",
+        longueur : 128,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_DISPP2",
+        element : "donnee",
+        libelle : "Dispositif",
+        longueur : 128,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_DISPSP2",
+        element : "donnee",
+        libelle : "Dispositif",
+        longueur : 128,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Affectation budgétaire -  PLAN 3",
+        style : "FormTitre"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_P3",
+        element : "donnee",
+        libelle : "Libellé du plan",
+        longueur : 255,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_CGAP3",
+        element : "donnee",
+        libelle : "Code groupe - Année",
+        longueur : 128,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_CGASP3",
+        element : "donnee",
+        libelle : "Code groupe - Année",
+        longueur : 128,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_CBLP3",
+        element : "donnee",
+        libelle : "Code budgétaire - Libellé",
+        longueur : 128,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_CBLSP3",
+        element : "donnee",
+        libelle : "Code budgétaire - Libellé",
+        longueur : 128,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_TYPEP3",
+        element : "donnee",
+        libelle : "Type",
+        longueur : 128,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_TYPESP3",
+        element : "donnee",
+        libelle : "Type",
+        longueur : 128,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_DISPP3",
+        element : "donnee",
+        libelle : "Dispositif",
+        longueur : 128,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_DISPSP3",
+        element : "donnee",
+        libelle : "Dispositif",
+        longueur : 128,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      } ],
+      element : "groupe",
+      libelle : "AFFECTATION BUDGÉTAIRE",
+      onglet : true
+    }, {
+      code : "DEM_FORM_SYN_PLAN_DUREES_GRP",
+      donnees : [ {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Durées - Plan 1",
+        style : "FormTitre"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_PLAN",
+        element : "donnee",
+        libelle : "Plan",
+        longueur : 255,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Affectation principale",
+        style : "BoxLabel"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Affectation secondaire",
+        style : "BoxLabel"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_PTRP1",
+        element : "donnee",
+        libelle : "Pendant le temps de travail",
+        longueur : 128,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_PTRSP1",
+        element : "donnee",
+        libelle : "Pendant le temps de travail",
+        longueur : 128,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_HTRP1",
+        element : "donnee",
+        libelle : "Hors temps de travail",
+        longueur : 128,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_HTRSP1",
+        element : "donnee",
+        libelle : "Hors temps de travail",
+        longueur : 128,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_CPFPTRP1",
+        element : "donnee",
+        libelle : "CPF pendant le temps de travail",
+        longueur : 128,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_CPFPTRSP1",
+        element : "donnee",
+        libelle : "CPF pendant le temps de travail",
+        longueur : 128,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_CPFHTRP1",
+        element : "donnee",
+        libelle : "CPF hors temps de travail",
+        longueur : 128,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_CPFHTRSP1",
+        element : "donnee",
+        libelle : "CPF hors temps de travail",
+        longueur : 128,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Durées - Plan 2",
+        style : "FormTitre"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_P2",
+        element : "donnee",
+        libelle : "Libellé du plan",
+        longueur : 255,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_PTRP2",
+        element : "donnee",
+        libelle : "Pendant le temps de travail",
+        longueur : 128,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_PTRSP2",
+        element : "donnee",
+        libelle : "Pendant le temps de travail",
+        longueur : 128,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_HTRPP2",
+        element : "donnee",
+        libelle : "Hors temps de travail",
+        longueur : 128,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_HTRPSP2",
+        element : "donnee",
+        libelle : "Hors temps de travail",
+        longueur : 128,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_CPFPTRP2",
+        element : "donnee",
+        libelle : "CPF pendant le temps de travail",
+        longueur : 128,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_CPFPTRSP2",
+        element : "donnee",
+        libelle : "CPF pendant le temps de travail",
+        longueur : 128,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_CPFHTRP2",
+        element : "donnee",
+        libelle : "CPF hors temps de travail",
+        longueur : 128,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_CPFHTRSP2",
+        element : "donnee",
+        libelle : "CPF hors temps de travail",
+        longueur : 128,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Durées - Plan 3",
+        style : "FormTitre"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_P3",
+        element : "donnee",
+        libelle : "Libellé du plan",
+        longueur : 255,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_PTRP3",
+        element : "donnee",
+        libelle : "Pendant le temps de travail",
+        longueur : 128,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_PTRSP3",
+        element : "donnee",
+        libelle : "Pendant le temps de travail",
+        longueur : 128,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_HTRPP3",
+        element : "donnee",
+        libelle : "Hors temps de travail",
+        longueur : 128,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_HTRPSP3",
+        element : "donnee",
+        libelle : "Hors temps de travail",
+        longueur : 128,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_CPFPTRP3",
+        element : "donnee",
+        libelle : "CPF pendant le temps de travail",
+        longueur : 128,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_CPFPTRSP3",
+        element : "donnee",
+        libelle : "CPF pendant le temps de travail",
+        longueur : 128,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_CPFHTRP3",
+        element : "donnee",
+        libelle : "CPF hors temps de travail",
+        longueur : 128,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_CPFHTRSP3",
+        element : "donnee",
+        libelle : "CPF hors temps de travail",
+        longueur : 128,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Total demande",
+        style : "FormTitre"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_TPTRP1",
+        element : "donnee",
+        libelle : "Pendant le temps de travail",
+        longueur : 128,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_THTRP",
+        element : "donnee",
+        libelle : "Hors temps de travail",
+        longueur : 128,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_TCPFPTRP",
+        element : "donnee",
+        libelle : "CPF pendant le temps de travail",
+        longueur : 128,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_TCPFHTRP",
+        element : "donnee",
+        libelle : "CPF hors temps de travail",
+        longueur : 128,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      } ],
+      element : "groupe",
+      libelle : "DURÉES",
+      onglet : true
+    }, {
+      code : "DEM_FORM_SYN_PLAN_COUTS_GRP",
+      donnees : [ {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Coût - Plan 1",
+        style : "FormTitre"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_PLAN",
+        element : "donnee",
+        libelle : "Plan",
+        longueur : 255,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Affectation principale",
+        style : "BoxLabel"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Affectation secondaire",
+        style : "BoxLabel"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "COÛT",
+        style : "BoxLabel"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "PEC",
+        style : "BoxLabel"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "COÛT",
+        style : "BoxLabel"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "PEC",
+        style : "BoxLabel"
+      }, {
+        code : "#SEP_ZONE",
+        element : "donnee"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_PECP1",
+        element : "donnee",
+        libelle : "Prise en charge ?",
+        longueur : 128,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_PECPP1",
+        element : "donnee",
+        libelle : "Prise en charge ?",
+        longueur : 128,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_PECSP1",
+        element : "donnee",
+        libelle : "Prise en charge ?",
+        longueur : 128,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_PECPSP1",
+        element : "donnee",
+        libelle : "Prise en charge ?",
+        longueur : 128,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_PECOUTP1",
+        element : "donnee",
+        libelle : "Pédagogique externe",
+        longueur : 50,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_PEPECP1",
+        element : "donnee",
+        libelle : "Pédagogique externe",
+        longueur : 51,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_PECOUTSP1",
+        element : "donnee",
+        libelle : "Pédagogique externe",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_PEPECSP1",
+        element : "donnee",
+        libelle : "Pédagogique externe",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_SALCOUTP1",
+        element : "donnee",
+        libelle : "Salarial",
+        longueur : 50,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_SALPECP1",
+        element : "donnee",
+        libelle : "Salarial",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_SALCOUTSP1",
+        element : "donnee",
+        libelle : "Salarial",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_SALPECSP1",
+        element : "donnee",
+        libelle : "Salarial",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_SALFCOUTP1",
+        element : "donnee",
+        libelle : "Salarial formateur",
+        longueur : 50,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_SALFPECP1",
+        element : "donnee",
+        libelle : "Salarial formateur",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_SALFCOUTSP1",
+        element : "donnee",
+        libelle : "Salarial formateur",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_SALFPECSP1",
+        element : "donnee",
+        libelle : "Salarial formateur",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_TRANSCP1",
+        element : "donnee",
+        libelle : "Transport",
+        longueur : 50,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_TRANSPECP1",
+        element : "donnee",
+        libelle : "Transport",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_TRANSCSP1",
+        element : "donnee",
+        libelle : "Transport",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_TRANSPECSP1",
+        element : "donnee",
+        libelle : "Transport",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_HEBCP1",
+        element : "donnee",
+        libelle : "Hebergement",
+        longueur : 50,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_HEBPECP1",
+        element : "donnee",
+        libelle : "Hebergement",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_HEBCSP1",
+        element : "donnee",
+        libelle : "Hebergement",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_HEBPECSP1",
+        element : "donnee",
+        libelle : "Hebergement",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_TUTCP1",
+        element : "donnee",
+        libelle : "Tuteur",
+        longueur : 50,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_TUTPECP1",
+        element : "donnee",
+        libelle : "Tuteur",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_TUTCSP1",
+        element : "donnee",
+        libelle : "Tuteur",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_TUTPECSP1",
+        element : "donnee",
+        libelle : "Tuteur",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Coût - Plan 2",
+        style : "FormTitre"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_PECP2",
+        element : "donnee",
+        libelle : "Prise en charge ?",
+        longueur : 128,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_PECPP2",
+        element : "donnee",
+        libelle : "Prise en charge ?",
+        longueur : 128,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_PECSP2",
+        element : "donnee",
+        libelle : "Prise en charge ?",
+        longueur : 128,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_PECPSP2",
+        element : "donnee",
+        libelle : "Prise en charge ?",
+        longueur : 128,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_PECOUTP2",
+        element : "donnee",
+        libelle : "Pédagogique externe",
+        longueur : 128,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_PEPECP2",
+        element : "donnee",
+        libelle : "Pédagogique externe",
+        longueur : 128,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_PECOUTSP2",
+        element : "donnee",
+        libelle : "Pédagogique externe",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_SALCOUTP2",
+        element : "donnee",
+        libelle : "Salarial",
+        longueur : 50,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_SALPECP2",
+        element : "donnee",
+        libelle : "Salarial",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_SALCOUTSP2",
+        element : "donnee",
+        libelle : "Salarial",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_SALPECSP2",
+        element : "donnee",
+        libelle : "Salarial",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_SALFCOUTP2",
+        element : "donnee",
+        libelle : "Salarial formateur",
+        longueur : 50,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_SALFPECP2",
+        element : "donnee",
+        libelle : "Salarial formateur",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_SALFCOUTSP2",
+        element : "donnee",
+        libelle : "Salarial formateur",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_SALFPECSP2",
+        element : "donnee",
+        libelle : "Salarial formateur",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_TRANSCP2",
+        element : "donnee",
+        libelle : "Transport",
+        longueur : 50,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_TRANSPECP2",
+        element : "donnee",
+        libelle : "Transport",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_TRANSCSP2",
+        element : "donnee",
+        libelle : "Transport",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_TRANSPECSP2",
+        element : "donnee",
+        libelle : "Transport",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_HEBCP2",
+        element : "donnee",
+        libelle : "Hebergement",
+        longueur : 50,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_HEBPECP2",
+        element : "donnee",
+        libelle : "Hebergement",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_HEBCSP2",
+        element : "donnee",
+        libelle : "Hebergement",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_HEBPECSP2",
+        element : "donnee",
+        libelle : "Hebergement",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_TUTCP2",
+        element : "donnee",
+        libelle : "Tuteur",
+        longueur : 50,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_TUTPECP2",
+        element : "donnee",
+        libelle : "Tuteur",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_TUTCSP2",
+        element : "donnee",
+        libelle : "Tuteur",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_TUTPECSP2",
+        element : "donnee",
+        libelle : "Tuteur",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Coût - Plan 3",
+        style : "FormTitre"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_PECP3",
+        element : "donnee",
+        libelle : "Prise en charge ?",
+        longueur : 128,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_PECPP3",
+        element : "donnee",
+        libelle : "Prise en charge ?",
+        longueur : 128,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_PECSP3",
+        element : "donnee",
+        libelle : "Prise en charge ?",
+        longueur : 128,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_PECPSP3",
+        element : "donnee",
+        libelle : "Prise en charge ?",
+        longueur : 128,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_PECOUTP3",
+        element : "donnee",
+        libelle : "Pédagogique externe",
+        longueur : 128,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_PEPECP3",
+        element : "donnee",
+        libelle : "Pédagogique externe",
+        longueur : 128,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_PECOUTSP3",
+        element : "donnee",
+        libelle : "Pédagogique externe",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_PEPECSP3",
+        element : "donnee",
+        libelle : "Pédagogique externe",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_SALCOUTSP3",
+        element : "donnee",
+        libelle : "Salarial",
+        longueur : 50,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_SALCOUTP3",
+        element : "donnee",
+        libelle : "Salarial",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_SALPECP3",
+        element : "donnee",
+        libelle : "Salarial",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_SALPECSP3",
+        element : "donnee",
+        libelle : "Salarial",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_SALFCOUTP3",
+        element : "donnee",
+        libelle : "Salarial formateur",
+        longueur : 50,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_SALFPECP3",
+        element : "donnee",
+        libelle : "Salarial formateur",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_SALFCOUTSP3",
+        element : "donnee",
+        libelle : "Salarial formateur",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_SALFPECSP3",
+        element : "donnee",
+        libelle : "Salarial formateur",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_TRANSCP3",
+        element : "donnee",
+        libelle : "Transport",
+        longueur : 50,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_TRANSPECP3",
+        element : "donnee",
+        libelle : "Transport",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_TRANSCSP3",
+        element : "donnee",
+        libelle : "Transport",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_TRANSPECSP3",
+        element : "donnee",
+        libelle : "Transport",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_HEBCP3",
+        element : "donnee",
+        libelle : "Hebergement",
+        longueur : 50,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_HEBCSP3",
+        element : "donnee",
+        libelle : "Hebergement",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_HEBPECP3",
+        element : "donnee",
+        libelle : "Hebergement",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_HEBPECSP3",
+        element : "donnee",
+        libelle : "Hebergement",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_TUTCP3",
+        element : "donnee",
+        libelle : "Tuteur",
+        longueur : 50,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_TUTPECP3",
+        element : "donnee",
+        libelle : "Tuteur",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_TUTCSP3",
+        element : "donnee",
+        libelle : "Tuteur",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_TUTPECSP3",
+        element : "donnee",
+        libelle : "Tuteur",
+        longueur : 50,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Total demande",
+        style : "FormTitre"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "COÛT",
+        style : "BoxLabel"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "PEC",
+        style : "BoxLabel"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_PETOTAL",
+        element : "donnee",
+        libelle : "Pédagogique externe",
+        longueur : 50,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_SALTOTAL",
+        element : "donnee",
+        libelle : "Salarial",
+        longueur : 50,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_SALFTOTAL",
+        element : "donnee",
+        libelle : "Salarial formateur",
+        longueur : 50,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_TRANSTOTAL",
+        element : "donnee",
+        libelle : "Transport",
+        longueur : 50,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_HEBTOTAL",
+        element : "donnee",
+        libelle : "Hebergement",
+        longueur : 50,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_TUTTOTAL",
+        element : "donnee",
+        libelle : "Tuteur",
+        longueur : 50,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      } ],
+      element : "groupe",
+      libelle : "COÛTS",
+      onglet : true
+    } ],
+    element : "groupe",
+    libelle : "Synthèse des plans"
+  },
+  libelle : "Synthèse des plans",
+  servicelet : "FormationDemandeWkf",
+  type : "W"
+}

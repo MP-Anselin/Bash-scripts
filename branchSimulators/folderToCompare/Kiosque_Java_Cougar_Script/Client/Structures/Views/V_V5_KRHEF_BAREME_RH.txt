@@ -1,0 +1,21 @@
+##
+V_V5_KRHEF_BAREME_RH
+=SQL=
+CREATE OR REPLACE VIEW V_V5_KRHEF_BAREME_RH ("ID_BAREME","ACTIF","LIBELLE","DESCRIPTION","ID_CATEGORIE","ORDRE","VAL_MINI","VAL_MAXI","DECIMALES","DATE_ARCHIVAGE","HASH_ARCHIVAGE","CODE_BAREMERH") AS 
+select brmrh.ID_BAREME
+        , brmrh.ACTIF
+        , brmrh.LIBELLE
+        , brmrh.DESCRIPTION
+        , brmrh.ID_CATEGORIE
+        , brmrh.ORDRE
+        , brmrh.VAL_MINI
+        , brmrh.VAL_MAXI
+        , brmrh.DECIMALES
+        , brmrh.DATE_ARCHIVAGE
+        , brmrh.HASH_ARCHIVAGE
+        , brm.CODE as CODE_BAREMERH
+
+     from T_V5_KRHEF_BAREME_RH brmrh
+
+     join T_V5_KRHEF_BAREME_DEF brm
+       on brm.ID_BAREME_DEF = brmrh.ID_BAREME_DEF

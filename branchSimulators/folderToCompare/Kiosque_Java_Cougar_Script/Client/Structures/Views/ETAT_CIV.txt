@@ -1,0 +1,89 @@
+##
+ETAT_CIV
+=SQL=
+CREATE OR REPLACE VIEW ETAT_CIV
+AS
+  (SELECT S.MATRIC AS MATRIC,
+    S.TITRE                     AS TCIVI,
+    S.NOM                       AS NOMFAM,
+    ''                     AS NOMJF,
+    S.PRENOM                    AS PRENOM,
+    U.SEXE                      AS SEXE,
+    TO_CHAR(U.DATE_NAISSANCE,'yyyymmdd') AS DTNAI,
+    U.EMAIL                    AS EMAIL,
+    ''                            AS FLAG,
+    '2'                           AS TYPE_MATRIC,
+    ''                            AS ET_HORAIREHEBDO,
+    ''                            AS ET_COEFMAJ,
+    U.CODE_CATEGORIE_PRO  AS ET_CATPRO,
+    '' AS ET_CATREM,
+    '' AS ET_TYPEPAIE,
+    '' AS ET_CLASSIF,
+    '' AS ET_CODECOTOR,
+    '' AS ET_CODE_ENTITE_JUR,
+    '' AS ET_CODE_ENTITE_ADM,
+    '' AS ET_CODE_ENTITE_GEO,
+    '' AS ET_CODEAFFNIV,
+    '' AS ET_LIBAFFNIV,
+    '' AS ET_RAISONSOC,
+    U.DATE_ENTREE_GROUPE AS ET_DTDEBGROUPE,
+    U.DATE_SORTIE AS ET_DTFINGROUPE,
+    U.DATE_ENTREE AS DTDEBSOCIETE,
+    U.DATE_SORTIE AS ET_DTFINSOCIETE,
+    '' AS ET_CODEMOTIFENTREE,
+    '' AS ET_CODEMOTIFSORTIE,
+    '' AS ET_CODERECOURS,
+    U.DATE_ANCIENNETE_FICTIVE AS ET_DTANCIENNETE,
+    '' AS ET_DTDEBMATERNITE,
+    '' AS ET_DTFINMATERNITE,
+    '' AS ET_TYPECNT,
+    '' AS ET_NATCNT,
+    '' AS ET_DTDEBCNT,
+    '' AS ET_DTFINCNT,
+    '' AS ET_CODESUSCNT,
+    '' AS ET_DTDEBSUSCNT,
+    '' AS ET_DTFINSUSCNT,
+    '' AS ET_DTDEBEMP,
+    (SELECT
+      CASE upper(valvar)
+        WHEN 'TRUE'
+        THEN S.EMPLOI
+        ELSE '*'
+      END
+    FROM sys_varsys
+    WHERE codvar LIKE 'AVECEMPLOILOC'
+    ) AS ET_CODEEMPL,
+    S.METIER AS ET_CODEEMPT,
+    S.FILIR AS ET_CODEFAM,
+    S.SSFIL  AS ET_CODEMET,
+    '' AS ET_CODEROLE,
+    U.CODE_EMPLOI_INSEE AS ET_CODEINSEE,
+    '' AS ET_DTDEBPROF,
+    '' AS ET_LOCALITE,
+    '' AS ET_CODEPOSTAL,
+    '' AS ET_BURDIST,
+    '' AS ET_TELEPHONE,
+    '' AS ET_LIEUDIT,
+    '' AS ET_NUMV,
+    '' AS ET_BTQ,
+    '' AS ET_TYPVOIE,
+    '' AS ET_NOMVOIE,
+    '' AS ET_CODPAYS,
+    '' AS ET_CODTYPCOL,
+    '' AS ET_CODADM1,
+    '' AS ET_CODADM2,
+    '' AS ET_CODADM3,
+    '' AS ET_CODADM4,
+    '' AS ET_CODADM5,
+    '' AS ET_CODADM6,
+    '' AS ET_BULLETIN,
+    '' AS ET_USERMODELE,
+    '' AS ET_CODE_UID,
+    '' AS ET_HR_ENTITE,
+    '' AS ET_TEL_PRO_FIXE,
+    '' AS ET_TEL_PRO_PORT,
+    '' AS ET_FAX_PRO,
+    '' AS ET_EMAIL_PERSO
+  FROM SECUMATRIC S
+  LEFT JOIN V_V5_KRH_SALARIE_USER U ON S.MATRIC = U.MATRICULE
+  )

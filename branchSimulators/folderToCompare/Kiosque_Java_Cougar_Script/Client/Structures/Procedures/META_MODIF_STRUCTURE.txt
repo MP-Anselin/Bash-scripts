@@ -1,0 +1,76 @@
+##
+TAG_CHARSET=@€éèç
+##
+META_MODIF_STRUCTURE
+=SQL=
+create or replace PROCEDURE META_MODIF_STRUCTURE(suffixeTable VARCHAR2, nomColonne VARCHAR2, definitionColonne VARCHAR2, valeurColonne VARCHAR2 DEFAULT NULL) IS
+ listePrefix TAB_VARCHAR:=META_LISTE_PREFIX_TABLE();
+ nomTable VARCHAR2(30);
+ nomTableLiee VARCHAR2(30);
+ existeTable NUMBER;
+ existeColonne NUMBER;
+ action VARCHAR2(10);
+ BEGIN
+ -- supprimer définitivement la table HIS_xxx
+ BEGIN
+ EXECUTE_IMMEDIATE_STRING( 'DROP TABLE HIS_' || suffixetable,0);
+ EXCEPTION WHEN OTHERS THEN
+ NULL; -- ne rien faire
+ END;
+ 
+ EXECUTE_IMMEDIATE_STRING( 'ALTER TRIGGER TRG_ALTER_META DISABLE',0);
+ FOR i IN listePrefix.first..listePrefix.last
+ LOOP
+ nomTable:=listePrefix(i);
+ IF NOT SUBSTR(suffixeTable,1,1)='_' THEN
+ nomTable:=nomTable||'_';
+ END IF;
+ nomTable:=nomTable||suffixeTable;
+ SELECT COUNT(*) INTO existeTable FROM USER_TABLES WHERE TABLE_NAME=nomTable;
+ IF existeTable=1 THEN
+ SELECT COUNT(*) INTO existeColonne FROM USER_TAB_COLUMNS WHERE TABLE_NAME=nomTable AND COLUMN_NAME=nomColonne;
+ action:=NULL;
+ IF definitionColonne IS NULL THEN
+ IF existeColonne=1 THEN
+ action:='DROP';
+ END IF;
+ ELSIF existeColonne=0 THEN
+ action:='ADD';
+ ELSE
+ action:='MODIFY';
+ END IF;
+ IF action IS NOT NULL THEN
+ EXECUTE_IMMEDIATE_STRING( 'ALTER TABLE '||nomTable||' '||action||' ('||nomColonne||' '||definitionColonne||')',0);
+ IF action ='ADD' and valeurColonne is not null THEN
+ EXECUTE_IMMEDIATE_STRING( 'UPDATE '||nomTable||' SET '||nomColonne||'='||valeurColonne||' ',0);
+ END IF;
+ END IF;
+ nomTableLiee := NULL;
+ IF nomTable = 'META_DONNEE_GENERALE' THEN
+ nomTableLiee := 'REF_DONNEE_GEN_MODEL';
+ ELSIF nomTable = 'META_DONNEE_ECRAN' THEN
+ nomTableLiee := 'REF_DONNEE_ECR_MODEL';
+ END IF;
+ IF nomTableLiee IS NOT NULL THEN
+ SELECT COUNT(*) INTO existeColonne FROM USER_TAB_COLUMNS WHERE TABLE_NAME=nomTableLiee AND COLUMN_NAME=nomColonne;
+ action:=NULL;
+ IF definitionColonne IS NULL THEN
+ IF existeColonne=1 THEN
+ action:='DROP';
+ END IF;
+ ELSIF existeColonne=0 THEN
+ action:='ADD';
+ ELSE
+ action:='MODIFY';
+ END IF;
+ IF action IS NOT NULL THEN
+ EXECUTE_IMMEDIATE_STRING( 'ALTER TABLE '||nomTableLiee||' '||action||' ('||nomColonne||' '||definitionColonne||')',0);
+ END IF;
+ END IF;
+ END IF;
+ END LOOP;
+ EXECUTE_IMMEDIATE_STRING( 'ALTER TRIGGER TRG_ALTER_META ENABLE',0);
+ EXCEPTION
+ WHEN OTHERS THEN
+ EXECUTE_IMMEDIATE_STRING( 'ALTER TRIGGER TRG_ALTER_META ENABLE',0);
+ END META_MODIF_STRUCTURE;

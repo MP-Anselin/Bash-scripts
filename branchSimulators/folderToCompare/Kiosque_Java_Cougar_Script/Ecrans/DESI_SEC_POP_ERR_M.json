@@ -1,0 +1,274 @@
+{
+  code : "DESI_SEC_POP_ERR_M",
+  element : "ecran",
+  groupe : {
+    code : "DESI_SEC_POP_ERR_GRP",
+    donnees : [ {
+      code : "ID_MAT",
+      element : "donnee",
+      libelle : "ID_MAT",
+      longueur : 50,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "DESI_SEC_COLL",
+      element : "donnee",
+      libelle : "Collaborateur",
+      longueur : 50,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "DESI_SEC_MAT",
+      element : "donnee",
+      libelle : "Matricule",
+      longueur : 50,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "DESI_SEC_MSGE_GRP",
+      donnees : [ {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "DESI_SEC_MSG1",
+        element : "donnee",
+        libelle : "DESI_SEC_MSG1",
+        longueur : 200,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "DESI_SEC_MSG2",
+        element : "donnee",
+        libelle : "DESI_SEC_MSG2",
+        longueur : 200,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "DESI_SEC_MSG3",
+        element : "donnee",
+        libelle : "DESI_SEC_MSG3",
+        longueur : 200,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "DESI_SEC_MSG4",
+        element : "donnee",
+        libelle : "DESI_SEC_MSG4",
+        longueur : 200,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "DESI_SEC_MSG5",
+        element : "donnee",
+        libelle : "DESI_SEC_MSG5",
+        longueur : 200,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "DESI_SEC_MSG6",
+        element : "donnee",
+        libelle : "DESI_SEC_MSG6",
+        longueur : 200,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      } ],
+      element : "groupe",
+      libelle : "Entretien",
+      onglet : true
+    }, {
+      code : "DESI_SEC_MSG_GRP",
+      donnees : [ {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "DESI_SEC_MSGF1",
+        element : "donnee",
+        libelle : "DESI_SEC_MSG1",
+        longueur : 200,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "DESI_SEC_MSGF2",
+        element : "donnee",
+        libelle : "DESI_SEC_MSG2",
+        longueur : 200,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "DESI_SEC_MSGF3",
+        element : "donnee",
+        libelle : "DESI_SEC_MSG3",
+        longueur : 200,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "DESI_SEC_MSGF4",
+        element : "donnee",
+        libelle : "DESI_SEC_MSG4",
+        longueur : 200,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "DESI_SEC_MSGF5",
+        element : "donnee",
+        libelle : "DESI_SEC_MSG5",
+        longueur : 200,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "DESI_SEC_MSGF6",
+        element : "donnee",
+        libelle : "DESI_SEC_MSG6",
+        longueur : 200,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      } ],
+      element : "groupe",
+      libelle : "Formation",
+      onglet : true
+    }, {
+      code : "DESI_SEC_MSGT_GRP",
+      donnees : [ {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "DESI_SEC_MSGT1",
+        element : "donnee",
+        libelle : "DESI_SEC_MSG1",
+        longueur : 200,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "DESI_SEC_MSGT2",
+        element : "donnee",
+        libelle : "DESI_SEC_MSG2",
+        longueur : 200,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "DESI_SEC_MSGT3",
+        element : "donnee",
+        libelle : "DESI_SEC_MSG3",
+        longueur : 200,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "DESI_SEC_MSGT4",
+        element : "donnee",
+        libelle : "DESI_SEC_MSG4",
+        longueur : 200,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "DESI_SEC_MSGT5",
+        element : "donnee",
+        libelle : "DESI_SEC_MSG5",
+        longueur : 200,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "DESI_SEC_MSGT6",
+        element : "donnee",
+        libelle : "DESI_SEC_MSG6",
+        longueur : 200,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      } ],
+      element : "groupe",
+      libelle : "Revue des talents",
+      onglet : true
+    } ],
+    element : "groupe",
+    libelle : "Modifier les désignations d'un utilisateur"
+  },
+  libelle : "Détail des anomalies d'un utilisateur",
+  servicelet : "DesignationSecuriteJsonServlet",
+  type : "P"
+}

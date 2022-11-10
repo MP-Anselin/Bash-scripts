@@ -1,0 +1,190 @@
+##
+TAG_CHARSET=@€ιθη
+##
+GET_LISTES_FORMATIONS
+=SQL=
+create or replace FUNCTION GET_LISTES_FORMATIONS (MOTCLE IN VARCHAR  ,TOUSLESMOTS IN VARCHAR2, DATEDEBUT IN DATE, DATEFIN IN DATE, LIEUF IN VARCHAR2, DUREEFPLUS IN VARCHAR2, DUREEFH IN VARCHAR2, DUREESUP IN VARCHAR2,DUREEF IN VARCHAR2, ID_ORGAN IN VARCHAR2, DOM IN VARCHAR2, ID_AXE_STRA IN VARCHAR2,
+ AXE IN VARCHAR2,CPF IN VARCHAR2,PRISEENCHARGE IN VARCHAR2,STRATEG IN VARCHAR2,ABD IN VARCHAR2, FORMATIONTT IN VARCHAR2 )
+ RETURN TABLE_KRHEF_CATALOGUE AS liste_catalogue TABLE_KRHEF_CATALOGUE := TABLE_KRHEF_CATALOGUE();
+ numlig                  NUMBER := 0;
+ compt               NUMBER := 0;
+ cur              SYS_REFCURSOR;
+ sql_cur_user          CLOB;
+ ID_CATALOGUE  NUMBER;
+ REFERENCE  VARCHAR2(128);
+ LIBELLE VARCHAR2(256);
+ ORGANISME VARCHAR2(128);
+ DUREE NUMBER;
+ COUT NUMBER;
+ INFORMATIONS NUMBER;
+ BEGIN
+ 
+sql_cur_user := 'select 
+ cat.ID_CATALOGUE  ,
+CASE
+ WHEN length (TO_CHAR(cat.code_stage))>=50 THEN
+substr (TO_CHAR(cat.code_stage),0,50)||''...''
+ELSE cat.code_stage END , 
+
+CASE
+ WHEN length (TO_CHAR(cat.Libelle))>=50 THEN
+substr (TO_CHAR(cat.Libelle),0,50)||''...''
+ELSE cat.Libelle END ,
+
+CASE 
+WHEN length (TO_CHAR(org.Libelle))>=50 THEN
+substr (TO_CHAR(org.Libelle),0,50)||''...''
+ELSE org.Libelle
+END,
+cat.NBRE_JOURS ,
+cat.COUT_PEDAGOGIQUE ,
+cat.note  
+FROM T_V5_KRHEF_CATALOGUE cat 
+left join T_V5_KRHEF_ORGANISME org on cat.ID_ORGANISME = org.ID_ORGANISME
+WHERE 
+cat.ACTIF = 1
+and cat.LASTID = 1';
+ 
+ if (MOTCLE is not null) then
+ if (TOUSLESMOTS = '1') then
+ FOR c IN (
+ WITH data AS (
+ SELECT
+ MOTCLE motcle
+ FROM
+ dual
+ )
+ SELECT
+ TRIM(regexp_substr(motcle, '[^,]+', 1, level)) motcle
+ FROM
+ data
+ CONNECT BY
+ instr(motcle, ',', 1, level - 1) > 0
+ ) LOOP
+ sql_cur_user:=sql_cur_user||' AND ( UPPER(cat.Libelle) LIKE UPPER(''%'||c.motcle||'%'')' ;
+ sql_cur_user:=sql_cur_user||' OR  UPPER(cat.code_stage) LIKE UPPER( ''%'||c.motcle||'%''))' ;
+ END LOOP;
+ ELSE
+ FOR c IN (
+ WITH data AS (
+ SELECT
+ MOTCLE motcle
+ FROM
+ dual
+ )
+ SELECT
+ TRIM(regexp_substr(motcle, '[^,]+', 1, level)) motcle
+ FROM
+ data
+ CONNECT BY
+ instr(motcle, ',', 1, level - 1) > 0
+ )LOOP
+ compt := compt + 1;
+ if compt = 1 then
+ sql_cur_user:=sql_cur_user||' AND (( UPPER(cat.Libelle) LIKE UPPER( ''%'||c.motcle||'%'')' ;
+ sql_cur_user:=sql_cur_user||' OR UPPER( cat.code_stage) LIKE UPPER( '''||c.motcle||'%''))' ;
+ ELSE
+ sql_cur_user:=sql_cur_user||' OR ( UPPER(cat.Libelle) LIKE UPPER( '''||c.motcle||'%'')' ;
+  sql_cur_user:=sql_cur_user||' OR UPPER(cat.code_stage) LIKE UPPER( '''||c.motcle||'%''))' ;
+ end if ;
+ END LOOP;
+ sql_cur_user:=sql_cur_user||' )' ;
+ end if ;
+ end if ;
+ 
+if(DATEDEBUT is not null) then
+sql_cur_user:=sql_cur_user||' and cat.ID_CATALOGUE in (select ID_CATALOGUE
+                                                    from T_V5_KRHEF_SESSION ses
+                                                    where ses.ID_CATALOGUE is not null AND TO_DATE(ses.DATE_DEBUT,''dd/mm/yyyy'')>= TO_DATE('''||DATEDEBUT||''',''dd/mm/yyyy''))';
+end if;
+
+if(DATEFIN is not null) then
+sql_cur_user:=sql_cur_user||' and cat.ID_CATALOGUE in (select ID_CATALOGUE
+                                                    from T_V5_KRHEF_SESSION ses
+                                                    where ses.ID_CATALOGUE is not null  AND  TO_DATE(ses.DATE_FIN,''dd/mm/yyyy'')<= TO_DATE('''||DATEFIN||''',''dd/mm/yyyy''))';
+end if;
+ 
+if(LIEUF is not null) then
+sql_cur_user:=sql_cur_user||' and cat.ID_CATALOGUE in (select ID_CATALOGUE
+                                                    from T_V5_KRHEF_SESSION ses
+                                                    where ses.ID_CATALOGUE is not null AND (LOWER(ses.LIEU) LIKE '''||LIEUF||''' OR cat.ID_ORGANISME IN (SELECT ID_ORGANISME
+                                                            FROM T_V5_KRHEF_ORGANISME
+                                                            WHERE LOWER(VILLE) LIKE '''||LIEUF||''')))';
+end if; 
+ 
+ if (DUREEFPLUS is not null) then
+ sql_cur_user:=sql_cur_user||' AND cat.NBRE_JOURS > '''||DUREEFPLUS||'''' ;
+ elsif (DUREEFH is not null AND DUREESUP is not null ) then
+ sql_cur_user:=sql_cur_user||' AND cat.NBRE_HEURES >= '''||DUREEFH||''' AND cat.NBRE_JOURS < '''||DUREESUP||'''' ;
+ else
+ if (DUREEF is not null) then
+ sql_cur_user:=sql_cur_user||' AND cat.NBRE_JOURS = '''||DUREEF||'''';
+ end if;
+ end if;
+ 
+ if ( ID_ORGAN IS NOT NULL ) then
+ sql_cur_user:=sql_cur_user||' AND cat.ID_ORGANISME = '''||ID_ORGAN||'''' ;
+ end if;
+ 
+ if (DOM is not null) then
+ sql_cur_user:=sql_cur_user||' AND cat.domaine = '''||DOM||'''' ;
+ end if;
+ 
+ 
+ if AXE = '1' then
+ sql_cur_user:=sql_cur_user||' AND cat.ID_AXE_STRATEG is null ' ;
+ ELSE
+ if (ID_AXE_STRA is not null  ) then
+ sql_cur_user:=sql_cur_user||' AND cat.ID_AXE_STRATEG = '''||ID_AXE_STRA||'''' ;
+ end if;
+ end if;
+ 
+ if CPF = '1' then
+ sql_cur_user:=sql_cur_user||' AND cat.CPF = 1 ' ;
+ end if ;
+ 
+ 
+ if (PRISEENCHARGE = '1') then
+ sql_cur_user:=sql_cur_user||' AND cat.PRISE_EN_CHARGE = 1' ;
+ end if ;
+ 
+ if (STRATEG = '1') then
+ sql_cur_user:=sql_cur_user||' AND cat.STRATEGIE = 1 ' ;
+ end if ;
+ 
+ if (ABD ='1') then
+ sql_cur_user:=sql_cur_user||' AND cat.ABONDEMENT = 1 ' ;
+ end if ;
+ 
+ if (FORMATIONTT = '1') then
+ sql_cur_user:=sql_cur_user||' AND cat.FORMATION_TT = 1 ' ;
+ end if ;
+ 
+ /**EXECUTE IMMEDIATE sql_cur_user INTO liste_catalogue ;**/
+ OPEN cur FOR sql_cur_user;
+ LOOP
+ FETCH cur INTO
+ ID_CATALOGUE  ,
+ REFERENCE  ,
+ LIBELLE ,
+ ORGANISME ,
+ DUREE ,
+ COUT ,
+ INFORMATIONS ;
+ 
+ EXIT WHEN cur%notfound;
+ numlig := numlig + 1;
+ liste_catalogue.extend;
+ liste_catalogue(numlig) := KRHEF_CATALOGUE(NULL, NULL,NULL, NULL, NULL, NULL,NULL);
+ liste_catalogue(numlig).id_catalogue := id_catalogue;
+ liste_catalogue(numlig).reference := reference;
+ liste_catalogue(numlig).libelle := libelle;
+ liste_catalogue(numlig).organisme := organisme;
+ liste_catalogue(numlig).duree := duree;
+ liste_catalogue(numlig).cout := cout;
+ liste_catalogue(numlig).informations := informations;
+ 
+ END LOOP;
+ CLOSE cur;
+ RETURN liste_catalogue;
+ END GET_LISTES_FORMATIONS;

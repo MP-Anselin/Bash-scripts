@@ -1,0 +1,19 @@
+##
+BATCH_DESCRIPTION
+=SQL IFNOTEXIST=BATCH_DESCRIPTION=
+CREATE TABLE BATCH_DESCRIPTION ( FAMILLE VARCHAR2(10) NOT NULL ENABLE, CLASSE_NAME VARCHAR2(150) NOT NULL ENABLE, LIBELLE VARCHAR2(100), TYPE_UTILISATEUR VARCHAR2(10), ARRET_TRT VARCHAR2(10), PRIMARY KEY (FAMILLE, CLASSE_NAME) ) 
+##
+BATCH_DESCRIPTION
+==
+DELETE FROM BATCH_DESCRIPTION WHERE FAMILLE = 'BATCH_GEN' AND CLASSE_NAME = 'fr.adp.com.gxp.std.mot_tech.lib.deploiement.Traitement_updateProduct'
+'BATCH_GEN','fr.adp.com.gxp.std.mot_tech.lib.deploiement.Traitement_updateProduct','Mise au produit des écrans',NULL,NULL
+##
+BATCH_DESCRIPTION
+==
+DELETE FROM BATCH_DESCRIPTION WHERE FAMILLE = 'BATCH_GEN' AND CLASSE_NAME = 'fr.adp.com.gxp.std.mot_tech.lib.deploiement.Traitement_deploiement'
+'BATCH_GEN','fr.adp.com.gxp.std.mot_tech.lib.deploiement.Traitement_deploiement','Déploiement des écrans',NULL,NULL
+##
+BATCH_DESCRIPTION
+==
+DELETE FROM BATCH_DESCRIPTION WHERE FAMILLE = 'BATCH_CFT' AND CLASSE_NAME = 'fr.adp.com.gxp.std.mot_met.lib.objects.traitements.Traitement_LancementBatchCFT'
+'BATCH_CFT','fr.adp.com.gxp.std.mot_met.lib.objects.traitements.Traitement_LancementBatchCFT','Lancement d''interfaces batch CFT à la demande',NULL,NULL

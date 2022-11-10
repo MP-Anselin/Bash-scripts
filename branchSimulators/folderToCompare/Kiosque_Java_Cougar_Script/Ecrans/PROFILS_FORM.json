@@ -1,0 +1,41 @@
+{
+  boutons : "INT",
+  code : "PROFILS_FORM",
+  element : "ecran",
+  groupe : {
+    code : "PROFILS_FORM_GRP",
+    donnees : [ {
+      code : "#BOUTONPERSO",
+      element : "donnee",
+      libelle : "Ordonner",
+      operation : "reOrdonner"
+    }, {
+      code : "#TABLEAU",
+      element : "donnee",
+      pageAjout : "PROFILS_FORM_POP",
+      pageModif : "PROFILS_FORM_POP_M",
+      requete : "PROFILS_1"
+    }, {
+      code : "HAB_AOID",
+      element : "donnee",
+      libelle : "L'AOID du collab",
+      longueur : 50,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "HAB_ISADP",
+      element : "donnee",
+      libelle : "collab ISADP",
+      longueur : 50,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    } ],
+    element : "groupe",
+    libelle : "PROFILS_FORM_GRP"
+  },
+  libelle : "Liste des profils",
+  servicelet : "ProfilsJsonServlet",
+  type : "U"
+}

@@ -1,0 +1,40 @@
+##
+TAG_CHARSET=@€éèç
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+create or replace PROCEDURE ADM_ADD_PAGE_IN_SCHEMA( p_code_schema             IN NUMBER,
+ p_lib_1                   IN VARCHAR2,
+ p_lib_2                   IN VARCHAR2,
+ p_lib_3                   IN VARCHAR2,
+ p_lib_4                   IN VARCHAR2,
+ p_lib_99                  IN VARCHAR2,
+ p_nom_page                IN VARCHAR2,
+ p_description             IN VARCHAR2,
+ code_langue               IN VARCHAR2,
+ p_code_role               IN NUMBER DEFAULT NULL)
+ 
+ IS
+ p_obj_application         SCH_ELEMENT;
+ p_obj_regroupement        SCH_ELEMENT;
+ p_obj_theme               SCH_ELEMENT;
+ p_obj_classeur            SCH_ELEMENT;
+ p_obj_sujet               SCH_ELEMENT;
+ 
+ 
+ BEGIN
+ IF ((p_lib_1 IS NULL) OR (p_lib_2 IS NULL) OR (p_lib_3 IS NULL) OR (p_lib_4 IS NULL) OR (p_lib_99 IS NULL) OR (p_nom_page IS NULL)) THEN
+ RAISE_APPLICATION_ERROR(-20001, 'Paramètre(s) invalide(s)');
+ END IF;
+ 
+ IF (ADM_PAGE_EXIST_IN_SCHEMA(p_nom_page, p_code_schema) != 0) THEN
+ RAISE_APPLICATION_ERROR(-20001, 'La page est déjà présente dans ce schéma');
+ END IF;
+ 
+ p_obj_application := ADM_ADD_SCH_APPLICATION(p_code_schema, p_lib_1,p_description, code_langue);
+ p_obj_regroupement := ADM_ADD_SCH_REGROUPEMENT(p_code_schema, p_lib_1, p_lib_2, p_obj_application,p_description, p_code_role, code_langue);
+ p_obj_theme := ADM_ADD_SCH_THEME(p_code_schema, p_lib_1, p_lib_2, p_lib_3, p_obj_regroupement,p_description, code_langue);
+ p_obj_classeur := ADM_ADD_SCH_CLASSEUR(p_code_schema, p_lib_1, p_lib_2, p_lib_3, p_lib_4, p_obj_theme,p_description, code_langue);
+ p_obj_sujet := ADM_ADD_SCH_SUJET(p_code_schema, p_lib_1, p_lib_2, p_lib_3, p_lib_4, p_lib_99, p_nom_page, p_obj_classeur,p_description, code_langue);
+ 
+ END ADM_ADD_PAGE_IN_SCHEMA;

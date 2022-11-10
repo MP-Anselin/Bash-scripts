@@ -1,0 +1,768 @@
+{
+  code : "CATALOGUE_FORM_POP_M",
+  element : "ecran",
+  groupe : {
+    code : "CATALOGUE_FORM_POP_M_GRP",
+    donnees : [ {
+      code : "CATALOGUE_TEXT",
+      element : "donnee",
+      libelle : "CATALOGUE_TEXT",
+      longueur : 250,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "CATALOGUE_ID",
+      element : "donnee",
+      libelle : "ID CATALOGUE",
+      longueur : 50,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "CATALOGUE_CODE_FORMA",
+      element : "donnee",
+      libelle : "Code formation",
+      longueur : 128,
+      obligatoire : true,
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "CATALOGUE_LIBELLE",
+      element : "donnee",
+      libelle : "Libellé ",
+      longueur : 256,
+      obligatoire : true,
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "CATALOGUE_DESCRIPTION",
+      element : "donnee",
+      libelle : "Description",
+      longueur : 3999,
+      saisie : "textarea",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "CATALOGUE_ORGANISME",
+      element : "donnee",
+      libelle : "Organisme ",
+      longueur : 40,
+      obligatoire : true,
+      requete : "CATALOGUE_7",
+      retour : "CATALOGUE_ORGANISME, #NON",
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "CATALOGUE_DOMAINE",
+      element : "donnee",
+      libelle : "Domaine ",
+      longueur : 40,
+      obligatoire : true,
+      requete : "CATALOGUE_3",
+      retour : "CATALOGUE_DOMAINE, #NON",
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "CATALOGUE_SOUS_DOM",
+      element : "donnee",
+      libelle : "Sous-domaine ",
+      longueur : 40,
+      requete : "CATALOGUE_4",
+      retour : "CATALOGUE_SOUS_DOM, #NON",
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "CATALOGUE_THEME",
+      element : "donnee",
+      libelle : "Thème ",
+      longueur : 40,
+      requete : "CATALOGUE_5",
+      retour : "CATALOGUE_THEME, #NON",
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "CATALOGUE_AXE",
+      element : "donnee",
+      libelle : "Axe stratégique ",
+      longueur : 40,
+      requete : "CATALOGUE_6",
+      retour : "CATALOGUE_AXE, #NON",
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      affichage : "CATALOGUE_MODIF_ACTIF",
+      code : "CATALOGUE_ACTIF",
+      element : "donnee",
+      libelle : "Actif ",
+      longueur : 1,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      affichage : "CATALOGUE_MODIF_HISTO",
+      code : "CATALOGUE_HIST",
+      element : "donnee",
+      libelle : "Historisé",
+      longueur : 1,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#BOUTONPERSO",
+      element : "donnee",
+      libelle : "Dupliquer",
+      operation : "Dupliquer"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "CATALOGUE_CARACTERISTIQUE_GRP",
+      donnees : [ {
+        code : "CAT_CAR_TYPOLOGIE",
+        element : "donnee",
+        libelle : "Typologie",
+        longueur : 3,
+        saisie : "radio",
+        style : "FDonneeG",
+        type : "X",
+        valeurs : [ {
+          code : "DIPLOMANTE",
+          libelle : "Diplomante"
+        }, {
+          code : "CERTIFIANTE",
+          libelle : "Certifiante"
+        }, {
+          code : "QUALIFIANTE",
+          libelle : "Qualifiante"
+        } ]
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "CAT_CAR_CPF",
+        element : "donnee",
+        libelle : "CPF ",
+        longueur : 2,
+        obligatoire : true,
+        saisie : "radio",
+        style : "FDonneeG",
+        type : "X",
+        valeurs : [ {
+          code : "OUI",
+          libelle : "Oui"
+        }, {
+          code : "NON",
+          libelle : "Non"
+        } ]
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "CAT_CAR_ABONDEMENT",
+        element : "donnee",
+        libelle : "Abondement ",
+        longueur : 1,
+        obligatoire : true,
+        saisie : "radio",
+        style : "FDonneeG",
+        type : "X",
+        valeurs : [ {
+          code : "OUI",
+          libelle : "Oui"
+        }, {
+          code : "NON",
+          libelle : "Non"
+        } ]
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "CAT_CAT_FORMA",
+        element : "donnee",
+        libelle : "Formation pendant le temps de travail ",
+        longueur : 1,
+        obligatoire : true,
+        saisie : "radio",
+        style : "FDonneeG",
+        type : "X",
+        valeurs : [ {
+          code : "OUI",
+          libelle : "Oui"
+        }, {
+          code : "NON",
+          libelle : "Non"
+        } ]
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "CAT_CAR_PEC",
+        element : "donnee",
+        libelle : "PEC ",
+        longueur : 1,
+        obligatoire : true,
+        saisie : "radio",
+        style : "FDonneeG",
+        type : "X",
+        valeurs : [ {
+          code : "OUI",
+          libelle : "Oui"
+        }, {
+          code : "NON",
+          libelle : "Non"
+        } ]
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "CAT_CAR_ELIGIBLE",
+        element : "donnee",
+        libelle : "Eligible bilan 6 ans ",
+        longueur : 1,
+        obligatoire : true,
+        saisie : "radio",
+        style : "FDonneeG",
+        type : "X",
+        valeurs : [ {
+          code : "OUI",
+          libelle : "Oui"
+        }, {
+          code : "NON",
+          libelle : "Non"
+        } ]
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "CAT_CAR_FORM_VISIBLE",
+        element : "donnee",
+        libelle : "Formation visible par les acteurs ",
+        longueur : 1,
+        obligatoire : true,
+        saisie : "radio",
+        style : "FDonneeG",
+        type : "X",
+        valeurs : [ {
+          code : "OUI",
+          libelle : "Oui"
+        }, {
+          code : "NON",
+          libelle : "Non"
+        } ]
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "CAT_CAR_ACTEUR",
+        element : "donnee",
+        libelle : "Formation visible par les collaborateurs",
+        longueur : 1,
+        obligatoire : true,
+        saisie : "radio",
+        style : "FDonneeG",
+        type : "X",
+        valeurs : [ {
+          code : "OUI",
+          libelle : "Oui"
+        }, {
+          code : "NON",
+          libelle : "Non"
+        } ]
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "CAT_CAR_CHAUD",
+        element : "donnee",
+        libelle : "Evaluer à chaud ",
+        longueur : 1,
+        obligatoire : true,
+        saisie : "radio",
+        style : "FDonneeG",
+        type : "X",
+        valeurs : [ {
+          code : "OUI",
+          libelle : "Oui"
+        }, {
+          code : "NON",
+          libelle : "Non"
+        } ]
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "CAT_CAR_FROID",
+        element : "donnee",
+        libelle : "Evaluer à froid",
+        longueur : 1,
+        obligatoire : true,
+        saisie : "radio",
+        style : "FDonneeG",
+        type : "X",
+        valeurs : [ {
+          code : "OUI",
+          libelle : "Oui"
+        }, {
+          code : "NON",
+          libelle : "Non"
+        } ]
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "CAT_CAR_LANGUE1",
+        element : "donnee",
+        libelle : "Langue 1",
+        longueur : 50,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "CAT_CAR_LANGUE2",
+        element : "donnee",
+        libelle : "Langue 2",
+        longueur : 50,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "CAT_CAR_NOTE",
+        decimal : 0,
+        element : "donnee",
+        entier : 10,
+        libelle : "Note",
+        negatif : true,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "9"
+      } ],
+      element : "groupe",
+      libelle : "Caractéristiques",
+      onglet : true
+    }, {
+      code : "CATALOGUE_VALORISATION_GRP",
+      donnees : [ {
+        code : "CAT_VAL_HRS_JRS",
+        element : "donnee",
+        libelle : "Durée d'une formation par jour",
+        longueur : 10,
+        saisie : "hidden",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "CAT_VAL_COUT",
+        decimal : 0,
+        element : "donnee",
+        entier : 10,
+        libelle : "Coût formation",
+        negatif : true,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "9"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        automatisme : "CATALOGUE_NBR_HRS",
+        code : "CAT_VAL_NBR_JRS",
+        decimal : 0,
+        element : "donnee",
+        entier : 10,
+        libelle : "Nombre de jours ",
+        negatif : true,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "9"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "CAT_VAL_NBR_HRS",
+        decimal : 0,
+        element : "donnee",
+        entier : 10,
+        libelle : "Nombre d'heures",
+        negatif : true,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "9"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "CAT_VAL_CAPACITE_MIN",
+        decimal : 0,
+        element : "donnee",
+        entier : 10,
+        libelle : "Capacité minimum",
+        negatif : true,
+        obligatoire : true,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "9"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "CAT_VAL_CAPACITE_MAX",
+        decimal : 0,
+        element : "donnee",
+        entier : 10,
+        libelle : "Capacité maximum",
+        negatif : true,
+        obligatoire : true,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "9"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "CAT_VAL_DUREE",
+        decimal : 0,
+        element : "donnee",
+        entier : 10,
+        libelle : "Durée de validité (mois)",
+        negatif : true,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "9"
+      } ],
+      element : "groupe",
+      libelle : "Valorisation",
+      onglet : true
+    }, {
+      code : "CATALOGUE_ORGANISATION_GRP",
+      donnees : [ {
+        code : "CAT_ORG_PRESENTIEL",
+        element : "donnee",
+        libelle : "Présentiel",
+        longueur : 1,
+        saisie : "radio",
+        style : "FDonneeG",
+        type : "X",
+        valeurs : [ {
+          code : "OUI",
+          libelle : "Oui"
+        }, {
+          code : "NON",
+          libelle : "Non"
+        } ]
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "CAT_ORG_SITUATION",
+        element : "donnee",
+        libelle : "En situation de travail",
+        longueur : 1,
+        saisie : "radio",
+        style : "FDonneeG",
+        type : "X",
+        valeurs : [ {
+          code : "OUI",
+          libelle : "Oui"
+        }, {
+          code : "NON",
+          libelle : "Non"
+        } ]
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "CAT_ORG_TETORAT",
+        element : "donnee",
+        libelle : "Tutorat",
+        longueur : 1,
+        saisie : "radio",
+        style : "FDonneeG",
+        type : "X",
+        valeurs : [ {
+          code : "OUI",
+          libelle : "Oui"
+        }, {
+          code : "NON",
+          libelle : "Non"
+        } ]
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "CAT_ORG_E_LEARNING",
+        element : "donnee",
+        libelle : "E-learning",
+        longueur : 1,
+        saisie : "radio",
+        style : "FDonneeG",
+        type : "X",
+        valeurs : [ {
+          code : "OUI",
+          libelle : "Oui"
+        }, {
+          code : "NON",
+          libelle : "Non"
+        } ]
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "CAT_ORG_TEL",
+        element : "donnee",
+        libelle : "Téléphone",
+        longueur : 1,
+        saisie : "radio",
+        style : "FDonneeG",
+        type : "X",
+        valeurs : [ {
+          code : "OUI",
+          libelle : "Oui"
+        }, {
+          code : "NON",
+          libelle : "Non"
+        } ]
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "CAT_ORG_COR",
+        element : "donnee",
+        libelle : "Correspondance",
+        longueur : 1,
+        saisie : "radio",
+        style : "FDonneeG",
+        type : "X",
+        valeurs : [ {
+          code : "OUI",
+          libelle : "Oui"
+        }, {
+          code : "NON",
+          libelle : "Non"
+        } ]
+      } ],
+      element : "groupe",
+      libelle : "Organisation",
+      onglet : true
+    }, {
+      code : "CATALOGUE_CONTENU_GRP",
+      donnees : [ {
+        code : "CAT_CONTENU_POP",
+        element : "donnee",
+        libelle : "Population Cible",
+        longueur : 3999,
+        saisie : "textarea",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "CAT_CONTENU_OBJECTIF",
+        element : "donnee",
+        libelle : "Objectifs",
+        longueur : 3999,
+        saisie : "textarea",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "CAT_CONTENU_PRE",
+        element : "donnee",
+        libelle : "Prérequis",
+        longueur : 3999,
+        saisie : "textarea",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "CAT_CONTENU_PROG",
+        element : "donnee",
+        libelle : "Programme",
+        longueur : 3999,
+        saisie : "textarea",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      } ],
+      element : "groupe",
+      libelle : "Contenu",
+      onglet : true
+    }, {
+      code : "CATALOGUE_CURSUS_GRP",
+      donnees : [ {
+        code : "CAT_CURSUS_1",
+        element : "donnee",
+        libelle : "Code cursus 01",
+        longueur : 128,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "CAT_CURSUS_2",
+        element : "donnee",
+        libelle : "Code cursus 02",
+        longueur : 128,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "CAT_CURSUS_3",
+        element : "donnee",
+        libelle : "Code cursus 03",
+        longueur : 128,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "CAT_CURSUS_4",
+        element : "donnee",
+        libelle : "Code cursus 04",
+        longueur : 128,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "CAT_CURSUS_5",
+        element : "donnee",
+        libelle : "Code cursus 05",
+        longueur : 128,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "CAT_CURSUS_6",
+        element : "donnee",
+        libelle : "Code cursus 06",
+        longueur : 128,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "CAT_CURSUS_7",
+        element : "donnee",
+        libelle : "Code cursus 07",
+        longueur : 128,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "CAT_CURSUS_8",
+        element : "donnee",
+        libelle : "Code cursus 08",
+        longueur : 128,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "CAT_CURSUS_9",
+        element : "donnee",
+        libelle : "Code cursus 09",
+        longueur : 128,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "CAT_CURSUS_10",
+        element : "donnee",
+        libelle : "Code cursus 10",
+        longueur : 128,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      } ],
+      element : "groupe",
+      libelle : "Cursus",
+      onglet : true
+    } ],
+    element : "groupe",
+    libelle : "Modification Catalogue formation"
+  },
+  libelle : "Modification catalogue formation",
+  servicelet : "FormationCatalogueJsonServlet",
+  type : "P"
+}

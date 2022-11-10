@@ -1,0 +1,118 @@
+{
+  code : "BUDG_FORM_POP_M",
+  element : "ecran",
+  groupe : {
+    code : "BUDG_FORM_POP_GRP_M",
+    donnees : [ {
+      code : "BUDG_FORM_IDBUDGET",
+      element : "donnee",
+      libelle : "Code budgétaire",
+      longueur : 256,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "BUDG_FORM_CODE",
+      element : "donnee",
+      libelle : "Code budgétaire",
+      longueur : 256,
+      obligatoire : true,
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "BUDG_FORM_LIB",
+      element : "donnee",
+      libelle : "Libellé",
+      longueur : 256,
+      obligatoire : true,
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "BUDG_FORM_ANNEE",
+      element : "donnee",
+      format : "dd.MM.yyyy",
+      libelle : "Année",
+      obligatoire : true,
+      requete : "BUDG_FORM_4",
+      saisie : "select",
+      style : "FDonneeG",
+      type : "D"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "BUDG_FORM_CATBUDG",
+      element : "donnee",
+      libelle : "Catégorie de budget",
+      longueur : 80,
+      obligatoire : true,
+      requete : "BUDG_FORM_3",
+      saisie : "select",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "BUDG_FORM_MONTANT",
+      decimal : 3,
+      element : "donnee",
+      entier : 22,
+      libelle : "Montant (€?) ",
+      negatif : true,
+      obligatoire : true,
+      saisie : "text",
+      style : "FDonneeG",
+      type : "9",
+      zero : true
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "BUDG_FORM_VISRESP",
+      element : "donnee",
+      libelle : "Budget visible par le responsable",
+      longueur : 80,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      affichage : "HISTOBUDGET",
+      code : "BUDG_FORM_ACTIF",
+      element : "donnee",
+      libelle : "Actif",
+      longueur : 80,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      affichage : "ACTIFBUDGET",
+      code : "BUDG_FORM_HISTO",
+      element : "donnee",
+      libelle : "Historisé",
+      longueur : 80,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    } ],
+    element : "groupe",
+    libelle : "Modifier un budget de formation"
+  },
+  libelle : "Modifier un budget de formation",
+  servicelet : "FormationBudgetsJsonServlet",
+  type : "P"
+}

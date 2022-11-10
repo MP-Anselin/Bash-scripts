@@ -1,0 +1,191 @@
+{
+  code : "DEM_FORM_ASS",
+  element : "ecran",
+  groupe : {
+    code : "DEM_FORM_ASS_GRP",
+    donnees : [ {
+      code : "DEM_FORM_ASS_NOM_GRP",
+      donnees : [ {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Associer le(s) salarié(s) à la demande",
+        style : "FormTitre"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_COLLAB",
+        element : "donnee",
+        libelle : "Collaborateur(s)",
+        longueur : 50,
+        requete : "PILOTAGE_BUDG_9",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      } ],
+      element : "groupe",
+      libelle : "Demande Nominatives"
+    }, {
+      code : "DEM_FORM_ASS_NNOM_GRP",
+      donnees : [ {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Saisir un nombre de demandeur(s) puis associer les salarié(s) (optionnel)",
+        style : "FormTitre"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_RESP",
+        element : "donnee",
+        libelle : "Responsable",
+        longueur : 50,
+        requete : "PILOTAGE_BUDG_9",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_NBCOLLAB",
+        element : "donnee",
+        libelle : "Nombre de collaborateur(s)",
+        longueur : 50,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_COLLAB",
+        element : "donnee",
+        libelle : "Collaborateur(s)",
+        longueur : 50,
+        requete : "PILOTAGE_BUDG_9",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      } ],
+      element : "groupe",
+      libelle : "Demande Non Nominatives"
+    }, {
+      code : "DEM_FORM_ASS_MNOM_GRP",
+      donnees : [ {
+        code : "WKF_200_DEM_FORM_LIBFORMAFF",
+        element : "donnee",
+        libelle : "Libellé formation",
+        longueur : 255,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_ORGAFF",
+        element : "donnee",
+        libelle : "Libellé organisme",
+        longueur : 255,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Associer le salarié(s) à la demande",
+        style : "FormTitre"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_COLLAB",
+        element : "donnee",
+        libelle : "Collaborateur(s)",
+        longueur : 50,
+        requete : "PILOTAGE_BUDG_9",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      } ],
+      element : "groupe",
+      libelle : "Demande Modèle Nominatives"
+    }, {
+      code : "DEM_FORM_ASS_MNNOM_GRP",
+      donnees : [ {
+        code : "WKF_200_DEM_FORM_LIBELLLE",
+        element : "donnee",
+        libelle : "Libellé de la formation",
+        longueur : 128,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_ORG",
+        element : "donnee",
+        libelle : "Libellé organisme",
+        longueur : 255,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Saisir un nombre de demandeur(s) puis associer les salarié(s) (optionnel)",
+        style : "FormTitre"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_RESP",
+        element : "donnee",
+        libelle : "Responsable",
+        longueur : 50,
+        requete : "PILOTAGE_BUDG_9",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_NBCOLLAB",
+        element : "donnee",
+        libelle : "Nombre de collaborateur(s)",
+        longueur : 50,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_COLLAB",
+        element : "donnee",
+        libelle : "Collaborateur(s)",
+        longueur : 50,
+        requete : "PILOTAGE_BUDG_9",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      } ],
+      element : "groupe",
+      libelle : "Demande Modèle Non Nominatives"
+    } ],
+    element : "groupe",
+    libelle : "Associer l(es) demandeur(s)"
+  },
+  libelle : "Associer l(es) demandeur(s)",
+  servicelet : "FormationDemandeWkf",
+  type : "W"
+}

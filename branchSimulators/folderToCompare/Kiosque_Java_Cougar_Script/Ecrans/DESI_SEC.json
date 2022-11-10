@@ -1,0 +1,136 @@
+{
+  boutons : "INT",
+  code : "DESI_SEC",
+  element : "ecran",
+  groupe : {
+    code : "DESIGNATION_GRP",
+    donnees : [ {
+      code : "HAB_COLLAB_FILTRE",
+      element : "donnee",
+      libelle : "Collaborateur",
+      longueur : 50,
+      requete : "HAB_UTIL_SEC_5",
+      retour : "HAB_COLLAB_FILTRE, #NON, #NON, ID_HAB_COLLAB_FILTRE",
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "",
+      style : "FDonneeG"
+    }, {
+      code : "HAB_POP_FILTRE",
+      element : "donnee",
+      libelle : "Population",
+      longueur : 50,
+      requete : "HAB_UTIL_SEC_6",
+      retour : "HAB_POP_FILTRE, #NON, #NON, ID_HAB_POP_FILTRE",
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "HAB_ISADP",
+      element : "donnee",
+      libelle : "collab ISADP",
+      longueur : 50,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "ID_HAB_POP_FILTRE",
+      element : "donnee",
+      libelle : "Population",
+      longueur : 50,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "ID_HAB_COLLAB_FILTRE",
+      element : "donnee",
+      libelle : "id collab",
+      longueur : 50,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "HAB_AOID",
+      element : "donnee",
+      libelle : "L'AOID du collab",
+      longueur : 50,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "DESI_SECU_ARBRE",
+      element : "donnee",
+      libelle : "type arbre",
+      longueur : 50,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "DESIGNATIONS_GENE",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        requete : "DESI_SEC_4"
+      } ],
+      element : "groupe",
+      libelle : "Général",
+      onglet : true
+    }, {
+      code : "DESIGNATIONS_ENTR",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        pageModif : "DESI_SEC_POP_M",
+        requete : "DESI_SEC_1"
+      } ],
+      element : "groupe",
+      libelle : "Entretien",
+      onglet : true
+    }, {
+      code : "DESIGNATIONS_FORM",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        pageModif : "DESI_SEC_POP_FORM_M",
+        requete : "DESI_SEC_2"
+      } ],
+      element : "groupe",
+      libelle : "Formation",
+      onglet : true
+    }, {
+      code : "DESIGNATIONS_TALENTS",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        pageModif : "DESI_SEC_POP_TAL_M",
+        requete : "DESI_SEC_3"
+      } ],
+      element : "groupe",
+      libelle : "Revue des talents",
+      onglet : true
+    }, {
+      code : "DESIGNATIONS_ERR",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        pageModif : "DESI_SEC_POP_ERR_M",
+        requete : "DESI_SEC_6"
+      } ],
+      element : "groupe",
+      libelle : "Désignations en erreur",
+      onglet : true
+    } ],
+    element : "groupe",
+    libelle : "Designations"
+  },
+  libelle : "Liste des désignations",
+  servicelet : "DesignationSecuriteJsonServlet",
+  type : "U"
+}

@@ -1,0 +1,166 @@
+##
+SYS_SCH_JSON
+=SQL IFNOTEXIST=SYS_SCH_JSON=
+CREATE TABLE SYS_SCH_JSON ( NOM_PAGE VARCHAR2(250) NOT NULL ENABLE, NOM_JSON VARCHAR2(250) NOT NULL ENABLE, PRIMARY KEY (NOM_PAGE, NOM_JSON) ) 
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Modules.RD.STD.EXP.VARSYS.VARSYS'
+'Ext.adp.Modules.RD.STD.EXP.VARSYS.VARSYS','VarsysJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE IN ('Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageEcransExtjs','Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageGroupesDonneesExtjs','Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageDonneesExtjs')
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageDonneesExtjs','CreationSysRequetesJspJsonServlet'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageDonneesExtjs','GestionProjetJsonServlet'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageDonneesExtjs','InfoProjetCourantJsonServlet'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageDonneesExtjs','ParametrageDonneesJsonServlet'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageEcransExtjs','CreationSysRequetesJspJsonServlet'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageEcransExtjs','GestionProjetJsonServlet'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageEcransExtjs','InfoProjetCourantJsonServlet'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageEcransExtjs','ParametrageEcransJsonServlet'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageGroupesDonneesExtjs','CreationSysRequetesJspJsonServlet'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageGroupesDonneesExtjs','GestionProjetJsonServlet'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageGroupesDonneesExtjs','InfoProjetCourantJsonServlet'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageGroupesDonneesExtjs','ParametrageGroupesDonneesJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageReglesGestionExtjs'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageReglesGestionExtjs','ParametrageReglesGestionJsonServicelet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE IN ('Ext.adp.Modules.RD.STD.EXP.FIN_FORM.FIN_FORM', 'Ext.adp.Modules.RD.STD.EXP.AXE_STR_FORM.AXE_STR_FORM', 'Ext.adp.Modules.RD.STD.EXP.ACTEUR_FORM.ACTEUR_FORM', 'Ext.adp.Modules.RD.STD.EXP.ADR_LIEU_FORM.ADR_LIEU_FORM', 'Ext.adp.Modules.RD.STD.EXP.DOM_FORM.DOM_FORM', 'Ext.adp.Modules.RD.STD.EXP.ORG_FORM.ORG_FORM')
+'Ext.adp.Modules.RD.STD.EXP.ACTEUR_FORM.ACTEUR_FORM','FormationActeurJsonServlet'
+'Ext.adp.Modules.RD.STD.EXP.ADR_LIEU_FORM.ADR_LIEU_FORM','FormationLieuJsonServlet'
+'Ext.adp.Modules.RD.STD.EXP.AXE_STR_FORM.AXE_STR_FORM','FormationAxesStrategiquesJsonServlet'
+'Ext.adp.Modules.RD.STD.EXP.DOM_FORM.DOM_FORM','DomaineFormationJsonServlet'
+'Ext.adp.Modules.RD.STD.EXP.FIN_FORM.FIN_FORM','FormationFinanceursJsonServlet'
+'Ext.adp.Modules.RD.STD.EXP.ORG_FORM.ORG_FORM','FormationOrganismesJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Modules.RD.STD.EXP.PARAMPAC_PARAM.PARAMPAC_PARAM'
+'Ext.adp.Modules.RD.STD.EXP.PARAMPAC_PARAM.PARAMPAC_PARAM','ParamPacClientJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Modules.RD.STD.EXP.TYPEDESPO_FORM.TYPEDESPO_FORM'
+'Ext.adp.Modules.RD.STD.EXP.TYPEDESPO_FORM.TYPEDESPO_FORM','FormationTypeDespositifJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Modules.RD.STD.EXP.PLAN_FORM.PLAN_FORM'
+'Ext.adp.Modules.RD.STD.EXP.PLAN_FORM.PLAN_FORM','FormationPlanJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Modules.RD.STD.EXP.CATEGORIEBUD_FORM.CATEGORIEBUD_FORM'
+'Ext.adp.Modules.RD.STD.EXP.CATEGORIEBUD_FORM.CATEGORIEBUD_FORM','FormationCategorieBudgetJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Modules.RD.STD.EXP.STR_BDG_FORM.STR_BDG_FORM'
+'Ext.adp.Modules.RD.STD.EXP.STR_BDG_FORM.STR_BDG_FORM','FormationStructureBudgetaireJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Modules.RD.STD.EXP.HAB_UTIL_SEC.HAB_UTIL_SEC'
+'Ext.adp.Modules.RD.STD.EXP.HAB_UTIL_SEC.HAB_UTIL_SEC','HabilitationUtilsateurJsonServlet'
+##
+SYs_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.AppelsTableTools'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.AppelsTableTools','AppelTableToolsJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE ='Ext.adp.Modules.RD.STD.EXP.UTILISATEUR_HP_FORM.UTILISATEUR_HP_FORM'
+'Ext.adp.Modules.RD.STD.EXP.UTILISATEUR_HP_FORM.UTILISATEUR_HP_FORM','UtilisateurHorsPaieJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE ='Ext.adp.Modules.RD.STD.EXP.GROUPE_FORM.GROUPE_FORM'
+'Ext.adp.Modules.RD.STD.EXP.GROUPE_FORM.GROUPE_FORM','GroupeJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE='Ext.adp.Modules.RD.STD.EXP.DESI_SEC.DESI_SEC'
+'Ext.adp.Modules.RD.STD.EXP.DESI_SEC.DESI_SEC','DesignationSecuriteJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Modules.RD.STD.EXP.GEN_SCREEN.GEN_SCREEN'
+'Ext.adp.Modules.RD.STD.EXP.GEN_SCREEN.GEN_SCREEN','GenerateScreenJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Modules.RD.STD.EXP.BUDG_FORM.BUDG_FORM'
+'Ext.adp.Modules.RD.STD.EXP.BUDG_FORM.BUDG_FORM','FormationBudgetsJsonServlet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.WkfOperationEcransMVVM' and NOM_JSON = 'BridgingJsonServlet'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.WkfOperationEcransMVVM', 'BridgingJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Krh.Expert.Formations.Administration.POPULATIONS.POPULATIONS'
+'Ext.adp.Krh.Expert.Formations.Administration.POPULATIONS.POPULATIONS','PopulationsJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Modules.ADP_ONLY.Workflow.admin.WkfProcessus'
+'Ext.adp.Modules.ADP_ONLY.Workflow.admin.WkfProcessus','WkfProcessusJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Modules.ADP_ONLY.Workflow.admin.WkfOperations'
+'Ext.adp.Modules.ADP_ONLY.Workflow.admin.WkfOperations','WkfOperationJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Modules.ADP_ONLY.Workflow.admin.WkfBranches'
+'Ext.adp.Modules.ADP_ONLY.Workflow.admin.WkfBranches','WkfBranchesJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Moteur/ADP_ONLY/ParamEcranDyn/WkfOperationEcrans.jsp'
+'Moteur/ADP_ONLY/ParamEcranDyn/WkfOperationEcrans.jsp','BridgingJsonServlet'
+'Moteur/ADP_ONLY/ParamEcranDyn/WkfOperationEcrans.jsp','WkfOperationEcransJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE ='Ext.adp.Krh.Expert.Formations.Referentiels.Plans.PLAN'
+'Ext.adp.Krh.Expert.Formations.Referentiels.Plans.PLAN','FormationPilotagePlanJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Modules.RD.STD.EXP.CATALOGUE_FORM.CATALOGUE_FORM'
+'Ext.adp.Modules.RD.STD.EXP.CATALOGUE_FORM.CATALOGUE_FORM','FormationCatalogueJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Modules.RD.STD.EXP.MOD_EVAL.MOD_EVAL'
+'Ext.adp.Modules.RD.STD.EXP.MOD_EVAL.MOD_EVAL','ModalitesEvaluationJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE  = 'Ext.adp.Modules.RD.STD.EXP.PILOTAGE_BUDG.PILOTAGE_BUDG'
+'Ext.adp.Modules.RD.STD.EXP.PILOTAGE_BUDG.PILOTAGE_BUDG','FormationPilotageBudgetsJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE nom_page='Ext.adp.Modules.RD.STD.EXP.PROFILS_FORM.PROFILS_FORM'
+'Ext.adp.Modules.RD.STD.EXP.PROFILS_FORM.PROFILS_FORM','ProfilsJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE nom_page='Ext.adp.Modules.RD.STD.EXP.DEM_FORM.DEM_FORM'
+'Ext.adp.Modules.RD.STD.EXP.DEM_FORM.DEM_FORM','FormationDemandesJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE nom_page= 'Ext.adp.Krh.Expert.Formations.InformationsRH.RECHERCHE_AVANCEE.RECHERCHE_AVANCEE'
+'Ext.adp.Krh.Expert.Formations.InformationsRH.RECHERCHE_AVANCEE.RECHERCHE_AVANCEE','RechercheFormationJsonServlet'

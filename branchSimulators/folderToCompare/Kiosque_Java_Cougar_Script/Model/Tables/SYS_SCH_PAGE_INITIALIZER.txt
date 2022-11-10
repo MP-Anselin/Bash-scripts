@@ -1,0 +1,239 @@
+##
+SYS_SCH_PAGE_INITIALIZER
+=SQL IFEXIST=SYS_SCH_PAGE_INITIALIZER=
+ALTER TABLE SYS_SCH_PAGE_INITIALIZER DROP CONSTRAINT SYS_SCH_PAGE_INITIALIZER_PK
+##
+SYS_SCH_PAGE_INITIALIZER
+=SQL IFNOTEXIST=SYS_SCH_PAGE_INITIALIZER=
+CREATE TABLE SYS_SCH_PAGE_INITIALIZER ( NOM_PAGE VARCHAR2(300), VAR_SYS VARCHAR2(400), ERR_MSG VARCHAR2(400), JSONSERVLET VARCHAR2(400) ) 
+##
+SYS_SCH_PAGE_INITIALIZER
+=SQL IFEXIST=SYS_SCH_PAGE_INITIALIZER=
+ALTER TABLE SYS_SCH_PAGE_INITIALIZER ADD CONSTRAINT SYS_SCH_PAGE_INITIALIZER_PK PRIMARY KEY  (NOM_PAGE)
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+DELETE FROM SYS_SCH_PAGE_INITIALIZER WHERE NOM_PAGE = 'Ext.adp.Modules.RD.STD.EXP.VARSYS.VARSYS'
+'Ext.adp.Modules.RD.STD.EXP.VARSYS.VARSYS',NULL,NULL,'VarsysJsonServlet'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+DELETE FROM SYS_SCH_PAGE_INITIALIZER WHERE NOM_PAGE IN ('Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.GestionDesLivrablesMVVM', 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.RapportLivrableSlide', 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.HistoriquesDesProjetsMVVM', 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.RapportProjetSlide', 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.MiseEnBacASableSlide', 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.CreationModifLivrableSlide', 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.ObjetsComplementairesALivrerSlide', 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageGroupesDonneesExtjs', 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInCreationDuplicationGroupe', 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.ParametrageDonneeCopieEcran', 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageEcransExtjs', 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInCreationDuplicationEcran', 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageDictionnairesExtjs', 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideParametrageDictionnairesMappingTGE', 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideParamDicEcransUtilisantDonnee', 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideCreationDictionnaire', 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInModificationDonnee', 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideVisualisationGroupeDeDonnees', 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInAssistantTableau', 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInAjoutEltAssistantTableau', 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideParamDonErgonomieEcran', 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideParametrageDonneesMappingTGE', 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideParamRechercheStructure', 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideDuplicationDonnee', 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideImportDonnee', 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInPieceJointeUXEcran', 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInPersoLibBoutonEcran', 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.AppelsTableTools', 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.SlideInTestParamAppelTable', 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.SlideInCreationDuplicationAppelTable', 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.AppelsTableAdmin', 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageDonneesExtjs', 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideCreationDonnee')
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.AppelsTableAdmin',NULL,NULL,'TOOLS_ML'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.AppelsTableTools',NULL,NULL,'TOOLS_ML'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.GestionDesLivrablesMVVM','SYS_COMPANY_ID',NULL,'TOOLS_ML'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.HistoriquesDesProjetsMVVM',NULL,NULL,'TOOLS_ML'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageDictionnairesExtjs','STD_PAGINATION_NBLIGPAGE','Z2X00033;Z2X00034;ADMPD076;ADMPD039;ADMPD184;ADMPD185','TOOLS_ML'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageDonneesExtjs','STD_PAGINATION_NBLIGPAGE','ADMPD001;ADMPD008;Z2X00033;Z2X00034;ADMPD076;ADMPD047;ADMPD121;ADMPD145;ADMPD180;ADMPD181;ADMPD182;ADMPD183;ADMPD218;ADMPD219;ADMPD220;ADMPD221;ADMPD222','TOOLS_ML'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageEcransExtjs',NULL,'ADMPD196;ADMPD197;ADMPD198;ADMPD199;ADMPD200;ADMPD201;GAP00179','TOOLS_ML'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageGroupesDonneesExtjs',NULL,'ADMPD002;ADMPD003;ADMPD004;ADMPD048;ADMPD179;ADMPD186;ADMPD187','TOOLS_ML'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.SlideInCreationDuplicationAppelTable',NULL,NULL,'TOOLS_ML'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.SlideInTestParamAppelTable',NULL,NULL,'TOOLS_ML'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.CreationModifLivrableSlide',NULL,NULL,'TOOLS_ML'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.MiseEnBacASableSlide',NULL,NULL,'TOOLS_ML'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.ObjetsComplementairesALivrerSlide',NULL,NULL,'TOOLS_ML'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.ParametrageDonneeCopieEcran',NULL,'ADMPD195','TOOLS_ML'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.RapportLivrableSlide',NULL,NULL,'TOOLS_ML'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.RapportProjetSlide',NULL,NULL,'TOOLS_ML'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideCreationDictionnaire',NULL,NULL,'TOOLS_ML'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideCreationDonnee',NULL,'ADMPD076;ADMPD218;ADMPD219;ADMPD221','TOOLS_ML'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideDuplicationDonnee',NULL,'ADMPD076','TOOLS_ML'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideImportDonnee',NULL,'ADMPD206;ADMPD207','TOOLS_ML'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInAjoutEltAssistantTableau',NULL,'ADMPD055;ADMPD054;ADMPD058;ADMPD053','TOOLS_ML'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInAssistantTableau',NULL,NULL,'TOOLS_ML'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInCreationDuplicationEcran',NULL,'ADMPD202;ADMPD203','TOOLS_ML'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInCreationDuplicationGroupe',NULL,NULL,'TOOLS_ML'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInModificationDonnee',NULL,NULL,'TOOLS_ML'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInPersoLibBoutonEcran',NULL,NULL,'TOOLS_ML'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInPieceJointeUXEcran',NULL,'ADMPD204;ADMPD205','TOOLS_ML'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideParamDicEcransUtilisantDonnee','STD_PAGINATION_NBLIGPAGE',NULL,'TOOLS_ML'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideParamDonErgonomieEcran',NULL,'ADMPD001;ADMPD076;ADMPD121;ADMPD145;ADMPD188;ADMPD189;ADMPD190;ADMPD191;ADMPD192;ADMPD193;ADMPD194','TOOLS_ML'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideParamRechercheStructure',NULL,NULL,'TOOLS_ML'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideParametrageDictionnairesMappingTGE',NULL,NULL,'TOOLS_ML'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideParametrageDonneesMappingTGE',NULL,NULL,'TOOLS_ML'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideVisualisationGroupeDeDonnees',NULL,NULL,'TOOLS_ML'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+DELETE FROM SYS_SCH_PAGE_INITIALIZER WHERE NOM_PAGE = 'Ext.adp.MainDesk.view.eastregion.theme.Theme'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme',NULL,NULL,'TOOLS_ML'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+DELETE FROM SYS_SCH_PAGE_INITIALIZER WHERE NOM_PAGE = 'Ext.adp.MainDesk.view.eastregion.gestionProjet.GestionProjetCM'
+'Ext.adp.MainDesk.view.eastregion.gestionProjet.GestionProjetCM',NULL,'STD00034;ADMPD102','TOOLS_ML'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+DELETE FROM SYS_SCH_PAGE_INITIALIZER WHERE NOM_PAGE IN ('Ext.adp.Modules.RD.STD.EXP.FIN_FORM.FIN_FORM', 'Ext.adp.Modules.RD.STD.EXP.AXE_STR_FORM.AXE_STR_FORM', 'Ext.adp.Modules.RD.STD.EXP.ACTEUR_FORM.ACTEUR_FORM', 'Ext.adp.Modules.RD.STD.EXP.ADR_LIEU_FORM.ADR_LIEU_FORM', 'Ext.adp.Modules.RD.STD.EXP.DOM_FORM.DOM_FORM', 'Ext.adp.Modules.RD.STD.EXP.ORG_FORM.ORG_FORM')
+'Ext.adp.Modules.RD.STD.EXP.ACTEUR_FORM.ACTEUR_FORM',NULL,NULL,'FormationActeurJsonServlet'
+'Ext.adp.Modules.RD.STD.EXP.ADR_LIEU_FORM.ADR_LIEU_FORM',NULL,NULL,'FormationLieuJsonServlet'
+'Ext.adp.Modules.RD.STD.EXP.AXE_STR_FORM.AXE_STR_FORM',NULL,NULL,'FormationAxesStrategiquesJsonServlet'
+'Ext.adp.Modules.RD.STD.EXP.DOM_FORM.DOM_FORM',NULL,NULL,'DomaineFormationJsonServlet'
+'Ext.adp.Modules.RD.STD.EXP.FIN_FORM.FIN_FORM',NULL,NULL,'FormationFinanceursJsonServlet'
+'Ext.adp.Modules.RD.STD.EXP.ORG_FORM.ORG_FORM',NULL,NULL,'FormationOrganismesJsonServlet'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+DELETE FROM SYS_SCH_PAGE_INITIALIZER WHERE NOM_PAGE = 'Ext.adp.Modules.RD.STD.EXP.PARAMPAC_PARAM.PARAMPAC_PARAM'
+'Ext.adp.Modules.RD.STD.EXP.PARAMPAC_PARAM.PARAMPAC_PARAM',NULL,NULL,'ParamPacClientJsonServlet'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+DELETE FROM SYS_SCH_PAGE_INITIALIZER WHERE NOM_PAGE = 'Ext.adp.Modules.RD.STD.EXP.TYPEDESPO_FORM.TYPEDESPO_FORM'
+'Ext.adp.Modules.RD.STD.EXP.TYPEDESPO_FORM.TYPEDESPO_FORM',NULL,NULL,'FormationTypeDespositifJsonServlet'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+DELETE FROM SYS_SCH_PAGE_INITIALIZER WHERE NOM_PAGE = 'Ext.adp.Modules.RD.STD.EXP.PLAN_FORM.PLAN_FORM'
+'Ext.adp.Modules.RD.STD.EXP.PLAN_FORM.PLAN_FORM',NULL,NULL,'FormationPlanJsonServlet'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+DELETE FROM SYS_SCH_PAGE_INITIALIZER WHERE NOM_PAGE = 'Ext.adp.Modules.RD.STD.EXP.CATEGORIEBUD_FORM.CATEGORIEBUD_FORM'
+'Ext.adp.Modules.RD.STD.EXP.CATEGORIEBUD_FORM.CATEGORIEBUD_FORM',NULL,NULL,'FormationCategorieBudgetJsonServlet'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+DELETE FROM SYS_SCH_PAGE_INITIALIZER WHERE NOM_PAGE = 'Ext.adp.Modules.RD.STD.EXP.STR_BDG_FORM.STR_BDG_FORM'
+'Ext.adp.Modules.RD.STD.EXP.STR_BDG_FORM.STR_BDG_FORM',NULL,NULL,'FormationStructureBudgetaireJsonServlet'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+DELETE FROM SYS_SCH_PAGE_INITIALIZER WHERE NOM_PAGE = 'Ext.adp.Modules.RD.STD.EXP.HAB_UTIL_SEC.HAB_UTIL_SEC'
+'Ext.adp.Modules.RD.STD.EXP.HAB_UTIL_SEC.HAB_UTIL_SEC',NULL,NULL,'HabilitationUtilsateurJsonServlet'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+DELETE FROM SYS_SCH_PAGE_INITIALIZER WHERE NOM_PAGE = 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageReglesGestionExtjs'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageReglesGestionExtjs',NULL,NULL,'ParametrageReglesGestionJsonServicelet'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+DELETE FROM SYS_SCH_PAGE_INITIALIZER WHERE NOM_PAGE ='Ext.adp.Modules.RD.STD.EXP.UTILISATEUR_HP_FORM.UTILISATEUR_HP_FORM'
+'Ext.adp.Modules.RD.STD.EXP.UTILISATEUR_HP_FORM.UTILISATEUR_HP_FORM',NULL,NULL,'UtilisateurHorsPaieJsonServlet'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+DELETE FROM SYS_SCH_PAGE_INITIALIZER WHERE NOM_PAGE ='Ext.adp.Modules.RD.STD.EXP.GROUPE_FORM.GROUPE_FORM'
+'Ext.adp.Modules.RD.STD.EXP.GROUPE_FORM.GROUPE_FORM',NULL,NULL,'GroupeJsonServlet'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+DELETE FROM SYS_SCH_PAGE_INITIALIZER WHERE NOM_PAGE='Ext.adp.Modules.RD.STD.EXP.DESI_SEC.DESI_SEC'
+'Ext.adp.Modules.RD.STD.EXP.DESI_SEC.DESI_SEC',NULL,NULL,'DesignationSecuriteJsonServlet'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+DELETE FROM SYS_SCH_PAGE_INITIALIZER WHERE NOM_PAGE = 'Ext.adp.Modules.RD.STD.EXP.GEN_SCREEN.GEN_SCREEN'
+'Ext.adp.Modules.RD.STD.EXP.GEN_SCREEN.GEN_SCREEN','','','GenerateScreenJsonServlet'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+DELETE FROM SYS_SCH_PAGE_INITIALIZER WHERE NOM_PAGE = 'Ext.adp.Modules.RD.STD.EXP.BUDG_FORM.BUDG_FORM'
+'Ext.adp.Modules.RD.STD.EXP.BUDG_FORM.BUDG_FORM',NULL,NULL,'FormationBudgetsJsonServlet'
+##
+SYS_SCH_PAGE_INITIALIZER
+=SQL=
+delete FROM SYS_SCH_PAGE_INITIALIZER where NOM_PAGE = 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInAjoutBridgingModel'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+delete from SYS_SCH_PAGE_INITIALIZER where NOM_PAGE in ('Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInAjoutBridging')
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInAjoutBridging', null, 'ADMPD201', 'TOOLS_ML'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+DELETE FROM SYS_SCH_PAGE_INITIALIZER WHERE NOM_PAGE = 'Ext.adp.Krh.Expert.Formations.Administration.POPULATIONS.POPULATIONS'
+'Ext.adp.Krh.Expert.Formations.Administration.POPULATIONS.POPULATIONS',NULL,NULL,'PopulationsJsonServlet'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+DELETE FROM SYS_SCH_PAGE_INITIALIZER WHERE NOM_PAGE = 'Ext.adp.Modules.ADP_ONLY.Workflow.admin.WkfProcessus'
+'Ext.adp.Modules.ADP_ONLY.Workflow.admin.WkfProcessus','','','WkfProcessusJsonServlet'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+DELETE FROM SYS_SCH_PAGE_INITIALIZER WHERE NOM_PAGE = 'Ext.adp.Modules.ADP_ONLY.Workflow.admin.WkfOperations'
+'Ext.adp.Modules.ADP_ONLY.Workflow.admin.WkfOperations','','','WkfOperationJsonServlet'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+DELETE FROM SYS_SCH_PAGE_INITIALIZER WHERE NOM_PAGE = 'Ext.adp.Modules.ADP_ONLY.Workflow.admin.WkfBranches'
+'Ext.adp.Modules.ADP_ONLY.Workflow.admin.WkfBranches','','','WkfBranchesJsonServlet'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+DELETE FROM SYS_SCH_PAGE_INITIALIZER WHERE NOM_PAGE IN ('Ext.adp.Workbox.Workbox','Ext.adp.Workbox.HistorySlide')
+'Ext.adp.Workbox.HistorySlide',NULL,NULL,'HistorySlideJsonServlet'
+'Ext.adp.Workbox.Workbox',NULL,NULL,'WorkboxJsonServlet'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+DELETE FROM SYS_SCH_PAGE_INITIALIZER WHERE NOM_PAGE ='Ext.adp.Krh.Expert.Formations.Referentiels.Plans.PLAN'
+'Ext.adp.Krh.Expert.Formations.Referentiels.Plans.PLAN',NULL,NULL,'FormationPilotagePlanJsonServlet'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+DELETE FROM SYS_SCH_PAGE_INITIALIZER WHERE NOM_PAGE = 'Ext.adp.Modules.RD.STD.EXP.CATALOGUE_FORM.CATALOGUE_FORM'
+'Ext.adp.Modules.RD.STD.EXP.CATALOGUE_FORM.CATALOGUE_FORM',NULL,NULL,'FormationCatalogueJsonServlet'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+delete from SYS_SCH_PAGE_INITIALIZER where NOM_PAGE = 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageReglesGestionExtjs'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageReglesGestionExtjs', null, 'ADMPD231;ADMPD232;ADMPD233;ADMPD234;ADMPD235;ADMPD236;ADMPD237;ADMPD238;ADMPD239;ADMPD240', 'TOOLS_ML'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+delete from SYS_SCH_PAGE_INITIALIZER where NOM_PAGE = 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInCreationDuplicatioRegle'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInCreationDuplicatioRegle', null, 'null', 'TOOLS_ML'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+delete from SYS_SCH_PAGE_INITIALIZER where NOM_PAGE = 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInTestRegleGestion'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInTestRegleGestion', null, 'null', 'TOOLS_ML'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+delete from SYS_SCH_PAGE_INITIALIZER where NOM_PAGE = 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.WkfOperationEcransMVVM'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.WkfOperationEcransMVVM', null, 'ADMPD213;ADMPD214;ADMPD215;ADMPD216;ADMPD217;ADMPD218;ADMPD219;ADMPD220;ADMPD221;ADMPD222;ADMPD223;ADMPD224;ADMPD225;ADMPD226;ADMPD230', 'TOOLS_ML'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+DELETE FROM SYS_SCH_PAGE_INITIALIZER WHERE NOM_PAGE = 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInAjoutEcranWkf'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInAjoutEcranWkf',null,'ADMPD227;ADMPD228;ADMPD229','TOOLS_ML'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+delete from SYS_SCH_PAGE_INITIALIZER where NOM_PAGE in ( 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.GenerationEcransDASlide')
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.GenerationEcransDASlide',null, null, 'TOOLS_ML'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+DELETE FROM SYS_SCH_PAGE_INITIALIZER WHERE NOM_PAGE = 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.WkfOperationEcransMVVM'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.WkfOperationEcransMVVM','','ADMPD213;ADMPD214;ADMPD215;ADMPD216;ADMPD217;ADMPD218;ADMPD219;ADMPD220;ADMPD221;ADMPD222;ADMPD223;ADMPD224;ADMPD225;ADMPD226;ADMPD230','TOOLS_ML'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+DELETE FROM SYS_SCH_PAGE_INITIALIZER WHERE NOM_PAGE = 'Ext.adp.Modules.RD.STD.EXP.MOD_EVAL.MOD_EVAL'
+'Ext.adp.Modules.RD.STD.EXP.MOD_EVAL.MOD_EVAL',NULL,NULL,'ModalitesEvaluationJsonServlet'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+DELETE FROM SYS_SCH_PAGE_INITIALIZER WHERE NOM_PAGE  = 'Ext.adp.Modules.RD.STD.EXP.PILOTAGE_BUDG.PILOTAGE_BUDG'
+'Ext.adp.Modules.RD.STD.EXP.PILOTAGE_BUDG.PILOTAGE_BUDG',NULL,NULL,'FormationPilotageBudgetsJsonServlet'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+DELETE FROM SYS_SCH_PAGE_INITIALIZER WHERE nom_page='Ext.adp.Modules.RD.STD.EXP.PROFILS_FORM.PROFILS_FORM'
+'Ext.adp.Modules.RD.STD.EXP.PROFILS_FORM.PROFILS_FORM',NULL,NULL,'ProfilsJsonServlet'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+DELETE FROM SYS_SCH_PAGE_INITIALIZER WHERE nom_page='Ext.adp.Modules.RD.STD.EXP.DEM_FORM.DEM_FORM'
+'Ext.adp.Modules.RD.STD.EXP.DEM_FORM.DEM_FORM',NULL,NULL,'FormationDemandesJsonServlet'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+DELETE FROM SYS_SCH_PAGE_INITIALIZER WHERE nom_page= 'Ext.adp.Krh.Expert.Formations.InformationsRH.RECHERCHE_AVANCEE.RECHERCHE_AVANCEE'
+'Ext.adp.Krh.Expert.Formations.InformationsRH.RECHERCHE_AVANCEE.RECHERCHE_AVANCEE',NULL,NULL,'RechercheFormationJsonServlet'

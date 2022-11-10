@@ -1,0 +1,37 @@
+{
+  boutons : "INT",
+  code : "FIN_FORM",
+  element : "ecran",
+  groupe : {
+    code : "FIN_FORM_ONGLET_GRP",
+    donnees : [ {
+      code : "FIN_FORM_GRP",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        pageAjout : "FIN_FORM_POP",
+        pageModif : "FIN_FORM_POP_MODIF",
+        requete : "FIN_FORM_1"
+      } ],
+      element : "groupe",
+      libelle : "Financeurs",
+      onglet : true
+    }, {
+      code : "FIN_FORM_HISTO_GRP",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        pageModif : "FIN_FORM_POP_MODIF",
+        requete : "FIN_FORM_HISTO_1"
+      } ],
+      element : "groupe",
+      libelle : "Financeurs historisés",
+      onglet : true
+    } ],
+    element : "groupe",
+    libelle : "onglet grp financeurs"
+  },
+  libelle : "Gestion des financeurs",
+  servicelet : "FormationFinanceursJsonServlet",
+  type : "U"
+}

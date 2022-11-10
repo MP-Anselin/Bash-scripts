@@ -1,0 +1,90 @@
+##
+V_V5_KRHEF_ENTR_ACT_CACHE
+=SQL=
+CREATE OR REPLACE VIEW V_V5_KRHEF_ENTR_ACT_CACHE ("MATRICULE","ID_CAMPAGNE","ID_ENT","ACTEUR_ROLE","ACTEUR_MATRICULE") AS 
+select ent.COLLABORATEUR as MATRICULE,
+           ent.ID_CAMPAGNE_ENT as ID_CAMPAGNE,
+           ent.ID_ENT,
+           ent.ACTEUR_ROLE,
+           ent.ACTEUR as ACTEUR_MATRICULE
+      from T_V5_KRHEF_ENTRETIEN ent
+
+    union
+
+    --
+    -- Responsables potentiels pour les entretiens non initialisés
+    --
+    select ent.MATRICULE,
+           ent.ID_CAMPAGNE,
+           null as ID_ENT,
+           'RESP' as ACTEUR_ROLE,
+           design.ACTEUR as ACTEUR_MATRICULE
+    from V_V5_KRHEF_ENTR_RESOURCE ent
+    join V_V5_KRHEF_CAMPAGNE_ACTEUR cmp_act
+      on cmp_act.ID_CAMPAGNE = ent.ID_CAMPAGNE
+    join V_V5_KRH_DESIGN_RESP_ENTR design
+      on design.COLLABORATEUR = ent.MATRICULE
+
+    where ent.ID_ENT is null
+      and cmp_act.RESP = 1
+      and design.ACTEUR is not null
+
+    union
+
+    --
+    -- Responsable RH
+    --
+    select ent.MATRICULE,
+           ent.ID_CAMPAGNE,
+           null as ID_ENT,
+           'RESP_RH' as ACTEUR_ROLE,
+           design.ACTEUR as ACTEUR_MATRICULE
+
+    from V_V5_KRHEF_ENTR_RESOURCE ent
+    join V_V5_KRHEF_CAMPAGNE_ACTEUR cmp_act
+      on cmp_act.ID_CAMPAGNE = ent.ID_CAMPAGNE
+    join T_KRH_DESIGN_CLI_RRH_ENTR design
+      on design.COLLABORATEUR = ent.MATRICULE
+
+    where ent.ID_ENT is null
+      and cmp_act.RESP_RH = 1
+
+    union
+
+    --
+    -- Directeur RH
+    --
+    select ent.MATRICULE,
+           ent.ID_CAMPAGNE,
+           null as ID_ENT,
+           'DIR_RH' as ACTEUR_ROLE,
+           design.ACTEUR as ACTEUR_MATRICULE
+
+    from V_V5_KRHEF_ENTR_RESOURCE ent
+    join V_V5_KRHEF_CAMPAGNE_ACTEUR cmp_act
+      on cmp_act.ID_CAMPAGNE = ent.ID_CAMPAGNE
+    join T_KRH_DESIGN_CLI_DRH_ENTR design
+      on design.COLLABORATEUR = ent.MATRICULE
+
+    where ent.ID_ENT is null
+      and cmp_act.DIR_RH = 1
+
+    union
+
+    --
+    -- Acteur indirect
+    --
+    select ent.MATRICULE,
+           ent.ID_CAMPAGNE,
+           null as ID_ENT,
+           'ACT_IND' as ACTEUR_ROLE,
+           design.ACTEUR as ACTEUR_MATRICULE
+
+    from V_V5_KRHEF_ENTR_RESOURCE ent
+    join V_V5_KRHEF_CAMPAGNE_ACTEUR cmp_act
+      on cmp_act.ID_CAMPAGNE = ent.ID_CAMPAGNE
+    join T_KRH_DESIGN_CLI_ACTIND_ENTR design
+      on design.COLLABORATEUR = ent.MATRICULE
+
+    where ent.ID_ENT is null
+      and cmp_act.ACT_IND = 1

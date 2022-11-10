@@ -1,0 +1,109 @@
+##
+TAG_CHARSET=@€éèç
+##
+ADM_ADD_SCH_CLASSEUR
+=SQL=
+create or replace FUNCTION ADM_ADD_SCH_CLASSEUR( p_code_schema            IN NUMBER, p_lib_1                  IN VARCHAR2,
+ p_lib_2                  IN VARCHAR2,
+ p_lib_3                  IN VARCHAR2,
+ p_lib_4                  IN VARCHAR2,
+ p_obj_theme              IN SCH_ELEMENT,
+ p_description            IN VARCHAR2,
+ code_langue              IN VARCHAR2
+ ) RETURN SCH_ELEMENT
+ 
+ IS
+ p_obj_classeur              SCH_ELEMENT;
+ ordreClasseur     NUMBER;
+ cnt NUMBER;
+ BEGIN
+ p_obj_classeur := sch_element(p_code_schema, 0, p_lib_4, NULL, 0, 0, 4);
+ 
+ BEGIN
+ /* VERIFICATION DANS SYS_SCH_ELEMENT*/
+ SELECT NVL(code_element, 0) INTO p_obj_classeur.code_element FROM sys_sch_element
+ WHERE (libelle = p_lib_4 AND niveau = 4) AND ROWNUM = 1;
+ EXCEPTION WHEN NO_DATA_FOUND THEN
+ NULL;
+ END;
+ 
+ IF (p_obj_classeur.code_element = 0) THEN
+ /* CREATION ELEMENT DANS SYS_SCH_ELEMENT */
+ SELECT MAX(code_element) + 1 INTO p_obj_classeur.code_element FROM sys_sch_element;
+ 
+ INSERT INTO sys_sch_element(niveau, code_element, libelle, nom_page, code_role, description, tags, type)
+ VALUES(p_obj_classeur.niveau, p_obj_classeur.code_element, p_obj_classeur.libelle, NULL, NULL, p_description, NULL, NULL);
+ 
+ --dbms_output.put_line('ADM_ADD_SCH_SUJET: (C) [code_element] ' || p_obj_classeur.code_element || ' [libelle] ' || p_obj_classeur.libelle || ' [niveau] ' || p_obj_classeur.niveau);
+ --FIXME utiliser la procédure trace_dbms_output()
+ --ELSE
+ --dbms_output.put_line('ADM_ADD_SCH_SUJET: (E) [code_element] ' || p_obj_classeur.code_element || ' [libelle] ' || p_obj_classeur.libelle || ' [niveau] ' || p_obj_classeur.niveau);
+ --FIXME utiliser la procédure trace_dbms_output()
+ END IF;
+ 
+ IF (code_langue != 'fr_fr') THEN
+ BEGIN
+ SELECT count(*) INTO cnt FROM sys_sch_element_ml a
+ WHERE a.code_element = p_obj_classeur.code_element AND a.CODLANG = code_langue AND a.niveau = p_obj_classeur.niveau;
+ EXCEPTION WHEN NO_DATA_FOUND THEN
+ NULL;
+ END;
+ 
+ IF (cnt = 0) THEN
+ INSERT INTO sys_sch_element_ml (CODLANG, NIVEAU, CODE_ELEMENT, LIBELLE)
+ VALUES (code_langue , p_obj_classeur.niveau, p_obj_classeur.code_element, p_obj_classeur.libelle);
+ END IF;
+ END IF;
+ 
+ /* VERIFICATION DANS SYS_SCHEMAS */
+ BEGIN
+ SELECT s4.code_asso, s4.code_asso_pere INTO p_obj_classeur.code_asso, p_obj_classeur.code_asso_pere
+ FROM sys_sch_element e1, sys_sch_element e2, sys_sch_element e3, sys_sch_element e4, sys_schemas s1, sys_schemas s2, sys_schemas s3, sys_schemas s4
+ WHERE  s1.code_schema = p_code_schema
+ AND s4.code_schema = p_code_schema
+ AND s3.code_schema = p_code_schema
+ AND s2.code_schema = p_code_schema
+ AND s1.code_schema = p_code_schema
+ AND s4.code_elt = e4.code_element AND s4.niveau = e4.niveau
+ AND s3.code_elt = e3.code_element AND s3.niveau = e3.niveau
+ AND s2.code_elt = e2.code_element AND s2.niveau = e2.niveau
+ AND s1.code_elt = e1.code_element AND s1.niveau = e1.niveau
+ AND s4.niveau ='4'
+ AND s3.niveau ='3'
+ AND s2.niveau ='2'
+ AND s1.niveau ='1'
+ AND s4.code_asso_pere = s3.code_asso
+ AND s3.code_asso_pere = s2.code_asso
+ AND s2.code_asso_pere = s1.code_asso
+ AND e1.libelle = p_lib_1
+ AND e2.libelle = p_lib_2
+ AND e3.libelle = p_lib_3
+ AND e4.libelle = p_lib_4;
+ EXCEPTION WHEN NO_DATA_FOUND THEN
+ NULL;
+ END;
+ 
+ IF (p_obj_classeur.code_asso = 0) THEN
+ /* CREATION ELEMENT DANS SYS_SCHEMAS */
+ SELECT MAX(code_asso) + 2 INTO p_obj_classeur.code_asso FROM sys_schemas;
+ p_obj_classeur.code_asso_pere := p_obj_theme.code_asso;
+ 
+ /* RECUPERATION de L ORDRE*/
+ SELECT MAX(NVL(ORDRE,0))+1 INTO ordreClasseur FROM SYS_SCHEMAS WHERE code_schema = p_obj_classeur.code_schema AND code_asso_pere = p_obj_classeur.code_asso_pere ;
+ IF ordreClasseur is NULL THEN
+ ordreClasseur := 0;
+ END IF;
+ 
+ 
+ 
+ INSERT INTO sys_schemas(code_schema, code_asso, code_asso_pere, code_elt, niveau, ordre)
+ VALUES(p_obj_classeur.code_schema, p_obj_classeur.code_asso, p_obj_classeur.code_asso_pere, p_obj_classeur.code_element, p_obj_classeur.niveau, ordreClasseur);
+ --dbms_output.put_line('ADM_ADD_SCH_SUJET: (C) [code_schema] ' || p_obj_classeur.code_schema || ' [code_asso] ' || p_obj_classeur.code_asso || ' [code_asso_pere) ' || p_obj_classeur.code_asso_pere || ' [niveau] ' || p_obj_classeur.niveau);
+ --FIXME utiliser la procédure trace_dbms_output()
+ --ELSE
+ --dbms_output.put_line('ADM_ADD_SCH_SUJET: (E) [code_schema] ' || p_obj_classeur.code_schema || ' [code_asso] ' || p_obj_classeur.code_asso || ' [code_asso_pere] ' || p_obj_classeur.code_asso_pere || ' [niveau] ' || p_obj_classeur.niveau);
+ --FIXME utiliser la procédure trace_dbms_output()
+ END IF;
+ 
+ RETURN p_obj_classeur;
+ END ADM_ADD_SCH_CLASSEUR; 

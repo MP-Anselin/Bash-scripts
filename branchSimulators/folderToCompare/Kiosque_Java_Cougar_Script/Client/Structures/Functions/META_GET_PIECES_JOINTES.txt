@@ -1,0 +1,42 @@
+##
+META_GET_PIECES_JOINTES
+=SQL=
+create or replace FUNCTION META_GET_PIECES_JOINTES 
+(
+  P_COMPANY_ID IN VARCHAR2
+, P_NOM_PAGE IN VARCHAR2
+, P_ID_GROUPE IN VARCHAR2 
+) RETURN NUMBER 
+ IS
+   
+  CURSOR CUR_DONNEES
+  IS
+  SELECT NOM_DONNEE, SUFFIXE_OU_LIBELLE
+   FROM META_GROUPE_DONNEES 
+   WHERE COMPANY_ID = p_company_id
+   AND ID_GROUPE   =p_id_groupe
+   AND NOM_DONNEE LIKE '#GROUPE%'
+   UNION 
+   SELECT NOM_DONNEE, SUFFIXE_OU_LIBELLE
+   FROM META_GROUPE_DONNEES 
+   WHERE COMPANY_ID = p_company_id
+   AND ID_GROUPE   =p_id_groupe
+   AND NOM_DONNEE NOT LIKE '#%';
+   
+   v_ligneDonnee CUR_DONNEES%ROWTYPE;
+   v_retour  number:=0; 
+
+ BEGIN
+   OPEN CUR_DONNEES;
+   LOOP
+    FETCH  CUR_DONNEES INTO v_ligneDonnee;
+    EXIT WHEN CUR_DONNEES%NOTFOUND;  
+      IF  SUBSTR(v_ligneDonnee.NOM_DONNEE,1,7)='#GROUPE' THEN 
+         v_retour  := v_retour+ META_GET_PIECES_JOINTES(p_company_id,p_nom_page,v_ligneDonnee.SUFFIXE_OU_LIBELLE);
+      ELSE
+        v_retour := v_retour+ META_EST_PIECE_JOINTE(p_company_id,v_ligneDonnee.NOM_DONNEE,p_nom_page);  
+      END IF;
+   END LOOP;
+   CLOSE CUR_DONNEES;
+  RETURN v_retour;
+END META_GET_PIECES_JOINTES;

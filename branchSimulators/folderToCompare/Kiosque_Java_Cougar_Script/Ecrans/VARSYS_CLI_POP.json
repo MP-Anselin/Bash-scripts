@@ -1,0 +1,84 @@
+{
+  code : "VARSYS_CLI_POP",
+  element : "ecran",
+  groupe : {
+	element: "groupe",
+	code: "VARSYS_CLI_POP_GRP",
+	libelle: "",
+	donnees: [{
+		element: "donnee",
+		code: "VARSYS_MODULE",
+		libelle: "Module",
+		saisie: "span",
+		type: "X",
+		longueur: 5,
+		obligatoire: true
+	},{
+		element: "donnee",
+		code: "#EOL"
+	},{
+		element: "donnee",
+		code: "VARSYS_CODE",
+		libelle: "Code",
+		saisie: "text",
+		type: "X",
+		longueur: 50,
+		obligatoire: true,
+		requete: "VARSYS_1",
+		retour: "VARSYS_MODULE,VARSYS_CODE,VARSYS_VALEUR,VARSYS_DESC,VARSYS_TYPE,#NON"
+	},{
+		element: "donnee",
+		code: "#EOL"
+	},{
+		element: "donnee",
+		code: "VARSYS_VALEUR",
+		libelle: "Valeur",
+		saisie: "text",
+		type: "X",
+		longueur: 4000
+	},{
+		element: "donnee",
+		code: "#EOL"
+	},{
+		element: "donnee",
+		code: "VARSYS_TYPE",
+		libelle: "Type",
+		saisie: "select",
+		type: "X",
+		longueur: 10,
+		obligatoire: true,
+		valeurs: [
+			{code: "Texte" 	,libelle:"Texte"},
+			{code: "Entier"	,libelle:"Entier"},
+			{code: "Réel"	,libelle:"Réel"},
+			{code: "Booléen",libelle:"Booléen"}
+		]
+	},{
+		element: "donnee",
+		code: "#EOL"
+	},{
+		element: "donnee",
+		code: "VARSYS_BLOQUEE",
+		libelle: "Bloquée",
+		saisie: "checkbox",
+		type: "X",
+		longueur: 3
+	},{
+		element: "donnee",
+		code: "#EOL"
+	},{
+		element: "donnee",
+		code: "VARSYS_DESC",
+		libelle: "Description",
+		saisie: "textarea",
+		type: "X",
+		longueur: 2000
+	},{
+		element: "donnee",
+		code: "#EOL"
+	}]
+  },
+  libelle : "Ajouter ou modifier une variable cliente",
+  servicelet : "VarsysJsonServlet",
+  type : "P"
+}

@@ -1,0 +1,93 @@
+##
+TAG_CHARSET=@€éèç
+##
+SYS_DEF_THEME
+=SQL IFNOTEXIST=SYS_DEF_THEME=
+CREATE TABLE SYS_DEF_THEME ( VAR_NAME VARCHAR2(50 BYTE) NOT NULL, LIBELLE VARCHAR2(50 BYTE), GROUPE VARCHAR2(50 BYTE), DEFAULT_COLOR VARCHAR2(50 BYTE), CONSTRAINT SYS_DEF_THEME_PK PRIMARY KEY (VAR_NAME))
+##
+SYS_DEF_THEME
+==
+DELETE FROM SYS_DEF_THEME
+'action-color','Lien et icône','Lien & Icône',NULL
+'action-color-hover','Lien et icône au survol','Lien & Icône','action-color#40'
+'appbar-bg-color','Fond de la barre de recherche','Navigation','btn-color#-40'
+'appbar-bg-color-light','Fond du champ de recherche','Navigation','btn-color#20'
+'appbar-bg-color-transparent','Surlignage dans la recherche','Navigation','btn-color#80'
+'appbar-font-color','Texte dans la barre de navigation','Navigation',NULL
+'avatar-bg-color','Fond de l''avatar','Avatar','btn-color#30'
+'appbar-icon-color','Icône de la barre de navigation','Navigation','#ffffff'
+'appbar-icon-color-hover','Icône de la barre de navigation au survol','Navigation','btn-color#-40'
+'bandeau-donnee-info-collab-color','Données du collaborateur dans le bandeau','Bandeau',NULL
+'bandeau-periode-ouverte-color','Période ouverte','Bandeau','bandeau-salarie-non-present-color#0'
+'bandeau-manager-color','Badge manager','Bandeau','#324fa5'
+'bandeau-badge-salarie-non-present-color','Badge pour un salarié sorti','Bandeau','#F9C4C3'
+'bandeau-badge-salarie-non-present-text-color','Texte du badge pour un salarié sorti','Bandeau','#A12F1F'
+'bandeau-badge-salarie-present-color','Badge pour un salarié présent','Bandeau','#C2F2C3'
+'bandeau-badge-salarie-present-text-color','Texte du badge pour un salarié présent','Bandeau','#2F5B22'
+'bandeau-badge-manager-color','Badge pour un manager','Bandeau','#D8E5F9'
+'bandeau-badge-manager-text-color','Texte du badge pour un manager','Bandeau','#324FA5'
+'bg-color','Bureau','Couleur de fond',NULL
+'bg-color-bandeau','Bandeau','Couleur de fond',NULL
+'bg-color-margin','Marges','Couleur de fond','bg-color#-70'
+'btn-color','Fond et bordures','Bouton',NULL
+'btn-hover-color','Fond au survol (boutons primaires)','Bouton','btn-color#-30'
+'btn-hover-color-light','Fond au survol (bouton secondaire et tableau)','Bouton','btn-color#80'
+'btn-primary-color','Fond du bouton primaire','Bouton','appbar-font-color#0'
+'busy-indicator-bg-color','Fond du chargement','Lien & Icône','btn-color#80'
+'busy-indicator-bg-mask','Masque du chargement','Lien & Icône','#00000080'
+'busy-indicator-color','Chargement','Lien & Icône','btn-color#0'
+'checkbox-radio-color','Non sélectionné','Checkbox & Radio','text-color#40'
+'checkbox-radio-color-checked','Sélectionné','Checkbox & Radio','btn-color#0'
+'checkbox-radio-color-checked-hover','Sélectionné au survol','Checkbox & Radio','btn-color#-30'
+'checkbox-radio-color-hover','Non sélectionné au survol','Checkbox & Radio','text-color#0'
+'checkbox-radio-color-disabled','Désactiver','Checkbox & Radio',NULL
+'checkbox-radio-color-disabled-checked','Désactiver sélectionné','Checkbox & Radio',NULL
+'checkbox-color-disabled-checked','Désactiver checkbox sélectionné','Checkbox & Radio',NULL
+'combo-hover-bg-color','Option au survol ','Liste déroulante','bg-color#0'
+'combo-selected-bg-color','Option sélectionnée','Liste déroulante','btn-color#70'
+'grid-body-bg-color','Fond','Grille','tuile-bg-color#0'
+'grid-header-bg-color','Entete','Grille','tuile-bg-color#0'
+'grid-header-font-color','Texte de l''entête','Grille','text-color#0'
+'grid-header-font-hover-color','Texte de l''entête au survol','Grille','text-color#40'
+'grid-header-hover-bg-color','Entete au survol','Grille','btn-color#90'
+'grid-item-font-color','Texte d''une ligne','Grille','text-color#0'
+'grid-item-font-hover-color','Texte d''une ligne au survol','Grille','text-color#40'
+'grid-item-hover-bg-color','Ligne au survol','Grille','btn-color#70'
+'grid-item-hover-border-color','Bordure au survol','Grille','action-color#20'
+'input-icon-color','Icône input','Bouton','text-color#0'
+'input-icon-color-focus','Icône input au focus','Bouton','#2a70e8'
+'input-icon-color-hover','Icône input au survol','Bouton','action-color#20'
+'input-color','Bordure','Champ de saisie','text-color#80'
+'input-error-color','Erreur','Champ de saisie','#9C2514'
+'input-hover-color','Bordure au survol','Champ de saisie','action-color#40'
+'input-text-color','Texte des champs','Champ de saisie','text-color#0'
+'msg-error-bg-color','Fond (erreur)','Message','#FAD9D9'
+'msg-error-icon-color','Texte & Icône (erreur)','Message','#9C2514'
+'msg-info-bg-color','Fond (information)','Message','#E8EFFA'
+'msg-info-icon-color','Texte & Icône (information)','Message','#324FA5'
+'msg-success-bg-color','Fond (succès)','Message','#DBF7DC'
+'msg-success-icon-color','Texte & Icône (succès)','Message','#2F5B22'
+'msg-text-color','Fond Info bulle','Message','btn-color#-40'
+'msg-tooltip-color','Texte Info bulle','Message','appbar-font-color#0'
+'msg-warning-bg-color','Fond (warning)','Message','#F8EED9'
+'msg-warning-icon-color','Texte & Icône (warning)','Message','#983F00'
+'navbar-bg-color','Fond de la barre de navigation','Navigation','bg-color'
+'navbar-not-selected-font','Texte d''un menu non sélectionné','Navigation','msg-text-color'
+'navbar-selected-border','Bordure du menu sélectionné','Navigation',NULL
+'preference-item-color','Texte des items du menu préférence','Bandeau','#393533'
+'preference-text-color','Texte de l''entête du menu préférence','Bandeau','#262321'
+'preference-text-color-delegation','Texte et indice de délégation du menu préférence','Bandeau','#f2635d'
+'text-color','Libellé','Texte',NULL
+'text-color-light','Donnée','Texte','text-color#40'
+'tuile-bg-color','Fond','Tuile',NULL
+'tuile-icon-extern-color','Lien externe','Tuile','navbar-selected-border#0'
+'tuile-icon-intern-color','Lien interne','Tuile','action-color#0'
+'menu-hover-bg-color','Option au survol dans menu','Liste déroulante','#e8effa'
+'wizard-step-completed','Opération terminée','Workflow','#324fa5'
+'wizard-step-in-process','Opération en cours','Workflow','#476bc3'
+'wizard-step-not-completed','Opération non complétée','Workflow','#d8e5f9'
+'wizard-ariane-step-in-process-with-mandatory','Ecran en cours avec saisie obligatoire','Workflow','#ff0000'
+'wizard-ariane-step-in-process-without-mandatory','Ecran en cours sans saisie obligatoire','Workflow','#ffb400'
+'wizard-ariane-step-completed','Ecran complété','Workflow','#008000'
+'wizard-ariane-step-not-completed','Ecran non complété','Workflow','#476bc3'
+'wizard-ariane-step-skipped','Ecran ignoré','Workflow','#808080'

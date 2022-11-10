@@ -1,0 +1,407 @@
+##
+PKG_SUPPORT_RD_PURGE_DBL_ENTR
+=SQL=
+create or replace PACKAGE PKG_SUPPORT_RD_PURGE_DBL_ENTR AS
+PROCEDURE addAdpUserToXpEntrAlias(adpUserAoid in VARCHAR2);
+PROCEDURE purge(idEntBackup in NUMBER, purgeReelle in NUMBER);
+end PKG_SUPPORT_RD_PURGE_DBL_ENTR
+##
+PKG_SUPPORT_RD_PURGE_DBL_ENTR
+=SQL=
+create or replace PACKAGE BODY PKG_SUPPORT_RD_PURGE_DBL_ENTR AS
+G_idPurge   INTEGER;
+PROCEDURE addAdpUserToXpEntrAlias(adpUserAoid in VARCHAR2)
+is
+cursor curAlias is
+with T_ENTRETIEN_ORDRE as
+(
+select COLLABORATEUR,
+nvl(cmp_1.ID_CAMPAGNE_INI, cmp_1.ID_CAMPAGNE) as ID_CAMPAGNE_INI,
+ID_ENT,
+1 + 1 * (
+select count(*)
+from T_V5_KRHEF_ENTRETIEN ent_2
+join T_V5_KRHEF_CAMPAGNE cmp_2
+on cmp_2.ID_CAMPAGNE = ent_2.ID_CAMPAGNE_ENT
+where ent_2.ID_ENT < ent_1.ID_ENT
+and ent_2.COLLABORATEUR = ent_1.COLLABORATEUR
+and nvl(cmp_2.ID_CAMPAGNE_INI, cmp_2.ID_CAMPAGNE) = nvl(cmp_1.ID_CAMPAGNE_INI, cmp_1.ID_CAMPAGNE)
+) as ORDRE
+from T_V5_KRHEF_ENTRETIEN ent_1
+join T_V5_KRHEF_CAMPAGNE cmp_1
+on cmp_1.ID_CAMPAGNE = ent_1.ID_CAMPAGNE_ENT
+where cmp_1.IS_ON_DEMAND = 0
+)
+select distinct uar.ID_ALIAS as ID_ALIAS_XP_ENTR
+from T_ENTRETIEN_ORDRE entr_1
+join T_ENTRETIEN_ORDRE entr_n
+on entr_n.COLLABORATEUR = entr_1.COLLABORATEUR
+and entr_n.ID_CAMPAGNE_INI = entr_1.ID_CAMPAGNE_INI
+join T_V5_KRH_PROFIL_USER prf
+on prf.MATRICULE = entr_1.COLLABORATEUR
+join T_V5_KRH_USER_ALIAS_REF uar
+on uar.ID_USER_ALIAS_REF = prf.EXPERT_ENTR
+where entr_1.ORDRE = 1
+and entr_n.ORDRE > 1
+and uar.ID_ALIAS is not null;
+lineAlias curAlias%ROWTYPE;
+userIsInAlias  NUMBER;
+begin
+open curAlias;
+LOOP
+fetch curAlias into lineAlias;
+EXIT WHEN curAlias%NOTFOUND;
+select count(*) into userIsInAlias from T_V5_ALIAS
+where ID_ALIAS = lineAlias.ID_ALIAS_XP_ENTR
+and upper(LOGON) = upper(adpUserAoid);
+if userIsInAlias > 0 then
+dbms_output.put_line('L''AOID ' || adpUserAoid || ' est déjà dans l''alias ' || lineAlias.ID_ALIAS_XP_ENTR);
+else
+insert into T_V5_ALIAS(ID_ALIAS, APPLI, DATE_DEBUT, LOGON, MAIN_MEMBER)
+values (lineAlias.ID_ALIAS_XP_ENTR, 'krhv5', sysdate, upper(adpUserAoid), 0);
+dbms_output.put_line('L''AOID ' || adpUserAoid || ' a été ajouté à l''alias ' || lineAlias.ID_ALIAS_XP_ENTR);
+commit;
+end if;
+end LOOP;
+close curAlias;
+EXCEPTION
+when others then
+rollback;
+dbms_output.put_line('Erreur lors de l''ajout de l''AOID ' || adpUserAoid);
+end;
+PROCEDURE initIdPurge
+is
+begin
+select nvl(max(ID_PURGE), 0) + 1 into G_idPurge from T_BACKUP_DBL_ENTRETIEN_LOG;
+end;
+PROCEDURE log(idEntBackup in NUMBER, logMsg in VARCHAR2)
+is
+begin
+dbms_output.put_line('[Entretien ' || idEntBackup || '] ' || logMsg);
+insert into T_BACKUP_DBL_ENTRETIEN_LOG (
+ID_PURGE,
+ID_LOG,
+ID_ENT,
+LOG_MSG
+)
+values (
+G_idPurge,
+(select nvl(max(ID_LOG), 0) + 1 from T_BACKUP_DBL_ENTRETIEN_LOG),
+idEntBackup,
+logMsg
+);
+end;
+FUNCTION checkPurgeIsAllowed(idEntBackup in NUMBER)
+RETURN INTEGER
+is
+tmpResult          NUMBER;
+entrStatut         NUMBER;
+entrCollaborateur  NUMBER;
+idCampagneIni      NUMBER;
+begin
+select count(*) into tmpResult from T_V5_KRHEF_ENTRETIEN where ID_ENT = idEntBackup;
+if tmpResult = 0 then
+PKG_SUPPORT_RD_PURGE_DBL_ENTR.log(idEntBackup, 'checkPurgeIsAllowed() - L''entretien ' || idEntBackup || ' n''existe pas');
+commit;
+return 0;
+end if;
+select entr.COLLABORATEUR,
+entr.STATUT,
+nvl(cmp.ID_CAMPAGNE_INI, cmp.ID_CAMPAGNE)
+into   entrCollaborateur,
+entrStatut,
+idCampagneIni
+from T_V5_KRHEF_ENTRETIEN entr
+join T_V5_KRHEF_CAMPAGNE cmp
+on cmp.ID_CAMPAGNE = entr.ID_CAMPAGNE_ENT
+where entr.ID_ENT = idEntBackup;
+if entrStatut != -1 then
+PKG_SUPPORT_RD_PURGE_DBL_ENTR.log(idEntBackup, 'checkPurgeIsAllowed() - L''entretien ' || idEntBackup || ' n''est pas au statut -1, il ne doit pas être purgé');
+commit;
+return 0;
+end if;
+select count(*) into tmpResult
+from T_V5_KRHEF_ENTRETIEN entr
+join T_V5_KRHEF_CAMPAGNE cmp
+on cmp.ID_CAMPAGNE = entr.ID_CAMPAGNE_ENT
+left join T_V5_KRHEF_CAMPAGNE cmp_ini
+on cmp_ini.ID_CAMPAGNE = nvl(cmp.ID_CAMPAGNE_INI, cmp.ID_CAMPAGNE)
+where entr.COLLABORATEUR = entrCollaborateur
+and entr.STATUT = entrStatut
+and cmp_ini.ID_CAMPAGNE = idCampagneIni;
+if tmpResult > 1 then
+PKG_SUPPORT_RD_PURGE_DBL_ENTR.log(
+idEntBackup,
+'checkPurgeIsAllowed() - Il existe plusieurs entretiens pour COLLABORATEUR = ' || entrCollaborateur
+|| ', STATUT = ' || entrStatut || ', ID_CAMPAGNE_INI = ' || idCampagneIni
+|| '. L''entretien ' || idEntBackup || ' ne doit pas être purgé'
+);
+commit;
+return 0;
+end if;
+PKG_SUPPORT_RD_PURGE_DBL_ENTR.log(idEntBackup, 'checkPurgeIsAllowed() - L''entretien ' || idEntBackup || ' peut être purgé');
+commit;
+return 1;
+end;
+FUNCTION runBackup(idEntBackup in NUMBER)
+RETURN INTEGER
+is
+tmpResult NUMBER;
+begin
+PKG_SUPPORT_RD_PURGE_DBL_ENTR.log(idEntBackup, 'runBackup() - Démarrage du backup de l''entretien ' || idEntBackup || '...');
+insert into T_BACKUP_DBL_ENTRETIEN select t.*, G_idPurge from T_V5_KRHEF_ENTRETIEN t where ID_ENT = idEntBackup;
+PKG_SUPPORT_RD_PURGE_DBL_ENTR.log(idEntBackup, 'runBackup() - T_V5_KRHEF_ENTRETIEN => T_BACKUP_DBL_ENTRETIEN: ' || SQL%ROWCOUNT || ' ligne(s) sauvegardée(s)');
+insert into T_BACKUP_DBL_ENTRETIEN_ASP1 select t.*, G_idPurge from T_V5_KRHEF_ENTRETIEN_ASP1 t where ID_ENT_ASP1 = idEntBackup;
+PKG_SUPPORT_RD_PURGE_DBL_ENTR.log(idEntBackup, 'runBackup() - T_V5_KRHEF_ENTRETIEN_ASP1 => T_BACKUP_DBL_ENTRETIEN_ASP1: ' || SQL%ROWCOUNT || ' ligne(s) sauvegardée(s)');
+insert into T_BACKUP_DBL_ENTRETIEN_ASP2 select t.*, G_idPurge from T_V5_KRHEF_ENTRETIEN_ASP2 t where ID_ENT_ASP2 = idEntBackup;
+PKG_SUPPORT_RD_PURGE_DBL_ENTR.log(idEntBackup, 'runBackup() - T_V5_KRHEF_ENTRETIEN_ASP2 => T_BACKUP_DBL_ENTRETIEN_ASP2: ' || SQL%ROWCOUNT || ' ligne(s) sauvegardée(s)');
+insert into T_BACKUP_DBL_ENTRETIEN_BIL1 select t.*, G_idPurge from T_V5_KRHEF_ENTRETIEN_BIL1 t where ID_ENT_BIL1 = idEntBackup;
+PKG_SUPPORT_RD_PURGE_DBL_ENTR.log(idEntBackup, 'runBackup() - T_V5_KRHEF_ENTRETIEN_BIL1 => T_BACKUP_DBL_ENTRETIEN_BIL1: ' || SQL%ROWCOUNT || ' ligne(s) sauvegardée(s)');
+insert into T_BACKUP_DBL_ENTRETIEN_BIL2 select t.*, G_idPurge from T_V5_KRHEF_ENTRETIEN_BIL2 t where ID_ENT_BIL2 = idEntBackup;
+PKG_SUPPORT_RD_PURGE_DBL_ENTR.log(idEntBackup, 'runBackup() - T_V5_KRHEF_ENTRETIEN_BIL2 => T_BACKUP_DBL_ENTRETIEN_BIL2: ' || SQL%ROWCOUNT || ' ligne(s) sauvegardée(s)');
+insert into T_BACKUP_DBL_ENTRETIEN_BILF select t.*, G_idPurge from T_V5_KRHEF_ENTRETIEN_BILF t where ID_ENT_BILF = idEntBackup;
+PKG_SUPPORT_RD_PURGE_DBL_ENTR.log(idEntBackup, 'runBackup() - T_V5_KRHEF_ENTRETIEN_BILF => T_BACKUP_DBL_ENTRETIEN_BILF: ' || SQL%ROWCOUNT || ' ligne(s) sauvegardée(s)');
+insert into T_BACKUP_DBL_ENTRETIEN_COM2 select t.*, G_idPurge from T_V5_KRHEF_ENTRETIEN_COM2 t where ID_ENT_COM2 = idEntBackup;
+PKG_SUPPORT_RD_PURGE_DBL_ENTR.log(idEntBackup, 'runBackup() - T_V5_KRHEF_ENTRETIEN_COM2 => T_BACKUP_DBL_ENTRETIEN_COM2: ' || SQL%ROWCOUNT || ' ligne(s) sauvegardée(s)');
+insert into T_BACKUP_DBL_ENTRETIEN_FORM select t.*, G_idPurge from T_V5_KRHEF_ENTRETIEN_FORM t where ID_ENT_FORM = idEntBackup;
+PKG_SUPPORT_RD_PURGE_DBL_ENTR.log(idEntBackup, 'runBackup() - T_V5_KRHEF_ENTRETIEN_FORM => T_BACKUP_DBL_ENTRETIEN_FORM: ' || SQL%ROWCOUNT || ' ligne(s) sauvegardée(s)');
+insert into T_BACKUP_DBL_ENTRETIEN_MISS select t.*, G_idPurge from T_V5_KRHEF_ENTRETIEN_MISS t where ID_ENT_MISS = idEntBackup;
+PKG_SUPPORT_RD_PURGE_DBL_ENTR.log(idEntBackup, 'runBackup() - T_V5_KRHEF_ENTRETIEN_MISS => T_BACKUP_DBL_ENTRETIEN_MISS: ' || SQL%ROWCOUNT || ' ligne(s) sauvegardée(s)');
+insert into T_BACKUP_DBL_ENTRETIEN_MISS2 select t.*, G_idPurge from T_V5_KRHEF_ENTRETIEN_MISS2 t where ID_ENT_MISS2 = idEntBackup;
+PKG_SUPPORT_RD_PURGE_DBL_ENTR.log(idEntBackup, 'runBackup() - T_V5_KRHEF_ENTRETIEN_MISS2 => T_BACKUP_DBL_ENTRETIEN_MISS2: ' || SQL%ROWCOUNT || ' ligne(s) sauvegardée(s)');
+insert into T_BACKUP_DBL_ENTRETIEN_MOY1 select t.*, G_idPurge from T_V5_KRHEF_ENTRETIEN_MOY1 t where ID_ENT_MOY1 = idEntBackup;
+PKG_SUPPORT_RD_PURGE_DBL_ENTR.log(idEntBackup, 'runBackup() - T_V5_KRHEF_ENTRETIEN_MOY1 => T_BACKUP_DBL_ENTRETIEN_MOY1: ' || SQL%ROWCOUNT || ' ligne(s) sauvegardée(s)');
+insert into T_BACKUP_DBL_ENTRETIEN_OBJ1 select t.*, G_idPurge from T_V5_KRHEF_ENTRETIEN_OBJ1 t where ID_ENT_OBJ1 = idEntBackup;
+PKG_SUPPORT_RD_PURGE_DBL_ENTR.log(idEntBackup, 'runBackup() - T_V5_KRHEF_ENTRETIEN_OBJ1 => T_BACKUP_DBL_ENTRETIEN_OBJ1: ' || SQL%ROWCOUNT || ' ligne(s) sauvegardée(s)');
+insert into T_BACKUP_DBL_ENTRETIEN_OBJ2 select t.*, G_idPurge from T_V5_KRHEF_ENTRETIEN_OBJ2 t where ID_ENT_OBJ2 = idEntBackup;
+PKG_SUPPORT_RD_PURGE_DBL_ENTR.log(idEntBackup, 'runBackup() - T_V5_KRHEF_ENTRETIEN_OBJ2 => T_BACKUP_DBL_ENTRETIEN_OBJ2: ' || SQL%ROWCOUNT || ' ligne(s) sauvegardée(s)');
+insert into T_BACKUP_DBL_ENTRETIEN_OBJ2 select t.*, G_idPurge from T_V5_KRHEF_ENTRETIEN_OBJ2 t where ID_ENTRETIEN_BIL = idEntBackup;
+PKG_SUPPORT_RD_PURGE_DBL_ENTR.log(idEntBackup, 'runBackup() - T_V5_KRHEF_ENTRETIEN_OBJ2 => T_BACKUP_DBL_ENTRETIEN_OBJ2: ' || SQL%ROWCOUNT || ' ligne(s) sauvegardée(s)');
+insert into T_BACKUP_DBL_ENTRETIEN_QUEST select t.*, G_idPurge from T_V5_KRHEF_ENTRETIEN_QUEST t where ID_ENT_QSTR = idEntBackup;
+PKG_SUPPORT_RD_PURGE_DBL_ENTR.log(idEntBackup, 'runBackup() - T_V5_KRHEF_ENTRETIEN_QUEST => T_BACKUP_DBL_ENTRETIEN_QUEST: ' || SQL%ROWCOUNT || ' ligne(s) sauvegardée(s)');
+insert into T_BACKUP_DBL_ENTRETIEN_REM1 select t.*, G_idPurge from T_V5_KRHEF_ENTRETIEN_REM1 t where ID_ENT_REM1 = idEntBackup;
+PKG_SUPPORT_RD_PURGE_DBL_ENTR.log(idEntBackup, 'runBackup() - T_V5_KRHEF_ENTRETIEN_REM1 => T_BACKUP_DBL_ENTRETIEN_REM1: ' || SQL%ROWCOUNT || ' ligne(s) sauvegardée(s)');
+insert into T_BACKUP_DBL_ENTRETIEN_SAL45 select t.*, G_idPurge from T_V5_KRHEF_ENTRETIEN_SAL45 t where ID_ENT_SAL45 = idEntBackup;
+PKG_SUPPORT_RD_PURGE_DBL_ENTR.log(idEntBackup, 'runBackup() - T_V5_KRHEF_ENTRETIEN_SAL45 => T_BACKUP_DBL_ENTRETIEN_SAL45: ' || SQL%ROWCOUNT || ' ligne(s) sauvegardée(s)');
+insert into T_BACKUP_DBL_ENT_BLC_NON_ABORD select t.*, G_idPurge from T_V5_KRHEF_ENT_BLC_NON_ABORDE t where ID_ENT_BLOC = idEntBackup;
+PKG_SUPPORT_RD_PURGE_DBL_ENTR.log(idEntBackup, 'runBackup() - T_V5_KRHEF_ENT_BLC_NON_ABORDE => T_BACKUP_DBL_ENT_BLC_NON_ABORD: ' || SQL%ROWCOUNT || ' ligne(s) sauvegardée(s)');
+insert into T_BACKUP_DBL_MISSION
+select t.*, G_idPurge
+from T_V5_KRHEF_MISSION t
+where t.ID_MISSION in (
+select ID_MISSION
+from T_V5_KRHEF_ENTRETIEN_MISS2
+where ID_ENT_MISS2 = idEntBackup
+);
+PKG_SUPPORT_RD_PURGE_DBL_ENTR.log(idEntBackup, 'runBackup() - T_V5_KRHEF_MISSION => T_BACKUP_DBL_MISSION: ' || SQL%ROWCOUNT || ' ligne(s) sauvegardée(s)');
+insert into T_BACKUP_DBL_MISSION_COLLABO
+select t.*, G_idPurge
+from T_V5_KRHEF_MISSION_COLLABO t
+where t.ID_MISSION in (
+select ID_MISSION
+from T_V5_KRHEF_ENTRETIEN_MISS2
+where ID_ENT_MISS2 = idEntBackup
+);
+PKG_SUPPORT_RD_PURGE_DBL_ENTR.log(idEntBackup, 'runBackup() - T_V5_KRHEF_MISSION_COLLABO => T_BACKUP_DBL_MISSION_COLLABO: ' || SQL%ROWCOUNT || ' ligne(s) sauvegardée(s)');
+insert into T_BACKUP_DBL_MISSION_CONTENU
+select t.*, G_idPurge
+from T_V5_KRHEF_MISSION_CONTENU t
+where t.ID_MISSION in (
+select ID_MISSION
+from T_V5_KRHEF_ENTRETIEN_MISS2
+where ID_ENT_MISS2 = idEntBackup
+);
+PKG_SUPPORT_RD_PURGE_DBL_ENTR.log(idEntBackup, 'runBackup() - T_V5_KRHEF_MISSION_CONTENU => T_BACKUP_DBL_MISSION_CONTENU: ' || SQL%ROWCOUNT || ' ligne(s) sauvegardée(s)');
+insert into T_BACKUP_DBL_MISSION_MORE
+select t.*, G_idPurge
+from T_V5_KRHEF_MISSION_MORE t
+join T_V5_KRHEF_MISSION_CONTENU mc
+on mc.ID_MISSION_CONT = t.ID_MISSION_CONT
+where mc.ID_MISSION in (
+select ID_MISSION
+from T_V5_KRHEF_ENTRETIEN_MISS2
+where ID_ENT_MISS2 = idEntBackup
+);
+PKG_SUPPORT_RD_PURGE_DBL_ENTR.log(idEntBackup, 'runBackup() - T_V5_KRHEF_MISSION_MORE => T_BACKUP_DBL_MISSION_MORE: ' || SQL%ROWCOUNT || ' ligne(s) sauvegardée(s)');
+PKG_SUPPORT_RD_PURGE_DBL_ENTR.log(idEntBackup, 'runBackup() - Backup de l''entretien ' || idEntBackup || ' terminé avec succès');
+commit;
+return 1;
+exception when others then
+rollback;
+PKG_SUPPORT_RD_PURGE_DBL_ENTR.log(idEntBackup, 'runBackup() - Erreur lors du backup de l''entretien ' || idEntBackup || ' - ' || SQLERRM);
+commit;
+return 0;
+end;
+FUNCTION getTachePurgeParams(idEntBackup in NUMBER)
+RETURN VARCHAR2
+is
+params              VARCHAR2(1000);
+entrStatut          NUMBER;
+entrCollaborateur   NUMBER;
+idCampagneIni       NUMBER;
+lengthStatus        NUMBER;
+lengthCollaborateur NUMBER;
+lengthCampagne      NUMBER;
+begin
+select entr.COLLABORATEUR,
+entr.STATUT,
+nvl(cmp.ID_CAMPAGNE_INI, cmp.ID_CAMPAGNE)
+into   entrCollaborateur,
+entrStatut,
+idCampagneIni
+from T_V5_KRHEF_ENTRETIEN entr
+join T_V5_KRHEF_CAMPAGNE cmp
+on cmp.ID_CAMPAGNE = entr.ID_CAMPAGNE_ENT
+where entr.ID_ENT = idEntBackup;
+if entrStatut != -1 then
+PKG_SUPPORT_RD_PURGE_DBL_ENTR.log(idEntBackup, 'getTachePurgeParams() - L''entretien ' || idEntBackup || ' n''est pas au statut -1, les paramètres ne seront pas fournis');
+commit;
+return null;
+end if;
+lengthCollaborateur := length(entrCollaborateur);
+lengthCampagne := length(idCampagneIni);
+params := 'a:5:{s:13:"ENTR_CAMPAGNE";s:' || lengthCampagne || ':"' || idCampagneIni
+|| '";s:18:"ENTR_MATRICULE_ALL";b:0;s:14:"ENTR_MATRICULE";s:' || lengthCollaborateur ||':"' || entrCollaborateur
+|| '";s:15:"ENTR_STATUS_ALL";b:0;s:11:"ENTR_STATUS";s:2:"-1";}';
+PKG_SUPPORT_RD_PURGE_DBL_ENTR.log(idEntBackup, 'getTachePurgeParams() - Paramètres de la tache pour l''entretien ' || idEntBackup || ': ' || params);
+commit;
+return params;
+end;
+PROCEDURE purge(idEntBackup in NUMBER, purgeReelle in NUMBER)
+is
+purgeIsAllowed    NUMBER;
+backupIsOk        NUMBER;
+libSimulation     VARCHAR2(30);
+sousOperation     VARCHAR2(30);
+dbLinkRobot       VARCHAR2(30);
+dbBaseName        VARCHAR2(30);
+codePac           VARCHAR2(6);
+tachePurgeParams  VARCHAR2(4000);
+sqlStmt           VARCHAR2(4000);
+tacheId           NUMBER;
+begin
+PKG_SUPPORT_RD_PURGE_DBL_ENTR.initIdPurge;
+if purgeReelle = 1 then
+libSimulation := '';
+sousOperation := 'ENTR';
+else
+libSimulation := ' (simulation)';
+sousOperation := 'SIMU_ENTR';
+end if;
+PKG_SUPPORT_RD_PURGE_DBL_ENTR.log(idEntBackup, 'purge() - Demande de purge de l''entretien ' || idEntBackup || ': démarrage' || libSimulation);
+commit;
+purgeIsAllowed := PKG_SUPPORT_RD_PURGE_DBL_ENTR.checkPurgeIsAllowed(idEntBackup);
+if purgeIsAllowed = 0 then
+PKG_SUPPORT_RD_PURGE_DBL_ENTR.log(idEntBackup, 'purge() - Demande de purge de l''entretien ' || idEntBackup || ': terminé avec des erreurs' || libSimulation);
+commit;
+return;
+end if;
+backupIsOk := PKG_SUPPORT_RD_PURGE_DBL_ENTR.runBackup(idEntBackup);
+if backupIsOk = 0 then
+PKG_SUPPORT_RD_PURGE_DBL_ENTR.log(idEntBackup, 'purge() - Demande de purge de l''entretien ' || idEntBackup || ': terminé avec des erreurs' || libSimulation);
+commit;
+return;
+end if;
+select SYS.DATABASE_NAME into dbBaseName from dual;
+if dbBaseName like 'KSQCLD%' then
+dbLinkRobot := 'KRHROBOT_KSQMDLD_DPE';
+elsif dbBaseName like 'KSQCLS%' then
+dbLinkRobot := 'KRHROBOT_KSQMDLS';
+elsif dbBaseName like 'KSQCLZ%' then
+dbLinkRobot := 'KRHROBOT_KSQMDLZ';
+elsif dbBaseName like 'KSQCLP%' then
+dbLinkRobot := 'KRHROBOT_KSQMDLP';
+else
+PKG_SUPPORT_RD_PURGE_DBL_ENTR.log(idEntBackup, 'purge() - Environnement non reconnu pour ' || DATABASE_NAME || '. Demande de purge de l''entretien ' || idEntBackup || ' terminée avec des erreurs' || libSimulation);
+commit;
+return;
+end if;
+select PAC into codePac from KRHMODELE.KRHCLIENTS where LOGON = (select SYS_CONTEXT('USERENV','CURRENT_SCHEMA') from DUAL);
+tachePurgeParams := PKG_SUPPORT_RD_PURGE_DBL_ENTR.getTachePurgeParams(idEntBackup);
+execute immediate 'select S_TACHE_ID.nextval@' || dbLinkRobot || ' from dual' into tacheId;
+sqlStmt := '
+insert into TACHE@' || dbLinkRobot || '(
+TACHE_ID,
+PAC,
+APPLICATION,
+OPERATION,
+MODE_POST,
+DATE_POST,
+DATE_OBJECTIF,
+STATUT,
+STATUTS_OK,
+STATUTS_WARNING,
+STATUTS_ERREUR,
+NB_ITERATIONS,
+NB_ITERATIONS_MAX,
+NB_ITER_PARTITIONS,
+NB_ITER_PARTITIONS_MAX,
+SERVEUR,
+BATCH,
+DATE_DEBUT,
+DATE_FIN,
+DATE_INIT,
+SOUS_OPERATION,
+MATRICULE,
+MAT_LDAP,
+PRIORITE,
+POIDS,
+PLANIF_TACHE_ID,
+PARAM1,
+PARAM2,
+PARAM3,
+PARAM4,
+PARAM5,
+PARAM_RETOUR,
+PAC_FROM,
+PAC_TO,
+NB_ITERATIONS_SIMULATE
+)
+values (
+' || tacheId || ',
+''' || codePac || ''',
+''Krhv5'',
+''PurgePac'',
+''P'',
+sysdate,
+sysdate,
+0,
+0,
+0,
+0,
+0,
+0,
+0,
+1,
+null,
+null,
+null,
+null,
+null,
+''' || sousOperation || ''',
+''rdkiosque-sup'',
+null,
+1,
+null,
+null,
+null,
+null,
+null,
+''' || tachePurgeParams || ''',
+null,
+null,
+null,
+null,
+1
+)
+';
+execute immediate sqlStmt;
+PKG_SUPPORT_RD_PURGE_DBL_ENTR.log(idEntBackup, 'purge() - Tache ' || tacheId || ' postée avec succès' || libSimulation);
+PKG_SUPPORT_RD_PURGE_DBL_ENTR.log(idEntBackup, 'purge() - Demande de purge de l''entretien ' || idEntBackup || ': terminé avec succès' || libSimulation);
+commit;
+exception when others then
+rollback;
+PKG_SUPPORT_RD_PURGE_DBL_ENTR.log(idEntBackup, 'purge() - Demande de purge de l''entretien ' || idEntBackup || ': terminé avec des erreurs' || libSimulation || ' - ' || SQLERRM);
+commit;
+end;
+end PKG_SUPPORT_RD_PURGE_DBL_ENTR

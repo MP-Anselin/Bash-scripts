@@ -1,0 +1,119 @@
+##
+V_V5_KRHEF_FORMATION_INSCR_WF
+=SQL=
+CREATE OR REPLACE VIEW V_V5_KRHEF_FORMATION_INSCR_WF ("ID_INSCRIPTION_REF","ID_WF_DEM_INSCR","ID_WF_DEM_INSCR_SUPPR","ID_WF_DEM_ANNUL_INSCR","ID_WF_DEM_ANNUL_INSCR_SUPPR","ID_WF_DEM_EVAL_FROID","ID_WF_DEM_EVAL_CHAUD","WF_STATUS_INSCR","WF_STATUS_INSCR_SUPPR","WF_STATUS_ANNUL_INSCR","WF_STATUS_ANNUL_INSCR_SUPPR","WF_STATUS_EVAL_FROID","WF_STATUS_EVAL_CHAUD","WF_ACT_STATUS_EVF_SAISIR","WF_ACT_STATUS_EVF_VALIDER","WF_ACT_STATUS_EVC_SAISIR","WF_ACT_STATUS_EVC_VALIDER","WF_ACT_DATE_EVF_SAISIR","WF_ACT_DATE_EVF_VALIDER","WF_ACT_DATE_EVC_SAISIR","WF_ACT_DATE_EVC_VALIDER") AS 
+with T_LAST_WF_DEMANDE as
+    (
+        select max(ID_WF_DEMANDE) as ID_WF_DEMANDE,
+               ID_REFERENCE,
+               TYPE_DEMANDE
+          from T_V5_WF_DEMANDE
+         where TYPE_DEMANDE in (
+                    'FormInscr',
+                    'FormInscrSuppr',
+                    'AnnulationFormInscr',
+                    'AnnulationFormInscrSuppr',
+                    'FormEvalFroid',
+                    'FormEvalChaud'
+               )
+         group by ID_REFERENCE,
+               TYPE_DEMANDE
+    )
+   select ins.ID_INSCRIPTION_REF,
+          wfforminscr.ID_WF_DEMANDE as ID_WF_DEM_INSCR,
+          wfforminscrsuppr.ID_WF_DEMANDE as ID_WF_DEM_INSCR_SUPPR,
+          wfannulationforminscr.ID_WF_DEMANDE as ID_WF_DEM_ANNUL_INSCR,
+          wfannulationforminscrsuppr.ID_WF_DEMANDE as ID_WF_DEM_ANNUL_INSCR_SUPPR,
+          wfevalfroid.ID_WF_DEMANDE as ID_WF_DEM_EVAL_FROID,
+          wfevalchaud.ID_WF_DEMANDE as ID_WF_DEM_EVAL_CHAUD,
+          wfforminscr.DEMANDE_ETAT as WF_STATUS_INSCR,
+          wfforminscrsuppr.DEMANDE_ETAT as WF_STATUS_INSCR_SUPPR,
+          wfannulationforminscr.DEMANDE_ETAT as WF_STATUS_ANNUL_INSCR,
+          wfannulationforminscrsuppr.DEMANDE_ETAT as WF_STATUS_ANNUL_INSCR_SUPPR,
+          wfevalfroid.DEMANDE_ETAT as WF_STATUS_EVAL_FROID,
+          wfevalchaud.DEMANDE_ETAT as WF_STATUS_EVAL_CHAUD,
+          wfactsaisirfroid.REPONSE_ETAT as WF_ACT_STATUS_EVF_SAISIR,
+          wfactvaliderfroid.REPONSE_ETAT as WF_ACT_STATUS_EVF_VALIDER,
+          wfactsaisirchaud.REPONSE_ETAT as WF_ACT_STATUS_EVC_SAISIR,
+          wfactvaliderchaud.REPONSE_ETAT as WF_ACT_STATUS_EVC_VALIDER,
+          wfactsaisirfroid.REPONSE_DATE as WF_ACT_DATE_EVF_SAISIR,
+          wfactvaliderfroid.REPONSE_DATE as WF_ACT_DATE_EVF_VALIDER,
+          wfactsaisirchaud.REPONSE_DATE as WF_ACT_DATE_EVC_SAISIR,
+          wfactvaliderchaud.REPONSE_DATE as WF_ACT_DATE_EVC_VALIDER
+     from T_V5_KRHEF_FORMATION_INSCR ins
+-- Workflow de demande d'inscription
+left join T_LAST_WF_DEMANDE lastwfforminscr
+       on (lastwfforminscr.ID_REFERENCE = to_char(ins.ID_INSCRIPTION_REF)
+           and lastwfforminscr.TYPE_DEMANDE = 'FormInscr')
+left join T_V5_WF_DEMANDE wfforminscr
+       on (wfforminscr.ID_WF_DEMANDE = lastwfforminscr.ID_WF_DEMANDE)
+-- Workflow de demande de suppression d'inscription
+left join T_LAST_WF_DEMANDE lastwfforminscrsuppr
+       on (lastwfforminscrsuppr.ID_REFERENCE = to_char(ins.ID_INSCRIPTION_REF)
+           and lastwfforminscrsuppr.TYPE_DEMANDE = 'FormInscrSuppr')
+left join T_V5_WF_DEMANDE wfforminscrsuppr
+       on (wfforminscrsuppr.ID_WF_DEMANDE = lastwfforminscrsuppr.ID_WF_DEMANDE)
+-- Workflow d'annulation de demande d'inscription
+left join T_LAST_WF_DEMANDE lastwfannulationforminscr
+       on (lastwfannulationforminscr.ID_REFERENCE = to_char(ins.ID_INSCRIPTION_REF)
+           and lastwfannulationforminscr.TYPE_DEMANDE = 'AnnulationFormInscr')
+left join T_V5_WF_DEMANDE wfannulationforminscr
+       on (wfannulationforminscr.ID_WF_DEMANDE = lastwfannulationforminscr.ID_WF_DEMANDE
+           and wfannulationforminscr.ID_WF_DEMANDE_ANNULEE = wfforminscr.ID_WF_DEMANDE)
+-- Workflow d'annulation de demande de suppression d'inscription
+left join T_LAST_WF_DEMANDE lastwfannulationforminscrsuppr
+       on (lastwfannulationforminscrsuppr.ID_REFERENCE = to_char(ins.ID_INSCRIPTION_REF)
+           and lastwfannulationforminscrsuppr.TYPE_DEMANDE = 'AnnulationFormInscrSuppr')
+left join T_V5_WF_DEMANDE wfannulationforminscrsuppr
+       on (wfannulationforminscrsuppr.ID_WF_DEMANDE = lastwfannulationforminscrsuppr.ID_WF_DEMANDE
+           and wfannulationforminscrsuppr.ID_WF_DEMANDE_ANNULEE = wfforminscrsuppr.ID_WF_DEMANDE)
+-- Workflow d'evaluations à froid
+left join T_LAST_WF_DEMANDE lastwfevalfroid
+       on (lastwfevalfroid.ID_REFERENCE = to_char(ins.ID_INSCRIPTION_REF)
+           and lastwfevalfroid.TYPE_DEMANDE = 'FormEvalFroid')
+left join T_V5_WF_DEMANDE wfevalfroid
+       on (wfevalfroid.ID_WF_DEMANDE = lastwfevalfroid.ID_WF_DEMANDE)
+-- Workflow d'evaluations à chaud
+left join T_LAST_WF_DEMANDE lastwfevalchaud
+       on (lastwfevalchaud.ID_REFERENCE = to_char(ins.ID_INSCRIPTION_REF)
+           and lastwfevalchaud.TYPE_DEMANDE = 'FormEvalChaud')
+left join T_V5_WF_DEMANDE wfevalchaud
+       on (wfevalchaud.ID_WF_DEMANDE = lastwfevalchaud.ID_WF_DEMANDE)
+-- Jointure WF Action "saisir" sur evaluation à froid
+left join (select max(ID_ACTION) as ID_ACTION, ID_WF_DEMANDE
+             from T_V5_WF_ACTION
+            where ACTION = 'saisir'
+              and DEMANDE_ETAT = REPONSE_ETAT
+            group by ID_WF_DEMANDE) wfpivotsaisirfroid
+       on wfpivotsaisirfroid.ID_WF_DEMANDE = wfevalfroid.ID_WF_DEMANDE
+left join T_V5_WF_ACTION wfactsaisirfroid
+       on wfactsaisirfroid.ID_ACTION = wfpivotsaisirfroid.ID_ACTION
+-- Jointure WF Action "valider" sur evaluation à froid
+left join (select max(ID_ACTION) as ID_ACTION, ID_WF_DEMANDE
+             from T_V5_WF_ACTION
+            where ACTION = 'valider'
+              and DEMANDE_ETAT = REPONSE_ETAT
+            group by ID_WF_DEMANDE) wfpivotvaliderfroid
+       on wfpivotvaliderfroid.ID_WF_DEMANDE = wfevalfroid.ID_WF_DEMANDE
+left join T_V5_WF_ACTION wfactvaliderfroid
+       on wfactvaliderfroid.ID_ACTION = wfpivotvaliderfroid.ID_ACTION
+-- Jointure WF Action "saisir" sur evaluation à chaud
+left join (select max(ID_ACTION) as ID_ACTION, ID_WF_DEMANDE
+             from T_V5_WF_ACTION
+            where ACTION = 'saisir'
+              and DEMANDE_ETAT = REPONSE_ETAT
+            group by ID_WF_DEMANDE) wfpivotsaisirchaud
+       on wfpivotsaisirchaud.ID_WF_DEMANDE = wfevalchaud.ID_WF_DEMANDE
+left join T_V5_WF_ACTION wfactsaisirchaud
+       on wfactsaisirchaud.ID_ACTION = wfpivotsaisirchaud.ID_ACTION
+-- Jointure WF Action "valider" sur evaluation à chaud
+left join (select max(ID_ACTION) as ID_ACTION, ID_WF_DEMANDE
+             from T_V5_WF_ACTION
+            where ACTION = 'valider'
+              and DEMANDE_ETAT = REPONSE_ETAT
+            group by ID_WF_DEMANDE) wfpivotvaliderchaud
+       on wfpivotvaliderchaud.ID_WF_DEMANDE = wfevalchaud.ID_WF_DEMANDE
+left join T_V5_WF_ACTION wfactvaliderchaud
+       on wfactvaliderchaud.ID_ACTION = wfpivotvaliderchaud.ID_ACTION
+
+where ins.NUM_SEQ = 1

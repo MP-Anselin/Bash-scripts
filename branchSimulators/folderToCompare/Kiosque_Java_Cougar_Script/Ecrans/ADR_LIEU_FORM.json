@@ -1,0 +1,37 @@
+{
+  boutons : "INT",
+  code : "ADR_LIEU_FORM",
+  element : "ecran",
+  groupe : {
+    code : "ADR_LIEU_FORM_ONGLET_GRP",
+    donnees : [ {
+      code : "ADR_LIEU_FORM_GRP",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        pageAjout : "ADR_LIEU_FORM_POP",
+        pageModif : "ADR_LIEU_FORM_POP_M",
+        requete : "ADR_LIEU_FORM_1"
+      } ],
+      element : "groupe",
+      libelle : "Adresses des lieux de formation non historisées",
+      onglet : true
+    }, {
+      code : "ADR_LIEU_FORM_HISTO_GRP",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        pageModif : "ADR_LIEU_FORM_POP_M",
+        requete : "ADR_LIEU_FORM_H_1"
+      } ],
+      element : "groupe",
+      libelle : "Adresses des lieux de formation historisées",
+      onglet : true
+    } ],
+    element : "groupe",
+    libelle : "onglet grp lieux de formation"
+  },
+  libelle : "Gestion des adresses des lieux de formation",
+  servicelet : "FormationLieuJsonServlet",
+  type : "U"
+}

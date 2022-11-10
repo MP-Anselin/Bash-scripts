@@ -1,0 +1,265 @@
+{
+  boutons : "INT",
+  code : "DEM_FORM",
+  element : "ecran",
+  groupe : {
+    code : "DEM_FORM_GRP",
+    donnees : [ {
+      code : "ORGA_FILTRE",
+      element : "donnee",
+      libelle : "Organisme",
+      longueur : 50,
+      requete : "ADR_LIEU_FORM_ORG_1",
+      retour : "ORGA_FILTRE,ORG_FORM_IDORG",
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "",
+      style : "FDonneeG"
+    }, {
+      code : "HAB_POP_FILTRE",
+      element : "donnee",
+      libelle : "Population",
+      longueur : 50,
+      requete : "HAB_UTIL_SEC_6",
+      retour : "HAB_POP_FILTRE, #NON, #NON, ID_HAB_POP_FILTRE",
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "RESP_FILTRE",
+      element : "donnee",
+      libelle : "Responsable",
+      longueur : 50,
+      requete : "PILOTAGE_BUDG_8",
+      retour : "RESP_FILTRE,RESP_ID_FILTRE",
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "RESP_ID_FILTRE",
+      element : "donnee",
+      libelle : "ID RESP",
+      longueur : 50,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "HAB_MATRICULE",
+      element : "donnee",
+      entier : 50,
+      libelle : "Matricule",
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "N"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "ENTR_FILTE",
+      element : "donnee",
+      libelle : "Entretien",
+      longueur : 50,
+      requete : "DEM_FORM_5",
+      retour : "ENTR_FILTE,ENTR_FILTE_MASQUE",
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "ENTR_FILTE_MASQUE",
+      element : "donnee",
+      libelle : "Entretien",
+      longueur : 50,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "",
+      style : "FDonneeG"
+    }, {
+      code : "TAL_FILTRE",
+      element : "donnee",
+      libelle : "Revue des talents",
+      longueur : 50,
+      requete : "DEM_FORM_6",
+      retour : "TAL_FILTRE,TAL_FILTE_MASQUE",
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "TAL_FILTE_MASQUE",
+      element : "donnee",
+      libelle : "Entretien",
+      longueur : 50,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#SEP_ZONE",
+      element : "donnee"
+    }, {
+      code : "DEM_NBDG_FILTRE",
+      element : "donnee",
+      libelle : "Non budgétisées",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      suffixe : "Non budgétisées",
+      type : "X"
+    }, {
+      code : "DEM_CPF_FILTRE",
+      element : "donnee",
+      libelle : "CPF",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      suffixe : "CPF",
+      type : "X"
+    }, {
+      code : "DEM_CPFWF_FILTRE",
+      element : "donnee",
+      libelle : "Demandes CPF avec WF non validé",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      suffixe : "Demandes CPF avec WF non validé",
+      type : "X"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "",
+      style : "FDonneeG"
+    }, {
+      code : "DEM_HCPFWF_FILTRE",
+      element : "donnee",
+      libelle : "Demandes hors CPF avec WF non validé",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      suffixe : "Demandes hors CPF avec WF non validé",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "ID_HAB_POP_FILTRE",
+      element : "donnee",
+      libelle : "Population",
+      longueur : 50,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "HAB_ISADP",
+      element : "donnee",
+      libelle : "collab ISADP",
+      longueur : 50,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "HAB_AOID",
+      element : "donnee",
+      libelle : "L'AOID du collab",
+      longueur : 50,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "ID_CPF",
+      element : "donnee",
+      libelle : "ID_CPF",
+      longueur : 50,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "ORG_FORM_IDORG",
+      element : "donnee",
+      libelle : "ID_Organisme",
+      longueur : 3999,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#SEP_ZONE",
+      element : "donnee"
+    }, {
+      code : "DEM_FORM_N_GRP",
+      donnees : [ {
+        boutons : [ {
+          libelle : "Supprimer",
+          operation : "Supprimer"
+        }, {
+          libelle : "Classer sans envoi",
+          operation : "ClasserSE"
+        } ],
+        code : "#TABLEAU",
+        element : "donnee",
+        pageModif : "DEM_FORM_N_M",
+        requete : "DEM_FORM_1"
+      } ],
+      element : "groupe",
+      libelle : "Nominatives",
+      onglet : true
+    }, {
+      code : "DEM_FORM_NN_GRP",
+      donnees : [ {
+        boutons : [ {
+          libelle : "Supprimer",
+          operation : "SupprimerNN"
+        }, {
+          libelle : "Classer sans envoi",
+          operation : "ClasserSE"
+        } ],
+        code : "#TABLEAU",
+        element : "donnee",
+        pageModif : "DEM_FORM_N_M",
+        requete : "DEM_FORM_2"
+      } ],
+      element : "groupe",
+      libelle : "Non nominatives",
+      onglet : true
+    }, {
+      code : "DEM_FORM_NC_GRP",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        requete : "DEM_FORM_3"
+      } ],
+      element : "groupe",
+      libelle : "Nominatives classées",
+      onglet : true
+    }, {
+      code : "DEM_FORM_NNC_GRP",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        requete : "DEM_FORM_4"
+      } ],
+      element : "groupe",
+      libelle : "Non nominatives classées",
+      onglet : true
+    } ],
+    element : "groupe",
+    libelle : "Nominatives"
+  },
+  libelle : "Demandes  de formation",
+  servicelet : "FormationDemandesJsonServlet",
+  type : "U"
+}

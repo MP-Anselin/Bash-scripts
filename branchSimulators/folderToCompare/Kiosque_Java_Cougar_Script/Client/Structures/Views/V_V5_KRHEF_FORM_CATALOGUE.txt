@@ -1,0 +1,26 @@
+##
+V_V5_KRHEF_FORM_CATALOGUE
+=SQL=
+CREATE OR REPLACE VIEW V_V5_KRHEF_FORM_CATALOGUE ("ID_FORM_CATALOGUE","ID_ORGANISME","CODE_STAGE","LIBELLE_FORMATION","ID_CATALOGUE","TYPE_DEMANDE","DATE_MAJ") AS 
+select fc.ID_FORM_CATALOGUE,
+       (case when fc.TYPE_DEMANDE = 'C'
+             then nvl(cat.ID_ORGANISME, fc.ID_ORGANISME)
+             else fc.ID_ORGANISME
+       end) as ID_ORGANISME,
+       (case when fc.TYPE_DEMANDE = 'C'
+             then nvl(cat.CODE_STAGE, fc.CODE_STAGE)
+             else fc.CODE_STAGE
+        end) as CODE_STAGE,
+       (case when fc.TYPE_DEMANDE = 'C'
+             then nvl(cat.LIBELLE, fc.LIBELLE_FORMATION)
+             else fc.LIBELLE_FORMATION
+        end) as LIBELLE_FORMATION,
+       (case when fc.TYPE_DEMANDE = 'C'
+             then fc.ID_CATALOGUE
+             else null
+        end) as ID_CATALOGUE,
+       fc.TYPE_DEMANDE,
+       fc.DATE_MAJ
+  from T_V5_KRHEF_FORM_CATALOGUE fc,
+       T_V5_KRHEF_CATALOGUE cat
+ where fc.ID_CATALOGUE = cat.ID_CATALOGUE(+)

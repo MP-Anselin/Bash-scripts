@@ -1,0 +1,181 @@
+{
+  code : "ADR_LIEU_FORM_POP",
+  element : "ecran",
+  groupe : {
+    code : "ADR_LIEU_FORM_POP_GRP",
+    donnees : [ {
+      code : "FORM_ADR_IDLIEU",
+      element : "donnee",
+      libelle : "FORM_ADR_IDLIEU",
+      longueur : 3999,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "FORM_ADR_NOMLIEU",
+      element : "donnee",
+      libelle : "Nom",
+      longueur : 100,
+      obligatoire : true,
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "FORM_ADR_ORG",
+      element : "donnee",
+      libelle : "Organisme",
+      longueur : 20,
+      maxSelect : 20,
+      obligatoire : true,
+      requete : "ADR_LIEU_FORM_ORG_1",
+      retour : "FORM_ADR_ORG,FORM_ADR_ID_ORG",
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "FORM_ADR_ID_ORG",
+      element : "donnee",
+      libelle : "ID_ORG",
+      longueur : 20,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "FORM_ADR_ADRESSE",
+      element : "donnee",
+      libelle : "Adresse",
+      longueur : 3999,
+      saisie : "textarea",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "FORM_ADR_CODPOST",
+      element : "donnee",
+      entier : 5,
+      libelle : "Code postal",
+      obligatoire : true,
+      saisie : "text",
+      style : "FDonneeG",
+      type : "N"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "FORM_ADR_VILLE",
+      element : "donnee",
+      libelle : "Ville",
+      longueur : 50,
+      obligatoire : true,
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "FORM_ADR_PAYS",
+      element : "donnee",
+      libelle : "Pays",
+      longueur : 50,
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "FORM_ADR_CONTACT",
+      element : "donnee",
+      libelle : "Contact",
+      longueur : 50,
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "FORM_ADR_TEL",
+      element : "donnee",
+      entier : 20,
+      libelle : "Téléphone",
+      saisie : "text",
+      style : "FDonneeG",
+      type : "N"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "FORM_ADR_FAX",
+      element : "donnee",
+      entier : 20,
+      libelle : "Fax",
+      saisie : "text",
+      style : "FDonneeG",
+      type : "N"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "FORM_ADR_ACCES",
+      element : "donnee",
+      libelle : "Accès",
+      longueur : 3999,
+      saisie : "textarea",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "FORM_ADR_PLAN",
+      element : "donnee",
+      libelle : "Plan",
+      longueur : 4000,
+      saisie : "asynchroneUploadFile",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      affichage : "HISTOLIEUAJOUT",
+      code : "FORM_ADR_ACTIF",
+      element : "donnee",
+      libelle : "Actif (ETAT)",
+      longueur : 1,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      affichage : "ACTFTLIEU",
+      code : "FORM_ADR_HISTORISE",
+      element : "donnee",
+      libelle : "Historiser",
+      longueur : 1,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    } ],
+    element : "groupe",
+    libelle : "Ajouter ou modifier lun lieu de formation"
+  },
+  libelle : "Ajouter un lieu de formation",
+  servicelet : "FormationLieuJsonServlet",
+  type : "P"
+}

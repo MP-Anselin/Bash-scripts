@@ -1,0 +1,79 @@
+##
+PKG_LIBELLE
+=SQL=
+create or replace PACKAGE PKG_LIBELLE as
+
+    /**
+     * Codes libelles
+     */
+    -- Libelle code emploi
+    CODE_LIBELLE_LIB_COD_EMPLOI constant CHAR(14) := 'LIB_COD_EMPLOI';
+
+    function get_id (
+        p_code_libelle in T_LIBELLE.CODE_LIBELLE%TYPE,
+        p_libelle      in T_LIBELLE.LIBELLE%TYPE
+    )
+    return T_LIBELLE.ID%TYPE;
+
+end PKG_LIBELLE
+##
+PKG_LIBELLE
+=SQL=
+create or replace PACKAGE BODY PKG_LIBELLE as
+
+    /**
+     * Cree un libelle
+     */
+    procedure create_libelle (
+        p_code_libelle in T_LIBELLE.CODE_LIBELLE%TYPE,
+        p_libelle      in T_LIBELLE.LIBELLE%TYPE
+    )
+    is
+    begin
+        insert into T_LIBELLE (ID, CODE_LIBELLE, LIBELLE)
+        values (S_LIBELLE.nextval, p_code_libelle, p_libelle);
+    end;
+
+    /**
+     * Fournit l'ID d'un libelle pour un code
+     * Lance une exception si le libelle n'existe pas
+     */
+    Function find_id (
+        p_code_libelle in T_LIBELLE.CODE_LIBELLE%TYPE,
+        p_libelle      in T_LIBELLE.LIBELLE%TYPE
+    )
+    return T_LIBELLE.ID%TYPE
+    is
+        v_id T_LIBELLE.ID%TYPE;
+    begin
+        select ID INTO v_id
+        from T_LIBELLE
+        where CODE_LIBELLE = p_code_libelle
+        and LIBELLE = p_libelle;
+
+        return v_id;
+    end;
+
+    /**
+     * Cree un libelle s'il n'existe pas deja et fournit son ID
+     */
+    function get_id (
+        p_code_libelle in T_LIBELLE.CODE_LIBELLE%TYPE,
+        p_libelle      in T_LIBELLE.LIBELLE%TYPE
+    )
+    return T_LIBELLE.ID%TYPE
+    is
+    begin
+	    -- On ne cree pas d'entree avec un libelle null
+        if p_libelle is null then
+           return null;
+        end if;
+
+        return find_id(p_code_libelle, p_libelle);
+
+    exception when others then
+        create_libelle(p_code_libelle, p_libelle);
+        return find_id(p_code_libelle, p_libelle);
+    end;
+
+end PKG_LIBELLE

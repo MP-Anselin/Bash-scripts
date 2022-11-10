@@ -1,0 +1,176 @@
+##
+V_V5_KRHEF_ENTR_RESOURCE
+=SQL=
+CREATE OR REPLACE VIEW V_V5_KRHEF_ENTR_RESOURCE ("MATRICULE","ID_ENT","ID_CAMPAGNE_ENT","STATUT","NOTE_COLLABO","NOTE_MANAGER","DATE_VALID_COLLABO","DATE_VALID_MANAGER","DATE_ENTRETIEN","DATE_PREPA_COLLABO","DATE_MAJ","COLLABORATEUR","MANAGER","ID_BLOCOBJ_PREC","MANAGER_NOM","MANAGER_PRENOM","COMMENTAIRE_MANAGER","COMMENTAIRE_COLLABO","NOTE_COLLABO_SAT","NOTE_MANAGER_SAT","SIMU","ACTEUR","VERSION","DATE_ARCHIVAGE","ACTEUR_ROLE","MISE_A_DISPOSITION","JOUR_CREATION","ID_ENT_DI","JOUR_CREATION_THEORIQUE","ID_CAMPAGNE","ID_CAMPAGNE_INI","IS_ON_DEMAND","ID_CAMPAGNE_UNIQUE","DETAIL_STATUT","DETAIL_LIBELLE") AS 
+select
+            --
+            -- Valeurs non calculées remontées directement de la table des entretiens
+            --
+             t."MATRICULE",t."ID_ENT",t."ID_CAMPAGNE_ENT",t."STATUT",t."NOTE_COLLABO",t."NOTE_MANAGER",t."DATE_VALID_COLLABO",t."DATE_VALID_MANAGER",t."DATE_ENTRETIEN",t."DATE_PREPA_COLLABO",t."DATE_MAJ",t."COLLABORATEUR",t."MANAGER",t."ID_BLOCOBJ_PREC",t."MANAGER_NOM",t."MANAGER_PRENOM",t."COMMENTAIRE_MANAGER",t."COMMENTAIRE_COLLABO",t."NOTE_COLLABO_SAT",t."NOTE_MANAGER_SAT",t."SIMU",t."ACTEUR",t."VERSION",t."DATE_ARCHIVAGE",t."ACTEUR_ROLE",t."MISE_A_DISPOSITION",t."JOUR_CREATION",t."ID_ENT_DI",t."JOUR_CREATION_THEORIQUE",t."ID_CAMPAGNE",t."ID_CAMPAGNE_INI",t."IS_ON_DEMAND"
+           , nvl(t.ID_CAMPAGNE_INI, t.ID_CAMPAGNE) as ID_CAMPAGNE_UNIQUE
+            --
+            -- Calcul du statut
+            --
+           , (case
+                     -- Entretien exclu (-2)
+                     when excl.ID_EXCLU is not null
+                     then -2
+                     -- Statut auto (0) et avant la date d'entretien => En cours (2)
+                     when STATUT = 0
+                          and (trunc(sysdate) - trunc(DATE_ENTRETIEN)) = 0
+                     then 2
+                     -- Statut auto (0) et avant la date d'entretien => Brouillon (1)
+                     when STATUT = 0
+                          and ((trunc(sysdate) - trunc(DATE_ENTRETIEN)) < 0
+                               or (trunc(sysdate) - trunc(DATE_ENTRETIEN) is null))
+                     then 1
+                     -- Statut auto (0) et après la date d'entretien => Entretien effectué (3)
+                     when STATUT = 0
+                          and (trunc(sysdate) - trunc(DATE_ENTRETIEN)) > 0
+                     then 3
+                     -- Entretien non initialisé (5)
+                     when STATUT is null
+                     then 5
+                     -- Entretien validé (4) et date validation coll renseigné => Accepté par le collaborateur (6)
+                     when STATUT = 4
+                          and DATE_VALID_COLLABO is not null
+                     then 6
+                     -- Autres cas: Statut renseigné dans T_V5_KRHEF_ENTRETIEN
+                     else STATUT
+                end
+            ) as DETAIL_STATUT
+            --
+            -- Calcul du libellé du statut (les tests doivent être identiques à ceux de ENT_COMPUTED_STATUT)
+            --
+            -- Libellé pour info support uniquement, ne pas utiliser le libellé dans l'appli !!!
+            --
+           , (case
+                     -- Entretien exclu (-2)
+                     when excl.ID_EXCLU is not null
+                     then 'Exclu'
+                     -- Statut auto (0) et avant la date d'entretien => En cours (2)
+                     when STATUT = 0
+                          and (trunc(sysdate) - trunc(DATE_ENTRETIEN)) = 0
+                     then 'En cours'
+                     -- Statut auto (0) et avant la date d'entretien => En préparation (1)
+                     when STATUT = 0
+                          and ((trunc(sysdate) - trunc(DATE_ENTRETIEN)) < 0
+                               or (trunc(sysdate) - trunc(DATE_ENTRETIEN) is null))
+                     then 'En préparation'
+                     -- Statut auto (0) et après la date d'entretien => Entretien en relecture (3)
+                     when STATUT = 0
+                          and (trunc(sysdate) - trunc(DATE_ENTRETIEN)) > 0
+                     then 'En relecture'
+                     -- Entretien non initialisé (5)
+                     when STATUT is null
+                     then 'Non initialisé'
+                     -- Entretien validé (4) et date validation coll renseigné => Accepté par le collaborateur (6)
+                     when STATUT = 4
+                          and DATE_VALID_COLLABO is not null
+                     then 'Accepté par le collaborateur'
+                     -- Autres cas: Statut renseigné dans T_V5_KRHEF_ENTRETIEN
+                     else decode(
+                        STATUT,
+                        10, 'Non accepté par le coll.',
+                        15, 'Refusé par le coll.',
+                        -1, 'Supprimé',
+                         9, 'En préparation collaborateur',
+                         1, 'En préparation',
+                        11, 'En préparation responsable',
+                        12, 'En préparation responsable RH',
+                        13, 'En préparation directeur RH',
+                        14, 'En préparation acteur indirect',
+                         2, 'En cours',
+                         3, 'En relecture',
+                         4, 'Validé',
+                         6, 'Accepté par le coll.',
+                        -2, 'Exclu',
+                        '???'
+                     )
+             end
+           ) as DETAIL_LIBELLE
+
+      from (
+            --
+            -- Sélection des entretiens initialisés et non initialisés par population
+            --
+            select pop.MATRICULE
+                 , ent.*
+                 , cmp.ID_CAMPAGNE
+                 , cmp.ID_CAMPAGNE_INI
+                 , cmp.IS_ON_DEMAND
+              from T_V5_KRHEF_CAMPAGNE cmp
+              join T_V5_POPULATION_STRUCTURE pop_struct
+                on pop_struct.ID_POP_STRUCTURE = cmp.ID_POPULATION
+              join T_V5_KRH_POPULATION pop
+                on pop.ID_POPULATION = pop_struct.ID_POPULATION
+         left join T_V5_KRHEF_ENTRETIEN ent
+                on ent.ID_CAMPAGNE_ENT = cmp.ID_CAMPAGNE
+                   and ent.COLLABORATEUR = pop.MATRICULE
+                   -- On ne remonte pas d'entretien non initialisé sur les campagnes archivées
+             where (ent.ID_ENT is not null
+                    or cmp.DATE_ARCHIVAGE is null)
+
+            union
+            --
+            -- Sélection des entretiens initialisés et non initialisés par structure
+            --
+            select salstruc.MATRICULE
+                 , ent.*
+                 , cmp.ID_CAMPAGNE
+                 , cmp.ID_CAMPAGNE_INI
+                 , cmp.IS_ON_DEMAND
+              from T_V5_KRHEF_CAMPAGNE cmp
+              join T_V5_POPULATION_STRUCTURE pop_struct
+                on pop_struct.ID_POP_STRUCTURE = cmp.ID_STRUCTURE
+              join T_V5_KRH_SALARIE_STRUCTURE salstruc
+                on salstruc.ID_ITEM = pop_struct.ID_ITEM
+         left join T_V5_KRHEF_ENTRETIEN ent
+                on ent.ID_CAMPAGNE_ENT = cmp.ID_CAMPAGNE
+                   and ent.COLLABORATEUR = salstruc.MATRICULE
+             where trunc(sysdate) >= salstruc.DATE_DEBUT
+               and nvl(salstruc.DATE_FIN, trunc(sysdate)) >= trunc(sysdate)
+                   -- On ne remonte pas d'entretien non initialisé sur les campagnes archivées
+               and (ent.ID_ENT is not null
+                    or cmp.DATE_ARCHIVAGE is null)
+
+            union
+            --
+            -- Sélection des entretiens initialisés
+            -- Permet d'inclure les sorties POP et STRUCTURE et les initialisés "A la demande"
+            --
+            select ent.COLLABORATEUR as MATRICULE
+                 , ent.*
+                 , cmp.ID_CAMPAGNE
+                 , cmp.ID_CAMPAGNE_INI
+                 , cmp.IS_ON_DEMAND
+              from T_V5_KRHEF_CAMPAGNE cmp
+              join T_V5_KRHEF_ENTRETIEN ent
+                on ent.ID_CAMPAGNE_ENT = cmp.ID_CAMPAGNE
+
+           ) t
+      left join T_V5_KRHEF_ENTRETIEN_EXCLU excl
+        on excl.ID_CAMPAGNE_EXCLU = t.ID_CAMPAGNE
+       and excl.COLLABORATEUR_EXCLU = t.MATRICULE
+     --
+     -- Filtre permettant de ne pas compter d'entretien non initialisé sur une campagne non archivée
+     -- s'il existe un entretien pour ce collaborateur sur une archive de cette campagne
+     --
+     where not exists (
+            select ent_ref.ID_ENT
+              from T_V5_KRHEF_ENTRETIEN ent_ref
+              join T_V5_KRHEF_CAMPAGNE cmp_ref
+                on cmp_ref.ID_CAMPAGNE = ent_ref.ID_CAMPAGNE_ENT
+             where ent_ref.COLLABORATEUR = t.MATRICULE
+               and cmp_ref.ID_CAMPAGNE  != t.ID_CAMPAGNE
+               and cmp_ref.IS_ON_DEMAND  = 0
+               and nvl(cmp_ref.ID_CAMPAGNE_INI, cmp_ref.ID_CAMPAGNE)
+                   = nvl(t.ID_CAMPAGNE_INI, t.ID_CAMPAGNE)
+           )
+     --
+     -- Filtre permettant l'exclusion des non initialisés sur les entretiens à la demande
+     --
+     and (
+           t.IS_ON_DEMAND = 0
+           or t.ID_ENT is not null
+     )

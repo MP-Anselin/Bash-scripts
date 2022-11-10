@@ -1,0 +1,58 @@
+{
+  code : "GEN_SCREEN",
+  element : "ecran",
+  groupe : {
+	element: "groupe",
+	code: "GEN_SCREEN_GRP",
+	libelle: "Générer les écrans groupe",
+	donnees: [{
+		element: "groupe",
+		code: "GEN_SCREEN_ECR_GRP",
+		libelle: "Ecrans",
+		onglet: "true",
+		donnees: [{
+			element: "donnee",
+			code: "#TABLEAU",
+			requete : "GEN_SCREEN_1",
+			pageModif: "FAKE_POPUP",
+			boutons: [{
+				libelle: "Générer les écrans",
+				operation: "GenerateScreen"
+			}]
+		}]
+	},{
+		element: "groupe",
+		code: "GEN_SCREEN_BAS_GRP",
+		libelle: "Bacs à Sable",
+		onglet: "true",
+		donnees: [{
+			element: "donnee",
+			code: "#TABLEAU",
+			requete : "GEN_SCREEN_2",
+			pageModif: "FAKE_POPUP",
+			boutons: [{
+				libelle: "Générer les écrans",
+				operation: "GenerateBaS"
+			}]
+		}]
+	},{
+		element: "groupe",
+		code: "GEN_SCREEN_MAP_GRP",
+		libelle: "Mise au produit",
+		onglet: "true",
+		donnees: [{
+			element: "donnee",
+			code: "#TABLEAU",
+			requete : "GEN_SCREEN_3",
+			pageModif: "FAKE_POPUP",
+			boutons: [{
+				libelle: "Valider les projets",
+				operation: "ValiderProjet"
+			}]
+		}]
+	}]
+  },
+  libelle : "Générer les écrans",
+  servicelet : "GenerateScreenJsonServlet",
+  type : "U"
+}

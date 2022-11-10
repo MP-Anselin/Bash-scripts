@@ -1,0 +1,17 @@
+{
+  code : "DEM_FORM_MO_R",
+  element : "ecran",
+  groupe : {
+    code : "DEM_FORM_MO_R_GRP",
+    donnees : [ {
+      code : "#TABLEAU",
+      element : "donnee",
+      requete : "WKF_200_DEM_FORM_MO_R_1"
+    } ],
+    element : "groupe",
+    libelle : "Rechercher le modèle"
+  },
+  libelle : "Rechercher le modèle",
+  servicelet : "FormationDemandeWkf",
+  type : "W"
+}

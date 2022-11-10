@@ -1,0 +1,46 @@
+{
+  boutons : "INT",
+  code : "STR_BDG_FORM",
+  element : "ecran",
+  groupe : {
+    code : "STR_BDG_FORM_GRP",
+    donnees : [ {
+      code : "#BOUTONPERSO",
+      element : "donnee",
+      libelle : "Ordonner",
+      operation : "reOrdonner"
+    }, {
+      code : "STR_BDG_NHISTO_FORM_GRP",
+      donnees : [ {
+        boutons : [ {
+          libelle : "Copier pour une nouvelle année",
+          operation : "CopieNouvAn"
+        } ],
+        code : "#TABLEAU",
+        element : "donnee",
+        pageAjout : "STR_BDG_GRPOUPE_POP_FORM",
+        pageModif : "STR_BDG_GRPOUPE_POP_M_FORM",
+        requete : "STR_BDG_FORM_1"
+      } ],
+      element : "groupe",
+      libelle : "Groupes de structures budgétaires",
+      onglet : true
+    }, {
+      code : "STR_BDG_HISTO_FORM_GRP",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        pageModif : "STR_BDG_GRPOUPE_POP_M_FORM",
+        requete : "STR_BDG_FORM_2"
+      } ],
+      element : "groupe",
+      libelle : "Groupes de structures budgétaires historisés",
+      onglet : true
+    } ],
+    element : "groupe",
+    libelle : "Liste des groupes de structures budgétaires"
+  },
+  libelle : "Liste des groupes de structures budgétaires",
+  servicelet : "FormationStructureBudgetaireJsonServlet",
+  type : "U"
+}

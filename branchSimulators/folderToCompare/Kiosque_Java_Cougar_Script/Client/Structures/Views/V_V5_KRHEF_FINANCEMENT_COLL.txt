@@ -1,0 +1,44 @@
+##
+V_V5_KRHEF_FINANCEMENT_COLL
+=SQL=
+CREATE OR REPLACE VIEW V_V5_KRHEF_FINANCEMENT_COLL ("ID_DOSSIER_FINANCEMENT","ID_ORGANISME","CODE_SOCIETE","TYPE_FINANCEMENT","ID_SESSION","DISPOSITIF","ID_AFF_BDG_TYPE","NUM_SEQ","COLLABORATEUR","ID_FINANCEMENT","INTERNE","PEC_RESTANT_EMPLOYEUR","PEC_MAINTIEN_SALAIRE_STAGIAIRE","PEC_SALAIRE_HTT","PEC_TUTORAT","PEC_HEBERGEMENT_RESTAURATION","PEC_TRANSPORT","PEC_MATERIEL","PEC_FRAIS_PERSO_FORMATEUR_INT","PEC_LOCAUX_ENTRETIEN","PEC_ORGANISATION_ADMIN","PEC_COUT_FORMATEUR","PEC_FONCTIONNEMENT_PEDAGO","PEC_FRAIS_PERSO_FORMATEUR_EXT") AS 
+select
+  df.ID_DOSSIER_FINANCEMENT,
+  df.ID_ORGANISME,
+  df.CODE_SOCIETE,
+  df.TYPE_FINANCEMENT,
+  df.ID_SESSION,
+  f.DISPOSITIF,
+  f.ID_AFF_BDG_TYPE,
+  f.NUM_SEQ,
+  fc.COLLABORATEUR,
+  f.ID_FINANCEMENT,
+  fc.INTERNE,
+  -- Pec interne/externe
+  round(nvl(f.PEC_RESTANT_EMPLOYEUR, 0)          / nb_coll.NB, 5) as PEC_RESTANT_EMPLOYEUR,
+  round(nvl(f.PEC_MAINTIEN_SALAIRE_STAGIAIRE, 0) / nb_coll.NB, 5) as PEC_MAINTIEN_SALAIRE_STAGIAIRE,
+  round(nvl(f.PEC_SALAIRE_HTT, 0)                / nb_coll.NB, 5) as PEC_SALAIRE_HTT,
+  round(nvl(f.PEC_TUTORAT, 0)                    / nb_coll.NB, 5) as PEC_TUTORAT,
+  round(nvl(f.PEC_HEBERGEMENT_RESTAURATION, 0)   / nb_coll.NB, 5) as PEC_HEBERGEMENT_RESTAURATION,
+  round(nvl(f.PEC_TRANSPORT, 0)                  / nb_coll.NB, 5) as PEC_TRANSPORT,
+  round(nvl(f.PEC_MATERIEL, 0)                   / nb_coll.NB, 5) as PEC_MATERIEL,
+  -- Pec interne
+  case when fc.INTERNE = 1 then nvl(round(nvl(f.PEC_FRAIS_PERSO_FORMATEUR_INT, 0)  / nb_coll_int.NB, 5), 0) else 0 end as PEC_FRAIS_PERSO_FORMATEUR_INT,
+  case when fc.INTERNE = 1 then nvl(round(nvl(f.PEC_LOCAUX_ENTRETIEN, 0)           / nb_coll_int.NB, 5), 0) else 0 end as PEC_LOCAUX_ENTRETIEN,
+  case when fc.INTERNE = 1 then nvl(round(nvl(f.PEC_ORGANISATION_ADMIN, 0)         / nb_coll_int.NB, 5), 0) else 0 end as PEC_ORGANISATION_ADMIN,
+  case when fc.INTERNE = 1 then nvl(round(nvl(f.PEC_COUT_FORMATEUR, 0)             / nb_coll_int.NB, 5), 0) else 0 end as PEC_COUT_FORMATEUR,
+  -- Pec externe
+  case when fc.INTERNE = 0 then nvl(round(nvl(f.PEC_FONCTIONNEMENT_PEDAGO, 0)      / nb_coll_ext.NB, 5), 0) else 0 end as PEC_FONCTIONNEMENT_PEDAGO,
+  case when fc.INTERNE = 0 then nvl(round(nvl(f.PEC_FRAIS_PERSO_FORMATEUR_EXT, 0)  / nb_coll_ext.NB, 5), 0) else 0 end as PEC_FRAIS_PERSO_FORMATEUR_EXT
+from
+  T_V5_KRHEF_DOSSIER_FINANCEMENT df,
+  T_V5_KRHEF_FINANCEMENT f,
+  T_V5_KRHEF_FINANCEMENT_COLL fc,
+  (select count(*) as NB, ID_FINANCEMENT from T_V5_KRHEF_FINANCEMENT_COLL group by ID_FINANCEMENT) nb_coll,
+  (select count(*) as NB, ID_FINANCEMENT from T_V5_KRHEF_FINANCEMENT_COLL where interne = 1 group by ID_FINANCEMENT) nb_coll_int,
+  (select count(*) as NB, ID_FINANCEMENT from T_V5_KRHEF_FINANCEMENT_COLL where interne = 0 group by ID_FINANCEMENT) nb_coll_ext
+where df.ID_DOSSIER_FINANCEMENT = f.ID_DOSSIER_FINANCEMENT
+  and f.ID_FINANCEMENT = fc.ID_FINANCEMENT
+  and nb_coll.ID_FINANCEMENT = f.ID_FINANCEMENT
+  and nb_coll_int.ID_FINANCEMENT (+) = f.ID_FINANCEMENT
+  and nb_coll_ext.ID_FINANCEMENT (+) = f.ID_FINANCEMENT

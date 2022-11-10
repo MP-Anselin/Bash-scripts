@@ -1,0 +1,33 @@
+{
+  code : "RECH_COLLAB",
+  element : "ecran",
+  groupe : {
+    code : "RECH_COLLAB_GRP",
+    donnees : [ {
+      code : "GROUPE_ID_ALIAS",
+      element : "donnee",
+      libelle : "ID ALIAS",
+      longueur : 50,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      boutons : [ {
+        libelle : "M'ajouter au groupe",
+        operation : "AjouterAdmintmp"
+      } ],
+      code : "#TABLEAU",
+      element : "donnee",
+      pageModif : "GROUP_FORM_POP_M",
+      requete : "GROUPE_FORM_8"
+    } ],
+    element : "groupe",
+    libelle : "Recherche Collaborateur"
+  },
+  libelle : "Recherche Collaborateur",
+  servicelet : "GroupeJsonServlet",
+  type : "P"
+}

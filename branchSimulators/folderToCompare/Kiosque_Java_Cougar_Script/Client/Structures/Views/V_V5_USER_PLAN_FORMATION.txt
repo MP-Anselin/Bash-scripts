@@ -1,0 +1,76 @@
+##
+V_V5_USER_PLAN_FORMATION
+=SQL=
+  CREATE OR REPLACE VIEW V_V5_USER_PLAN_FORMATION AS 
+  SELECT
+        pl.id_plan,
+        pl.libelle,
+        fd.id_formation_demande,
+        fd.libelle_formation,
+        fd.collectif,
+        fd.collaborateur,
+        fd.manager,
+        fd.date_demande,
+        fd.cpf,
+        fd.domaine,
+        fd.origine_demande,
+        fd.statut_manager,
+        fd.interne,
+        cout.prev_jours,
+        cout.prev_heures,
+        cout.id_aff_bdg_detail,
+        plform.id_form_plan,
+        plform.id_budget,
+        plform.budget_choisi,
+        resp.nom    AS nom_resp,
+        resp.prenom AS prenom_resp,
+        vsu.nom     AS nom_coll,
+        vsu.prenom  AS prenom_coll,
+        org.libelle AS liborg
+    FROM
+             t_v5_krhef_form_demande fd
+        JOIN t_v5_krhef_form_plan      plform ON plform.id_formation_demande = fd.id_formation_demande
+        JOIN t_v5_krhef_form_cout_plan cout ON cout.id_form_plan = plform.id_form_plan
+        JOIN t_v5_krhef_plan           pl ON pl.id_plan = plform.id_plan
+        LEFT JOIN t_v5_krhef_organisme      org ON org.id_organisme = fd.id_organisme
+        LEFT JOIN v_v5_krh_salarie_user     vsu ON vsu.matricule = fd.collaborateur
+        LEFT JOIN v_v5_krh_salarie_user     resp ON resp.matricule = fd.manager
+    WHERE
+            fd.plan_gele = 0
+        AND plform.plan_gele = 0
+        AND cout.plan_gele = 0
+        AND plform.id_plan_report IS NULL
+        AND fd.statut_expert NOT IN ( 4, 2 )
+        AND pl.statut = 1
+        AND ( ( fd.collectif = 1
+                AND id_ref_collectif IS NULL
+                AND fd.collaborateur IS NULL )
+              OR ( fd.collectif = 0
+                   AND id_ref_collectif IS NULL ) )
+ AND (
+                    ( ( fd.cpf = 0
+          OR fd.cpf IS NULL )
+        AND ( fd.collectif = 0
+              OR fd.collectif IS NULL ) )
+      OR ( ( cout.prev_jours = 0
+             OR cout.prev_jours IS NULL )
+           AND cout.prev_heures != 0 )
+         OR ( ( cout.prev_heures = 0
+                OR cout.prev_heures IS NULL )
+              AND cout.prev_jours != 0 )
+            OR ( cout.prev_jours IS NULL
+                 AND cout.prev_heures IS NULL )
+               OR cout.id_aff_bdg_detail IS NULL
+                  OR fd.domaine IS NULL
+                     OR ( fd.origine_demande IS NULL
+                          AND ( fd.collectif = 0
+                                OR fd.collectif IS NULL ) )
+                        OR ( fd.statut_manager = 0
+                             OR fd.statut_manager IS NULL )
+                           OR ( plform.id_budget IS NULL
+                                AND ( plform.budget_choisi = 0
+                                      OR plform.budget_choisi IS NULL ) )
+                              OR fd.date_demande IS NULL
+                                 OR ( fd.id_formation_demande = plform.id_formation_demande
+                                      AND cout.cout IS NULL ))
+                                      

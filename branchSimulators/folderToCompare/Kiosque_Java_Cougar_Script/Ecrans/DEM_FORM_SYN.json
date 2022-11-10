@@ -1,0 +1,131 @@
+{
+  code : "DEM_FORM_SYN",
+  element : "ecran",
+  groupe : {
+    code : "DEM_FORM_SYN_GRP",
+    donnees : [ {
+      code : "WKF_200_DEM_FORM_LIBFORM",
+      element : "donnee",
+      libelle : "Libellé formation",
+      longueur : 255,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "WKF_200_DEM_FORM_ORG",
+      element : "donnee",
+      libelle : "Libellé organisme",
+      longueur : 255,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "WKF_200_DEM_FORM_DOMAINE",
+      element : "donnee",
+      libelle : "Domaine",
+      longueur : 255,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "WKF_200_DEM_FORM_PLAN_SYN",
+      element : "donnee",
+      libelle : "Plan",
+      longueur : 255,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "WKF_200_DEM_FORM_BUDG",
+      element : "donnee",
+      libelle : "Budget",
+      longueur : 255,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "WKF_200_DEM_FORM_AFFBUDG",
+      element : "donnee",
+      libelle : "Affectation budgétaire",
+      longueur : 255,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#SEP_ZONE",
+      element : "donnee"
+    }, {
+      code : "WKF_200_DEM_FORM_DURE",
+      element : "donnee",
+      libelle : "Durée (heures)",
+      longueur : 255,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#SEP_ZONE",
+      element : "donnee"
+    }, {
+      code : "WKF_200_DEM_FORM_COUT",
+      element : "donnee",
+      libelle : "Coût  TOTAL",
+      longueur : 255,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#SEP_ZONE",
+      element : "donnee"
+    }, {
+      code : "WKF_200_DEM_FORM_MONTANT",
+      element : "donnee",
+      libelle : "Montant PEC",
+      longueur : 255,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#SEP_ZONE",
+      element : "donnee"
+    }, {
+      code : "WKF_200_DEM_FORM_NIVPR",
+      element : "donnee",
+      libelle : "Niveau de priorité expert",
+      longueur : 255,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#SEP_ZONE",
+      element : "donnee"
+    }, {
+      code : "WKF_200_DEM_FORM_ARBEXP",
+      element : "donnee",
+      libelle : "Arbitrage expert",
+      longueur : 255,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    } ],
+    element : "groupe",
+    libelle : "Synthèse"
+  },
+  libelle : "Synthèse",
+  servicelet : "FormationDemandeWkf",
+  type : "W"
+}

@@ -1,0 +1,37 @@
+{
+  boutons : "INT",
+  code : "MOD_EVAL",
+  element : "ecran",
+  groupe : {
+    code : "MOD_EVAL_ONGLET_GRP",
+    donnees : [ {
+      code : "MOD_EVAL_GRP",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        pageAjout : "MOD_EVAL_POP",
+        pageModif : "MOD_EVAL_POP_M",
+        requete : "MOD_EVAL_1"
+      } ],
+      element : "groupe",
+      libelle : "Modalités d'évaluation",
+      onglet : true
+    }, {
+      code : "MOD_EVAL_HISTO_GRP",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        pageModif : "MOD_EVAL_POP_M",
+        requete : "MOD_EVAL_2"
+      } ],
+      element : "groupe",
+      libelle : "Modalités d'évaluation historisées",
+      onglet : true
+    } ],
+    element : "groupe",
+    libelle : "MOD_EVAL_ONGLET_GRP"
+  },
+  libelle : "Modalités d'évaluation",
+  servicelet : "ModalitesEvaluationJsonServlet",
+  type : "U"
+}

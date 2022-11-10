@@ -1,0 +1,75 @@
+##
+STD_ANNUAIRE
+=SQL=
+CREATE OR REPLACE VIEW "STD_ANNUAIRE" AS
+SELECT
+    T_V5_KRH_SALARIE.MATRICULE   AS MATRICULE,
+    T_V5_KRH_SALARIE.NOM         AS NOM,
+    T_V5_KRH_SALARIE.PRENOM      AS PRENOM,
+    (
+        SELECT
+            MIN(LOGIN)
+        FROM
+            SYS_USR_CONFIG SUC1
+        WHERE
+            SUC1.REQUETEMATRIC = SECUMATRIC.MATRIC
+            AND ( LOGIN LIKE '%-%'
+                  OR NOT EXISTS (
+                SELECT
+                    1
+                FROM
+                    SYS_USR_CONFIG SUC2
+                WHERE
+                    REQUETEMATRIC = SUC1.REQUETEMATRIC
+                    AND LOGIN LIKE '%-%'
+            ) )
+    ) AS LOGIN,
+    '' AS MATRICRESP,
+    'Responsable hiérarchique' AS LABELRESP,
+    '' AS NOMRESP,
+    '' AS PRENOMRESP,
+    '' AS LOGINRESP,
+    '' AS PHONE1EXT,
+    '' AS PHONE1NUM,
+    'Bureau' AS PHONE1LIB,
+    '' AS PHONE2EXT,
+    '' AS PHONE2NUM,
+    'Mobile Pro' AS PHONE2LIB,
+    '' AS PHONE3EXT,
+    '' AS PHONE3NUM,
+    'Fax' AS PHONE3LIB,
+    '' AS PHONE4EXT,
+    '' AS PHONE4NUM,
+    'Mobile perso' AS PHONE4LIB,
+    'Email' AS EMAIL1LIB,
+    '' AS EMAIL1ADRESSE,
+    'Email perso' AS EMAIL2LIB,
+    '' AS EMAIL2ADRESSE,
+    'Emploi' AS EMPLOILIB,
+    T_V5_KRH_SALARIE.LIBELLE_EMPLOI AS EMPLOI,
+    'Etablissement' AS ETABLISSEMENTLIB,
+    T_V5_KRH_SALARIE.LIBELLE_ETABLISSEMENT AS ETABLISSEMENT,
+    '' AS INTITULE1,
+    '' AS VALEUR1,
+    '' AS INTITULE2,
+    '' AS VALEUR2,
+    '' AS INTITULE3,
+    '' AS VALEUR3,
+    '' AS INTITULE4,
+    '' AS VALEUR4,
+    '' AS INTITULE5,
+    '' AS VALEUR5,
+    '' AS INTITULE6,
+    '' AS VALEUR6,
+    '' AS INTITULE7,
+    '' AS VALEUR7,
+    '' AS INTITULE8,
+    '' AS VALEUR8,
+    '' AS INTITULE9,
+    '' AS VALEUR9
+FROM
+    T_V5_KRH_SALARIE,
+    SECUMATRIC
+WHERE
+    PRIORITE_SITUATION = 0
+    AND T_V5_KRH_SALARIE.MATRICULE = SECUMATRIC.MATRIC

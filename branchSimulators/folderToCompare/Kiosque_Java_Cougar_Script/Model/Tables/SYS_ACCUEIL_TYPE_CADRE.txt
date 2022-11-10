@@ -1,0 +1,49 @@
+##
+SYS_ACCUEIL_TYPE_CADRE
+=SQL IFNOTEXIST=SYS_ACCUEIL_TYPE_CADRE=
+CREATE TABLE SYS_ACCUEIL_TYPE_CADRE ( TYPE_CADRE NUMBER NOT NULL ENABLE, LIBELLE VARCHAR2(50), TYPE_EXPERT VARCHAR2(1), TYPE_COLLAB VARCHAR2(1), NOM_PAGE_PARAM VARCHAR2(255), NOM_PAGE_CADRE VARCHAR2(255), ACTIF VARCHAR2(1), ORDRE NUMBER, PRIMARY KEY (TYPE_CADRE) ) 
+##
+SYS_ACCUEIL_TYPE_CADRE
+==
+DELETE FROM SYS_ACCUEIL_TYPE_CADRE
+'-1','Alertes','O','N',NULL,'Moteur/LookAndFeel/REVO/accueil/AccueilDynamiquePages.jsp','N','1'
+'-2','Enquête','O','N',NULL,'Moteur/LookAndFeel/REVO/accueil/AccueilDynamiqueEnquetes.jsp','N','2'
+'-3','Publications','O','N',NULL,'Moteur/LookAndFeel/REVO/accueil/AccueilDynamiquePublications.jsp','O','3'
+'-4','bandeau d''accueil','O','N','Moteur/Comp/WebAdmin/Accueil/Parametrage/ParametrageAccueilImage.jsp','Moteur/LookAndFeel/REVO/accueil/AccueilDynamiqueImages.jsp','O','4'
+'-5','DashBoard','O','N',NULL,'Moteur/LookAndFeel/REVO/accueil/AccueilDynamiqueJfreeChart.jsp','N','5'
+'-6','Actions En cours','O','N',NULL,NULL,'N','6'
+'-7','Solde des droits','O','N',NULL,NULL,'N','7'
+'-8','Demande de formation','O','N',NULL,NULL,'N','8'
+'-9','Historiques Formations','O','N',NULL,NULL,'N','9'
+'-10','10 pages les plus utilisées par le profil','O','O',NULL,NULL,'N','10'
+'-11','10 pages les plus utilisées par l''utilisateur','O','O',NULL,NULL,'N','11'
+'-12','Les prises de délégation','O','O',NULL,NULL,'N','12'
+'-14','Liens Fixes','O','O','Moteur/Comp/WebAdmin/Accueil/Parametrage/ParametrageAccueilLiens.jsp','Moteur/LookAndFeel/REVO/accueil/AccueilDynamiqueLiens.jsp','O','14'
+'-15','Index','O','O',NULL,'Moteur/LookAndFeel/REVO/accueil/AccueilDynamiqueIndex.jsp','O','15'
+'-16','Badgeage virtuel','O','O',NULL,NULL,'N','16'
+'-17','Message top down','O','N','Moteur/Comp/WebAdmin/Accueil/Parametrage/ParametrageAccueilMessage.jsp','Moteur/LookAndFeel/REVO/accueil/AccueilDynamiqueMessage.jsp','N','17'
+'-18','Planning de la semaine',NULL,NULL,NULL,NULL,'N','18'
+'-19','carrousel','O','N',NULL,NULL,'N','19'
+'-20','Graphiques','O','O',NULL,NULL,'O','20'
+'-21','Tâches en attente','O','O',NULL,NULL,'O','21'
+'-22','Mes demandes en cours','O','O',NULL,NULL,'O','22'
+##
+SYS_ACCUEIL_TYPE_CADRE
+=SQL=
+UPDATE SYS_ACCUEIL_TYPE_CADRE SET LIBELLE = 'Liens fixes' WHERE TYPE_CADRE = '-14'
+##
+SYS_ACCUEIL_TYPE_CADRE
+=SQL=
+UPDATE SYS_ACCUEIL_TYPE_CADRE SET LIBELLE = 'Bandeau d''accueil' WHERE TYPE_CADRE = '-4'
+##
+SYS_ACCUEIL_TYPE_CADRE
+=SQL=
+UPDATE SYS_ACCUEIL_TYPE_CADRE SET LIBELLE = 'Carrousel' WHERE TYPE_CADRE = '-19'
+##
+SYS_ACCUEIL_TYPE_CADRE
+=SQL=
+UPDATE SYS_ACCUEIL_TYPE_CADRE SET LIBELLE = 'Actions en cours' WHERE TYPE_CADRE = '-6'
+##
+SYS_ACCUEIL_TYPE_CADRE
+=SQL=
+UPDATE SYS_ACCUEIL_TYPE_CADRE SET LIBELLE = 'Historiques formations' WHERE TYPE_CADRE = '-9'

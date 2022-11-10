@@ -1,0 +1,99 @@
+{
+  code : "HAB_FORM_POP_M",
+  element : "ecran",
+  groupe : {
+    code : "HAB_FORM_MODIF",
+    donnees : [ {
+      code : "HAB_MATRICULE",
+      element : "donnee",
+      entier : 50,
+      libelle : "Matricule",
+      masquerLibelle : true,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "N"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Collaborateur : ",
+      style : "FormTitre"
+    }, {
+      code : "HAB_NOMCOLLAB",
+      element : "donnee",
+      libelle : "NomPrenom",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "HAB_FORM_UTIL",
+      element : "donnee",
+      libelle : "Utilisateur",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "BoxLabel",
+      suffixe : "Utilisateur",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "HAB_FORM_RESP",
+      element : "donnee",
+      libelle : "Responsable",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      suffixe : "Responsable",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "HAB_FORM_EXP",
+      element : "donnee",
+      libelle : "Expert",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "BoxLabel",
+      suffixe : "Expert",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "HAB_FORM_GEST",
+      element : "donnee",
+      libelle : "Gestionnaire",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "BoxLabel",
+      suffixe : "Gestionnaire",
+      type : "X"
+    }, {
+      code : "HAB_FORM_ONGLET",
+      element : "donnee",
+      libelle : "onglet Formation",
+      longueur : 1,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    } ],
+    element : "groupe",
+    libelle : "modifier les habilitations formation"
+  },
+  libelle : "Modifier les habilitations formation",
+  servicelet : "HabilitationUtilsateurJsonServlet",
+  type : "P"
+}

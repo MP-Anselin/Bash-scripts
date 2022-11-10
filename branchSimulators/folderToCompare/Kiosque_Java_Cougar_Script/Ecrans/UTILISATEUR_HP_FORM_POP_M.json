@@ -1,0 +1,142 @@
+{
+  code : "UTILISATEUR_HP_FORM_POP_M",
+  element : "ecran",
+  groupe : {
+    code : "UTILISATEUR_HP_FORM_POP_M_GRP",
+    donnees : [ {
+      code : "UTIL_HP_ID_MATRICULE",
+      element : "donnee",
+      libelle : "id utilisateur hors paie",
+      longueur : 300,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "UTIL_HP_CIVILITE",
+      element : "donnee",
+      libelle : "Civilité",
+      longueur : 100,
+      saisie : "select",
+      style : "FDonneeG",
+      type : "X",
+      valeurs : [ {
+        code : "MONSIEUR",
+        libelle : "Monsieur"
+      }, {
+        code : "MADAME",
+        libelle : "Madame"
+      }, {
+        code : "MADEMOISELLE",
+        libelle : "Mademoiselle"
+      } ]
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "UTIL_HP_NOM",
+      element : "donnee",
+      libelle : "Nom",
+      longueur : 200,
+      obligatoire : true,
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "UTIL_HP_PRENOM",
+      element : "donnee",
+      libelle : "Prénom",
+      longueur : 200,
+      obligatoire : true,
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "UTIL_HP_EMAIL",
+      element : "donnee",
+      libelle : "Email",
+      longueur : 200,
+      obligatoire : true,
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "UTIL_HP_ETABL",
+      element : "donnee",
+      libelle : "Code établissement",
+      longueur : 6,
+      obligatoire : true,
+      requete : "UTILISATEURS_HP_4",
+      retour : "UTIL_HP_ETABL,#OUI,#OUI",
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "UTIL_HP_CATE",
+      element : "donnee",
+      libelle : "Code catégorie",
+      longueur : 6,
+      obligatoire : true,
+      requete : "UTILISATEURS_HP_2",
+      retour : "UTIL_HP_CATE,#OUI,#OUI",
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "UTIL_HP_OTT",
+      element : "donnee",
+      libelle : "Code OTT",
+      longueur : 6,
+      obligatoire : true,
+      requete : "UTILISATEURS_HP_3",
+      retour : "UTIL_HP_OTT,#OUI,#OUI",
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "UTIL_HP_DATE_ENTREE",
+      element : "donnee",
+      format : "dd.MM.yyyy",
+      libelle : "Date d'entrée",
+      saisie : "text",
+      style : "FDonneeG",
+      type : "D"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "UTIL_HP_DATE_SORTIE",
+      element : "donnee",
+      format : "dd.MM.yyyy",
+      libelle : "Date de sortie",
+      saisie : "text",
+      style : "FDonneeG",
+      type : "D"
+    } ],
+    element : "groupe",
+    libelle : "Modifier un utilisateur hors paie"
+  },
+  libelle : "Modifier un utilisateur hors paie",
+  servicelet : "UtilisateurHorsPaieJsonServlet",
+  type : "P"
+}

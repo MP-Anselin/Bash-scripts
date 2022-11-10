@@ -1,0 +1,121 @@
+{
+  code : "DEM_FORM_CPF",
+  element : "ecran",
+  groupe : {
+    code : "DEM_FORM_CPF_GRP",
+    donnees : [ {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Caractéristiques de la demande",
+      style : "FormTitre"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Libellé formation",
+      style : "FDonneeG"
+    }, {
+      code : "WKF_200_DEM_FORM_LIBELLLE",
+      element : "donnee",
+      libelle : "Libellé de la formation",
+      longueur : 128,
+      masquerLibelle : true,
+      obligatoire : true,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Libellé organisme",
+      style : "FDonneeG"
+    }, {
+      code : "WKF_200_DEM_FORM_ORGA",
+      element : "donnee",
+      libelle : "Organisme",
+      longueur : 128,
+      masquerLibelle : true,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Caractérisation CPF ",
+      style : "FormTitre"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "WKF_200_DEM_FORM_CPFTR",
+      element : "donnee",
+      libelle : "CPF de transition",
+      longueur : 1,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Caractéristique CPF",
+      style : "BoxLabel"
+    }, {
+      code : "WKF_200_DEM_FORM_CCPFOUI",
+      element : "donnee",
+      libelle : "OUI",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      suffixe : "Oui",
+      type : "X"
+    }, {
+      code : "WKF_200_DEM_FORM_CCPFNON",
+      element : "donnee",
+      libelle : "NON",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      suffixe : "Non",
+      type : "X"
+    }, {
+      code : "WKF_200_DEM_FORM_CCPFNONT",
+      element : "donnee",
+      libelle : "Non traité",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      suffixe : "Non traité",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "WKF_200_DEM_FORM_ALTR",
+      element : "donnee",
+      libelle : "Alternance Pro A",
+      longueur : 1,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    } ],
+    element : "groupe",
+    libelle : "Caractéristiques CPF"
+  },
+  libelle : "CPF",
+  servicelet : "FormationDemandeWkf",
+  type : "W"
+}

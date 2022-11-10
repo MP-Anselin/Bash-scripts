@@ -1,0 +1,87 @@
+{
+  code : "MOD_EVAL_POP",
+  element : "ecran",
+  groupe : {
+    code : "MOD_EVAL_POP_GRP",
+    donnees : [ {
+      code : "MOD_EVAL_LIB",
+      element : "donnee",
+      libelle : "Libellé",
+      longueur : 128,
+      obligatoire : true,
+      saisie : "text",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "MOD_EVAL_DESC",
+      element : "donnee",
+      libelle : "Description",
+      longueur : 3999,
+      saisie : "textarea",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "MOD_EVAL_ACTIF",
+      element : "donnee",
+      libelle : "Actif (Etat)",
+      longueur : 50,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "MOD_EVAL_HISTO",
+      element : "donnee",
+      libelle : "Historisée",
+      longueur : 1,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "MOD_EVAL_MODL",
+      element : "donnee",
+      libelle : "Enregistrer en tant que Modèle",
+      longueur : 1,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "ID_TEXTE",
+      element : "donnee",
+      libelle : "Id de la modalité",
+      longueur : 50,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "MOD_EVAL_MATRICULE",
+      element : "donnee",
+      libelle : "Id de la modalité",
+      longueur : 50,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    } ],
+    element : "groupe",
+    libelle : "Ajouter ou modifier une modalité d'évaluation"
+  },
+  libelle : "Créer une modalité d'évaluation",
+  servicelet : "ModalitesEvaluationJsonServlet",
+  type : "P"
+}

@@ -1,0 +1,74 @@
+##
+TAG_CHARSET=@€ιθη
+##
+GET_USER_DESIGNATION
+=SQL=
+create or replace FUNCTION GET_USER_DESIGNATION(module IN VARCHAR2,arbre in VARCHAR2)  RETURN table_krhef_aff_user_designation AS 
+user_designation_groupe table_krhef_aff_user_designation := table_krhef_aff_user_designation();
+   numlig                NUMBER := 0;
+        cur_user              SYS_REFCURSOR;
+        sql_cur_user          CLOB;
+matricule                        NUMBER;
+np                               VARCHAR2(256);
+matricule_paie                    VARCHAR2(256);
+date_sortie                           DATE;
+designation_erreur                    VARCHAR2(256);
+nom_prenom_responsable             VARCHAR2(256);
+nom_prenom_directeur_rh                     VARCHAR2 ( 256 ) ;
+NOM_PRENOM_ACTEUR_INDIRECT          VARCHAR2 ( 256 ) ;
+NOM_PRENOM_RESPONSABLE_RH             VARCHAR2 ( 256 ) ;
+NOM_PRENOM_GESTIONNAIRE            VARCHAR2 ( 256 ) ; 
+NOM_PRENOM_EXPERT              VARCHAR2 ( 256 );
+    BEGIN
+ sql_cur_user :='select  vsu.matricule ID_MAT ,
+vsu.np,
+ vsu.matricule_paie,
+ vsu.date_sortie  ,
+ vsu.designation_erreur  ,
+ vsu.nom_prenom_responsable ,
+ vsu.nom_prenom_directeur_rh,
+ vsu.nom_prenom_acteur_indirect,
+ vsu.nom_prenom_responsable_rh,
+ vsu.nom_prenom_gestionnaire,
+ vsu.nom_prenom_expert from  ';
+if(arbre='1') then
+sql_cur_user:=sql_cur_user||'V_V5_USER_DESI'||module||'_CONF  vsu';
+ else
+sql_cur_user:=sql_cur_user||'V_V5_USER_DESI'||module||'  vsu';
+ end if;                    
+        OPEN cur_user FOR sql_cur_user;
+
+        LOOP
+            FETCH cur_user INTO
+		matricule ,                		
+		np   ,                     		
+		matricule_paie ,           		
+		date_sortie ,              		
+		designation_erreur,        		
+		nom_prenom_responsable,    		
+		nom_prenom_directeur_rh  , 		
+		NOM_PRENOM_ACTEUR_INDIRECT,		
+		NOM_PRENOM_RESPONSABLE_RH, 		
+		NOM_PRENOM_GESTIONNAIRE,   		
+		NOM_PRENOM_EXPERT ;        		
+					
+            EXIT WHEN cur_user%notfound;
+            numlig := numlig + 1;
+             user_designation_groupe.extend;
+ user_designation_groupe(numlig) := krhef_aff_secu_designation(NULL, NULL,NULL, NULL, NULL, NULL,NULL, NULL, NULL, NULL, NULL);
+ user_designation_groupe(numlig).matricule := matricule;
+ user_designation_groupe(numlig).np := np;
+ user_designation_groupe(numlig).matricule_paie :=matricule_paie;
+ user_designation_groupe(numlig).date_sortie := date_sortie;
+ user_designation_groupe(numlig).designation_erreur := designation_erreur;
+ user_designation_groupe(numlig).nom_prenom_responsable := nom_prenom_responsable;
+ user_designation_groupe(numlig).nom_prenom_directeur_rh := nom_prenom_directeur_rh;
+ user_designation_groupe(numlig).NOM_PRENOM_ACTEUR_INDIRECT :=NOM_PRENOM_ACTEUR_INDIRECT;
+  user_designation_groupe(numlig).NOM_PRENOM_RESPONSABLE_RH :=NOM_PRENOM_RESPONSABLE_RH;
+ user_designation_groupe(numlig).NOM_PRENOM_GESTIONNAIRE := NOM_PRENOM_GESTIONNAIRE;
+ user_designation_groupe(numlig).NOM_PRENOM_EXPERT := NOM_PRENOM_EXPERT;
+        END LOOP;
+ CLOSE cur_user;
+ RETURN user_designation_groupe;
+
+END GET_USER_DESIGNATION;

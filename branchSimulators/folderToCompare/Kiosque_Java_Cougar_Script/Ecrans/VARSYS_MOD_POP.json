@@ -1,0 +1,73 @@
+{
+  code : "VARSYS_MOD_POP",
+  element : "ecran",
+  groupe : {
+	element: "groupe",
+	code: "VARSYS_MOD_POP_GRP",
+	libelle: "",
+	donnees: [{
+		element: "donnee",
+		code: "VARSYS_MODULE",
+		libelle: "Module",
+		saisie: "span",
+		type: "X",
+		longueur: 5
+	},{
+		element: "donnee",
+		code: "#EOL"
+	},{
+		element: "donnee",
+		code: "VARSYS_CODE",
+		libelle: "Code",
+		saisie: "span",
+		type: "X",
+		longueur: 50
+	},{
+		element: "donnee",
+		code: "#EOL"
+	},{
+		element: "donnee",
+		code: "VARSYS_VALEUR",
+		libelle: "Valeur",
+		saisie: "span",
+		type: "X",
+		longueur: 4000
+	},{
+		element: "donnee",
+		code: "#EOL"
+	},{
+		element: "donnee",
+		code: "VARSYS_TYPE",
+		libelle: "Type",
+		saisie: "span",
+		type: "X",
+		longueur: 10
+	},{
+		element: "donnee",
+		code: "#EOL"
+	},{
+		element: "donnee",
+		code: "VARSYS_BLOQUEE",
+		libelle: "Bloquée",
+		saisie: "span",
+		type: "X",
+		longueur: 3
+	},{
+		element: "donnee",
+		code: "#EOL"
+	},{
+		element: "donnee",
+		code: "VARSYS_DESC",
+		libelle: "Description",
+		saisie: "textarea-readonly",
+		type: "X",
+		longueur: 2000
+	},{
+		element: "donnee",
+		code: "#EOL"
+	}]
+  },
+  libelle : "Variables systèmes modèles",
+  servicelet : "VarsysJsonServlet",
+  type : "P"
+}

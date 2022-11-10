@@ -1,0 +1,57 @@
+{
+  code : "PILOTAGE_BUDG_RESP_POP",
+  element : "ecran",
+  groupe : {
+    code : "PILOTAGE_BUDG_RESP_POP",
+    donnees : [ {
+      code : "BUDG_FORM",
+      element : "donnee",
+      libelle : "Budget de formation",
+      longueur : 50,
+      requete : "PILOTAGE_BUDG_9",
+      retour : "#NON,BUDG_FORM,#NON,#NON,BUDG_FORM_IDBUDGET",
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "BUDG_FORM_IDBUDGET",
+      element : "donnee",
+      libelle : "Code budgétaire",
+      longueur : 256,
+      saisie : "hidden",
+      style : "FDonneeG",
+      suffixe : "ID_BUDGET",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "RESP_BUDG_FORM",
+      element : "donnee",
+      libelle : "Responsable",
+      longueur : 50,
+      requete : "PILOTAGE_BUDG_8",
+      retour : "RESP_BUDG_FORM,HAB_MATRICULE",
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "HAB_MATRICULE",
+      element : "donnee",
+      entier : 50,
+      libelle : "Matricule",
+      masquerLibelle : true,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "N"
+    } ],
+    element : "groupe",
+    libelle : "Responsable formation"
+  },
+  libelle : "Lier un responsable à un budget de formation",
+  servicelet : "FormationPilotageBudgetsJsonServlet",
+  type : "P"
+}

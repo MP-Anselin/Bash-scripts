@@ -1,0 +1,101 @@
+##
+TAG_CHARSET=@€ιθη
+##
+GET_PLAN_FORM
+=SQL=
+create or replace FUNCTION GET_PLAN_FORM(x in number)  RETURN TABLE_KRHEF_AFF_FORM_INCOMPLETE AS 
+             allform     TABLE_KRHEF_AFF_FORM_INCOMPLETE := TABLE_KRHEF_AFF_FORM_INCOMPLETE();
+             numlig                NUMBER := 0;
+             numlig1                NUMBER := 0;
+            LIBELLE VARCHAR2(4000);
+ nombre_formation NUMBER(38);
+ STATUT NUMBER(1);
+NB_DEMANDES_INCOMPLETES NUMBER(38);
+ANNEE  VARCHAR2(128);
+ TEST NUMBER;
+  
+ CURSOR cur IS
+         
+      SELECT pl.ID_PLAN as ID_PLAN , pl.LIBELLE as LIBELLE, pl.ANNEE as ANNEE , pl.STATUT as STATUT ,decode (
+(select count(*) from T_V5_KRHEF_FORM_PLAN fp where fp.ID_PLAN = pl.ID_PLAN)
++ (select count(*) from T_V5_KRHEF_FORM_PLAN fp where fp.ID_PLAN_REPORT = pl.ID_PLAN)
++ (select count(*) from T_V5_KRHEF_FORMATION_INSCR ins where ins.ID_PLAN = pl.ID_PLAN)
++ (select count(*) from T_V5_KRHEF_FORMATION_COUT cout where cout.ID_PLAN = pl.ID_PLAN),
+0, 0,
+1
+)  as TEST FROM T_V5_KRHEF_PLAN pl where PREVU_REALISE='P';
+
+         lig                     cur%rowtype;
+         lig1                     cur%rowtype;
+         BEGIN
+          OPEN cur;
+ if(x=0) then
+        LOOP
+            FETCH cur INTO  lig;
+            EXIT WHEN cur%notfound;
+            numlig := numlig + 1;
+            allform.extend;
+         
+            select count(1) into nombre_formation from T_V5_KRHEF_FORM_DEMANDE fd join T_V5_KRHEF_FORM_PLAN plform on plform.ID_FORMATION_DEMANDE = fd.ID_FORMATION_DEMANDE
+ join T_V5_KRHEF_FORM_COUT_PLAN cout on cout.ID_FORM_PLAN = plform.ID_FORM_PLAN
+ join T_V5_KRHEF_PLAN pl on pl.ID_PLAN = plform.ID_PLAN
+ left join T_V5_KRHEF_ORGANISME org on org.ID_ORGANISME = fd.ID_ORGANISME
+ left join V_V5_KRH_SALARIE_USER vsu on vsu.MATRICULE = fd.COLLABORATEUR
+ left join V_V5_KRH_SALARIE_USER resp on resp.MATRICULE = fd.MANAGER
+ where fd.PLAN_GELE = 0
+ and plform.PLAN_GELE = 0
+ and cout.PLAN_GELE = 0
+ and plform.ID_PLAN_REPORT IS NULL
+ and fd.STATUT_EXPERT not in (4,2)
+ and pl.STATUT= 1
+ and (( fd.COLLECTIF = 1 and  ID_REF_COLLECTIF IS NULL AND fd.COLLABORATEUR IS NULL)
+or (fd.COLLECTIF = 0 AND ID_REF_COLLECTIF IS NULL)) and pl.id_plan=lig.ID_PLAN ;
+
+SELECT COUNT(1) INTO NB_DEMANDES_INCOMPLETES
+ FROM V_V5_USER_PLAN_FORMATION
+ WHERE ID_PLAN = lig.ID_PLAN;
+
+            allform(numlig) := KRHEF_AFF_FORM_INCOMPLETE(NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+            allform(numlig).ID_PLAN :=lig.ID_PLAN;
+           
+            allform(numlig).LIBELLE :=lig.LIBELLE;
+            allform(numlig).STATUT :=lig.STATUT;
+            allform(numlig).ANNEE :=lig.ANNEE;
+            
+            allform(numlig).NB_DEMANDES_INCOMPLETES  :=NB_DEMANDES_INCOMPLETES;
+            allform(numlig).TEST :=lig.TEST;
+            allform(numlig).nombre_formation :=nombre_formation;
+            
+                 
+        END LOOP;
+        CLOSE cur;   
+        else 
+        
+          LOOP
+            FETCH cur INTO  lig1;
+            EXIT WHEN cur%notfound;
+            numlig1 := numlig1 + 1;
+            allform.extend;
+         
+           
+
+
+
+            allform(numlig1) := KRHEF_AFF_FORM_INCOMPLETE(NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+            allform(numlig1).ID_PLAN :=lig1.ID_PLAN;
+           
+            allform(numlig1).LIBELLE :=lig1.LIBELLE;
+            allform(numlig1).STATUT :=lig1.STATUT;
+            allform(numlig1).ANNEE :=lig1.ANNEE;
+            
+          
+            allform(numlig1).TEST :=lig1.TEST;
+           
+            
+                 
+        END LOOP;
+        CLOSE cur;   
+        end if;
+        
+     RETURN allform;
+END GET_PLAN_FORM;

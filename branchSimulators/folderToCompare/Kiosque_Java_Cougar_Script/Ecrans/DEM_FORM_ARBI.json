@@ -1,0 +1,170 @@
+{
+  code : "DEM_FORM_ARBI",
+  element : "ecran",
+  groupe : {
+    code : "DEM_FORM_ARBI_GRP",
+    donnees : [ {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Libellé formation",
+      style : "FDonneeG"
+    }, {
+      code : "WKF_200_DEM_FORM_LIBELLLE",
+      element : "donnee",
+      libelle : "Libellé de la formation",
+      longueur : 128,
+      masquerLibelle : true,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Libellé organisme",
+      style : "FDonneeG"
+    }, {
+      code : "WKF_200_DEM_FORM_ORG",
+      element : "donnee",
+      libelle : "Libellé organisme",
+      longueur : 255,
+      masquerLibelle : true,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Arbitrer la demande",
+      style : "FormTitre"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Niveau de priorité expert",
+      style : "BoxLabel"
+    }, {
+      code : "WKF_200_DEM_FORM_1",
+      element : "donnee",
+      libelle : "1",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      suffixe : "1",
+      type : "X"
+    }, {
+      code : "WKF_200_DEM_FORM_2",
+      element : "donnee",
+      libelle : "2",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      suffixe : "2",
+      type : "X"
+    }, {
+      code : "WKF_200_DEM_FORM_3",
+      element : "donnee",
+      libelle : "3",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      suffixe : "3",
+      type : "X"
+    }, {
+      code : "WKF_200_DEM_FORM_4",
+      element : "donnee",
+      libelle : "4",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      suffixe : "4",
+      type : "X"
+    }, {
+      code : "WKF_200_DEM_FORM_5",
+      element : "donnee",
+      libelle : "5",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      suffixe : "5",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Arbitrage expert ",
+      style : "BoxLabel"
+    }, {
+      code : "WKF_200_DEM_FORM_ACCORD",
+      element : "donnee",
+      libelle : "Accord",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      suffixe : "Accord",
+      type : "X"
+    }, {
+      code : "WKF_200_DEM_FORM_REFUS",
+      element : "donnee",
+      libelle : "Refus",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      suffixe : "Refus",
+      type : "X"
+    }, {
+      code : "WKF_200_DEM_FORM_ANNULE",
+      element : "donnee",
+      libelle : "Annulé",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      suffixe : "Annulé",
+      type : "X"
+    }, {
+      code : "WKF_200_DEM_FORM_ATTENTE",
+      element : "donnee",
+      libelle : "En attente",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      suffixe : "En attente",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "WKF_200_DEM_FORM_COMMENT",
+      element : "donnee",
+      libelle : "Commentaire expert",
+      lignes : 2,
+      longueur : 128,
+      saisie : "textarea",
+      style : "FDonneeG",
+      type : "X"
+    } ],
+    element : "groupe",
+    libelle : "Arbitrage"
+  },
+  libelle : "Arbitrage",
+  servicelet : "FormationDemandeWkf",
+  type : "W"
+}

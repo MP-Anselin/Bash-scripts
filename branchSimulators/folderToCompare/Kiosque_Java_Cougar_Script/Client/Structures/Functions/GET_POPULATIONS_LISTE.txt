@@ -1,0 +1,188 @@
+##
+TAG_CHARSET=@€éèç
+##
+GET_POPULATIONS_LISTE
+=SQL=
+create or replace FUNCTION GET_POPULATIONS_LISTE (isadp IN NUMBER,aoid IN VARCHAR2) RETURN table_krhef_populations AS 
+populations_liste table_krhef_populations := table_krhef_populations();
+ numlig                  NUMBER := 0;
+ 
+ CURSOR cur IS
+         
+  
+  WITH t_user_alias AS (
+SELECT
+libelle,
+id_user_alias_ref,
+uraia.matricule AS matricule,
+uraia.logon     AS logon,
+uraia.id_alias  AS id_alias
+FROM
+t_v5_alias_def          urial,
+t_v5_krh_user_alias_ref uraia
+WHERE
+urial.id_alias(+) = uraia.id_alias
+), krh_user AS (
+SELECT
+est_expert_form,
+est_responsable_form
+FROM
+t_v5_krh_user
+WHERE
+matricule = aoid
+)
+SELECT
+pop.id_population,
+pop.libelle,
+CASE
+WHEN pop.contextrole = 'xp'   THEN
+'Expert'
+WHEN pop.contextrole = 'resp' THEN
+'Responsable'
+WHEN pop.type_population = 1  THEN
+NULL
+ELSE
+'Expert'
+END                 prop_role,
+CASE
+WHEN pop.type_population = 1
+AND t_user_alias.libelle = 'Administrateurs ADP' THEN
+'Modéle'
+WHEN t_user_alias.matricule IS NOT NULL THEN
+(
+SELECT
+( vsuria.nom
+|| ' '
+|| vsuria.prenom )
+|| ' '
+|| ( vsuria.matricule_paie )
+FROM
+v_v5_krh_salarie_user vsuria
+WHERE
+vsuria.matricule = t_user_alias.matricule
+)
+ELSE
+decode(t_user_alias.logon, NULL, t_user_alias.libelle, '('|| t_user_alias.logon|| ')')
+END                 identite,
+CASE
+WHEN to_user_alias_ref_id IS NULL THEN
+'Tous'
+ELSE
+(select case
+when uraia.MATRICULE is not null then
+(select (VSURIA.NOM||' '||VSURIA.PRENOM)||' '||(VSURIA.MATRICULE_PAIE)
+from V_V5_KRH_SALARIE_USER vsuria
+where vsuria.matricule = uraia.MATRICULE)
+when uraia.ID_ALIAS is not null then
+(select LIBELLE
+from T_V5_ALIAS_DEF urial
+where urial.ID_ALIAS = uraia.ID_ALIAS)
+ else
+                       '(' || uraia.LOGON || ')'
+                    end
+            from T_V5_KRH_USER_ALIAS_REF uraia
+            where uraia.ID_USER_ALIAS_REF = pop.TO_USER_ALIAS_REF_ID) END UTILISATEUR,
+pop.date_modification,
+pop.date_recalcul,
+CASE
+    WHEN pop.active = 1 THEN
+        'Active'
+    ELSE
+        'Inactive'
+END                 etat,
+(
+    SELECT
+     decode ( isadp,1,v.nb_tot ,v.nb_vis )
+    FROM
+        v_v5_krh_population v
+    WHERE
+            v.matricule = aoid
+        AND v.id_population = pop.id_population
+)                   salarie_visible,
+pop.nombre_salaries salarie_total,
+CASE
+    WHEN ( EXISTS (
+        SELECT
+            1
+        FROM
+            t_v5_krh_population e
+        WHERE
+            e.id_population = pop.id_population
+        UNION ALL
+        SELECT
+            1
+        FROM
+            t_v5_evt_instance f
+        WHERE
+            f.id_population = pop.id_population
+        UNION ALL
+        SELECT
+            1
+        FROM
+            t_v5_population_def_nodes g
+        WHERE
+            g.id_population = pop.id_population
+        UNION ALL
+        SELECT
+            1
+        FROM
+            t_v5_krhdp_filtre_page h
+        WHERE
+            h.id_population = pop.id_population
+        UNION ALL
+        SELECT
+            1
+        FROM
+            t_v5_population_structure k
+        WHERE
+            k.id_population = pop.id_population
+    ) ) THEN
+        'N'
+    WHEN pop.type_population = 0
+         AND t_user_alias.libelle = 'Administrateurs ADP' THEN
+        'X'
+    WHEN ( t_user_alias.matricule = aoid )
+         AND ( ( pop.contextrole = 'xp'
+                 AND krh_user.est_expert_form = 1 )
+               OR ( pop.contextrole = 'resp'
+                    AND krh_user.est_responsable_form = 1 ) ) THEN
+        'X'
+    ELSE
+        'N'
+END                 affiche_btn_supp
+FROM
+t_v5_population_def pop,
+t_user_alias,
+krh_user
+WHERE
+pop.owner_user_alias_ref_id = t_user_alias.id_user_alias_ref
+AND pop.appli = 'krhv5'
+AND pop.historise = 0
+ORDER BY pop.ACTIVE desc , pop.libelle asc
+;
+lig                     cur%rowtype;
+BEGIN
+ OPEN cur;
+ LOOP
+ FETCH cur INTO lig;
+ EXIT WHEN cur%notfound;
+ numlig := numlig + 1;
+ populations_liste.extend;
+ populations_liste(numlig) := KRHEF_POPULATIONS(NULL, NULL,NULL, NULL, NULL, NULL,NULL, NULL, NULL, NULL, NULL);
+ 
+ populations_liste(numlig).id_population := lig.id_population;
+ populations_liste(numlig).libelle := lig.libelle;
+  populations_liste(numlig).prop_role := lig.prop_role;
+ populations_liste(numlig).identite := lig.identite;
+ populations_liste(numlig).utilisateur := lig.utilisateur;
+ populations_liste(numlig).date_modification := lig.date_modification;
+ populations_liste(numlig).date_recalcul := lig.date_recalcul;
+ populations_liste(numlig).etat := lig.etat;
+ populations_liste(numlig).salarie_visible := lig.salarie_visible;
+ populations_liste(numlig).salarie_total := lig.salarie_total;
+populations_liste(numlig).affiche_btn_supp := lig.affiche_btn_supp;
+
+ END LOOP;
+ 
+  RETURN populations_liste;
+END GET_POPULATIONS_LISTE;

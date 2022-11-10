@@ -1,0 +1,1827 @@
+{
+  code : "DEM_FORM_PLAN_AFF",
+  element : "ecran",
+  groupe : {
+    code : "DEM_FORM_PLAN_AFF_GRP",
+    donnees : [ {
+      code : "WKF_200_DEM_FORM_LIBELLLE",
+      element : "donnee",
+      libelle : "Libellé de la formation",
+      longueur : 128,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "WKF_200_DEM_FORM_ORG",
+      element : "donnee",
+      libelle : "Libellé organisme",
+      longueur : 255,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Choisir les plans et affectations",
+      style : "FormTitre"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "DEM_FORM_PLAN_AFF_P1",
+      donnees : [ {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Affectation principale",
+        style : "FormTitre"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_PLAN",
+        element : "donnee",
+        libelle : "Plan",
+        longueur : 255,
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_BUDG",
+        element : "donnee",
+        libelle : "Budget",
+        longueur : 255,
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_AFFBUDG",
+        element : "donnee",
+        libelle : "Affectation budgétaire",
+        longueur : 255,
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_VIS",
+        element : "donnee",
+        libelle : "Mode de visualisation",
+        longueur : 255,
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_COUTP",
+        element : "donnee",
+        libelle : "Coût pédagogique externe",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_DUREES",
+        element : "donnee",
+        entier : 20,
+        libelle : "Durée du stage",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "N"
+      }, {
+        code : "WKF_200_DEM_FORM_JOUR",
+        element : "donnee",
+        entier : 20,
+        libelle : "jours soit",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "N"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "heures",
+        style : "FDonneeG"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_TRA",
+        element : "donnee",
+        entier : 20,
+        libelle : "Dont pendant le temps de travail",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "N"
+      }, {
+        code : "WKF_200_DEM_FORM_HEU",
+        element : "donnee",
+        entier : 20,
+        libelle : "heures : ",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "N"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "% du temps de formation",
+        style : "FDonneeG"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_HTR",
+        element : "donnee",
+        entier : 20,
+        libelle : "Dont hors temps de travail",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "N"
+      }, {
+        code : "WKF_200_DEM_FORM_HHTR",
+        element : "donnee",
+        entier : 20,
+        libelle : "heures :",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "N"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "% du temps de formation",
+        style : "FDonneeG"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_PCH",
+        element : "donnee",
+        libelle : "Prise en charge\t",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Montant",
+        style : "BoxLabel"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Montant PEC",
+        style : "BoxLabel"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_COUTPP",
+        element : "donnee",
+        libelle : "Coût pédagogique externe",
+        longueur : 20,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_COUTS",
+        element : "donnee",
+        libelle : "Coût salarial",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_CSMP",
+        element : "donnee",
+        libelle : "Coût salarial\t",
+        longueur : 20,
+        masquerLibelle : true,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_COUTTR",
+        element : "donnee",
+        libelle : "Coût transport\t",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_CTMP",
+        element : "donnee",
+        libelle : "Coût transport",
+        longueur : 20,
+        masquerLibelle : true,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_HEB",
+        element : "donnee",
+        libelle : "Coût hébergement\t",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_CHMP",
+        element : "donnee",
+        libelle : "Coût hébergement",
+        longueur : 20,
+        masquerLibelle : true,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_COUTTU",
+        element : "donnee",
+        libelle : "Coût tuteur",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_CTUMP",
+        element : "donnee",
+        libelle : "Coût tuteur",
+        longueur : 20,
+        masquerLibelle : true,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_TOTAL",
+        element : "donnee",
+        libelle : "Total",
+        longueur : 20,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_TPEC",
+        element : "donnee",
+        libelle : "Total",
+        longueur : 20,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_SI",
+        element : "donnee",
+        libelle : "Subvention individuelle",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Affectation secondaire",
+        style : "FormTitre"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_AFBUDGS",
+        element : "donnee",
+        libelle : "Affectation budgétaire",
+        longueur : 20,
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_COUTPS",
+        element : "donnee",
+        libelle : "Coût pédagogique externe",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_DURS",
+        element : "donnee",
+        libelle : "Durée du stage",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_JS",
+        element : "donnee",
+        libelle : "jours soit",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "heures",
+        style : "FDonneeG"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_TRAS",
+        element : "donnee",
+        libelle : "Dont pendant le temps de travail",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_HEUS",
+        element : "donnee",
+        libelle : "heures :",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "% du temps de formation",
+        style : "FDonneeG"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_HTRS",
+        element : "donnee",
+        libelle : "Dont hors temps de travail",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_HHTRS",
+        element : "donnee",
+        libelle : "heures :",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "% du temps de formation",
+        style : "FDonneeG"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_PCHS",
+        element : "donnee",
+        libelle : "Prise en charge\t",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Montant",
+        style : "BoxLabel"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Montant PEC",
+        style : "BoxLabel"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_COUTPSS",
+        element : "donnee",
+        libelle : "Coût pédagogique externe",
+        longueur : 20,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_CSS",
+        element : "donnee",
+        libelle : "Coût salarial",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_CSSPEC",
+        element : "donnee",
+        libelle : "Coût salarial",
+        longueur : 20,
+        masquerLibelle : true,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_CTS",
+        element : "donnee",
+        libelle : "Coût transport",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_CTSPEC",
+        element : "donnee",
+        libelle : "Coût transport",
+        longueur : 20,
+        masquerLibelle : true,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_CHS",
+        element : "donnee",
+        libelle : "Coût hébergement",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_CHSPEC",
+        element : "donnee",
+        libelle : "Coût hébergement",
+        longueur : 20,
+        masquerLibelle : true,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_CTUS",
+        element : "donnee",
+        libelle : "Coût tuteur",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_CTUSPEC",
+        element : "donnee",
+        libelle : "Coût tuteur",
+        longueur : 20,
+        masquerLibelle : true,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_TOTALS",
+        element : "donnee",
+        libelle : "Total",
+        longueur : 20,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_TPECS",
+        element : "donnee",
+        libelle : "Total",
+        longueur : 20,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_SIS",
+        element : "donnee",
+        libelle : "Subvention individuelle",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      } ],
+      element : "groupe",
+      libelle : "PLAN 1",
+      onglet : true
+    }, {
+      code : "DEM_FORM_PLAN_AFF_P2",
+      donnees : [ {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Affectation principale",
+        style : "FormTitre"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_PLANP2",
+        element : "donnee",
+        libelle : "Plan",
+        longueur : 255,
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_BUDGP2",
+        element : "donnee",
+        libelle : "Budget",
+        longueur : 255,
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_AFFBUDGP2",
+        element : "donnee",
+        libelle : "Affectation budgétaire",
+        longueur : 255,
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_VISP2",
+        element : "donnee",
+        libelle : "Mode de visualisation",
+        longueur : 255,
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_COUTP2",
+        element : "donnee",
+        libelle : "Coût pédagogique externe",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_DUREP2",
+        element : "donnee",
+        entier : 20,
+        libelle : "Durée du stage",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "N"
+      }, {
+        code : "WKF_200_DEM_FORM_JOURP2",
+        element : "donnee",
+        entier : 20,
+        libelle : "jours soit",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "N"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "heures",
+        style : "FDonneeG"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_TRAP2",
+        element : "donnee",
+        entier : 20,
+        libelle : "Dont pendant le temps de travail",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "N"
+      }, {
+        code : "WKF_200_DEM_FORM_HEUP2",
+        element : "donnee",
+        entier : 20,
+        libelle : "heures : ",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "N"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "% du temps de formation",
+        style : "FDonneeG"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_HTRP2",
+        element : "donnee",
+        entier : 20,
+        libelle : "Dont hors temps de travail",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "N"
+      }, {
+        code : "WKF_200_DEM_FORM_HHTRP2",
+        element : "donnee",
+        entier : 20,
+        libelle : "heures : ",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "N"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "% du temps de formation",
+        style : "FDonneeG"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_PCHP2",
+        element : "donnee",
+        entier : 20,
+        libelle : "Prise en charge",
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "N"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Montant",
+        style : "BoxLabel"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Montant PEC",
+        style : "BoxLabel"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_COUTPP2",
+        element : "donnee",
+        entier : 20,
+        libelle : "Coût pédagogique externe",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "N"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_COUTSP2",
+        element : "donnee",
+        entier : 20,
+        libelle : "Coût salarial",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "N"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_CSMP2",
+        element : "donnee",
+        libelle : "Coût salarial\t",
+        longueur : 20,
+        masquerLibelle : true,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_COUTTRP2",
+        element : "donnee",
+        libelle : "Coût transport\t",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_CTMP2",
+        element : "donnee",
+        libelle : "Coût transport",
+        longueur : 20,
+        masquerLibelle : true,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_HEBP2",
+        element : "donnee",
+        libelle : "Coût hébergement\t",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_CHMP2",
+        element : "donnee",
+        libelle : "Coût hébergement",
+        longueur : 20,
+        masquerLibelle : true,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_COUTTUP2",
+        element : "donnee",
+        libelle : "Coût tuteur",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_CTUMP2",
+        element : "donnee",
+        libelle : "Coût tuteur",
+        longueur : 20,
+        masquerLibelle : true,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_TOTALP2",
+        element : "donnee",
+        libelle : "Total",
+        longueur : 20,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_TPECP2",
+        element : "donnee",
+        libelle : "Total",
+        longueur : 20,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_SIP2",
+        element : "donnee",
+        libelle : "Subvention individuelle",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Affectation secondaire",
+        style : "FormTitre"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_AFBSP2",
+        element : "donnee",
+        libelle : "Affectation budgétaire",
+        longueur : 20,
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_COUTPSP2",
+        element : "donnee",
+        libelle : "Coût pédagogique externe",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_DURSP2",
+        element : "donnee",
+        libelle : "Durée du stage",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_JSP2",
+        element : "donnee",
+        libelle : "jours soit",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "heures",
+        style : "FDonneeG"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_TRASP2",
+        element : "donnee",
+        libelle : "Dont pendant le temps de travail",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_HEUSP2",
+        element : "donnee",
+        libelle : "heures :",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "% du temps de formation",
+        style : "FDonneeG"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_HTRSP2",
+        element : "donnee",
+        libelle : "Dont hors temps de travail",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_HHTRSP2",
+        element : "donnee",
+        libelle : "heures :",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "% du temps de formation",
+        style : "FDonneeG"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_PCHSP2",
+        element : "donnee",
+        libelle : "Prise en charge\t",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Montant",
+        style : "BoxLabel"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Montant PEC",
+        style : "BoxLabel"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_CSSP2",
+        element : "donnee",
+        libelle : "Coût salarial",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_CSSPEP2",
+        element : "donnee",
+        libelle : "Coût salarial",
+        longueur : 20,
+        masquerLibelle : true,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_CTSP2",
+        element : "donnee",
+        libelle : "Coût transport",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_CTSPECP2",
+        element : "donnee",
+        libelle : "Coût transport",
+        longueur : 20,
+        masquerLibelle : true,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_CHSP2",
+        element : "donnee",
+        libelle : "Coût hébergement",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_CHSPECP2",
+        element : "donnee",
+        libelle : "Coût hébergement",
+        longueur : 20,
+        masquerLibelle : true,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_CTUSP2",
+        element : "donnee",
+        libelle : "Coût tuteur",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_CTUSPECP2",
+        element : "donnee",
+        libelle : "Coût tuteur",
+        longueur : 20,
+        masquerLibelle : true,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_TOTALSP2",
+        element : "donnee",
+        libelle : "Total",
+        longueur : 20,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_TPECSP2",
+        element : "donnee",
+        libelle : "Total",
+        longueur : 20,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_SVP2",
+        element : "donnee",
+        libelle : "Subvention individuelle",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      } ],
+      element : "groupe",
+      libelle : "PLAN 2",
+      onglet : true
+    }, {
+      code : "DEM_FORM_PLAN_AFF_P3",
+      donnees : [ {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Affectation principale",
+        style : "FormTitre"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_PLANP3",
+        element : "donnee",
+        libelle : "Plan",
+        longueur : 255,
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_BUDGP3",
+        element : "donnee",
+        libelle : "Budget",
+        longueur : 255,
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_AFFBUDGP3",
+        element : "donnee",
+        libelle : "Affectation budgétaire",
+        longueur : 255,
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_VISP3",
+        element : "donnee",
+        libelle : "Mode de visualisation",
+        longueur : 255,
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_COUTPP3",
+        element : "donnee",
+        entier : 20,
+        libelle : "Coût pédagogique externe",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "N"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_DUREP3",
+        element : "donnee",
+        entier : 20,
+        libelle : "Durée du stage",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "N"
+      }, {
+        code : "WKF_200_DEM_FORM_JOURP3",
+        element : "donnee",
+        entier : 20,
+        libelle : "jours soit",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "N"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "heures",
+        style : "FDonneeG"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_TRAP3",
+        element : "donnee",
+        entier : 20,
+        libelle : "Dont pendant le temps de travail",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "N"
+      }, {
+        code : "WKF_200_DEM_FORM_HEUP3",
+        element : "donnee",
+        entier : 20,
+        libelle : "heures : ",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "N"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "% du temps de formation",
+        style : "FDonneeG"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_HTRP3",
+        element : "donnee",
+        entier : 20,
+        libelle : "Dont hors temps de travail",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "N"
+      }, {
+        code : "WKF_200_DEM_FORM_HHTRP3",
+        element : "donnee",
+        entier : 20,
+        libelle : "heures : ",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "N"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "% du temps de formation",
+        style : "FDonneeG"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_PCHP3",
+        element : "donnee",
+        entier : 20,
+        libelle : "Prise en charge",
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "N"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Montant",
+        style : "BoxLabel"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Montant PEC",
+        style : "BoxLabel"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_CTPP3",
+        element : "donnee",
+        entier : 20,
+        libelle : "Coût pédagogique externe",
+        saisie : "span",
+        style : "FDonneeG",
+        type : "N"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_COUTSP3",
+        element : "donnee",
+        entier : 20,
+        libelle : "Coût salarial",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "N"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_CSMP3",
+        element : "donnee",
+        libelle : "Coût salarial\t",
+        longueur : 20,
+        masquerLibelle : true,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_COUTTRP3",
+        element : "donnee",
+        libelle : "Coût transport\t",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_CTMP3",
+        element : "donnee",
+        libelle : "Coût transport",
+        longueur : 20,
+        masquerLibelle : true,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_HEBP3",
+        element : "donnee",
+        libelle : "Coût hébergement\t",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_CHMP3",
+        element : "donnee",
+        libelle : "Coût hébergement",
+        longueur : 20,
+        masquerLibelle : true,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_COUTTUP3",
+        element : "donnee",
+        libelle : "Coût tuteur",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_CTUMP3",
+        element : "donnee",
+        libelle : "Coût tuteur",
+        longueur : 20,
+        masquerLibelle : true,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_TOTALP3",
+        element : "donnee",
+        libelle : "Total",
+        longueur : 20,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_TPECP3",
+        element : "donnee",
+        libelle : "Total",
+        longueur : 20,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_SIP3",
+        element : "donnee",
+        libelle : "Subvention individuelle",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Affectation secondaire",
+        style : "FormTitre"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_AFBSP3",
+        element : "donnee",
+        libelle : "Affectation budgétaire",
+        longueur : 20,
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_COUTPSP3",
+        element : "donnee",
+        libelle : "Coût pédagogique externe",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_DURSP3",
+        element : "donnee",
+        libelle : "Durée du stage",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_JSP3",
+        element : "donnee",
+        libelle : "jours soit",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "heures",
+        style : "FDonneeG"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_TRASP3",
+        element : "donnee",
+        libelle : "Dont pendant le temps de travail",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_HEUSP3",
+        element : "donnee",
+        libelle : "heures :",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "% du temps de formation",
+        style : "FDonneeG"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_HTRSP3",
+        element : "donnee",
+        libelle : "Dont hors temps de travail",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_HHTRSP3",
+        element : "donnee",
+        libelle : "heures :",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "% du temps de formation",
+        style : "FDonneeG"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_PCHSP3",
+        element : "donnee",
+        libelle : "Prise en charge\t",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Montant",
+        style : "BoxLabel"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Montant PEC",
+        style : "BoxLabel"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_COUTP3",
+        element : "donnee",
+        libelle : "Coût pédagogique externe",
+        longueur : 20,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_CSSPEP3",
+        element : "donnee",
+        libelle : "Coût salarial",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_CSSP3",
+        element : "donnee",
+        libelle : "Coût salarial",
+        longueur : 20,
+        masquerLibelle : true,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_CTSP3",
+        element : "donnee",
+        libelle : "Coût transport",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_CTSPECP3",
+        element : "donnee",
+        libelle : "Coût transport",
+        longueur : 20,
+        masquerLibelle : true,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_CHSP3",
+        element : "donnee",
+        libelle : "Coût hébergement",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_CHSPECP3",
+        element : "donnee",
+        libelle : "Coût hébergement",
+        longueur : 20,
+        masquerLibelle : true,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_CTUSP3",
+        element : "donnee",
+        libelle : "Coût tuteur",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_CTUSPECP3",
+        element : "donnee",
+        libelle : "Coût tuteur",
+        longueur : 20,
+        masquerLibelle : true,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "WKF_200_DEM_FORM_TOTALSP3",
+        element : "donnee",
+        libelle : "Total",
+        longueur : 20,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_TPECSP3",
+        element : "donnee",
+        libelle : "Total",
+        longueur : 20,
+        masquerLibelle : true,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_SISP3",
+        element : "donnee",
+        libelle : "Subvention individuelle",
+        longueur : 20,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      } ],
+      element : "groupe",
+      libelle : "PLAN 3",
+      onglet : true
+    } ],
+    element : "groupe",
+    libelle : "Plan - Affectation"
+  },
+  libelle : "Plan - Affectation",
+  servicelet : "FormationDemandeWkf",
+  type : "W"
+}

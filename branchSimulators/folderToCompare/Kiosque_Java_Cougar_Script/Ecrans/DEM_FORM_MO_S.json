@@ -1,0 +1,140 @@
+{
+  code : "DEM_FORM_MO_S",
+  element : "ecran",
+  groupe : {
+    code : "DEM_FORM_MO_S_GRP",
+    donnees : [ {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Cette étape vous permet de choisir le mode de saisie utilisé  pour créer une demande de formation",
+      style : "FormTitreC"
+    }, {
+      code : "#SEP_ZONE",
+      element : "donnee"
+    }, {
+      affichage : "DEM_FORM_WRF_N",
+      code : "WKF_200_DEM_FORM_NOMI",
+      element : "donnee",
+      libelle : "Demande nominative",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      suffixe : "Demande nominative",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "A privilégier si vous ne connaissez pas encore les  salariés pour lesquels vous réalisez la demande",
+      style : "FDonneeG"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "de formation. Vous pourrez par la suite associer les collaborateurs.",
+      style : "FDonneeG"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      affichage : "DEM_FORM_WRF_NN",
+      code : "WKF_200_DEM_FORM_NNOMI",
+      element : "donnee",
+      libelle : "Demande nom nominative",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      suffixe : "Demande nom nominative",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "A privilégier si vous ne connaissez pas encore les  salariés pour lesquels vous réalisez la demande ",
+      style : "FDonneeG"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "de formation. Vous pourrez par la suite associer les collaborateurs",
+      style : "FDonneeG"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      affichage : "DEM_FORM_WRF_MN",
+      code : "WKF_200_DEM_FORM_MNOMI",
+      element : "donnee",
+      libelle : "Demande modèle nominative",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      suffixe : "Demande modèle nominative",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Vous connaissez un salarié pour lequel vous avez créé la même  demande.",
+      style : "FDonneeG"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Vous avez déjà créé la même demande et connaissez le libellé de  la formation.",
+      style : "FDonneeG"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Vous pourrez ainsi reprendre la trame et l'associer à un ou plusieurs collaborateurs.",
+      style : "FDonneeG"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      affichage : "DEM_FORM_WRF_MNN",
+      code : "WKF_200_DEM_FORM_MNNOMI",
+      element : "donnee",
+      libelle : "Demande modèle non nominative",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      suffixe : "Demande modèle non nominative",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Vous avez déjà créé la même demande et connaissez le libellé  de la formation.",
+      style : "FDonneeG"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Vous pourrez ainsi reprendre la trame et définir le nombre de  collaborateurs.",
+      style : "FDonneeG"
+    } ],
+    element : "groupe",
+    libelle : "Choisir son mode de saisie"
+  },
+  libelle : "Choisir son mode de saisie",
+  servicelet : "FormationDemandeWkf",
+  type : "W"
+}

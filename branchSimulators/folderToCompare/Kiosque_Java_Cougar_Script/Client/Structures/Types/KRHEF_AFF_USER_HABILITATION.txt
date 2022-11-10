@@ -1,0 +1,20 @@
+##
+TAG_CHARSET=@€ιθη
+##
+KRHEF_AFF_USER_HABILITATION
+=SQL=
+create or replace TYPE krhef_aff_user_habilitation FORCE AS OBJECT (
+    matricule           NUMBER,
+    matricule_paie      VARCHAR2(50),
+    np                  VARCHAR2(256),
+    est_utilisateur     VARCHAR2(256),
+    est_responsable     VARCHAR2(256),
+    est_expert          VARCHAR2(256),
+    est_gestionnaire    VARCHAR2(256),
+    est_directeur_rh    VARCHAR2(256),
+    est_responsable_rh  VARCHAR2(256),
+    est_acteur_indirect VARCHAR2(256),
+    est_expert_securite VARCHAR2(256),
+    est_utilisateur_all VARCHAR2(256),
+    est_responsable_all VARCHAR2(256)
+)

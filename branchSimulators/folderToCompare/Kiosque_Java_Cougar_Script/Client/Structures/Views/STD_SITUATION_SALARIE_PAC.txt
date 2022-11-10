@@ -1,0 +1,50 @@
+##
+TAG_CHARSET=@€éèç
+##
+STD_SITUATION_SALARIE_PAC
+=SQL=
+CREATE OR REPLACE FORCE VIEW  STD_SITUATION_SALARIE_PAC (NUMPAC, PACMAT, MATRICULE, NOM, PRENOM, TITRE, PRIORITE_SITUATION, INTITULE1, VALEUR1, INTITULE2, VALEUR2, INTITULE3, VALEUR3, INTITULE4, VALEUR4, INTITULE5, VALEUR5, INTITULE6, VALEUR6, INTITULE7, VALEUR7, INTITULE8, VALEUR8, INTITULE9, VALEUR9, INTITULE10, VALEUR10, INTITULE11, VALEUR11, INTITULE12, VALEUR12, INTITULE13, VALEUR13)
+AS
+  (SELECT numpac       AS numpac,
+    pacmat             AS pacmat,
+    matric             AS matricule,
+    nom                AS nom,
+    prenom             AS prenom,
+    titre              AS titre,
+    priorite_situation AS priorite_situation,
+    'Etablissement' AS intitule1,
+    NULL       AS valeur1,
+    'N° SS' AS intitule2,
+    SEXESS
+    ||ANNESS
+    ||MOISSS
+    ||DEPTSS
+    ||SECTSS
+    ||ORDRSS
+    ||CLCTSS                                            AS valeur2,
+    'Date de naissance'                                 AS intitule3,
+    TO_CHAR (TO_DATE (dsnai, 'yyyymmdd'), 'dd/mm/yyyy') AS valeur3,
+    'Date d''ancienneté groupe'                         AS intitule4,
+    TO_CHAR (TO_DATE (dsagp, 'yyyymmdd'), 'dd/mm/yyyy') AS valeur4,
+    'Date d''ancienneté'                                AS intitule5,
+    TO_CHAR (TO_DATE (dsato, 'yyyymmdd'), 'dd/mm/yyyy') AS valeur5,
+    'Date de début de contrat'                          AS intitule6,
+    TO_CHAR (TO_DATE (dsdcn, 'yyyymmdd'), 'dd/mm/yyyy') AS valeur6,
+    'Date de fin de contrat'                            AS intitule7,
+    TO_CHAR (TO_DATE (dsfcn, 'yyyymmdd'), 'dd/mm/yyyy') AS valeur7,
+    'Nature de contrat'                                 AS intitule8,
+	NULL                 AS valeur8,
+	'Type de contrat' AS intitule9,
+	NULL        AS valeur9,
+
+    'Emploi' AS intitule10,
+    NULL                           AS valeur10,
+    'CPN'                        AS intitule11,
+    CODCPN                       AS valeur11,
+    'Affectation administrative' AS intitule12,
+    NULL                       AS valeur12,
+    'Taux d''emploi'        AS intitule13,
+    TXACT
+    ||'%' AS valeur13
+  FROM SECUPACMAT
+  )

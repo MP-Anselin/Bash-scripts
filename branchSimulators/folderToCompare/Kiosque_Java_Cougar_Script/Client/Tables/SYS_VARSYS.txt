@@ -1,0 +1,37 @@
+##
+SYS_VARSYS
+=SQL IFNOTEXIST=SYS_VARSYS=
+CREATE TABLE SYS_VARSYS ( MODULE VARCHAR2(3) NOT NULL ENABLE, CODVAR VARCHAR2(50) NOT NULL ENABLE, VALVAR VARCHAR2(4000), TYPVAR VARCHAR2(10), DESCRIPTION VARCHAR2(2000), PRIMARY KEY (MODULE, CODVAR) ) 
+##
+SYS_VARSYS
+==
+DELETE FROM SYS_VARSYS WHERE module='SYS' and codvar='TGE'
+'SYS','TGE','true','Booléen','TRUE : si on gère les écrans dans le cadre d''un client Zadig TGE, FALSE sinon.'
+##
+SYS_VARSYS
+==
+DELETE FROM SYS_VARSYS WHERE MODULE = 'STD' AND CODVAR = 'DESK_NOM_CLIENT'
+'STD','DESK_NOM_CLIENT','ADP','Texte','A la place du logo de l''entreprise, il est possible d''afficher le nom du client au format texte'
+##
+sys_varsys
+==
+UPDATE SYS_VARSYS SET DESCRIPTION = 'Conditionne l''affichage de la favicon (true = afficher, false = ne pas afficher).' WHERE CODVAR = 'DESK_SHOW_FAVICONE' AND MODULE = 'STD'
+##
+sys_varsys
+==
+DELETE FROM SYS_VARSYS WHERE CODVAR = 'DESK_FAVICON' AND MODULE = 'STD'
+'STD','DESK_FAVICON','','Texte','Libellé de l''image du favicon (dans bibliothèque d''image et de documents). Ne pas saisir le nom du fichier.'
+##
+sys_varsys
+==
+DELETE FROM SYS_VARSYS WHERE CODVAR = 'DESK_LOGO_ENTREPRISE' AND MODULE = 'STD'
+'STD','DESK_LOGO_ENTREPRISE','','Texte','Libellé de l''image du logo d''entreprise (dans bibliothèque d''image et de documents). Ne pas saisir le nom du fichier.'
+##
+sys_varsys
+==
+DELETE FROM SYS_VARSYS WHERE CODVAR = 'LIBELLE_SALARIE_PRESENT' AND MODULE = 'STD'
+'STD','LIBELLE_SALARIE_PRESENT','Présent(e)','Texte','Mot pour qualifier une personne présente à l''effectif. On retrouve ce terme dans les badges du bandeau. Par défaut ( Présent(e) ).'
+##
+SYS_VARSYS
+==
+call ADM_ADD_OR_UPDATE_VARSYS ('STD', 'PUBLICA_LOGO', '','Texte', 'URL d''accès au logo affiché sur le bureau à droite du logo ADP. A noter que la sécurité ADP bloque l''accès à certaines URL sur le Web.')

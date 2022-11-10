@@ -1,0 +1,111 @@
+##
+PKG_LIBELLE_LOCAL
+=SQL=
+create or replace package PKG_LIBELLE_LOCAL
+as
+
+    /**
+     * Codes libelles
+     */
+    -- Dossier Individuel Talent: Delai de mobilite
+    CODE_LIBELLE_DI_TAL_DEL_MOB  constant CHAR(14) := 'DI_TAL_DEL_MOB';
+    -- Dossier Individuel Talent: Type de mobilite
+    CODE_LIBELLE_DI_TAL_TYP_MOB  constant CHAR(14) := 'DI_TAL_TYP_MOB';
+    -- Dossier Individuel Talent: Delai pour la proposition de remplacement
+    CODE_LIBELLE_DI_TAL_PRO_REM  constant CHAR(14) := 'DI_TAL_PRO_REM';
+    -- Dossier Individuel Talent: Types d'actions
+    CODE_LIBELLE_DI_TAL_TYP_ACT  constant CHAR(14) := 'DI_TAL_TYP_ACT';
+    -- Dossier Individuel Talent: Types d'objectifs
+    CODE_LIBELLE_DI_TAL_TYP_OBJ  constant CHAR(14) := 'DI_TAL_TYP_OBJ';
+    -- Dossier Individuel Talent: Valeurs des axes des N Grid Box
+    CODE_LIBELLE_DI_TAL_AXE_NGB  constant CHAR(14) := 'DI_TAL_AXE_NGB';
+    -- Dossier Individuel Talent: Valeurs des groupes des N Grid Box
+    CODE_LIBELLE_DI_TAL_GRP_NGB  constant CHAR(14) := 'DI_TAL_GRP_NGB';
+
+    function get_id (
+        p_code_libelle  in T_LIBELLE_LOCAL.code_libelle%type,
+        p_libelle_fr_fr in T_LIBELLE_LOCAL.libelle_fr_fr%type,
+        p_libelle_en_us in T_LIBELLE_LOCAL.libelle_en_us%type,
+        p_libelle_de_ch in T_LIBELLE_LOCAL.libelle_de_ch%type
+    )
+    return T_LIBELLE_LOCAL.ID%TYPE;
+
+end PKG_LIBELLE_LOCAL
+##
+PKG_LIBELLE_LOCAL
+=SQL=
+create or replace package body PKG_LIBELLE_LOCAL as
+
+    /**
+     * Cree un libelle
+     */
+    function create_libelle (
+        p_code_libelle  in T_LIBELLE_LOCAL.CODE_LIBELLE%TYPE,
+        p_libelle_fr_fr in T_LIBELLE_LOCAL.LIBELLE_FR_FR%TYPE,
+        p_libelle_en_us in T_LIBELLE_LOCAL.LIBELLE_EN_US%TYPE,
+        p_libelle_de_ch in T_LIBELLE_LOCAL.LIBELLE_DE_CH%TYPE
+    )
+    return T_LIBELLE_LOCAL.ID%TYPE
+    is
+    begin
+        insert into T_LIBELLE_LOCAL (
+             ID,
+             CODE_LIBELLE,
+             LIBELLE_FR_FR,
+             LIBELLE_EN_US,
+             LIBELLE_DE_CH,
+             HASH_LIBELLE_FR_FR,
+             HASH_LIBELLE_EN_US,
+             HASH_LIBELLE_DE_CH
+         )
+        values (
+            s_libelle_local.nextval,
+            p_code_libelle,
+            p_libelle_fr_fr,
+            p_libelle_en_us,
+            p_libelle_de_ch,
+            STANDARD_HASH(p_libelle_fr_fr, 'MD5'),
+            STANDARD_HASH(p_libelle_en_us, 'MD5'),
+            STANDARD_HASH(p_libelle_de_ch, 'MD5')
+        );
+
+        return s_libelle_local.currval;
+    end;
+
+    /**
+     * Cree un libelle s'il n'existe pas deja et fournit son ID
+     */
+    function get_id (
+        p_code_libelle  in T_LIBELLE_LOCAL.CODE_LIBELLE%TYPE,
+        p_libelle_fr_fr in T_LIBELLE_LOCAL.LIBELLE_FR_FR%TYPE,
+        p_libelle_en_us in T_LIBELLE_LOCAL.LIBELLE_EN_US%TYPE,
+        p_libelle_de_ch in T_LIBELLE_LOCAL.LIBELLE_DE_CH%TYPE
+    )
+    return T_LIBELLE_LOCAL.ID%TYPE
+    is
+        v_id T_LIBELLE_LOCAL.ID%TYPE;
+    begin
+	    -- On ne cree pas d'entree avec un libelle null
+	    if p_libelle_fr_fr is null and p_libelle_en_us is null  and p_libelle_de_ch is null then
+	       return null;
+	    end if;
+
+        select ID INTO v_id
+        from T_LIBELLE_LOCAL
+        where CODE_LIBELLE = p_code_libelle
+          and HASH_LIBELLE_FR_FR = STANDARD_HASH(p_libelle_fr_fr, 'MD5')
+          and HASH_LIBELLE_EN_US = STANDARD_HASH(p_libelle_en_us, 'MD5')
+          and HASH_LIBELLE_DE_CH = STANDARD_HASH(p_libelle_de_ch, 'MD5');
+
+        return v_id;
+
+    exception when others then
+        return create_libelle(
+            p_code_libelle,
+            p_libelle_fr_fr,
+            p_libelle_en_us,
+            p_libelle_de_ch
+        );
+    end;
+
+end PKG_LIBELLE_LOCAL

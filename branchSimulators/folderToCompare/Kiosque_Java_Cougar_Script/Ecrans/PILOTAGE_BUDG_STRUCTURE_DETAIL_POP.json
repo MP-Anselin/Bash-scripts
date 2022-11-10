@@ -1,0 +1,127 @@
+{
+  code : "PILOTAGE_BUDG_STRUCTURE_DETAIL_POP",
+  element : "ecran",
+  groupe : {
+    code : "PILOTAGE_STRUCTURE_BUDG_DETAIL_GRP",
+    donnees : [ {
+      code : "ID_AFF_BDG_DETAIL",
+      element : "donnee",
+      libelle : "ID STRUCTURE",
+      longueur : 128,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "STRUCTURE_BUDG",
+      element : "donnee",
+      libelle : "Structure budgétaire",
+      longueur : 128,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "CODE_BUDG",
+      element : "donnee",
+      libelle : "Code budgétaire",
+      longueur : 128,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "TYPE_BUDG",
+      element : "donnee",
+      libelle : "Type",
+      longueur : 128,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "DISPOSITIF_BUDG",
+      element : "donnee",
+      libelle : "Dispositif",
+      longueur : 128,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "ANNEE_BUDG",
+      element : "donnee",
+      libelle : "Année",
+      longueur : 128,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "ASSOCIE_DEMANDE_BUDG",
+      decimal : 2,
+      element : "donnee",
+      entier : 22,
+      libelle : "Coût total des formations de la structure budgétaire",
+      negatif : true,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "9"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "MONTANT_BUDG",
+      decimal : 2,
+      element : "donnee",
+      entier : 22,
+      libelle : "Montant de la structure budgétaire",
+      negatif : true,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "9"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "SOLDE_BUDG",
+      decimal : 2,
+      element : "donnee",
+      entier : 22,
+      libelle : "Solde total de la structure budgétaire",
+      negatif : true,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "9"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "FORM_STRUCTURE_GRP",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        requete : "PILOTAGE_BUDG_10"
+      } ],
+      element : "groupe",
+      libelle : "Liste des formations associées à une structure"
+    } ],
+    element : "groupe",
+    libelle : "Liste des demandes de formations associées"
+  },
+  libelle : "Liste des demandes de formations associées",
+  servicelet : "FormationPilotageBudgetsJsonServlet",
+  type : "P"
+}

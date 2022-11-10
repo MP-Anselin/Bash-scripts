@@ -1,0 +1,136 @@
+{
+  code : "PILOTAGE_BUDG_RESP_POP_M",
+  element : "ecran",
+  groupe : {
+    code : "PILOTAGE_BUDG_RESP_POP_M",
+    donnees : [ {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Budget de formation",
+      style : "FormTitre"
+    }, {
+      code : "PILOTAGE_BUDG_BDG",
+      element : "donnee",
+      libelle : "Budget de formation",
+      longueur : 256,
+      masquerLibelle : true,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Code budgétaire",
+      style : "FormTitre"
+    }, {
+      code : "PILOTAGE_BUDG_CODE",
+      element : "donnee",
+      libelle : "code",
+      longueur : 256,
+      masquerLibelle : true,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Année",
+      style : "FormTitre"
+    }, {
+      code : "PILOTAGE_BUDG_ANN",
+      element : "donnee",
+      libelle : "Année",
+      longueur : 256,
+      masquerLibelle : true,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Coût total des formations du budget",
+      style : "FormTitre"
+    }, {
+      code : "PILOTAGE_BUDG_COUT",
+      decimal : 2,
+      element : "donnee",
+      entier : 22,
+      libelle : "Coût total",
+      masquerLibelle : true,
+      negatif : true,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "9",
+      zero : true
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Montant du budget",
+      style : "FormTitre"
+    }, {
+      code : "PILOTAGE_BUDG_MONTANT",
+      decimal : 2,
+      element : "donnee",
+      entier : 22,
+      libelle : "Montant",
+      masquerLibelle : true,
+      negatif : true,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "9",
+      zero : true
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Solde total du budget",
+      style : "FormTitre"
+    }, {
+      code : "PILOTAGE_BUDG_SOLDE",
+      decimal : 2,
+      element : "donnee",
+      entier : 22,
+      libelle : "Solde",
+      masquerLibelle : true,
+      negatif : true,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "9",
+      zero : true
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "BUDG_FORM_IDBUDGET",
+      element : "donnee",
+      libelle : "Code budgétaire",
+      longueur : 256,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#TABLEAU",
+      element : "donnee",
+      requete : "PILOTAGE_BUDG_11"
+    } ],
+    element : "groupe",
+    libelle : "Responsables formation"
+  },
+  libelle : "Responsables",
+  servicelet : "FormationPilotageBudgetsJsonServlet",
+  type : "P"
+}

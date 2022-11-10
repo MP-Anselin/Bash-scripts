@@ -1,0 +1,70 @@
+{
+  boutons : "INT",
+  code : "PILOTAGE_BUDG",
+  element : "ecran",
+  groupe : {
+    code : "PILOTAGE_BUDG",
+    donnees : [ {
+      code : "PILOTAGE_BUDG_FORM",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        pageModif : "PILOTAGE_BUDG_FORM_POP",
+        requete : "PILOTAGE_BUDG_1"
+      } ],
+      element : "groupe",
+      libelle : "Budgets formation",
+      onglet : true
+    }, {
+      code : "PILOTAGE_BUDG_FORM_HIST",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        pageModif : "PILOTAGE_BUDG_FORM_POP",
+        requete : "PILOTAGE_BUDG_2"
+      } ],
+      element : "groupe",
+      libelle : "Budgets formation historisés",
+      onglet : true
+    }, {
+      code : "PILOTAGE_BUDG_RESP",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        pageAjout : "PILOTAGE_BUDG_RESP_POP",
+        pageModif : "PILOTAGE_BUDG_FORM_POP",
+        requete : "PILOTAGE_BUDG_3"
+      } ],
+      element : "groupe",
+      libelle : "Budgets responsables",
+      onglet : true
+    }, {
+      code : "PILOTAGE_STR_BUDG",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        pageModif : "PILOTAGE_BUDG_STRUCTURE_POP",
+        requete : "PILOTAGE_BUDG_4"
+      } ],
+      element : "groupe",
+      libelle : "Budgets structures budgétaires",
+      onglet : true
+    }, {
+      code : "PILOTAGE_STR_BUDG_HISTO",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        pageModif : "PILOTAGE_BUDG_STRUCTURE_POP",
+        requete : "PILOTAGE_BUDG_5"
+      } ],
+      element : "groupe",
+      libelle : "Budgets structures budgétaires historisées",
+      onglet : true
+    } ],
+    element : "groupe",
+    libelle : "Pilotage des budgets"
+  },
+  libelle : "Pilotage des budgets",
+  servicelet : "FormationPilotageBudgetsJsonServlet",
+  type : "U"
+}

@@ -1,0 +1,200 @@
+##
+V_V5_KRHEF_FORM_MONTANT_DUREE
+=SQL=
+CREATE OR REPLACE VIEW V_V5_KRHEF_FORM_MONTANT_DUREE ("ID_INSCRIPTION","ID_INSCRIPTION_REF","NUM_SEQ","ORDRE_AFF_BDG","ORDRE_PLAN","ID_AFF_BDG_DETAIL","FROM_FINANCEMENT","IMPUTABILITE","COUT_FORMATEUR","FONCTIONNEMENT_PEDAGO","FRAIS_PERSO_FORMATEUR_INT","FRAIS_PERSO_FORMATEUR_EXT","HEBERGEMENT_RESTAURATION","LOCAUX_ENTRETIEN","MAINTIEN_SALAIRE_STAGIAIRE","MATERIEL","ORGANISATION_ADMINISTRATIVE","RESTANT_EMPLOYEUR","SALAIRE_HTT","TRANSPORT","TUTORAT","MONTANT_PRISE_EN_CHARGE","MONTANT_PEC_REALISE","PEC_COUT_FORMATEUR","PEC_FONCTIONNEMENT_PEDAGO","PEC_FRAIS_PERSO_FORMATEUR_INT","PEC_FRAIS_PERSO_FORMATEUR_EXT","PEC_HEBERGEMENT_RESTAURATION","PEC_LOCAUX_ENTRETIEN","PEC_MAINTIEN_SALAIRE_STAGIAIRE","PEC_MATERIEL","PEC_ORGANISATION_ADMIN","PEC_RESTANT_EMPLOYEUR","PEC_SALAIRE_HTT","PEC_TUTORAT","PEC_TRANSPORT","PREV_NBRE_HEURES","PREV_NBRE_JOURS","PREV_HRS_TT","PREV_HRS_HTT","PREV_HRS_DIF_TT","PREV_HRS_DIF_HTT","REALISE_NBRE_HEURES","REALISE_NBRE_JOURS","REALISE_HRS_TT","REALISE_HRS_HTT","REALISE_HRS_DIF_TT","REALISE_HRS_DIF_HTT","NVL_REEL_PREV_NBRHEURES","NVL_REEL_PREV_NBRJOURS","NVL_REEL_PREV_NBRTT","NVL_REEL_PREV_NBRHTT") AS 
+select
+    ins.ID_INSCRIPTION,
+    ins.ID_INSCRIPTION_REF,
+    ins.NUM_SEQ,
+    cout.ORDRE_AFF_BDG,
+    cout.ORDRE_PLAN,
+    cout.ID_AFF_BDG_DETAIL,
+    0 as FROM_FINANCEMENT,
+    cout.IMPUTABILITE,
+    -- Couts
+    nvl(cout.COUT_FORMATEUR, 0)              as COUT_FORMATEUR,
+    nvl(cout.FONCTIONNEMENT_PEDAGO, 0)       as FONCTIONNEMENT_PEDAGO,
+    nvl(cout.FRAIS_PERSO_FORMATEUR_INT, 0)   as FRAIS_PERSO_FORMATEUR_INT,
+    nvl(cout.FRAIS_PERSO_FORMATEUR_EXT, 0)   as FRAIS_PERSO_FORMATEUR_EXT,
+    nvl(cout.HEBERGEMENT_RESTAURATION, 0)    as HEBERGEMENT_RESTAURATION,
+    nvl(cout.LOCAUX_ENTRETIEN, 0)            as LOCAUX_ENTRETIEN,
+    nvl(cout.MAINTIEN_SALAIRE_STAGIAIRE, 0)  as MAINTIEN_SALAIRE_STAGIAIRE,
+    nvl(cout.MATERIEL, 0)                    as MATERIEL,
+    nvl(cout.ORGANISATION_ADMINISTRATIVE, 0) as ORGANISATION_ADMINISTRATIVE,
+    nvl(cout.RESTANT_EMPLOYEUR, 0)           as RESTANT_EMPLOYEUR,
+    nvl(cout.SALAIRE_HTT, 0)                 as SALAIRE_HTT,
+    nvl(cout.TRANSPORT, 0)                   as TRANSPORT,
+    nvl(cout.TUTORAT, 0)                     as TUTORAT,
+    -- Montant de prise en charge total
+    nvl(cout.MONTANT_PRISE_EN_CHARGE, 0) as MONTANT_PRISE_EN_CHARGE,
+    nvl(cout.PEC_TRANSPORT, 0)
+    + nvl(cout.PEC_MAINTIEN_SALAIRE_STAGIAIRE, 0)
+    + nvl(cout.PEC_TUTORAT, 0)
+    + nvl(cout.PEC_SALAIRE_HTT, 0)
+    + nvl(cout.PEC_ORGANISATION_ADMIN, 0)
+    + nvl(cout.PEC_RESTANT_EMPLOYEUR, 0)
+    + nvl(cout.PEC_LOCAUX_ENTRETIEN, 0)
+    + nvl(cout.PEC_FRAIS_PERSO_FORMATEUR_INT, 0)
+    + nvl(cout.PEC_FRAIS_PERSO_FORMATEUR_EXT, 0)
+    + nvl(cout.PEC_FONCTIONNEMENT_PEDAGO, 0)
+    + nvl(cout.PEC_HEBERGEMENT_RESTAURATION, 0)
+    + nvl(cout.PEC_MATERIEL, 0)
+    + nvl(cout.PEC_COUT_FORMATEUR, 0)
+    as MONTANT_PEC_REALISE,
+    -- PEC par cout
+    nvl(cout.PEC_COUT_FORMATEUR, 0)             as PEC_COUT_FORMATEUR,
+    nvl(cout.PEC_FONCTIONNEMENT_PEDAGO, 0)      as PEC_FONCTIONNEMENT_PEDAGO,
+    nvl(cout.PEC_FRAIS_PERSO_FORMATEUR_INT, 0)  as PEC_FRAIS_PERSO_FORMATEUR_INT,
+    nvl(cout.PEC_FRAIS_PERSO_FORMATEUR_EXT, 0)  as PEC_FRAIS_PERSO_FORMATEUR_EXT,
+    nvl(cout.PEC_HEBERGEMENT_RESTAURATION, 0)   as PEC_HEBERGEMENT_RESTAURATION,
+    nvl(cout.PEC_LOCAUX_ENTRETIEN, 0)           as PEC_LOCAUX_ENTRETIEN,
+    nvl(cout.PEC_MAINTIEN_SALAIRE_STAGIAIRE, 0) as PEC_MAINTIEN_SALAIRE_STAGIAIRE,
+    nvl(cout.PEC_MATERIEL, 0)                   as PEC_MATERIEL,
+    nvl(cout.PEC_ORGANISATION_ADMIN, 0)         as PEC_ORGANISATION_ADMIN,
+    nvl(cout.PEC_RESTANT_EMPLOYEUR, 0)          as PEC_RESTANT_EMPLOYEUR,
+    nvl(cout.PEC_SALAIRE_HTT, 0)                as PEC_SALAIRE_HTT,
+    nvl(cout.PEC_TUTORAT, 0)                    as PEC_TUTORAT,
+    nvl(cout.PEC_TRANSPORT, 0)                  as PEC_TRANSPORT,
+    -- Durées
+    nvl(cout.PREV_NBRE_HEURES, 0)    as PREV_NBRE_HEURES,
+    nvl(cout.PREV_NBRE_JOURS, 0)     as PREV_NBRE_JOURS,
+    nvl(cout.PREV_HRS_TT, 0)         as PREV_HRS_TT,
+    nvl(cout.PREV_HRS_HTT, 0)        as PREV_HRS_HTT,
+    nvl(cout.PREV_HRS_DIF_TT, 0)     as PREV_HRS_DIF_TT,
+    nvl(cout.PREV_HRS_DIF_HTT, 0)    as PREV_HRS_DIF_HTT,
+    nvl(cout.REALISE_HRS_HTT
+        + cout.REALISE_HRS_TT, 0)    as REALISE_NBRE_HEURES,
+    nvl(cout.REALISE_NBRE_JOURS, 0)  as REALISE_NBRE_JOURS,
+    nvl(cout.REALISE_HRS_TT, 0)      as REALISE_HRS_TT,
+    nvl(cout.REALISE_HRS_HTT, 0)     as REALISE_HRS_HTT,
+    nvl(cout.REALISE_HRS_DIF_TT, 0)  as REALISE_HRS_DIF_TT,
+    nvl(cout.REALISE_HRS_DIF_HTT, 0) as REALISE_HRS_DIF_HTT,
+    -- nvl(réalisé, prévu) utilisé par le tdb des plans
+    nvl(nvl(cout.REALISE_HRS_HTT + cout.REALISE_HRS_TT,
+            cout.PREV_NBRE_HEURES),
+        0)                                                       as NVL_REEL_PREV_NBRHEURES,
+    nvl(nvl(cout.REALISE_NBRE_JOURS, cout.PREV_NBRE_JOURS), 0)   as NVL_REEL_PREV_NBRJOURS,
+    nvl(nvl(cout.REALISE_HRS_TT, cout.PREV_HRS_TT), 0)           as NVL_REEL_PREV_NBRTT,
+    nvl(nvl(cout.REALISE_HRS_HTT, cout.PREV_HRS_HTT), 0)         as NVL_REEL_PREV_NBRHTT
+  from
+    T_V5_KRHEF_FORMATION_COUT cout,
+    T_V5_KRHEF_FORMATION_INSCR ins
+   where cout.ID_INSCRIPTION = ins.ID_INSCRIPTION
+     and cout.NUM_SEQ = ins.NUM_SEQ
+     and cout.ALL_FORMATION = 0
+     and cout.NUM_SEQ != 0
+  --
+union
+  --
+  -- Financements de types "financement" et "remboursement"
+  --
+  select
+    ins_seq.ID_INSCRIPTION_SEQ as ID_INSCRIPTION,
+    ins_seq.ID_INSCRIPTION as ID_INSCRIPTION_REF,
+    ins_seq.NUM_SEQ,
+    cout.ORDRE_AFF_BDG,
+    cout.ORDRE_PLAN,
+    -- S'il s'agit d'un financement, on l'associe à l'affectation budgétaire d'ordre 1 quelque soit son type
+    -- et son dispositif
+    -- (les filtres dans les tdb des plans et synthèses de la déductibilité s'appuient sur l'affectation budgétaire
+    -- collaborateur et non pas sur l'affectation budgétaire du financement)
+    cout.ID_AFF_BDG_DETAIL as ID_AFF_BDG_DETAIL,
+    max(1) as FROM_FINANCEMENT,
+    cout.IMPUTABILITE,
+    -- Couts
+    sum(case when fc.TYPE_FINANCEMENT = 'F' then fc.PEC_COUT_FORMATEUR else 0 end)             as COUT_FORMATEUR,
+    sum(case when fc.TYPE_FINANCEMENT = 'F' then fc.PEC_FONCTIONNEMENT_PEDAGO else 0 end)      as FONCTIONNEMENT_PEDAGO,
+    sum(case when fc.TYPE_FINANCEMENT = 'F' then fc.PEC_FRAIS_PERSO_FORMATEUR_INT else 0 end)  as FRAIS_PERSO_FORMATEUR_INT,
+    sum(case when fc.TYPE_FINANCEMENT = 'F' then fc.PEC_FRAIS_PERSO_FORMATEUR_EXT else 0 end)  as FRAIS_PERSO_FORMATEUR_EXT,
+    sum(case when fc.TYPE_FINANCEMENT = 'F' then fc.PEC_HEBERGEMENT_RESTAURATION else 0 end)   as HEBERGEMENT_RESTAURATION,
+    sum(case when fc.TYPE_FINANCEMENT = 'F' then fc.PEC_LOCAUX_ENTRETIEN else 0 end)           as LOCAUX_ENTRETIEN,
+    sum(case when fc.TYPE_FINANCEMENT = 'F' then fc.PEC_MAINTIEN_SALAIRE_STAGIAIRE else 0 end) as MAINTIEN_SALAIRE_STAGIAIRE,
+    sum(case when fc.TYPE_FINANCEMENT = 'F' then fc.PEC_MATERIEL else 0 end)                   as MATERIEL,
+    sum(case when fc.TYPE_FINANCEMENT = 'F' then fc.PEC_ORGANISATION_ADMIN else 0 end)         as ORGANISATION_ADMINISTRATIVE,
+    sum(case when fc.TYPE_FINANCEMENT = 'F' then fc.PEC_RESTANT_EMPLOYEUR else 0 end)          as RESTANT_EMPLOYEUR,
+    sum(case when fc.TYPE_FINANCEMENT = 'F' then fc.PEC_SALAIRE_HTT else 0 end)                as SALAIRE_HTT,
+    sum(case when fc.TYPE_FINANCEMENT = 'F' then fc.PEC_TRANSPORT else 0 end)                  as TRANSPORT,
+    sum(case when fc.TYPE_FINANCEMENT = 'F' then fc.PEC_TUTORAT else 0 end)                    as TUTORAT,
+    -- Montant de prise en charge total
+    sum(case when fc.TYPE_FINANCEMENT = 'F' then 0
+    else fc.PEC_TRANSPORT
+       + fc.PEC_MAINTIEN_SALAIRE_STAGIAIRE
+       + fc.PEC_TUTORAT
+       + fc.PEC_SALAIRE_HTT
+       + fc.PEC_ORGANISATION_ADMIN
+       + fc.PEC_RESTANT_EMPLOYEUR
+       + fc.PEC_LOCAUX_ENTRETIEN
+       + fc.PEC_FRAIS_PERSO_FORMATEUR_INT
+       + fc.PEC_FRAIS_PERSO_FORMATEUR_EXT
+       + fc.PEC_FONCTIONNEMENT_PEDAGO
+       + fc.PEC_HEBERGEMENT_RESTAURATION
+       + fc.PEC_MATERIEL
+       + fc.PEC_COUT_FORMATEUR end) as MONTANT_PRISE_EN_CHARGE,
+    sum(case when fc.TYPE_FINANCEMENT = 'F' then 0
+    else fc.PEC_TRANSPORT
+       + fc.PEC_MAINTIEN_SALAIRE_STAGIAIRE
+       + fc.PEC_TUTORAT
+       + fc.PEC_SALAIRE_HTT
+       + fc.PEC_ORGANISATION_ADMIN
+       + fc.PEC_RESTANT_EMPLOYEUR
+       + fc.PEC_LOCAUX_ENTRETIEN
+       + fc.PEC_FRAIS_PERSO_FORMATEUR_INT
+       + fc.PEC_FRAIS_PERSO_FORMATEUR_EXT
+       + fc.PEC_FONCTIONNEMENT_PEDAGO
+       + fc.PEC_HEBERGEMENT_RESTAURATION
+       + fc.PEC_MATERIEL
+       + fc.PEC_COUT_FORMATEUR end) as MONTANT_PEC_REALISE,
+    -- PEC par cout
+   sum(case when fc.TYPE_FINANCEMENT = 'R' then fc.PEC_COUT_FORMATEUR else 0 end)             as PEC_COUT_FORMATEUR,
+   sum(case when fc.TYPE_FINANCEMENT = 'R' then fc.PEC_FONCTIONNEMENT_PEDAGO else 0 end)      as PEC_FONCTIONNEMENT_PEDAGO,
+   sum(case when fc.TYPE_FINANCEMENT = 'R' then fc.PEC_FRAIS_PERSO_FORMATEUR_INT else 0 end)  as PEC_FRAIS_PERSO_FORMATEUR_INT,
+   sum(case when fc.TYPE_FINANCEMENT = 'R' then fc.PEC_FRAIS_PERSO_FORMATEUR_EXT else 0 end)  as PEC_FRAIS_PERSO_FORMATEUR_EXT,
+   sum(case when fc.TYPE_FINANCEMENT = 'R' then fc.PEC_HEBERGEMENT_RESTAURATION else 0 end)   as PEC_HEBERGEMENT_RESTAURATION,
+   sum(case when fc.TYPE_FINANCEMENT = 'R' then fc.PEC_LOCAUX_ENTRETIEN else 0 end)           as PEC_LOCAUX_ENTRETIEN,
+   sum(case when fc.TYPE_FINANCEMENT = 'R' then fc.PEC_MAINTIEN_SALAIRE_STAGIAIRE else 0 end) as PEC_MAINTIEN_SALAIRE_STAGIAIRE,
+   sum(case when fc.TYPE_FINANCEMENT = 'R' then fc.PEC_MATERIEL else 0 end)                   as PEC_MATERIEL,
+   sum(case when fc.TYPE_FINANCEMENT = 'R' then fc.PEC_ORGANISATION_ADMIN else 0 end)         as PEC_ORGANISATION_ADMIN,
+   sum(case when fc.TYPE_FINANCEMENT = 'R' then fc.PEC_RESTANT_EMPLOYEUR else 0 end)          as PEC_RESTANT_EMPLOYEUR,
+   sum(case when fc.TYPE_FINANCEMENT = 'R' then fc.PEC_SALAIRE_HTT else 0 end )               as PEC_SALAIRE_HTT,
+   sum(case when fc.TYPE_FINANCEMENT = 'R' then fc.PEC_TUTORAT else 0 end)                    as PEC_TUTORAT,
+   sum(case when fc.TYPE_FINANCEMENT = 'R' then fc.PEC_TRANSPORT else 0 end)                  as PEC_TRANSPORT,
+   -- Durées
+   sum(0) as PREV_NBRE_HEURES,
+   sum(0) as PREV_NBRE_JOURS,
+   sum(0) as PREV_HRS_TT,
+   sum(0) as PREV_HRS_HTT,
+   sum(0) as PREV_HRS_DIF_TT,
+   sum(0) as PREV_HRS_DIF_HTT,
+   sum(0) as REALISE_NBRE_HEURES,
+   sum(0) as REALISE_NBRE_JOURS,
+   sum(0) as REALISE_HRS_TT,
+   sum(0) as REALISE_HRS_HTT,
+   sum(0) as REALISE_HRS_DIF_TT,
+   sum(0) as REALISE_HRS_DIF_HTT,
+   -- nvl(réalisé, prévu) utilisé par le tdb des plans
+   sum(0) as NVL_REEL_PREV_NBRHEURES,
+   sum(0) as NVL_REEL_PREV_NBRJOURS,
+   sum(0) as NVL_REEL_PREV_NBRTT,
+   sum(0) as NVL_REEL_PREV_NBRHTT
+  from
+    V_V5_KRHEF_FINANCEMENT_COLL fc,
+    V_V5_KRHEF_FORM_INSCR ins,
+    V_V5_KRHEF_FORM_INSCR_SEQ ins_seq,
+    T_V5_KRHEF_FORMATION_COUT cout
+  where ins.ID_INSCRIPTION = ins_seq.ID_INSCRIPTION
+    and ins.ID_SESSION = fc.ID_SESSION
+    and ins_seq.NUM_SEQ = fc.NUM_SEQ
+    and ins.COLLABORATEUR = fc.COLLABORATEUR
+    and ins.DATE_REPORT is null
+    and cout.ID_INSCRIPTION = ins_seq.ID_INSCRIPTION_SEQ
+    and cout.NUM_SEQ = ins_seq.NUM_SEQ
+    and cout.NUM_SEQ != 0
+    and cout.ORDRE_AFF_BDG = 1
+  group by
+    ins_seq.ID_INSCRIPTION_SEQ ,
+    ins_seq.ID_INSCRIPTION ,
+    ins_seq.NUM_SEQ,
+    cout.ORDRE_AFF_BDG,
+    cout.ORDRE_PLAN,
+    cout.ID_AFF_BDG_DETAIL,
+    cout.IMPUTABILITE

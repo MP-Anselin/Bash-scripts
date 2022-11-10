@@ -1,0 +1,137 @@
+{
+  code : "STR_BDG_LIST_FORM",
+  element : "ecran",
+  groupe : {
+    code : "STR_BDG_LISTE_FORM_POP_GRP",
+    donnees : [ {
+      code : "STR_BDGLI_FORM_ID",
+      element : "donnee",
+      libelle : "ID",
+      longueur : 50,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "STR_BDG_FORM_IDSTR",
+      element : "donnee",
+      libelle : "id",
+      longueur : 50,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "STR_BDG_FORM_LIB",
+      element : "donnee",
+      libelle : "Libellé",
+      longueur : 256,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "STR_BDG_FORM_CODE",
+      element : "donnee",
+      libelle : "Code",
+      longueur : 50,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "STR_BDG_FORM_ANNEE",
+      element : "donnee",
+      libelle : "Année",
+      longueur : 50,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "STR_BDG_MONTGRP_FORM",
+      element : "donnee",
+      entier : 25,
+      libelle : "Total des montants",
+      saisie : "span",
+      style : "FDonneeG",
+      type : "N"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "TYPBDGLIT_FORM",
+      element : "donnee",
+      libelle : "Type et dispositif",
+      longueur : 50,
+      obligatoire : true,
+      requete : "STR_BDG_FORM_5",
+      saisie : "select",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "LIBLIT_FORM",
+      element : "donnee",
+      libelle : "Libellé ",
+      longueur : 50,
+      obligatoire : true,
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "CODE_FORM",
+      element : "donnee",
+      libelle : "Code budgétaire",
+      longueur : 50,
+      obligatoire : true,
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "STR_BDG_MONTLIS_FORM",
+      element : "donnee",
+      entier : 25,
+      libelle : "Montant (€?)",
+      saisie : "text",
+      style : "FDonneeG",
+      type : "N"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "STR_BDG_ACTLIST_FORM",
+      element : "donnee",
+      libelle : "Actif",
+      longueur : 1,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#BOUTONPERSO",
+      element : "donnee",
+      libelle : "Dupliquer",
+      operation : "Dupliquer"
+    } ],
+    element : "groupe",
+    libelle : "Modifier une structure budgétaire"
+  },
+  libelle : "Ajouter une structure budgétaire",
+  servicelet : "FormationStructureBudgetaireJsonServlet",
+  type : "P"
+}

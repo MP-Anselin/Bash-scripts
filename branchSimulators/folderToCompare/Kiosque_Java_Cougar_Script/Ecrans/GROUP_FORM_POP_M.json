@@ -1,0 +1,107 @@
+{
+  code : "GROUP_FORM_POP_M",
+  element : "ecran",
+  groupe : {
+    code : "GROUP_FORM_POP_M_GRP",
+    donnees : [ {
+      code : "ID_ALIAS",
+      element : "donnee",
+      libelle : "ID",
+      longueur : 30,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "GROUPE_CODE_FORM",
+      element : "donnee",
+      libelle : "Code ",
+      longueur : 20,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "GROUPE_PROFIL_FORM",
+      element : "donnee",
+      libelle : "Profil GS ADP ",
+      longueur : 50,
+      maxSelect : 7,
+      requete : "GROUPE_FORM_2",
+      retour : "GROUPE_PROFIL_FORM, #OUI",
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "GROUPE_ID_PROFIL",
+      element : "donnee",
+      libelle : "ID PROFIL",
+      longueur : 400,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "GROUPE_LIB_FORM",
+      element : "donnee",
+      libelle : "Libellé ",
+      longueur : 128,
+      obligatoire : true,
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "GROUPE_SIGN_FORM",
+      element : "donnee",
+      libelle : "Signataire des documents génériques ",
+      longueur : 200,
+      requete : "GROUPE_FORM_3",
+      saisie : "select",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "GROUPE_DES_FORM",
+      element : "donnee",
+      libelle : "Description ",
+      longueur : 3999,
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "GROUPE_ACTIF_FORM",
+      element : "donnee",
+      libelle : "Actif ",
+      longueur : 1,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TABLEAU",
+      element : "donnee",
+      pageAjout : "RECH_COLLAB_MODIF",
+      pageModif : "GROUP_FORM_POP_M",
+      requete : "GROUPE_FORM_4"
+    } ],
+    element : "groupe",
+    libelle : "Modification d'un groupe",
+    onglet : true
+  },
+  libelle : "Modification d'un groupe",
+  servicelet : "GroupeJsonServlet",
+  type : "P"
+}

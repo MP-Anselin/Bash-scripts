@@ -1,0 +1,10 @@
+##
+SYS_AIDE_CUSTOMTAGS
+=SQL IFNOTEXIST=SYS_AIDE_CUSTOMTAGS=
+CREATE TABLE SYS_AIDE_CUSTOMTAGS ( BSTART VARCHAR2(255), BEND VARCHAR2(255), HTMLSTART CLOB, HTMLEND CLOB, PRIMARY KEY (BSTART, BEND) ) 
+##
+SYS_AIDE_CUSTOMTAGS
+==
+DELETE FROM SYS_AIDE_CUSTOMTAGS
+'[btn]','[/btn]','<a class="x-btn vdl-button adpvdl-button x-unselectable x-btn-default-small vdl-button--secondary" hidefocus="on" unselectable="on" role="button" aria-hidden="false" aria-disabled="false"><span role="presentation" unselectable="on" class="x-btn-wrap x-btn-wrap-default-small "><span role="presentation" unselectable="on" class="x-btn-button x-btn-button-default-small x-btn-text  x-btn-icon x-btn-icon-left x-btn-button-center "><span role="presentation" unselectable="on" class="x-btn-icon-el x-btn-icon-el-default-small  fa -icone- "></span><span unselectable="on" class="x-btn-inner x-btn-inner-default-small">','</span></span></span></a>'
+'[btn-primaire]','[/btn-primaire]','<a class="x-btn vdl-button adpvdl-button x-unselectable x-btn-default-small vdl-button--primary" hidefocus="on" unselectable="on" role="button" aria-hidden="false" aria-disabled="false"><span role="presentation" unselectable="on" class="x-btn-wrap x-btn-wrap-default-small "><span role="presentation" unselectable="on" class="x-btn-button x-btn-button-default-small x-btn-text  x-btn-icon x-btn-icon-left x-btn-button-center "><span role="presentation" unselectable="on" class="x-btn-icon-el x-btn-icon-el-default-small  fa -icone- "></span><span unselectable="on" class="x-btn-inner x-btn-inner-default-small">','</span></span></span></a>'

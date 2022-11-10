@@ -1,0 +1,171 @@
+{
+  code : "DEM_FORM_CARACT",
+  element : "ecran",
+  groupe : {
+    code : "DEM_FORM_CARACT_GRP_G",
+    donnees : [ {
+      code : "DEM_FORM_CARACT_GRP",
+      donnees : [ {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Caractéristiques de la demande",
+        style : "FormTitre"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_LIBELLLE",
+        element : "donnee",
+        libelle : "Libellé de la formation",
+        longueur : 128,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_OBJFORM",
+        element : "donnee",
+        libelle : "Objet de la formation",
+        longueur : 128,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_CODE",
+        element : "donnee",
+        libelle : "Code formation",
+        longueur : 128,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_ORGA",
+        element : "donnee",
+        libelle : "Organisme",
+        longueur : 128,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_DOM",
+        element : "donnee",
+        libelle : "Domaine de formation",
+        longueur : 50,
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_AXE",
+        element : "donnee",
+        libelle : "Lié à un axe statégique",
+        longueur : 50,
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_MOD",
+        element : "donnee",
+        libelle : "Modalité",
+        longueur : 50,
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_TYPEF",
+        element : "donnee",
+        libelle : "Type de formation",
+        longueur : 50,
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_TYPO",
+        element : "donnee",
+        libelle : "Typologie",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_STYPO",
+        element : "donnee",
+        libelle : "Sans typologie",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_CERTIF",
+        element : "donnee",
+        libelle : "Certifiante",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "WKF_200_DEM_FORM_QUAL",
+        element : "donnee",
+        libelle : "Qualifiante",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "WKF_200_DEM_FORM_OBLI",
+        element : "donnee",
+        libelle : "Obligatoire",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      } ],
+      element : "groupe",
+      libelle : "Caractéristiques",
+      onglet : true
+    }, {
+      code : "DEM_FORM_CARACT_GRP_F",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        requete : "WKF_200_DEM_FORM_CPF_2"
+      } ],
+      element : "groupe",
+      libelle : "Formateurs associés",
+      onglet : true
+    } ],
+    element : "groupe",
+    libelle : "Caractéristiques"
+  },
+  libelle : "Caractéristiques",
+  servicelet : "FormationDemandeWkf",
+  type : "W"
+}

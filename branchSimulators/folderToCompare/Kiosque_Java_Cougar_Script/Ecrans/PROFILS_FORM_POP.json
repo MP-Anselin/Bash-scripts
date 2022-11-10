@@ -1,0 +1,1273 @@
+{
+  code : "PROFILS_FORM_POP",
+  element : "ecran",
+  groupe : {
+    code : "PROFILS_FORM_POP_GRP",
+    donnees : [ {
+      code : "PROFILS_LIBELLE",
+      element : "donnee",
+      libelle : "Titre du profil",
+      longueur : 255,
+      obligatoire : true,
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "PROFILS_DESCRIPTION",
+      element : "donnee",
+      libelle : "Description",
+      longueur : 255,
+      obligatoire : true,
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "PROFILS_POPULATION",
+      element : "donnee",
+      libelle : "Population",
+      longueur : 255,
+      obligatoire : true,
+      requete : "HAB_UTIL_SEC_6",
+      retour : "PROFILS_POPULATION,#NON,#NON,PROFILS_POPULATION_ID",
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "PROFILS_POPULATION_ID",
+      element : "donnee",
+      libelle : "PROFILS_POPULATION_ID",
+      longueur : 255,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "PROFILS_GENERAL_GRP",
+      donnees : [ {
+        code : "PROFILS_LANGUE",
+        element : "donnee",
+        libelle : "Langue par défaut",
+        longueur : 255,
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X",
+        valeurs : [ {
+          code : "NON DÉFINI DANS LE PROFIL",
+          libelle : "Non défini dans le profil"
+        }, {
+          code : "FR",
+          libelle : "FR"
+        } ]
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PROFILS_SITE_ATTESTATION",
+        element : "donnee",
+        libelle : "Site d'attestation",
+        longueur : 255,
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X",
+        valeurs : [ {
+          code : "NON DÉFINI DANS LE PROFIL",
+          libelle : "Non défini dans le profil"
+        } ]
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PROFILS_TITRE",
+        element : "donnee",
+        libelle : "Titre du site",
+        longueur : 255,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PROFILS_DESCRIPTION_SITE",
+        element : "donnee",
+        libelle : "Description du site",
+        longueur : 255,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PROFILS_EXPERT_SECURITE",
+        element : "donnee",
+        libelle : "Choix de l'expert sécurité",
+        longueur : 255,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFIL_GROUPE_VERIF",
+        code : "PROFILS_GROUPE_CHECK",
+        element : "donnee",
+        libelle : "Groupe",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFILS_GROUPE_LST",
+        code : "PROFILS_GROUPE_LST",
+        element : "donnee",
+        libelle : "PROFILS_GROUPE_LST",
+        longueur : 50,
+        requete : "GROUPE_FORM_PROFILS_1",
+        retour : "PROFILS_GROUPE_LST,PROFILS_GROUPE_LST_MAT",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "PROFILS_GROUPE_LST_MAT",
+        element : "donnee",
+        libelle : "PROFILS_GROUPE_LST_MAT",
+        longueur : 50,
+        saisie : "hidden",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFILS_UTILISATEUR_VERIF",
+        code : "PROFIL_CHECK_UTILISATEUR",
+        element : "donnee",
+        libelle : "Utilisateur",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFILS_UTILISATEUR_EXPERT_SEC_LST",
+        code : "PROFILS_UTILISATEUR_LST",
+        element : "donnee",
+        libelle : "PROFILS_UTILISATEUR_LST",
+        longueur : 50,
+        requete : "PROFILS_UTILISATEUR_1",
+        retour : "PROFILS_UTILISATEUR_LST,PROFILS_UTILISATEUR_LST_MAT,#OUI",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "PROFILS_UTILISATEUR_LST_MAT",
+        element : "donnee",
+        libelle : "PROFILS_UTILISATEUR_LST_MAT",
+        longueur : 50,
+        saisie : "hidden",
+        style : "FDonneeG",
+        type : "X"
+      } ],
+      element : "groupe",
+      libelle : "Général",
+      onglet : true
+    }, {
+      code : "PROFIL_AFFICHAGE_GRP",
+      donnees : [ {
+        code : "PROFILS_LOGO_SITE",
+        element : "donnee",
+        libelle : "Logo du site ",
+        longueur : 4000,
+        minuscle : true,
+        saisie : "asynchroneUploadFile",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PROFIL_WIDGET_INFORMATION_1",
+        element : "donnee",
+        libelle : "Widget 'Information' 1",
+        longueur : 255,
+        requete : "PROFILS_WIDGET_INFORMATION_TAB_1",
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PROFIL_WIDGET_INFORMATION_2",
+        element : "donnee",
+        libelle : "Widget 'Information' 2",
+        longueur : 255,
+        requete : "PROFILS_WIDGET_INFORMATION_TAB_1",
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PROFIL_WIDGET_COLLABORATEUR",
+        element : "donnee",
+        libelle : "Widget 'Bienvenue' collaborateurs",
+        longueur : 255,
+        requete : "PROFILS_WIDGET_COLLABORATEURS_TAB_1",
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PROFIL_WIDGET_ACTEURS",
+        element : "donnee",
+        libelle : "Widget 'Bienvenue' acteurs",
+        longueur : 255,
+        requete : "PROFILS_WIDGET_COLLABORATEURS_TAB_1",
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PROFIL_WIDGET_EXPERTS",
+        element : "donnee",
+        libelle : "Widget 'Bienvenue' 1 Experts",
+        longueur : 255,
+        requete : "PROFILS_WIDGET_COLLABORATEURS_TAB_1",
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X"
+      } ],
+      element : "groupe",
+      libelle : "Affichage",
+      onglet : true
+    }, {
+      code : "PROFILS_ENTRETIEN_GRP",
+      donnees : [ {
+        code : "PROFILS_MODULE_ENTRETIEN",
+        element : "donnee",
+        libelle : "Module entretien",
+        longueur : 255,
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X",
+        valeurs : [ {
+          code : "NON DÉFINI DANS LE PROFIL",
+          libelle : "Non défini dans le profil"
+        }, {
+          code : "PAS D\"ACCÉS AU MODULE ENTRETIEN",
+          libelle : "Pas d`accés au module entretien"
+        }, {
+          code : "ACCÈS AU MODULE ENTRETIEN",
+          libelle : "Accès au module entretien"
+        } ]
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PROFILS_EXPERT_ENTRETIEN",
+        element : "donnee",
+        libelle : "Choix de l'expert entretien",
+        longueur : 1,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFIL_GROUPE_EXPERT_ENTRETIEN_VERIF",
+        code : "PROFILS_GROUPE_EXPERT_ENTRETIEN_CHECK",
+        element : "donnee",
+        libelle : "GROUPE",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFILS_GROUPE_EXPERT_ENTRETIEN_LST",
+        code : "PROFILS_GROUPE_EXPERT_ENTRETIEN_LST",
+        element : "donnee",
+        libelle : "PROFILS_GROUPE_EXPERT_ENTRETIEN_LST",
+        longueur : 50,
+        requete : "GROUPE_FORM_PROFILS_1",
+        retour : "PROFILS_GROUPE_EXPERT_ENTRETIEN_LST,PROFILS_GROUPE_EXPERT_ENTRETIEN_LST_MAT",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "PROFILS_GROUPE_EXPERT_ENTRETIEN_LST_MAT",
+        element : "donnee",
+        libelle : "PROFILS_GROUPE_EXPERT_ENTRETIEN_LST_MAT",
+        longueur : 50,
+        saisie : "hidden",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFILS_UTILISATEUR_EXPERT_ENTRETIEN_VERIF",
+        code : "PROFILS_UTILISATEUR_EXPERT_ENTRETIEN_CHECK",
+        element : "donnee",
+        libelle : "Utilisateur",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFILS_UTILISATEUR_EXPERT_ENTRETIEN_LST",
+        code : "PROFILS_UTILISATEUR_EXPERT_ENTRETIEN_LST",
+        element : "donnee",
+        libelle : "PROFILS_UTILISATEUR_EXPERT_ENTRETIEN_LST",
+        longueur : 50,
+        requete : "PROFILS_UTILISATEUR_1",
+        retour : "PROFILS_UTILISATEUR_EXPERT_ENTRETIEN_LST,PROFILS_UTILISATEUR_EXPERT_ENTRETIEN_LST_MAT,#OUI",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "PROFILS_UTILISATEUR_EXPERT_ENTRETIEN_LST_MAT",
+        element : "donnee",
+        libelle : "PROFILS_UTILISATEUR_EXPERT_ENTRETIEN_LST_MAT",
+        longueur : 50,
+        saisie : "hidden",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PROFILS_GESTIONNAIRE_ENTRETIEN",
+        element : "donnee",
+        libelle : "Choix du gestionnaire entretien",
+        longueur : 1,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFIL_GROUPE_GESTIONNAIRE_ENTRETIEN_VERIF",
+        code : "PROFILS_GROUPE_GESTIONNAIRE_ENTRETIEN_CHECK",
+        element : "donnee",
+        libelle : "Groupe",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFILS_GROUPE_GESTIONNAIRE_ENTRETIEN_LST",
+        code : "PROFILS_GROUPE_GESTIONNAIRE_ENTRETIEN_LST",
+        element : "donnee",
+        libelle : "PROFILS_GROUPE_GESTIONNAIRE_ENTRETIEN_LST",
+        longueur : 255,
+        requete : "GROUPE_FORM_PROFILS_1",
+        retour : "PROFILS_GROUPE_GESTIONNAIRE_ENTRETIEN_LST,PROFILS_GROUPE_GESTIONNAIRE_ENTRETIEN_LST_MAT",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "PROFILS_GROUPE_GESTIONNAIRE_ENTRETIEN_LST_MAT",
+        element : "donnee",
+        libelle : "PROFILS_GROUPE_GESTIONNAIRE_ENTRETIEN_LST_MAT",
+        longueur : 255,
+        saisie : "hidden",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFILS_UTILISATEUR_GESTIONNAIRE_ENTRETIEN_VERIF",
+        code : "PROFILS_UTILISATEUR_GESTIONNAIRE_ENTRETIEN_CHECK",
+        element : "donnee",
+        libelle : "Utilisateur",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFILS_UTILISATEUR_GESTIONNAIRE_ENTRETIEN_LST",
+        code : "PROFILS_UTILISATEUR_GESTIONNAIRE_ENTRETIEN_LST",
+        element : "donnee",
+        libelle : "PROFILS_UTILISATEUR_GESTIONNAIRE_ENTRETIEN_LST",
+        longueur : 50,
+        requete : "PROFILS_UTILISATEUR_1",
+        retour : "PROFILS_UTILISATEUR_GESTIONNAIRE_ENTRETIEN_LST,PROFILS_UTILISATEUR_GESTIONNAIRE_ENTRETIEN_LST_MAT,#OUI",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "PROFILS_UTILISATEUR_GESTIONNAIRE_ENTRETIEN_LST_MAT",
+        element : "donnee",
+        libelle : "PROFILS_UTILISATEUR_GESTIONNAIRE_ENTRETIEN_LST_MAT",
+        longueur : 255,
+        saisie : "hidden",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PROFILS_DIRECTEUR_RH_ENTRETIEN",
+        element : "donnee",
+        libelle : "Choix du directeur RH entretien",
+        longueur : 1,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFIL_GROUPE_DIRECTEUR_RH_ENTRETIEN_VERIF",
+        code : "PROFILS_GROUPE_DIRECTEUR_RH_ENTRETIEN_CHECK",
+        element : "donnee",
+        libelle : "Groupe",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFILS_GROUPE_DIRECTEUR_RH_ENTRETIEN_LST",
+        code : "PROFILS_GROUPE_DIRECTEUR_RH_ENTRETIEN_LST",
+        element : "donnee",
+        libelle : "PROFILS_GROUPE_DIRECTEUR_RH_ENTRETIEN_LST",
+        longueur : 255,
+        requete : "GROUPE_FORM_PROFILS_1",
+        retour : "PROFILS_GROUPE_DIRECTEUR_RH_ENTRETIEN_LST,PROFILS_GROUPE_DIRECTEUR_RH_ENTRETIEN_LST_MAT",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "PROFILS_GROUPE_DIRECTEUR_RH_ENTRETIEN_LST_MAT",
+        element : "donnee",
+        libelle : "PROFILS_GROUPE_DIRECTEUR_RH_ENTRETIEN_LST_MAT",
+        longueur : 255,
+        saisie : "hidden",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFILS_UTILISATEUR_DIRECTEUR_RH_ENTRETIEN_VERIF",
+        code : "PROFILS_UTILISATEUR_DIRECTEUR_RH_ENTRETIEN_CHECK",
+        element : "donnee",
+        libelle : "Utilisateur",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFILS_UTILISATEUR_DIRECTEUR_RH_ENTRETIEN_LST",
+        code : "PROFILS_UTILISATEUR_DIRECTEUR_RH_ENTRETIEN_LST",
+        element : "donnee",
+        libelle : "PROFILS_UTILISATEUR_DIRECTEUR_RH_ENTRETIEN_LST",
+        longueur : 255,
+        requete : "PROFILS_UTILISATEUR_1",
+        retour : "PROFILS_UTILISATEUR_DIRECTEUR_RH_ENTRETIEN_LST,PROFILS_UTILISATEUR_DIRECTEUR_RH_ENTRETIEN_LST_MAT,#OUI",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "PROFILS_UTILISATEUR_DIRECTEUR_RH_ENTRETIEN_LST_MAT",
+        element : "donnee",
+        libelle : "PROFILS_UTILISATEUR_DIRECTEUR_RH_ENTRETIEN_LST_MAT",
+        longueur : 255,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PROFILS_RESPONSABLE_RH_ENTRETIEN",
+        element : "donnee",
+        libelle : "Choix du responsable RH entretien",
+        longueur : 1,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFIL_GROUPE_RESPONSABLE_RH_ENTRETIEN_VERIF",
+        code : "PROFILS_GROUPE_RESPONSABLE_RH_ENTRETIEN_CHECK",
+        element : "donnee",
+        libelle : "Groupe",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFILS_GROUPE_RESPONSABLE_RH_ENTRETIEN_LST",
+        code : "PROFILS_GROUPE_RESPONSABLE_RH_ENTRETIEN_LST",
+        element : "donnee",
+        libelle : "PROFILS_GROUPE_RESPONSABLE_RH_ENTRETIEN_LST",
+        longueur : 50,
+        requete : "GROUPE_FORM_PROFILS_1",
+        retour : "PROFILS_GROUPE_RESPONSABLE_RH_ENTRETIEN_LST,PROFILS_GROUPE_RESPONSABLE_RH_ENTRETIEN_LST_MAT",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "PROFILS_GROUPE_RESPONSABLE_RH_ENTRETIEN_LST_MAT",
+        element : "donnee",
+        libelle : "PROFILS_GROUPE_RESPONSABLE_RH_ENTRETIEN_LST_MAT",
+        longueur : 255,
+        saisie : "hidden",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFILS_UTILISATEUR_RESPONSABLE_RH_ENTRETIEN_VERIF",
+        code : "PROFILS_UTILISATEUR_RESPONSABLE_RH_ENTRETIEN_CHECK",
+        element : "donnee",
+        libelle : "Utilisateur",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFILS_UTILISATEUR_RESPONSABLE_RH_ENTRETIEN_LST",
+        code : "PROFILS_UTILISATEUR_RESPONSABLE_RH_ENTRETIEN_LST",
+        element : "donnee",
+        libelle : "PROFILS_UTILISATEUR_RESPONSABLE_RH_ENTRETIEN_LST",
+        longueur : 50,
+        requete : "PROFILS_UTILISATEUR_1",
+        retour : "PROFILS_UTILISATEUR_RESPONSABLE_RH_ENTRETIEN_LST,PROFILS_UTILISATEUR_RESPONSABLE_RH_ENTRETIEN_LST_MAT,#OUI",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "PROFILS_UTILISATEUR_RESPONSABLE_RH_ENTRETIEN_LST_MAT",
+        element : "donnee",
+        libelle : "PROFILS_UTILISATEUR_RESPONSABLE_RH_ENTRETIEN_LST_MAT",
+        longueur : 255,
+        saisie : "hidden",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PROFILS_ACTEUR_INDIRECT_ENTRETIEN",
+        element : "donnee",
+        libelle : "Choix de l'acteur indirect entretien",
+        longueur : 1,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFIL_GROUPE_ACTEUR_INDIRECT_ENTRETIEN_VERIF",
+        code : "PROFILS_GROUPE_ACTEUR_INDIRECT_ENTRETIEN_CHECK",
+        element : "donnee",
+        libelle : "Groupe",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFILS_GROUPE_ACTEUR_INDIRECT_ENTRETIEN_LST",
+        code : "PROFILS_GROUPE_ACTEUR_INDIRECT_ENTRETIEN_LST",
+        element : "donnee",
+        libelle : "PROFILS_GROUPE_ACTEUR_INDIRECT_ENTRETIEN_LST",
+        longueur : 255,
+        requete : "GROUPE_FORM_PROFILS_1",
+        retour : "PROFILS_GROUPE_ACTEUR_INDIRECT_ENTRETIEN_LST,PROFILS_GROUPE_ACTEUR_INDIRECT_ENTRETIEN_LST_MAT",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "PROFILS_GROUPE_ACTEUR_INDIRECT_ENTRETIEN_LST_MAT",
+        element : "donnee",
+        libelle : "PROFILS_GROUPE_ACTEUR_INDIRECT_ENTRETIEN_LST_MAT",
+        longueur : 255,
+        saisie : "hidden",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFILS_UTILISATEUR_ACTEUR_INDIREC_ENTRETIEN_VERIF",
+        code : "PROFILS_UTILISATEUR_ACTEUR_INDIRECT_ENTRETIEN_CHECK",
+        element : "donnee",
+        libelle : "Utilisateur",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFILS_UTILISATEUR_ACTEUR_INDIRECT_ENTRETIEN_LST",
+        code : "PROFILS_UTILISATEUR_ACTEUR_INDIRECT_ENTRETIEN_LST",
+        element : "donnee",
+        libelle : "PROFILS_UTILISATEUR_ACTEUR_INDIRECT_ENTRETIEN_LST",
+        longueur : 50,
+        requete : "PROFILS_UTILISATEUR_1",
+        retour : "PROFILS_UTILISATEUR_ACTEUR_INDIRECT_ENTRETIEN_LST,PROFILS_UTILISATEUR_ACTEUR_INDIRECT_ENTRETIEN_LST_MAT",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "PROFILS_UTILISATEUR_ACTEUR_INDIRECT_ENTRETIEN_LST_MAT",
+        element : "donnee",
+        libelle : "PROFILS_UTILISATEUR_ACTEUR_INDIRECT_ENTRETIEN_LST_MAT",
+        longueur : 255,
+        saisie : "hidden",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        affichage : "PROFIL_OPTION_COMPETENCE_VERIF",
+        code : "PROFIL_OPTION_COMPETENCE",
+        element : "donnee",
+        libelle : "Option d'ajout de compétences par l'acteur",
+        longueur : 255,
+        requete : "PROFIL_OPTION_COMPETENCE_1",
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        affichage : "PROFIL_BILAN_FORMATION_REMONTER_VERIF",
+        code : "PROFIL_BILAN_FORMATION_REMONTER",
+        element : "donnee",
+        format : "dd.MM.yyyy",
+        libelle : "Ne jamais faire remonter dans le bilan formation les formations antérieures au ",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "D"
+      } ],
+      element : "groupe",
+      libelle : "Entretien",
+      onglet : true
+    }, {
+      code : "PROFILS_FORMATION_GRP",
+      donnees : [ {
+        code : "PROFILS_MODULE_FORMATION",
+        element : "donnee",
+        libelle : "Module formation",
+        longueur : 50,
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X",
+        valeurs : [ {
+          code : "NON DÉFINI DANS LE PROFIL",
+          libelle : "Non défini dans le profil"
+        }, {
+          code : "PAS D\"ACCÉS AU MODULE FORMATION",
+          libelle : "Pas d`accés au module formation"
+        }, {
+          code : "ACCÈS AU MODULE FORMATION",
+          libelle : "Accès au module formation"
+        } ]
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PROFILS_EXPERT_FORMATION",
+        element : "donnee",
+        libelle : "Choix de l'expert formation",
+        longueur : 1,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFIL_GROUPE_EXPERT_FORMATION_VERIF",
+        code : "PROFILS_GROUPE_EXPERT_FORMATION_CHECK",
+        element : "donnee",
+        libelle : "Groupe",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFILS_GROUPE_EXPERT_FORMATION_LST",
+        code : "PROFILS_GROUPE_EXPERT_FORMATION_LST",
+        element : "donnee",
+        libelle : "PROFILS_GROUPE_EXPERT_FORMATION_LST",
+        longueur : 50,
+        requete : "GROUPE_FORM_PROFILS_1",
+        retour : "PROFILS_GROUPE_EXPERT_FORMATION_LST,PROFILS_GROUPE_EXPERT_FORMATION_LST_MAT",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "PROFILS_GROUPE_EXPERT_FORMATION_LST_MAT",
+        element : "donnee",
+        libelle : "PROFILS_GROUPE_EXPERT_FORMATION_LST_MAT",
+        longueur : 50,
+        saisie : "hidden",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFILS_UTILISATEUR_EXPERT_FORMATION_VERIF",
+        code : "PROFILS_UTILISATEUR_EXPERT_FORMATION_CHECK",
+        element : "donnee",
+        libelle : "Utilisateur",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFILS_UTILISATEUR_EXPERT_FORMATION_LST",
+        code : "PROFILS_UTILISATEUR_EXPERT_FORMATION_LST",
+        element : "donnee",
+        libelle : "PROFILS_UTILISATEUR_EXPERT_FORMATION_LST",
+        longueur : 50,
+        requete : "PROFILS_UTILISATEUR_1",
+        retour : "PROFILS_UTILISATEUR_EXPERT_FORMATION_LST,PROFILS_UTILISATEUR_EXPERT_FORMATION_LST_MAT",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "PROFILS_UTILISATEUR_EXPERT_FORMATION_LST_MAT",
+        element : "donnee",
+        libelle : "PROFILS_UTILISATEUR_EXPERT_FORMATION_LST_MAT",
+        longueur : 50,
+        saisie : "hidden",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PROFILS_GESTIONNAIRE_FORMATION",
+        element : "donnee",
+        libelle : "Choix du gestionnaire formation ",
+        longueur : 1,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFIL_GROUPE_GESTIONNAIRE_FORMATION_VERIF",
+        code : "PROFILS_GROUPE_GESTIONNAIRE_FORMATION_CHECK",
+        element : "donnee",
+        libelle : "Groupe",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFILS_GROUPE_GESTIONNAIRE_FORMATION_LST",
+        code : "PROFILS_GROUPE_GESTIONNAIRE_FORMATION_LST",
+        element : "donnee",
+        libelle : "PROFILS_GROUPE_GESTIONNAIRE_FORMATION_LST",
+        longueur : 50,
+        requete : "GROUPE_FORM_PROFILS_1",
+        retour : "PROFILS_GROUPE_GESTIONNAIRE_FORMATION_LST,PROFILS_GROUPE_GESTIONNAIRE_FORMATION_LST_MAT",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "PROFILS_GROUPE_GESTIONNAIRE_FORMATION_LST_MAT",
+        element : "donnee",
+        libelle : "PROFILS_GROUPE_GESTIONNAIRE_FORMATION_LST_MAT",
+        longueur : 50,
+        saisie : "hidden",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFILS_UTILISATEUR_GESTIONNAIRE_FORMATION_VERIF",
+        code : "PROFILS_UTILISATEUR_GESTIONNAIRE_FORMATION_CHECK",
+        element : "donnee",
+        libelle : "Utilisateur",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFILS_UTILISATEUR_GESTIONNAIRE_FORMATION_LST",
+        code : "PROFILS_UTILISATEUR_GESTIONNAIRE_FORMATION_LST",
+        element : "donnee",
+        libelle : "PROFILS_UTILISATEUR_GESTIONNAIRE_FORMATION_LST",
+        longueur : 50,
+        requete : "PROFILS_UTILISATEUR_1",
+        retour : "PROFILS_UTILISATEUR_GESTIONNAIRE_FORMATION_LST,PROFILS_UTILISATEUR_GESTIONNAIRE_FORMATION_LST_MAT",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "PROFILS_UTILISATEUR_GESTIONNAIRE_FORMATION_LST_MAT",
+        element : "donnee",
+        libelle : "PROFILS_UTILISATEUR_GESTIONNAIRE_FORMATION_LST_MAT",
+        longueur : 50,
+        saisie : "hidden",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        affichage : "PROFILS_DEM_FORM_INDIV_VERIF",
+        code : "PROFILS_DEM_FORM_INDIV",
+        element : "donnee",
+        libelle : "PROFILS_DEM_FORM_INDIV",
+        longueur : 50,
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X",
+        valeurs : [ {
+          code : "NON DÉFINI DANS LE PROFIL",
+          libelle : "Non défini dans le profil"
+        }, {
+          code : "OUI",
+          libelle : "Oui"
+        }, {
+          code : "NON",
+          libelle : "Non"
+        } ]
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        affichage : "PROFIL_NB_FROID",
+        code : "PROFILS_NB_FROID",
+        element : "donnee",
+        libelle : "Nombre de jours avant évaluation à froid",
+        longueur : 255,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        affichage : "PROFIL_NB_FROID_FORMATION",
+        code : "PROFILS_NB_FROID_FORMATION",
+        element : "donnee",
+        format : "dd.MM.yyyy",
+        libelle : "Ne jamais évaluer à froid les formations antérieures au",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "D"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        affichage : "PROFIL_NB_CHAUD_FORMATION",
+        code : "PROFILS_NB_CHAUD_FORMATION",
+        element : "donnee",
+        format : "dd.MM.yyyy",
+        libelle : "Ne jamais évaluer à chaud les formations antérieures au",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "D"
+      } ],
+      element : "groupe",
+      libelle : "Formation",
+      onglet : true
+    }, {
+      code : "PROFILS_TALENT_GRP",
+      donnees : [ {
+        code : "PROFILS_MODULE_TALENT",
+        element : "donnee",
+        libelle : "Module revue des talents",
+        longueur : 50,
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X",
+        valeurs : [ {
+          code : "NON DÉFINI DANS LE PROFIL",
+          libelle : "Non défini dans le profil"
+        }, {
+          code : "PAS D\"ACCÉS AU MODULE REVUE DES TALENTS",
+          libelle : "Pas d`accés au module revue des talents"
+        }, {
+          code : "ACCÈS AU MODULE REVUE DES TALENTS",
+          libelle : "Accès au module revue des talents"
+        } ]
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PROFILS_EXPERT_REVUE_TALENT",
+        element : "donnee",
+        libelle : "Choix de l'expert revue des talents ",
+        longueur : 1,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFIL_GROUPE_EXPERT_REVUE_TALENT_VERIF",
+        code : "PROFILS_GROUPE_EXPERT_REVUE_TALENT_CHECK",
+        element : "donnee",
+        libelle : "Groupe",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFILS_GROUPE_EXPERT_REVUE_TALENT_LST",
+        code : "PROFILS_GROUPE_EXPERT_REVUE_TALENT_LST",
+        element : "donnee",
+        libelle : "PROFILS_GROUPE_EXPERT_REVUE_TALENT_LST",
+        longueur : 50,
+        requete : "GROUPE_FORM_PROFILS_1",
+        retour : "PROFILS_GROUPE_EXPERT_REVUE_TALENT_LST,PROFILS_GROUPE_EXPERT_REVUE_TALENT_LST_MAT",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "PROFILS_GROUPE_EXPERT_REVUE_TALENT_LST_MAT",
+        element : "donnee",
+        libelle : "PROFILS_GROUPE_EXPERT_REVUE_TALENT_LST_MAT",
+        longueur : 50,
+        saisie : "hidden",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFILS_UTILISATEUR_EXPERT_REVUE_TALENT_VERIF",
+        code : "PROFILS_UTILISATEUR_EXPERT_REVUE_TALENT_CHECK",
+        element : "donnee",
+        libelle : "Utilisateur",
+        longueur : 255,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFILS_UTILISATEUR_EXPERT_REVUE_TALENT_LST",
+        code : "PROFILS_UTILISATEUR_EXPERT_REVUE_TALENT_LST",
+        element : "donnee",
+        libelle : "PROFILS_UTILISATEUR_EXPERT_REVUE_TALENT_LST",
+        longueur : 50,
+        requete : "PROFILS_UTILISATEUR_1",
+        retour : "PROFILS_UTILISATEUR_EXPERT_REVUE_TALENT_LST,PROFILS_UTILISATEUR_EXPERT_REVUE_TALENT_LST_MAT",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "PROFILS_UTILISATEUR_EXPERT_REVUE_TALENT_LST_MAT",
+        element : "donnee",
+        libelle : "PROFILS_UTILISATEUR_EXPERT_REVUE_TALENT_LST_MAT",
+        longueur : 50,
+        saisie : "hidden",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PROFILS_GESTIONNAIRE_REVUE_TALENTS",
+        element : "donnee",
+        libelle : "Choix du gestionnaire revue des talents",
+        longueur : 1,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFIL_GROUPE_GESTIONNAIRE_REVUE_TALENT_VERIF",
+        code : "PROFILS_GROUPE_GESTIONNAIRE_REVUE_TALENT_CHECK",
+        element : "donnee",
+        libelle : "Groupe",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFILS_GROUPE_GESTIONNAIRE_REVUE_TALENT_LST",
+        code : "PROFILS_GROUPE_GESTIONNAIRE_REVUE_TALENT_LST",
+        element : "donnee",
+        libelle : "PROFILS_GROUPE_GESTIONNAIRE_REVUE_TALENT_LST",
+        longueur : 50,
+        requete : "GROUPE_FORM_PROFILS_1",
+        retour : "PROFILS_GROUPE_GESTIONNAIRE_REVUE_TALENT_LST,PROFILS_GROUPE_GESTIONNAIRE_REVUE_TALENT_LST_MAT",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "PROFILS_GROUPE_GESTIONNAIRE_REVUE_TALENT_LST_MAT",
+        element : "donnee",
+        libelle : "PROFILS_GROUPE_GESTIONNAIRE_REVUE_TALENT_LST_MAT",
+        longueur : 50,
+        saisie : "hidden",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFILS_UTILISATEUR_GESTIONNAIRE_REVUE_TALEN_VERIF",
+        code : "PROFILS_UTILISATEUR_GESTIONNAIRE_REVUE_TALENT_CHECK",
+        element : "donnee",
+        libelle : "Utilisateur",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFILS_UTILISATEUR_GESTIONNAIRE_REVUE_TALENT_LST",
+        code : "PROFILS_UTILISATEUR_GESTIONNAIRE_REVUE_TALENT_LST",
+        element : "donnee",
+        libelle : "PROFILS_UTILISATEUR_GESTIONNAIRE_REVUE_TALENT_LST",
+        longueur : 50,
+        requete : "PROFILS_UTILISATEUR_1",
+        retour : "PROFILS_UTILISATEUR_GESTIONNAIRE_REVUE_TALENT_LST,PROFILS_UTILISATEUR_GESTIONNAIRE_REVUE_TALENT_LST_MAT",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "PROFILS_UTILISATEUR_GESTIONNAIRE_REVUE_TALENT_LST_MAT",
+        element : "donnee",
+        libelle : "PROFILS_UTILISATEUR_GESTIONNAIRE_REVUE_TALENT_LST_MAT",
+        longueur : 50,
+        saisie : "hidden",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PROFILS_DIRECTEUR_RH_REVUE_TALENT",
+        element : "donnee",
+        libelle : "Choix du directeur RH revue des talents",
+        longueur : 1,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFIL_GROUPE_DIRECTEUR_RH_REVUE_TALENT_VERIF",
+        code : "PROFILS_GROUPE_DIRECTEUR_RH_REVUE_TALENT_CHECK",
+        element : "donnee",
+        libelle : "Groupe",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFILS_GROUPE_DIRECTEUR_RH_REVUE_TALENT_LST",
+        code : "PROFILS_GROUPE_DIRECTEUR_RH_REVUE_TALENT_LST",
+        element : "donnee",
+        libelle : "PROFILS_GROUPE_DIRECTEUR_RH_REVUE_TALENT_LST",
+        longueur : 50,
+        requete : "GROUPE_FORM_PROFILS_1",
+        retour : "PROFILS_GROUPE_DIRECTEUR_RH_REVUE_TALENT_LST,PROFILS_GROUPE_DIRECTEUR_RH_REVUE_TALENT_LST_MAT",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "PROFILS_GROUPE_DIRECTEUR_RH_REVUE_TALENT_LST_MAT",
+        element : "donnee",
+        libelle : "PROFILS_GROUPE_DIRECTEUR_RH_REVUE_TALENT_LST_MAT",
+        longueur : 50,
+        saisie : "hidden",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFILS_UTILISATEUR_DIRECTEUR_RH_REVUE_TALEN_VERIF",
+        code : "PROFILS_UTILISATEUR_DIRECTEUR_RH_REVUE_TALENT_CHECK",
+        element : "donnee",
+        libelle : "Utilisateur",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFILS_UTILISATEUR_DIRECTEUR_RH_REVUE_TALENT_LST",
+        code : "PROFILS_UTILISATEUR_DIRECTEUR_RH_REVUE_TALENT_LST",
+        element : "donnee",
+        libelle : "PROFILS_UTILISATEUR_DIRECTEUR_RH_REVUE_TALENT_LST",
+        longueur : 50,
+        requete : "PROFILS_UTILISATEUR_1",
+        retour : "PROFILS_UTILISATEUR_DIRECTEUR_RH_REVUE_TALENT_LST,PROFILS_UTILISATEUR_DIRECTEUR_RH_REVUE_TALENT_LST_MAT",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "PROFILS_UTILISATEUR_DIRECTEUR_RH_REVUE_TALENT_LST_MAT",
+        element : "donnee",
+        libelle : "PROFILS_UTILISATEUR_DIRECTEUR_RH_REVUE_TALENT_LST_MAT",
+        longueur : 50,
+        saisie : "hidden",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        affichage : "PROFIL_GROUPE_RESPONSABLE_RH_REVUE_TALENT_VERIF",
+        code : "PROFILS_RESPONSABLE_RH_REVUE_TALENT",
+        element : "donnee",
+        libelle : "Choix du responsable RH revue des talents",
+        longueur : 1,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFIL_GROUPE_RESPONSABLE_RH_REVUE_TALENT_VERIF",
+        code : "PROFILS_GROUPE_RESPONSABLE_RH_REVUE_TALENT_CHECK",
+        element : "donnee",
+        libelle : "Groupe",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFILS_GROUPE_RESPONSABLE_RH_REVUE_TALENT_LST",
+        code : "PROFILS_GROUPE_RESPONSABLE_RH_REVUE_TALENT_LST",
+        element : "donnee",
+        libelle : "PROFILS_GROUPE_RESPONSABLE_RH_REVUE_TALENT_LST",
+        longueur : 50,
+        requete : "GROUPE_FORM_PROFILS_1",
+        retour : "PROFILS_GROUPE_RESPONSABLE_RH_REVUE_TALENT_LST,PROFILS_GROUPE_RESPONSABLE_RH_REVUE_TALENT_LST_MAT",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "PROFILS_GROUPE_RESPONSABLE_RH_REVUE_TALENT_LST_MAT",
+        element : "donnee",
+        libelle : "PROFILS_GROUPE_RESPONSABLE_RH_REVUE_TALENT_LST_MAT",
+        longueur : 50,
+        saisie : "hidden",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFILS_UTILISATEUR_RESPONSABLE_RH_REVUE_TAL_VERIF",
+        code : "PROFILS_UTILISATEUR_RESPONSABLE_RH_REVUE_TALENT_CHECK",
+        element : "donnee",
+        libelle : "Utilisateur",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFILS_UTILISATEUR_RESPONSABLE_RH_REVUE_TAL_LST",
+        code : "PROFILS_UTILISATEUR_RESPONSABLE_RH_REVUE_TALENT_LST",
+        element : "donnee",
+        libelle : "PROFILS_UTILISATEUR_RESPONSABLE_RH_REVUE_TALENT_LST",
+        longueur : 50,
+        requete : "PROFILS_UTILISATEUR_1",
+        retour : "PROFILS_UTILISATEUR_RESPONSABLE_RH_REVUE_TALENT_LST,PROFILS_UTILISATEUR_RESPONSABLE_RH_REVUE_TALENT_LST_MAT",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "PROFILS_UTILISATEUR_RESPONSABLE_RH_REVUE_TALENT_LST_MAT",
+        element : "donnee",
+        libelle : "PROFILS_UTILISATEUR_RESPONSABLE_RH_REVUE_TALENT_LST_MAT",
+        longueur : 50,
+        saisie : "hidden",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "ROFILS_ACTEUR_INDIRECT_REVUE_TALENT",
+        element : "donnee",
+        libelle : "Choix de l'acteur indirect revue des talents",
+        longueur : 1,
+        saisie : "span",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFIL_GROUPE_ACTEUR_INDIRECT_REVUE_TALENT_VERIF",
+        code : "PROFILS_GROUPE_ACTEUR_INDIRECT_REVUE_TALENT_CHECK",
+        element : "donnee",
+        libelle : "Groupe",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFILS_GROUPE_ACTEUR_INDIRECT_REVUE_TALENT_LST",
+        code : "PROFILS_GROUPE_ACTEUR_INDIRECT_REVUE_TALENT_LST",
+        element : "donnee",
+        libelle : "PROFILS_GROUPE_ACTEUR_INDIRECT_REVUE_TALENT_LST",
+        longueur : 50,
+        requete : "GROUPE_FORM_PROFILS_1",
+        retour : "PROFILS_GROUPE_ACTEUR_INDIRECT_REVUE_TALENT_LST,PROFILS_GROUPE_ACTEUR_INDIRECT_REVUE_TALENT_LST_MAT",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "PROFILS_GROUPE_ACTEUR_INDIRECT_REVUE_TALENT_LST_MAT",
+        element : "donnee",
+        libelle : "PROFILS_GROUPE_ACTEUR_INDIRECT_REVUE_TALENT_LST_MAT",
+        longueur : 50,
+        saisie : "hidden",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFILS_UTILISATEUR_ACTEUR_INDIREC_REVUE_TAL_VERIF",
+        code : "PROFILS_UTILISATEUR_ACTEUR_INDIRECT_REVUE_TALENT_CHECK",
+        element : "donnee",
+        libelle : "Utilisateur",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        affichage : "PROFILS_UTILISATEUR_ACTEUR_INDIRECT_REVUE_TAL_LST",
+        code : "PROFILS_UTILISATEUR_ACTEUR_INDIRECT_REVUE_TALENT_LST",
+        element : "donnee",
+        libelle : "PROFILS_UTILISATEUR_ACTEUR_INDIRECT_REVUE_TALENT_LST",
+        longueur : 50,
+        requete : "PROFILS_UTILISATEUR_1",
+        retour : "PROFILS_UTILISATEUR_ACTEUR_INDIRECT_REVUE_TALENT_LST,PROFILS_UTILISATEUR_ACTEUR_INDIRECT_REVUE_TALENT_LST_MAT",
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "PROFILS_UTILISATEUR_ACTEUR_INDIRECT_REVUE_TALENT_LST_MAT",
+        element : "donnee",
+        libelle : "PROFILS_UTILISATEUR_ACTEUR_INDIRECT_REVUE_TALENT_LST_MAT",
+        longueur : 50,
+        saisie : "hidden",
+        style : "FDonneeG",
+        type : "X"
+      } ],
+      element : "groupe",
+      libelle : "Revue des Talents",
+      onglet : true
+    }, {
+      code : "PROFILS_MAIL_GRP",
+      donnees : [ {
+        code : "PROFILS_MAIL_EMMISSION",
+        element : "donnee",
+        libelle : "Adresse d'émission des emails",
+        longueur : 50,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PROFILS_MAIL_TITRE",
+        element : "donnee",
+        libelle : "PROFILS_MAIL_TITRE",
+        longueur : 50,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PROFILS_MAIL_CONTENU",
+        element : "donnee",
+        libelle : "Contenu pour vérification des emails utilisateurs séparés par des points-virgules",
+        longueur : 50,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      } ],
+      element : "groupe",
+      libelle : "Mail",
+      onglet : true
+    } ],
+    element : "groupe",
+    libelle : "Ajouter un profil"
+  },
+  libelle : "Ajouter un profil",
+  servicelet : "ProfilsJsonServlet",
+  type : "P"
+}

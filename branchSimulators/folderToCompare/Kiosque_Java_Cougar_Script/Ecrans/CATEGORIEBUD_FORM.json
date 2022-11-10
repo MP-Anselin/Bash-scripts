@@ -1,0 +1,37 @@
+{
+  boutons : "INT",
+  code : "CATEGORIEBUD_FORM",
+  element : "ecran",
+  groupe : {
+    code : "CATEGORIEBUD_FORM_GRP",
+    donnees : [ {
+      code : "CATEGORIEBUD_NHISTO_FORM_GRP",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        pageAjout : "CATEGORIEBUD_FORM_POP",
+        pageModif : "CATEGORIEBUD_FORM_POP_M",
+        requete : "CATEGORIEBUD_FORM_1"
+      } ],
+      element : "groupe",
+      libelle : "Catégories de budget non historisées",
+      onglet : true
+    }, {
+      code : "CATEGORIEBUD_HISTO_FORM_GRP",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        pageModif : "CATEGORIEBUD_FORM_POP_M",
+        requete : "CATEGORIEBUD_FORM_2"
+      } ],
+      element : "groupe",
+      libelle : "Catégories de budget historisées",
+      onglet : true
+    } ],
+    element : "groupe",
+    libelle : "Groupe generale"
+  },
+  libelle : "Catégories de budget",
+  servicelet : "FormationCategorieBudgetJsonServlet",
+  type : "U"
+}

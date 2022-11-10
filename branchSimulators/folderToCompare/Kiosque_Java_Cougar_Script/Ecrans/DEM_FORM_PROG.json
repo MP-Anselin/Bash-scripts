@@ -1,0 +1,153 @@
+{
+  code : "DEM_FORM_PROG",
+  element : "ecran",
+  groupe : {
+    code : "DEM_FORM_PROG_GRP",
+    donnees : [ {
+      code : "WKF_200_DEM_FORM_LIBFORMAFF",
+      element : "donnee",
+      libelle : "Libellé formation",
+      longueur : 255,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "WKF_200_DEM_FORM_ORG",
+      element : "donnee",
+      libelle : "Libellé organisme",
+      longueur : 255,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Saisir les éléments pédagiques",
+      style : "FormTitre"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "WKF_200_DEM_FORM_OBJ",
+      element : "donnee",
+      libelle : "Objectif profesionnel",
+      lignes : 2,
+      longueur : 255,
+      saisie : "textarea",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "WKF_200_DEM_FORM_PROG",
+      element : "donnee",
+      libelle : "Programme de la formation",
+      lignes : 2,
+      longueur : 255,
+      saisie : "textarea",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "WKF_200_DEM_FORM_MOD",
+      element : "donnee",
+      libelle : "Modalité",
+      longueur : 50,
+      saisie : "select",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "WKF_200_DEM_FORM_MODEVAL",
+      element : "donnee",
+      libelle : "Modalité d'évaluation de la formation",
+      longueur : 255,
+      saisie : "textarea-readonly",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Origine de la demande",
+      style : "BoxLabel"
+    }, {
+      code : "WKF_200_DEM_FORM_COLL",
+      element : "donnee",
+      libelle : "Collaborateur",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      suffixe : "Collaborateur",
+      type : "X"
+    }, {
+      code : "WKF_200_DEM_FORM_RESPO",
+      element : "donnee",
+      libelle : "Responsable",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      suffixe : "Responsable",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Avis responsable",
+      style : "BoxLabel"
+    }, {
+      code : "WKF_200_DEM_FORM_FAV",
+      element : "donnee",
+      libelle : "Favorable",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      suffixe : "Favorable",
+      type : "X"
+    }, {
+      code : "WKF_200_DEM_FORM_DFAV",
+      element : "donnee",
+      libelle : "Défavorable",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      suffixe : "Défavorable",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "WKF_200_DEM_FORM_DATE",
+      element : "donnee",
+      format : "dd.MM.yyyy",
+      libelle : "Date de la demande",
+      saisie : "text",
+      style : "FDonneeG",
+      type : "D"
+    } ],
+    element : "groupe",
+    libelle : "Programme  & origine"
+  },
+  libelle : "Programme  & origine",
+  servicelet : "FormationDemandeWkf",
+  type : "W"
+}

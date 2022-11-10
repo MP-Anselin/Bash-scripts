@@ -1,0 +1,89 @@
+{
+  code : "VARSYS_USR_POP",
+  element : "ecran",
+  groupe : {
+	element: "groupe",
+	code: "VARSYS_USR_POP_GRP",
+	libelle: "",
+	donnees: [{
+		element: "donnee",
+		code: "VARSYS_LOGIN",
+		libelle: "Login",
+		saisie: "text",
+		type: "X",
+		longueur: 30,
+		obligatoire: true,
+		requete: "VARSYS_5",
+		retour: "VARSYS_LOGIN,#OUI,#NON"
+	},{
+		element: "donnee",
+		code: "#EOL"
+	},{
+		element: "donnee",
+		code: "VARSYS_MODULE",
+		libelle: "Module",
+		saisie: "span",
+		type: "X",
+		longueur: 5
+	},{
+		element: "donnee",
+		code: "#EOL"
+	},{
+		element: "donnee",
+		code: "VARSYS_CODE",
+		libelle: "Code",
+		saisie: "text",
+		type: "X",
+		longueur: 50,
+		obligatoire: true,
+		requete: "VARSYS_4",
+		retour: "VARSYS_MODULE,VARSYS_CODE,VARSYS_VALEUR,VARSYS_DESC,VARSYS_TYPE,VARSYS_BLOQUEE"
+	},{
+		element: "donnee",
+		code: "#EOL"
+	},{
+		element: "donnee",
+		code: "VARSYS_VALEUR",
+		libelle: "Valeur",
+		saisie: "text",
+		type: "X",
+		longueur: 4000
+	},{
+		element: "donnee",
+		code: "#EOL"
+	},{
+		element: "donnee",
+		code: "VARSYS_TYPE",
+		libelle: "Type",
+		saisie: "span",
+		type: "X",
+		longueur: 10
+	},{
+		element: "donnee",
+		code: "#EOL"
+	},{
+		element: "donnee",
+		code: "VARSYS_BLOQUEE",
+		libelle: "Bloquée",
+		saisie: "span",
+		type: "X",
+		longueur: 3
+	},{
+		element: "donnee",
+		code: "#EOL"
+	},{
+		element: "donnee",
+		code: "VARSYS_DESC",
+		libelle: "Description",
+		saisie: "textarea-readonly",
+		type: "X",
+		longueur: 2000
+	},{
+		element: "donnee",
+		code: "#EOL"
+	}]
+  },
+  libelle : "Ajouter ou modifier une variable utilisateur",
+  servicelet : "VarsysJsonServlet",
+  type : "P"
+}

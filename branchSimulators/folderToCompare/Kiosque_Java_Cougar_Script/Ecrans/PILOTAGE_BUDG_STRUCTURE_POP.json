@@ -1,0 +1,93 @@
+{
+  code : "PILOTAGE_BUDG_STRUCTURE_POP",
+  element : "ecran",
+  groupe : {
+    code : "PILOTAGE_STRUCTURE_BUDG_GRP",
+    donnees : [ {
+      code : "ID_AFF_BDG_GROUPE",
+      element : "donnee",
+      libelle : "ID BUDGET GROUPE",
+      longueur : 128,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "BUDG_STRUC_GROUPE",
+      element : "donnee",
+      libelle : "Groupe de structure budgétaires",
+      longueur : 128,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "BUDG_STRUC_CODE",
+      element : "donnee",
+      libelle : "Code du groupe",
+      longueur : 128,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "BUDG_STRUC_ANNEE",
+      element : "donnee",
+      libelle : "Année",
+      longueur : 128,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "BUDG_STRUC_MONTANT",
+      decimal : 2,
+      element : "donnee",
+      entier : 22,
+      libelle : "Total des montants du groupe",
+      negatif : true,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "9"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "BUDG_STRUC_SOLDE",
+      decimal : 2,
+      element : "donnee",
+      entier : 22,
+      libelle : "Total des soldes du groupe",
+      negatif : true,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "9"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "STRUCTURE_GRP",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        pageModif : "PILOTAGE_BUDG_STRUCTURE_DETAIL_POP",
+        requete : "PILOTAGE_BUDG_7"
+      } ],
+      element : "groupe",
+      libelle : "Liste des structures budgétaires associées"
+    } ],
+    element : "groupe",
+    libelle : "Liste des structures budgétaires associées"
+  },
+  libelle : "Liste des structures budgétaires associées",
+  servicelet : "FormationPilotageBudgetsJsonServlet",
+  type : "P"
+}

@@ -1,0 +1,47 @@
+{
+  boutons : "INT",
+  code : "BUDG_FORM",
+  element : "ecran",
+  groupe : {
+    code : "BUDG_FORM_GRP",
+    donnees : [ {
+      code : "#BOUTONPERSO",
+      element : "donnee",
+      libelle : "Ordonner",
+      operation : "reOrdonner"
+    }, {
+      code : "BUDG_FORM_GRP_NHISTO",
+      donnees : [ {
+        boutons : [ {
+          libelle : "Copier pour une nouvelle année",
+          operation : "Dupliquer"
+        } ],
+        code : "#TABLEAU",
+        element : "donnee",
+        pageAjout : "BUDG_FORM_POP",
+        pageModif : "BUDG_FORM_POP_M",
+        requete : "BUDG_FORM_1"
+      } ],
+      element : "groupe",
+      libelle : "Budgets",
+      onglet : true
+    }, {
+      code : "BUDG_FORM_GRP_HISTO",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        pageModif : "BUDG_FORM_POP_M",
+        requete : "BUDG_FORM_2"
+      } ],
+      element : "groupe",
+      libelle : "Budgets historisés",
+      onglet : true
+    } ],
+    element : "groupe",
+    libelle : "Groupe des budgets de formation",
+    onglet : true
+  },
+  libelle : "Budgets",
+  servicelet : "FormationBudgetsJsonServlet",
+  type : "U"
+}

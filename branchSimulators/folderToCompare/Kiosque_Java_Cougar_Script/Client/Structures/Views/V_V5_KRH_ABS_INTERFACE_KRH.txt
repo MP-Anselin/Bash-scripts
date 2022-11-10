@@ -1,0 +1,37 @@
+##
+V_V5_KRH_ABS_INTERFACE_KRH
+=SQL=
+CREATE OR REPLACE VIEW V_V5_KRH_ABS_INTERFACE_KRH ("CODE_ACTION","MATRICULE","DATE_STATUT","CODE_STATUT","ID_SAISIE","MATRICULE_PAIE","MOTIF","DATE_DEBUT","DATE_FIN","MATIN","APRES_MIDI","MOTIF_EN_PAIE","MOTIF_EN_PAIE_DJ","CODE_TRANSFORME","CODE_JOUR_COMPLET","DUREE","EXPORT_GTA") AS 
+select
+    intsta.CODE_ACTION,
+    intsta.MATRICULE,
+    intsta.DATE_STATUT,
+    intsta.CODE_STATUT,
+    intsta.ID_ABSENCE_KRH as ID_SAISIE,
+    io.VALEUR as MATRICULE_PAIE,
+    abs.MOTIF,
+    to_char(abs.DATE_DEBUT, 'yyyymmdd') as DATE_DEBUT,
+    to_char(abs.DATE_FIN, 'yyyymmdd') as DATE_FIN,
+    abs.MATIN,
+    abs.APRES_MIDI,
+    mot.MOTIFENPAIEGTA as MOTIF_EN_PAIE,
+    mot.MOTIFENPAIEDJGTA as MOTIF_EN_PAIE_DJ,
+    'O' as CODE_TRANSFORME,
+    case when mot.JOUR_COMPLET in (3, 4) then 'H' else 'J' end as CODE_JOUR_COMPLET,
+    case when abs.DUREE_HEURE is not null then abs.DUREE_HEURE
+         when abs.MATIN = 1 and abs.APRES_MIDI = 1 then 1
+         when abs.MATIN = 1 or abs.APRES_MIDI = 1 then 0.5
+         else 0
+    end as DUREE,
+    mot.EXPORT_GTA
+from T_V5_KRH_ABSENCE_KRH abs, V_V5_KRH_MOTIF_KRH mot,
+     T_V5_KRH_SALARIE_IO_TYPE io,
+     V_V5_KRH_ABS_INTERFACE_STA_KRH intsta
+where intsta.MATRICULE = abs.MATRICULE
+     and abs.MATRICULE = io.MATRICULE
+     and io.TYPE = 'HRV'
+     and abs.ID_ABSENCE_KRH = intsta.ID_ABSENCE_KRH
+     and abs.MOTIF = mot.MOTIF
+     and mot.LANGUE = (select VALEUR from T_V5_INFO where APPLI = 'krhv5' and CODE = 'LANGUE')
+     and (intsta.DATE_STATUT > abs.DATE_EXPORT_INTERFACE or abs.DATE_EXPORT_INTERFACE is null)
+order by MATRICULE_PAIE, ID_SAISIE, intsta.CODE_STATUT, DATE_STATUT

@@ -1,0 +1,136 @@
+##
+PKG_DI_COLLABORATEUR
+=SQL=
+create or replace package PKG_DI_COLLABORATEUR as
+
+    function get_id_by_matricule (
+        p_matricule in T_DI_COLLABORATEUR.MATRICULE%TYPE
+    )
+    return T_DI_COLLABORATEUR.ID_COLLABORATEUR%TYPE;
+
+    function get_id_by_identite (
+        p_nom            in T_DI_COLLABORATEUR.NOM%TYPE,
+        p_prenom         in T_DI_COLLABORATEUR.PRENOM%TYPE,
+        p_matricule_paie in T_DI_COLLABORATEUR.MATRICULE_PAIE%TYPE
+    )
+    return T_DI_COLLABORATEUR.ID_COLLABORATEUR%TYPE;
+
+end PKG_DI_COLLABORATEUR
+##
+PKG_DI_COLLABORATEUR
+=SQL=
+create or replace PACKAGE BODY PKG_DI_COLLABORATEUR as
+
+    /**
+     * Cree un collaborateur a partir d'un matricule
+     */
+    procedure create_by_matricule (
+        p_matricule in T_DI_COLLABORATEUR.MATRICULE%TYPE
+    )
+    is
+    begin
+        insert into T_DI_COLLABORATEUR (ID_COLLABORATEUR, MATRICULE)
+        values (S_DI_COLLABORATEUR.nextval, p_matricule);
+    end;
+
+    /**
+     * Cree un collaborateur a partir d'une identite
+     */
+    procedure create_by_identite (
+        p_nom            in T_DI_COLLABORATEUR.NOM%TYPE,
+        p_prenom         in T_DI_COLLABORATEUR.PRENOM%TYPE,
+        p_matricule_paie in T_DI_COLLABORATEUR.MATRICULE_PAIE%TYPE
+    )
+    is
+    begin
+        insert into T_DI_COLLABORATEUR (ID_COLLABORATEUR, NOM, PRENOM, MATRICULE_PAIE)
+        values (S_DI_COLLABORATEUR.nextval, p_nom, p_prenom, p_matricule_paie);
+    end;
+
+    /**
+     * Fournit l'ID d'un collaborateur defini par un matricule
+     * Lance une exception si le collaborateur n'existe pas
+     */
+    function find_id_by_matricule (
+        p_matricule in T_DI_COLLABORATEUR.MATRICULE%TYPE
+    )
+    return T_DI_COLLABORATEUR.ID_COLLABORATEUR%TYPE
+    IS
+        v_id_collaborateur T_DI_COLLABORATEUR.ID_COLLABORATEUR%TYPE;
+    BEGIN
+        select ID_COLLABORATEUR into v_id_collaborateur
+        from T_DI_COLLABORATEUR
+        where MATRICULE = p_matricule;
+
+        return v_id_collaborateur;
+    END;
+
+    /**
+     * Fournit l'ID d'un collaborateur defini par une identite
+     * Lance une exception si le collaborateur n'existe pas
+     */
+    function find_id_by_identite (
+        p_nom            in T_DI_COLLABORATEUR.NOM%TYPE,
+        p_prenom         in T_DI_COLLABORATEUR.PRENOM%TYPE,
+        p_matricule_paie in T_DI_COLLABORATEUR.MATRICULE_PAIE%TYPE
+    )
+    return T_DI_COLLABORATEUR.ID_COLLABORATEUR%TYPE
+    is
+        v_id_collaborateur T_DI_COLLABORATEUR.ID_COLLABORATEUR%TYPE;
+    begin
+        select ID_COLLABORATEUR into v_id_collaborateur
+        from T_DI_COLLABORATEUR
+        where (NOM = p_nom or (NOM is null and p_nom is null))
+        and (PRENOM = p_prenom or (PRENOM is null and p_prenom is null))
+        and (MATRICULE_PAIE = p_matricule_paie OR (MATRICULE_PAIE IS NULL AND p_matricule_paie IS NULL));
+
+        RETURN v_id_collaborateur;
+    END;
+
+    /**
+     * Cree un collaborateur a partir de son matricule
+     * interne s'il n'existe pas deja et fournit son ID
+     */
+    function get_id_by_matricule (
+        p_matricule in T_DI_COLLABORATEUR.MATRICULE%TYPE
+    )
+    return T_DI_COLLABORATEUR.ID_COLLABORATEUR%TYPE
+    is
+    begin
+	    -- On ne cree pas d'entree avec un matricule null
+        if p_matricule is null then
+           return null;
+        end if;
+
+        return find_id_by_matricule(p_matricule);
+
+    exception when others then
+        create_by_matricule(p_matricule);
+        return find_id_by_matricule(p_matricule);
+    end;
+
+    /**
+     * Cree un collaborateur a partir de son identite
+     * s'il n'existe pas deja et fournit son ID
+     */
+    function get_id_by_identite (
+        p_nom            in T_DI_COLLABORATEUR.NOM%TYPE,
+        p_prenom         in T_DI_COLLABORATEUR.PRENOM%TYPE,
+        p_matricule_paie in T_DI_COLLABORATEUR.MATRICULE_PAIE%TYPE
+    )
+    return T_DI_COLLABORATEUR.ID_COLLABORATEUR%TYPE
+    is
+    begin
+	    -- On ne cree pas d'entree sans identite
+        if p_nom is null and p_prenom is null and p_matricule_paie is null then
+           return null;
+        end if;
+
+        return find_id_by_identite(p_nom, p_prenom, p_matricule_paie);
+
+    exception when others then
+        create_by_identite(p_nom, p_prenom, p_matricule_paie);
+        return find_id_by_identite(p_nom, p_prenom, p_matricule_paie);
+    end;
+
+end PKG_DI_COLLABORATEUR
