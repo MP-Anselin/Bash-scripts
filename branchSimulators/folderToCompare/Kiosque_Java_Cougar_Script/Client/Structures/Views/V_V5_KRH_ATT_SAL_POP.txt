@@ -1,0 +1,9 @@
+##
+V_V5_KRH_ATT_SAL_POP
+=SQL=
+CREATE OR REPLACE VIEW V_V5_KRH_ATT_SAL_POP ("MATRICULE","ID_LETTRE","ID_FILTRE") AS 
+SELECT matricule, id_lettre, id_filtre
+FROM V_V5_KRH_ATT_FILTRE flt, T_V5_POPULATION_STRUCTURE ps, T_V5_KRH_POPULATION pop
+WHERE flt.id_population = ps.id_pop_structure
+AND ps.id_population = pop.ID_POPULATION
+ORDER BY matricule, id_lettre

@@ -1,0 +1,125 @@
+{
+  code : "ACTEUR_FORM_POP_M",
+  element : "ecran",
+  groupe : {
+    code : "ACTEUR_FORM_POP_M_GRP",
+    donnees : [ {
+      code : "ACT_FORM_ACT",
+      element : "donnee",
+      libelle : "Acteur",
+      longueur : 50,
+      obligatoire : true,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "ACT_FORM_MATPAIE",
+      element : "donnee",
+      libelle : "Matricule paie",
+      longueur : 50,
+      memeColonne : true,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "ACT_FORM_DOMAINE",
+      element : "donnee",
+      libelle : "Domaine d'éxpertise",
+      longueur : 3999,
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "ACT_FORM_SOCIETE",
+      element : "donnee",
+      libelle : "Société",
+      longueur : 50,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "ACT_FORM_DATE_DEBUT",
+      element : "donnee",
+      format : "dd.MM.yyyy",
+      libelle : "Date de début",
+      obligatoire : true,
+      saisie : "text",
+      style : "FDonneeG",
+      type : "D"
+    }, {
+      code : "ACT_FORM_DATE_DEB",
+      element : "donnee",
+      format : "dd.MM.yyyy",
+      libelle : "Date de début",
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "D"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "ACT_FORM_DATE_FIN",
+      element : "donnee",
+      format : "dd.MM.yyyy",
+      libelle : "Date de fin",
+      saisie : "text",
+      style : "FDonneeG",
+      type : "D"
+    }, {
+      code : "ACT_FORM_DATE_FINANC",
+      element : "donnee",
+      format : "dd.MM.yyyy",
+      libelle : "Date de fin",
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "D"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "ACT_FORM_HISTORISE",
+      element : "donnee",
+      libelle : "Historiser",
+      longueur : 1,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "ACT_FORM_PERMANENT",
+      element : "donnee",
+      libelle : "Permanent",
+      longueur : 1,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "ACT_FORM_ID",
+      element : "donnee",
+      libelle : "ID acteur",
+      longueur : 50,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    } ],
+    element : "groupe",
+    libelle : "Modifier un acteur formation"
+  },
+  libelle : "Modifier un acteur formation",
+  servicelet : "FormationActeurJsonServlet",
+  type : "P"
+}

@@ -1,0 +1,19 @@
+##
+V_V5_GDE_PARAMS_MNT_R2
+=SQL=
+CREATE OR REPLACE VIEW V_V5_GDE_PARAMS_MNT_R2 ("ID_SIMULATION","MATRICULE","RANG","P_POP_DE","ANC_REQ","ANC_PROF","TPS_REST") AS 
+SELECT sim.ID AS id_simulation, sal.matricule, p_mdt_rang as RANG, params.p_pop_de, params.p_anc_de  as ANC_REQ,
+params_ada.ANC_PROF, p_anc_de - params_ada.ANC_PROF as TREST
+FROM t_v5_gde_params params, t_v5_gde_salarie sal, t_v5_gde_salarie_pop sal_pop, t_v5_gde_simulation sim,
+     v_v5_gde_params_mdt_ada_r2 params_ada
+WHERE params.p_pop_de = sal_pop.sal_pop_mnt
+    AND params.p_pop_a = sal_pop.sal_pop_mnt
+    AND sal.matricule = sal_pop.matricule
+    AND params.p_anc2_de is null
+    AND params.p_anc2_a is null
+    AND params.p_nature = 'MNT'
+    AND sal_pop.id_simulation = sim.ID
+    AND params.id_params = sim.id_params_table
+    AND sal.id_data = sim.id_data
+    AND params_ada.id_simulation = sim.ID
+    AND params_ada.matricule = sal.matricule

@@ -1,0 +1,15 @@
+##
+V_V5_GDE_PARAMS_MDT_ADA_R1
+=SQL=
+CREATE OR REPLACE VIEW V_V5_GDE_PARAMS_MDT_ADA_R1 ("ID_SIMULATION","MATRICULE","P_POP_DE","P_AGE_DEBUT_ACT","DATE_DEBUT_ACTIVITE","ANC_PROF") AS 
+SELECT sim.ID AS id_simulation, sal.matricule, p_pop_de, p_age_deb_act, sal.DATE_DEBUT_ACTIVITE,
+    GREATEST(case when sal.DATE_DEBUT_ACTIVITE is null then (sal.AGE - P_AGE_DEB_ACT)
+             else round(PKG_UTIL.yearDifference(to_char(sysdate, 'dd/mm/yyyy'), to_char(sal.DATE_DEBUT_ACTIVITE, 'dd/mm/yyyy')), 5) end, sal.ANCIENNETE) as anc_prof
+FROM t_v5_gde_params params, t_v5_gde_salarie sal, t_v5_gde_salarie_pop sal_pop, t_v5_gde_simulation sim
+WHERE params.p_pop_de = sal_pop.sal_pop_ada
+    AND params.p_pop_a = sal_pop.sal_pop_ada
+    AND sal.matricule = sal_pop.matricule
+    AND params.p_nature = 'ADA'
+    AND sal_pop.id_simulation = sim.ID
+    AND params.id_params = sim.id_params_hypothese
+    AND sal.id_data = sim.id_data

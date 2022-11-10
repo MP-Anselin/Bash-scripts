@@ -1,0 +1,18 @@
+##
+V_V5_GDE_PARAMS_ADP_R1
+=SQL=
+CREATE OR REPLACE VIEW V_V5_GDE_PARAMS_ADP_R1 ("ID_SIMULATION","MATRICULE","P_POP_DE","P_AGE_DE","P_AGE_A","P_AGE_DEPART","TPS_REST") AS 
+SELECT sim.ID AS id_simulation, sal.matricule, p_pop_de, p_age_de, p_age_a,
+       NVL (NULLIF (sal.age_dep_ret, 0), params.p_age_depart) AS p_age_depart,
+       case when (NVL (NULLIF (sal.age_dep_ret, 0), params.p_age_depart) - sal.AGE) < 0 then 0
+            else (NVL (NULLIF (sal.age_dep_ret, 0), params.p_age_depart) - sal.AGE) end as TPS_REST
+FROM t_v5_gde_params params, t_v5_gde_salarie sal, t_v5_gde_salarie_pop sal_pop, t_v5_gde_simulation sim
+WHERE params.p_pop_de = sal_pop.sal_pop_adp
+    AND params.p_pop_a = sal_pop.sal_pop_adp
+    AND sal.matricule = sal_pop.matricule
+    AND sal.age >= params.p_age_de
+    AND sal.age < params.p_age_a
+    AND params.p_nature = 'ADP'
+    AND sal_pop.id_simulation = sim.ID
+    AND params.id_params = sim.id_params_table
+    AND sal.id_data = sim.id_data

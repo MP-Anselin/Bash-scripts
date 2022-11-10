@@ -1,0 +1,55 @@
+##
+V_V5_KRHEF_FORM_INSCR_STATUS
+=SQL=
+CREATE OR REPLACE VIEW V_V5_KRHEF_FORM_INSCR_STATUS ("ID_INSCRIPTION_REF","STATUS") AS 
+select ins.ID_INSCRIPTION_REF,
+          (case
+                -- "Inscription effectuée"
+                when (-- Pas de WF de demande d'inscr, ou WF de demande d'inscr accepté
+                        inswf.WF_STATUS_INSCR is null
+                        or inswf.WF_STATUS_INSCR = 'O'
+                     )
+                     and
+                     (-- Pas de WF de demande de suppression, ou WF de demande de suppression refusé ou annulé
+                        inswf.WF_STATUS_INSCR_SUPPR is null
+                        or inswf.WF_STATUS_INSCR_SUPPR in ('N', 'S')
+                     )
+                then 'validated'
+
+                -- "Inscription reportée"
+                when ins.DATE_REPORT is not null
+                then 'postponed'
+
+                -- "Demande d'inscription en attente de validation"
+                when inswf.WF_STATUS_INSCR = 'W'
+                     and (inswf.WF_STATUS_ANNUL_INSCR is null
+                          or inswf.WF_STATUS_ANNUL_INSCR in ('N', 'S'))
+                then 'waitingForValid'
+
+                -- "Demande d'inscription en cours d'annulation"
+                when inswf.WF_STATUS_ANNUL_INSCR = 'W'
+                then 'waitingForInscrCancel'
+
+                -- "Demande d'inscription annulée"
+                when inswf.WF_STATUS_ANNUL_INSCR = 'O'
+                     and inswf.WF_STATUS_INSCR = 'S'
+                then 'canceled'
+
+                -- "Demande de suppression d'inscription en attente de validation"
+                when inswf.WF_STATUS_INSCR_SUPPR = 'W'
+                     and (inswf.WF_STATUS_ANNUL_INSCR_SUPPR is null
+                          or inswf.WF_STATUS_ANNUL_INSCR_SUPPR in ('N', 'S'))
+                then 'waitingForSuppr'
+
+                -- "Demande de suppression d'inscription en cours d'annulation"
+                when inswf.WF_STATUS_ANNUL_INSCR_SUPPR = 'W'
+                then 'waitingForSupprCancel'
+
+                -- Statut non défini (ne devrait pas exister)
+                else 'undefined'
+
+           end) as STATUS
+     from T_V5_KRHEF_FORMATION_INSCR ins
+left join T_V5_KRHEF_FORMATION_INSCR_WF inswf
+       on ins.ID_INSCRIPTION_REF = inswf.ID_INSCRIPTION_REF
+    where ins.NUM_SEQ = 1

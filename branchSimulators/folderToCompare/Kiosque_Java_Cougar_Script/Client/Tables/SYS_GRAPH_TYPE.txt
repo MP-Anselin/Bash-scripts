@@ -1,0 +1,16 @@
+##
+SYS_GRAPH_TYPE
+=SQL IFNOTEXIST=SYS_GRAPH_TYPE=
+CREATE TABLE SYS_GRAPH_TYPE ( ID_TYPE_GRAPH NUMBER, LIB_GRAPH VARCHAR2(20), ICON VARCHAR2(255), PRIMARY KEY (ID_TYPE_GRAPH) ) 
+##
+SYS_GRAPH_TYPE
+==
+DELETE FROM SYS_GRAPH_TYPE
+'1','Donut','icon-chart-donut'
+'2','Camembert','fa-pie-chart'
+'3','HistoBarStacked','icon-chart-column'
+'4','HistoColumnStacked','icon-chart-column'
+'5','HistoBar','icon-chart-column'
+'6','HistoColumn','fa-bar-chart'
+'7','AeraNeg','icon-chart-area'
+'8','LineMarked','fa-line-chart'

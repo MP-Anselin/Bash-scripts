@@ -1,0 +1,130 @@
+{
+  code : "HAB_TALENT_POP_M",
+  element : "ecran",
+  groupe : {
+    code : "HAB_TALENT_MODIF",
+    donnees : [ {
+      code : "HAB_MATRICULE",
+      element : "donnee",
+      entier : 50,
+      libelle : "Matricule",
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "N"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Collaborateur : ",
+      style : "FormTitre"
+    }, {
+      code : "HAB_NOMCOLLAB",
+      element : "donnee",
+      libelle : "NomPrenom",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "HAB_TALENT_UTIL",
+      element : "donnee",
+      libelle : "Utilisateur",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      suffixe : "Utilisateur",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "HAB_TALENT_RESP",
+      element : "donnee",
+      libelle : "Responsable",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      suffixe : "Responsable",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "HAB_TALENT_EXP",
+      element : "donnee",
+      libelle : "Expert",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      suffixe : "Expert",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "HAB_TALENT_DRH",
+      element : "donnee",
+      libelle : "Directeur RH",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      suffixe : "Directeur RH",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "HAB_TALENT_RRH",
+      element : "donnee",
+      libelle : "Responsable RH",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      suffixe : "Responsable RH",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "HAB_TALENT_ACT",
+      element : "donnee",
+      libelle : "Acteiu indirect",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      suffixe : "Acteur indirect",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "HAB_TAL_ONG",
+      element : "donnee",
+      libelle : "Onglet Talant",
+      longueur : 1,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    } ],
+    element : "groupe",
+    libelle : "modifier les habilitations revue des talents"
+  },
+  libelle : "Modifier les habilitations revue des talents",
+  servicelet : "HabilitationUtilsateurJsonServlet",
+  type : "P"
+}

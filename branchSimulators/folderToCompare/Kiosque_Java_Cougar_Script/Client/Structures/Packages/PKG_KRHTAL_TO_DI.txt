@@ -1,0 +1,1048 @@
+##
+PKG_KRHTAL_TO_DI
+=SQL=
+create or replace PACKAGE PKG_KRHTAL_TO_DI as
+
+    /**
+     * Type d'accessibilite pour une campagne close et transferee vers le DI Talent
+     */
+    C_TYPE_ACCESS_CLOSE_TRANSFEREE  CONSTANT NUMBER(1) := 4;
+
+    /**
+     * Codes des themes de campagne dans le module KRH Talent
+     */
+    C_THEME_ORGANISATION          CONSTANT VARCHAR2(3) := 'ORG'; -- Mon organisation
+    C_THEME_PERFORMANCE_POTENTIEL CONSTANT VARCHAR2(3) := 'PER'; -- Performance et potentiel
+    C_THEME_RISQUE_IMPACT_DEPART  CONSTANT VARCHAR2(3) := 'RIS'; -- Risques et impacts de depart
+    C_THEME_MOBILITE              CONSTANT VARCHAR2(3) := 'MOB'; -- Mobilite
+    C_THEME_PLAN_REMPLACEMENT     CONSTANT VARCHAR2(3) := 'PLA'; -- Plan de remplacement
+    C_THEME_VALIDER_REVUE         CONSTANT VARCHAR2(3) := 'VAL'; -- Finaliser ma revue
+
+    /**
+     * Codes axe pour la table T_DI_TAL_CAMPAGNE_AXE_VAL
+     */
+    C_CODE_AXE_PERFORMANCE CONSTANT VARCHAR2(14) := 'PERFO'; -- Axe des performances
+    C_CODE_AXE_POTENTIEL   CONSTANT VARCHAR2(14) := 'POTEN'; -- Axe des potentiels
+    C_CODE_AXE_RISQUE      CONSTANT VARCHAR2(14) := 'RISQU'; -- Axe des risques de depart
+    C_CODE_AXE_IMPACT      CONSTANT VARCHAR2(14) := 'IMPCT'; -- Axe des impacts de depart
+
+    /**
+     * Codes groupe pour la table T_DI_TAL_CAMPAGNE_GRP_VAL
+     */
+    C_CODE_GRP_PERFO_POTEN CONSTANT VARCHAR2(14) := 'PERFO'; -- Groupes de performance / potentiel
+    C_CODE_GRP_DEPART      CONSTANT VARCHAR2(14) := 'DEPAR'; -- Groupes de risque/ ipmpact de depart
+
+    /**
+     * Codes item pour la table T_DI_TAL_CAMPAGNE_ITEM
+     */
+    C_CODE_ITEM_TYPE_ACTION        VARCHAR2(7) := 'TYP_ACT';
+    C_CODE_ITEM_TYPE_OBJECTIF      VARCHAR2(7) := 'TYP_OBJ';
+    C_CODE_ITEM_DELAI_MOBILITE     VARCHAR2(7) := 'DEL_MOB';
+    C_CODE_ITEM_TYPE_MOBILITE      VARCHAR2(7) := 'TYP_MOB';
+    C_CODE_ITEM_DELAI_REMPLACEMENT VARCHAR2(7) := 'DEL_REM';
+
+
+    procedure close_and_send_to_di(
+        p_krhtal_id_campagne in T_V5_KRHTAL_CAMPAGNE.ID%TYPE,
+        p_id_tache_maj_dossiers in T_V5_KRHTAL_CAMPAGNE.ID_TACHE_MAJ_DOSSIERS%TYPE
+    );
+
+end PKG_KRHTAL_TO_DI
+##
+PKG_KRHTAL_TO_DI
+=SQL=
+create or replace PACKAGE BODY PKG_KRHTAL_TO_DI as
+
+    /**
+     * Fournit l'identifiant d'un item d'une campagne
+     */
+    function get_id_item(
+        p_id_di_tal_campagne in T_DI_TAL_CAMPAGNE.ID%TYPE,
+        p_code_item in T_DI_TAL_CAMPAGNE_ITEM.CODE_ITEM%TYPE,
+        p_ordre_item in T_DI_TAL_CAMPAGNE_ITEM.ORDRE%TYPE
+    )
+    return T_DI_TAL_CAMPAGNE_ITEM.ID%TYPE
+    is
+        v_id_item T_DI_TAL_CAMPAGNE_ITEM.ID%TYPE;
+    begin
+
+        select ID into v_id_item
+        from T_DI_TAL_CAMPAGNE_ITEM
+        where ID_DI_TAL_CAMPAGNE = p_id_di_tal_campagne
+        and CODE_ITEM = p_code_item
+        and ORDRE = p_ordre_item;
+
+        return v_id_item;
+    end;
+
+    /**
+     * Cloture une campagne dans le module KRH Talent
+     */
+    procedure close_campagne(
+        p_krhtal_id_campagne in T_V5_KRHTAL_CAMPAGNE.ID%TYPE,
+        p_id_di_tal_campagne in T_V5_KRHTAL_CAMPAGNE.ID_DI_TAL_CAMPAGNE%TYPE,
+        p_id_tache_maj_dossiers in T_V5_KRHTAL_CAMPAGNE.ID_TACHE_MAJ_DOSSIERS%TYPE
+    )
+    is
+    begin
+        update T_V5_KRHTAL_CAMPAGNE set
+            DATE_TACHE_MAJ_DOSSIERS = sysdate,
+            DATE_SITUATION_MAJ_DOSSIERS = sysdate,
+            DATE_MODIFICATION = sysdate,
+            ID_TACHE_MAJ_DOSSIERS = p_id_tache_maj_dossiers,
+            ID_DI_TAL_CAMPAGNE = p_id_di_tal_campagne,
+            ACTIF = 0,
+            TYPE_ACCESSIBILITE = C_TYPE_ACCESS_CLOSE_TRANSFEREE
+        where ID = p_krhtal_id_campagne;
+    end;
+
+    /**
+     * Cree une campagne dans le Dossier Individuel Talent et fournit son identifiant
+     */
+    function create_di_tal_campagne(
+        p_krhtal_id_campagne in T_V5_KRHTAL_CAMPAGNE.ID%TYPE
+    )
+    return T_DI_TAL_CAMPAGNE.ID%TYPE
+    is
+        v_id_libelle_localise T_LIBELLE_LOCAL.ID%TYPE;
+        v_id_di_tal_campagne T_DI_TAL_CAMPAGNE.ID%TYPE;
+
+        -- Curseur pour la configuration de l'axe des performances
+        -- (stocke dans T_V5_KRHTAL_LISTE_ITEM_PRIM pour le code theme 'PER')
+        cursor curAxePerf is
+            select
+                axe.ORDRE as VALEUR,
+                axe.LIBELLE_FR_FR,
+                axe.LIBELLE_EN_US,
+                axe.LIBELLE_DE_CH
+            from T_V5_KRHTAL_CAMPAGNE cmp
+            join T_V5_KRHTAL_CAMPAGNE_CONTENU cont on cont.ID_CAMPAGNE = cmp.ID
+            join T_V5_KRHTAL_LISTE_ITEM_PRIM axe on axe.ID_CONTENU = cont.ID
+            where cmp.ID = p_krhtal_id_campagne
+            and cont.THEME = C_THEME_PERFORMANCE_POTENTIEL;
+
+        lineAxePerf curAxePerf%ROWTYPE;
+
+        -- Curseur pour la configuration de l'axe des potentiels
+        -- (stocke dans T_V5_KRHTAL_LISTE_ITEM_SECO pour le code theme 'PER')
+        cursor curAxePotentiel is
+            select
+                axe.ORDRE as VALEUR,
+                axe.LIBELLE_FR_FR,
+                axe.LIBELLE_EN_US,
+                axe.LIBELLE_DE_CH
+            from T_V5_KRHTAL_CAMPAGNE cmp
+            join T_V5_KRHTAL_CAMPAGNE_CONTENU cont on cont.ID_CAMPAGNE = cmp.ID
+            join T_V5_KRHTAL_LISTE_ITEM_SECO axe on axe.ID_CONTENU = cont.ID
+            where cmp.ID = p_krhtal_id_campagne
+            and cont.THEME = C_THEME_PERFORMANCE_POTENTIEL;
+
+        lineAxePotentiel curAxePotentiel%ROWTYPE;
+
+        -- Curseur pour la configuration de l'axe des risques de depart
+        -- (stocke dans T_V5_KRHTAL_LISTE_ITEM_PRIM pour le code theme 'RIS')
+        cursor curAxeRisque is
+            select
+                axe.ORDRE as VALEUR,
+                axe.LIBELLE_FR_FR,
+                axe.LIBELLE_EN_US,
+                axe.LIBELLE_DE_CH
+            from T_V5_KRHTAL_CAMPAGNE cmp
+            join T_V5_KRHTAL_CAMPAGNE_CONTENU cont on cont.ID_CAMPAGNE = cmp.ID
+            join T_V5_KRHTAL_LISTE_ITEM_PRIM axe on axe.ID_CONTENU = cont.ID
+            where cmp.ID = p_krhtal_id_campagne
+            and cont.THEME = C_THEME_RISQUE_IMPACT_DEPART;
+
+        lineAxeRisque curAxeRisque%ROWTYPE;
+
+        -- Curseur pour la configuration de l'axe des impacts de depart
+        -- (stocke dans T_V5_KRHTAL_LISTE_ITEM_SECO pour le code theme 'RIS')
+        cursor curAxeImpact is
+            select
+                axe.ORDRE as VALEUR,
+                axe.LIBELLE_FR_FR,
+                axe.LIBELLE_EN_US,
+                axe.LIBELLE_DE_CH
+            from T_V5_KRHTAL_CAMPAGNE cmp
+            join T_V5_KRHTAL_CAMPAGNE_CONTENU cont on cont.ID_CAMPAGNE = cmp.ID
+            join T_V5_KRHTAL_LISTE_ITEM_SECO axe on axe.ID_CONTENU = cont.ID
+            where cmp.ID = p_krhtal_id_campagne
+            and cont.THEME = C_THEME_RISQUE_IMPACT_DEPART;
+
+        lineAxeImpact curAxeImpact%ROWTYPE;
+
+        --
+        -- Comprendre le codage de l'ordre des groupes dans T_V5_KRHTAL_LISTE_ITEM_PRIM...
+        --
+        --   Y
+        --   ^------------
+        -- 3 | 0 | 1 | 2 |
+        --   +---+---+---+
+        -- 2 | 3 | 4 | 5 |
+        --   +---+---+---+
+        -- 1 | 6 | 7 | 8 |
+        --   --------------> X
+        --     1   2   3
+
+        -- Curseur pour la configuration des groupes de performance et potentiel
+        -- (stocke dans T_V5_KRHTAL_LISTE_ITEM_TERT pour le code theme 'PER')
+        cursor curGrpPerf is
+            select
+                decode(grp.ORDRE, 0, 1, 3, 1, 6, 1, 1, 2, 4, 2, 7, 2, 2, 3, 5, 3, 8, 3, grp.ORDRE) as VALEUR_X,
+                decode(grp.ORDRE, 6, 1, 7, 1, 8, 1, 3, 2, 4, 2, 5, 2, 0, 3, 1, 3, 2, 3, grp.ORDRE) as VALEUR_Y,
+                grp.LIBELLE_FR_FR,
+                grp.LIBELLE_EN_US,
+                grp.LIBELLE_DE_CH
+            from T_V5_KRHTAL_CAMPAGNE cmp
+            join T_V5_KRHTAL_CAMPAGNE_CONTENU cont on cont.ID_CAMPAGNE = cmp.ID
+            join T_V5_KRHTAL_LISTE_ITEM_TERT grp on grp.ID_CONTENU = cont.ID
+            where cmp.ID = p_krhtal_id_campagne
+            and cont.THEME = C_THEME_PERFORMANCE_POTENTIEL;
+
+        lineGrpPerf curGrpPerf%ROWTYPE;
+
+        -- Curseur pour la configuration des groupes de risque et impact de depart
+        -- (stocke dans T_V5_KRHTAL_LISTE_ITEM_TERT pour le code theme 'RIS')
+        cursor curGrpDepart is
+            select
+                decode(grp.ORDRE, 0, 1, 3, 1, 6, 1, 1, 2, 4, 2, 7, 2, 2, 3, 5, 3, 8, 3, grp.ORDRE) as VALEUR_X,
+                decode(grp.ORDRE, 6, 1, 7, 1, 8, 1, 3, 2, 4, 2, 5, 2, 0, 3, 1, 3, 2, 3, grp.ORDRE) as VALEUR_Y,
+                grp.LIBELLE_FR_FR,
+                grp.LIBELLE_EN_US,
+                grp.LIBELLE_DE_CH
+            from T_V5_KRHTAL_CAMPAGNE cmp
+            join T_V5_KRHTAL_CAMPAGNE_CONTENU cont on cont.ID_CAMPAGNE = cmp.ID
+            join T_V5_KRHTAL_LISTE_ITEM_TERT grp on grp.ID_CONTENU = cont.ID
+            where cmp.ID = p_krhtal_id_campagne
+            and cont.THEME = C_THEME_RISQUE_IMPACT_DEPART;
+
+        lineGrpDepart curGrpDepart%ROWTYPE;
+
+        -- Curseur pour la configurations des items de types d'actions
+        -- (stocke dans T_V5_KRHTAL_LISTE_ITEM_SECO pour le theme 'Finaliser ma revue')
+        cursor curItemTypeAct is
+            select
+                itm_act.ORDRE,
+                itm_act.LIBELLE_FR_FR,
+                itm_act.LIBELLE_EN_US,
+                itm_act.LIBELLE_DE_CH
+            from T_V5_KRHTAL_LISTE_ITEM_SECO itm_act
+            join T_V5_KRHTAL_CAMPAGNE_CONTENU cont on cont.ID = itm_act.ID_CONTENU and cont.THEME = C_THEME_VALIDER_REVUE
+            where cont.ID_CAMPAGNE = p_krhtal_id_campagne;
+
+        lineItemTypeAct curItemTypeAct%ROWTYPE;
+
+        -- Curseur pour la configurations des items de types d'objectifs
+        -- (stocke dans T_V5_KRHTAL_LISTE_ITEM_PRIM pour le theme 'Finaliser ma revue')
+        cursor curItemTypeObj is
+            select
+                itm_obj.ORDRE,
+                itm_obj.LIBELLE_FR_FR,
+                itm_obj.LIBELLE_EN_US,
+                itm_obj.LIBELLE_DE_CH
+            from T_V5_KRHTAL_LISTE_ITEM_PRIM itm_obj
+            join T_V5_KRHTAL_CAMPAGNE_CONTENU cont on cont.ID = itm_obj.ID_CONTENU and cont.THEME = C_THEME_VALIDER_REVUE
+            where cont.ID_CAMPAGNE = p_krhtal_id_campagne;
+
+        lineItemTypeObj curItemTypeObj%ROWTYPE;
+
+        -- Curseur pour la configurations des items de delais de mobilite
+        -- (stocke dans T_V5_KRHTAL_LISTE_ITEM_PRIM pour le thème 'Mobilite')
+        cursor curItemDelaiMob is
+            select
+                itm_del_mob.ORDRE,
+                itm_del_mob.LIBELLE_FR_FR,
+                itm_del_mob.LIBELLE_EN_US,
+                itm_del_mob.LIBELLE_DE_CH
+            from T_V5_KRHTAL_LISTE_ITEM_PRIM itm_del_mob
+            join T_V5_KRHTAL_CAMPAGNE_CONTENU cont on cont.ID = itm_del_mob.ID_CONTENU and cont.THEME = C_THEME_MOBILITE
+            where cont.ID_CAMPAGNE = p_krhtal_id_campagne;
+
+        lineItemDelaiMob curItemDelaiMob%ROWTYPE;
+
+        -- Curseur pour la configurations des items de types de mobilite
+        -- (stocke dans T_V5_KRHTAL_LISTE_ITEM_SECO pour le thème 'Mobilite')
+        cursor curItemTypeMob is
+            select
+                itm_typ_mob.ORDRE,
+                itm_typ_mob.LIBELLE_FR_FR,
+                itm_typ_mob.LIBELLE_EN_US,
+                itm_typ_mob.LIBELLE_DE_CH
+            from T_V5_KRHTAL_LISTE_ITEM_SECO itm_typ_mob
+            join T_V5_KRHTAL_CAMPAGNE_CONTENU cont on cont.ID = itm_typ_mob.ID_CONTENU and cont.THEME = C_THEME_MOBILITE
+            where cont.ID_CAMPAGNE = p_krhtal_id_campagne;
+
+        lineItemTypeMob curItemTypeMob%ROWTYPE;
+
+        -- Curseur pour la configurations des items de delais de remplacement
+        -- (stocke dans T_V5_KRHTAL_LISTE_ITEM_PRIM pour le thème 'Plan de remplacement')
+        cursor curItemDelaiRempl is
+            select
+                itm_del_rem.ORDRE,
+                itm_del_rem.LIBELLE_FR_FR,
+                itm_del_rem.LIBELLE_EN_US,
+                itm_del_rem.LIBELLE_DE_CH
+            from T_V5_KRHTAL_LISTE_ITEM_PRIM itm_del_rem
+            join T_V5_KRHTAL_CAMPAGNE_CONTENU cont on cont.ID = itm_del_rem.ID_CONTENU and cont.THEME = C_THEME_PLAN_REMPLACEMENT
+            where cont.ID_CAMPAGNE = p_krhtal_id_campagne;
+
+        lineItemDelaiRempl curItemDelaiRempl%ROWTYPE;
+
+    begin
+        --
+        -- Creation des infos generales de la configuration de la campagne
+        --
+        select S_DI_TAL_CAMPAGNE.nextval into v_id_di_tal_campagne from DUAL;
+
+        insert into T_DI_TAL_CAMPAGNE (
+            ID,
+            DATE_DEBUT,
+            DATE_FIN,
+            DATE_MAJ_DOSSIERS,
+            LIBELLE_FR_FR,
+            LIBELLE_EN_US,
+            LIBELLE_DE_CH,
+            CODE_PROVENANCE
+        )
+        select
+            v_id_di_tal_campagne,
+            krhtal_cmp.DATE_DEB,
+            krhtal_cmp.DATE_FIN,
+            sysdate,
+            krhtal_cmp.LIBELLE_FR_FR,
+            krhtal_cmp.LIBELLE_EN_US,
+            krhtal_cmp.LIBELLE_DE_CH,
+            'INT'
+        from T_V5_KRHTAL_CAMPAGNE krhtal_cmp
+        where krhtal_cmp.ID = p_krhtal_id_campagne;
+
+        --
+        -- Configuration de l'axe des performances
+        --
+        open curAxePerf;
+        loop
+            fetch curAxePerf into lineAxePerf;
+            exit when curAxePerf%NOTFOUND;
+
+            -- Recuperation de l'ID du libelle localise pour cette valeur d'axe
+            v_id_libelle_localise := PKG_LIBELLE_LOCAL.GET_ID(
+                PKG_LIBELLE_LOCAL.CODE_LIBELLE_DI_TAL_AXE_NGB,
+                lineAxePerf.LIBELLE_FR_FR,
+                lineAxePerf.LIBELLE_EN_US,
+                lineAxePerf.LIBELLE_DE_CH
+            );
+
+            insert into T_DI_TAL_CAMPAGNE_AXE_VAL (
+                ID,
+                ID_DI_TAL_CAMPAGNE,
+                CODE_AXE,
+                VALEUR,
+                ID_LIBELLE_LOCALISE
+            )
+            values (
+                S_DI_TAL_CAMPAGNE_AXE_VAL.nextval,
+                v_id_di_tal_campagne,
+                C_CODE_AXE_PERFORMANCE,
+                lineAxePerf.VALEUR,
+                v_id_libelle_localise
+            );
+
+        end loop;
+        close curAxePerf;
+
+        --
+        -- Configuration de l'axe des potentiels
+        --
+        open curAxePotentiel;
+        loop
+            fetch curAxePotentiel into lineAxePotentiel;
+            exit when curAxePotentiel%NOTFOUND;
+
+            -- Recuperation de l'ID du libelle localise pour cette valeur d'axe
+            v_id_libelle_localise := PKG_LIBELLE_LOCAL.get_id(
+                PKG_LIBELLE_LOCAL.CODE_LIBELLE_DI_TAL_AXE_NGB,
+                lineAxePotentiel.LIBELLE_FR_FR,
+                lineAxePotentiel.LIBELLE_EN_US,
+                lineAxePotentiel.LIBELLE_DE_CH
+            );
+
+            insert into T_DI_TAL_CAMPAGNE_AXE_VAL (
+                ID,
+                ID_DI_TAL_CAMPAGNE,
+                CODE_AXE,
+                VALEUR,
+                ID_LIBELLE_LOCALISE
+            )
+            values (
+                S_DI_TAL_CAMPAGNE_AXE_VAL.nextval,
+                v_id_di_tal_campagne,
+                C_CODE_AXE_POTENTIEL,
+                lineAxePotentiel.VALEUR,
+                v_id_libelle_localise
+            );
+
+        end loop;
+        close curAxePotentiel;
+
+        --
+        -- Configuration de l'axe des risques de depart
+        --
+        open curAxeRisque;
+        loop
+            fetch curAxeRisque into lineAxeRisque;
+            exit when curAxeRisque%NOTFOUND;
+
+            -- Recuperation de l'ID du libelle localise pour cette valeur d'axe
+            v_id_libelle_localise := PKG_LIBELLE_LOCAL.get_id(
+                PKG_LIBELLE_LOCAL.CODE_LIBELLE_DI_TAL_AXE_NGB,
+                lineAxeRisque.LIBELLE_FR_FR,
+                lineAxeRisque.LIBELLE_EN_US,
+                lineAxeRisque.LIBELLE_DE_CH
+            );
+
+            insert into T_DI_TAL_CAMPAGNE_AXE_VAL (
+                ID,
+                ID_DI_TAL_CAMPAGNE,
+                CODE_AXE,
+                VALEUR,
+                ID_LIBELLE_LOCALISE
+            )
+            values (
+                S_DI_TAL_CAMPAGNE_AXE_VAL.nextval,
+                v_id_di_tal_campagne,
+                C_CODE_AXE_RISQUE,
+                lineAxeRisque.VALEUR,
+                v_id_libelle_localise
+            );
+
+        end loop;
+        close curAxeRisque;
+
+        --
+        -- Configuration de l'axe des impacts de depart
+        --
+        open curAxeImpact;
+        loop
+            fetch curAxeImpact into lineAxeImpact;
+            exit when curAxeImpact%NOTFOUND;
+
+            -- Recuperation de l'ID du libelle localise pour cette valeur d'axe
+            v_id_libelle_localise := PKG_LIBELLE_LOCAL.get_id(
+                PKG_LIBELLE_LOCAL.CODE_LIBELLE_DI_TAL_AXE_NGB,
+                lineAxeImpact.LIBELLE_FR_FR,
+                lineAxeImpact.LIBELLE_EN_US,
+                lineAxeImpact.LIBELLE_DE_CH
+            );
+
+            insert into T_DI_TAL_CAMPAGNE_AXE_VAL (
+                ID,
+                ID_DI_TAL_CAMPAGNE,
+                CODE_AXE,
+                VALEUR,
+                ID_LIBELLE_LOCALISE
+            )
+            values (
+                S_DI_TAL_CAMPAGNE_AXE_VAL.nextval,
+                v_id_di_tal_campagne,
+                C_CODE_AXE_IMPACT,
+                lineAxeImpact.VALEUR,
+                v_id_libelle_localise
+            );
+
+        end loop;
+        close curAxeImpact;
+
+        --
+        -- Creation de la configuration des groupes performances et potentiels
+        --
+        open curGrpPerf;
+        loop
+            fetch curGrpPerf into lineGrpPerf;
+            exit when curGrpPerf%NOTFOUND;
+
+            -- Recuperation de l'ID du libelle localise pour cette valeur de groupe
+            v_id_libelle_localise := PKG_LIBELLE_LOCAL.get_id(
+                PKG_LIBELLE_LOCAL.CODE_LIBELLE_DI_TAL_GRP_NGB,
+                lineGrpPerf.LIBELLE_FR_FR,
+                lineGrpPerf.LIBELLE_EN_US,
+                lineGrpPerf.LIBELLE_DE_CH
+            );
+
+            insert into T_DI_TAL_CAMPAGNE_GRP_VAL (
+                ID,
+                ID_DI_TAL_CAMPAGNE,
+                CODE_GROUPE,
+                VALEUR_X,
+                VALEUR_Y,
+                ID_LIBELLE_LOCALISE
+            )
+            values (
+                S_DI_TAL_CAMPAGNE_AXE_VAL.nextval,
+                v_id_di_tal_campagne,
+                C_CODE_GRP_PERFO_POTEN,
+                lineGrpPerf.VALEUR_X,
+                lineGrpPerf.VALEUR_Y,
+                v_id_libelle_localise
+            );
+
+        end loop;
+        close curGrpPerf;
+
+        --
+        -- Creation de la configuration des groupes risques et impacts de depart
+        --
+        open curGrpDepart;
+        loop
+            fetch curGrpDepart into lineGrpDepart;
+            exit when curGrpDepart%NOTFOUND;
+
+            -- Recuperation de l'ID du libelle localise pour cette valeur de groupe
+            v_id_libelle_localise := PKG_LIBELLE_LOCAL.get_id(
+                PKG_LIBELLE_LOCAL.CODE_LIBELLE_DI_TAL_GRP_NGB,
+                lineGrpDepart.LIBELLE_FR_FR,
+                lineGrpDepart.LIBELLE_EN_US,
+                lineGrpDepart.LIBELLE_DE_CH
+            );
+
+            insert into T_DI_TAL_CAMPAGNE_GRP_VAL (
+                ID,
+                ID_DI_TAL_CAMPAGNE,
+                CODE_GROUPE,
+                VALEUR_X,
+                VALEUR_Y,
+                ID_LIBELLE_LOCALISE
+            )
+            values (
+                S_DI_TAL_CAMPAGNE_AXE_VAL.nextval,
+                v_id_di_tal_campagne,
+                C_CODE_GRP_DEPART,
+                lineGrpDepart.VALEUR_X,
+                lineGrpDepart.VALEUR_Y,
+                v_id_libelle_localise
+            );
+
+        end loop;
+        close curGrpDepart;
+
+        --
+        -- Création de la configurations des items pour les types d'actions
+        --
+        open curItemTypeAct;
+        loop
+            fetch curItemTypeAct into lineItemTypeAct;
+            exit when curItemTypeAct%NOTFOUND;
+
+            -- Recuperation de l'ID du libelle localise pour cet item
+            v_id_libelle_localise := PKG_LIBELLE_LOCAL.get_id(
+                PKG_LIBELLE_LOCAL.CODE_LIBELLE_DI_TAL_TYP_ACT,
+                lineItemTypeAct.LIBELLE_FR_FR,
+                lineItemTypeAct.LIBELLE_EN_US,
+                lineItemTypeAct.LIBELLE_DE_CH
+            );
+
+            insert into T_DI_TAL_CAMPAGNE_ITEM (
+                ID,
+                CODE_ITEM,
+                ORDRE,
+                ID_DI_TAL_CAMPAGNE,
+                ID_LIBELLE_LOCALISE
+            )
+            values (
+                S_DI_TAL_CAMPAGNE_ITEM.nextval,
+                C_CODE_ITEM_TYPE_ACTION,
+                lineItemTypeAct.ORDRE,
+                v_id_di_tal_campagne,
+                v_id_libelle_localise
+            );
+
+        end loop;
+        close curItemTypeAct;
+
+        --
+        -- Création de la configurations des items pour les types d'objectifs
+        --
+        open curItemTypeObj;
+        loop
+            fetch curItemTypeObj into lineItemTypeObj;
+            exit when curItemTypeObj%NOTFOUND;
+
+            -- Recuperation de l'ID du libelle localise pour cet item
+            v_id_libelle_localise := PKG_LIBELLE_LOCAL.get_id(
+                PKG_LIBELLE_LOCAL.CODE_LIBELLE_DI_TAL_TYP_OBJ,
+                lineItemTypeObj.LIBELLE_FR_FR,
+                lineItemTypeObj.LIBELLE_EN_US,
+                lineItemTypeObj.LIBELLE_DE_CH
+            );
+
+            insert into T_DI_TAL_CAMPAGNE_ITEM (
+                ID,
+                CODE_ITEM,
+                ORDRE,
+                ID_DI_TAL_CAMPAGNE,
+                ID_LIBELLE_LOCALISE
+            )
+            values (
+                S_DI_TAL_CAMPAGNE_ITEM.nextval,
+                C_CODE_ITEM_TYPE_OBJECTIF,
+                lineItemTypeObj.ORDRE,
+                v_id_di_tal_campagne,
+                v_id_libelle_localise
+            );
+
+        end loop;
+        close curItemTypeObj;
+
+        --
+        -- Création de la configurations des items pour les delais de mobilite
+        --
+        open curItemDelaiMob;
+        loop
+            fetch curItemDelaiMob into lineItemDelaiMob;
+            exit when curItemDelaiMob%NOTFOUND;
+
+            -- Recuperation de l'ID du libelle localise pour cet item
+            v_id_libelle_localise := PKG_LIBELLE_LOCAL.get_id(
+                PKG_LIBELLE_LOCAL.CODE_LIBELLE_DI_TAL_DEL_MOB,
+                lineItemDelaiMob.LIBELLE_FR_FR,
+                lineItemDelaiMob.LIBELLE_EN_US,
+                lineItemDelaiMob.LIBELLE_DE_CH
+            );
+
+            insert into T_DI_TAL_CAMPAGNE_ITEM (
+                ID,
+                CODE_ITEM,
+                ORDRE,
+                ID_DI_TAL_CAMPAGNE,
+                ID_LIBELLE_LOCALISE
+            )
+            values (
+                S_DI_TAL_CAMPAGNE_ITEM.nextval,
+                C_CODE_ITEM_DELAI_MOBILITE,
+                lineItemDelaiMob.ORDRE,
+                v_id_di_tal_campagne,
+                v_id_libelle_localise
+            );
+
+        end loop;
+        close curItemDelaiMob;
+
+        --
+        -- Création de la configurations des items pour les types de mobilite
+        --
+        open curItemTypeMob;
+        loop
+            fetch curItemTypeMob into lineItemTypeMob;
+            exit when curItemTypeMob%NOTFOUND;
+
+            -- Recuperation de l'ID du libelle localise pour cet item
+            v_id_libelle_localise := PKG_LIBELLE_LOCAL.get_id(
+                PKG_LIBELLE_LOCAL.CODE_LIBELLE_DI_TAL_TYP_MOB,
+                lineItemTypeMob.LIBELLE_FR_FR,
+                lineItemTypeMob.LIBELLE_EN_US,
+                lineItemTypeMob.LIBELLE_DE_CH
+            );
+
+            insert into T_DI_TAL_CAMPAGNE_ITEM (
+                ID,
+                CODE_ITEM,
+                ORDRE,
+                ID_DI_TAL_CAMPAGNE,
+                ID_LIBELLE_LOCALISE
+            )
+            values (
+                S_DI_TAL_CAMPAGNE_ITEM.nextval,
+                C_CODE_ITEM_TYPE_MOBILITE,
+                lineItemTypeMob.ORDRE,
+                v_id_di_tal_campagne,
+                v_id_libelle_localise
+            );
+
+        end loop;
+        close curItemTypeMob;
+
+        --
+        -- Création de la configurations des items pour les delais de remplacement
+        --
+        open curItemDelaiRempl;
+        loop
+            fetch curItemDelaiRempl into lineItemDelaiRempl;
+            exit when curItemDelaiRempl%NOTFOUND;
+
+            -- Recuperation de l'ID du libelle localise pour cet item
+            v_id_libelle_localise := PKG_LIBELLE_LOCAL.get_id(
+                PKG_LIBELLE_LOCAL.CODE_LIBELLE_DI_TAL_PRO_REM,
+                lineItemDelaiRempl.LIBELLE_FR_FR,
+                lineItemDelaiRempl.LIBELLE_EN_US,
+                lineItemDelaiRempl.LIBELLE_DE_CH
+            );
+
+            insert into T_DI_TAL_CAMPAGNE_ITEM (
+                ID,
+                CODE_ITEM,
+                ORDRE,
+                ID_DI_TAL_CAMPAGNE,
+                ID_LIBELLE_LOCALISE
+            )
+            values (
+                S_DI_TAL_CAMPAGNE_ITEM.nextval,
+                C_CODE_ITEM_DELAI_REMPLACEMENT,
+                lineItemDelaiRempl.ORDRE,
+                v_id_di_tal_campagne,
+                v_id_libelle_localise
+            );
+
+        end loop;
+        close curItemDelaiRempl;
+
+        return v_id_di_tal_campagne;
+    end;
+
+    /**
+     * Envoie les revues d'une campagne dans le Dossier individuel Talent
+     */
+    procedure send_revues_to_di(
+        p_krhtal_id_campagne in T_V5_KRHTAL_CAMPAGNE.ID%TYPE,
+        p_id_di_tal_campagne in T_DI_TAL_CAMPAGNE.ID%TYPE
+    )
+    is
+        v_id_di_tal_revue T_DI_TAL_REVUE.ID%TYPE;
+        v_id_candidat T_DI_COLLABORATEUR.ID_COLLABORATEUR%TYPE;
+        v_id_responsable T_DI_COLLABORATEUR.ID_COLLABORATEUR%TYPE;
+        v_id_remplacant T_DI_COLLABORATEUR.ID_COLLABORATEUR%TYPE;
+        v_id_libelle_code_emploi T_LIBELLE.ID%TYPE;
+        v_id_item T_DI_TAL_CAMPAGNE_ITEM.ID%TYPE;
+        v_id_item_bis T_DI_TAL_CAMPAGNE_ITEM.ID%TYPE;
+
+        --
+        -- Curseur pour la liste des revues candidats de la campagne
+        --
+        cursor curRevue is
+            select
+                rev.ID as ID_SAISIE_CANDIDAT,
+                rev.POSTE_CLE,
+                rev.TALENT_CLE,
+                item_perf.ORDRE as VALEUR_PERFORMANCE,
+                item_pot.ORDRE as VALEUR_POTENTIEL,
+                item_risk.ORDRE as VALEUR_RISQUE,
+                item_imp.ORDRE as VALEUR_IMPACT,
+                rev.COMMENTAIRE_PER as COMMENTAIRE_PERF_ET_POTENTIEL,
+                rev.COMMENTAIRE_RIS as COMMENTAIRE_RISQ_IMPACT_DEPART,
+                rev.COMMENTAIRE_FIN,
+                usr.EST_RESPONSABLE_TAL as EST_MANAGER,
+                rev.LIBELLE_CODE_EMPLOI,
+                rev.CANDIDAT as MATRICULE_CANDIDAT,
+                usr.RESPONSABLE_TAL as MATRICULE_RESPONSABLE
+
+                from T_V5_KRHTAL_SAISIE_CANDIDAT rev
+                join T_V5_KRH_USER usr on usr.MATRICULE = rev.CANDIDAT
+                join T_V5_KRH_SALARIE sal on sal.MATRICULE = rev.CANDIDAT
+                left join T_V5_KRHTAL_LISTE_ITEM_PRIM item_perf on item_perf.ID = rev.id_matrice_axe_item_per
+                left join T_V5_KRHTAL_LISTE_ITEM_SECO item_pot on item_pot.ID = rev.id_matrice_axe_item_pot
+                left join T_V5_KRHTAL_LISTE_ITEM_PRIM item_risk on item_risk.ID = rev.id_matrice_axe_item_ris
+                left join T_V5_KRHTAL_LISTE_ITEM_SECO item_imp on item_imp.ID = rev.id_matrice_axe_item_imp
+
+                where rev.id_campagne = p_krhtal_id_campagne
+                and rev.participe = 1;
+
+        lineRevue curRevue%ROWTYPE;
+
+        -- Curseur pour les propositions de mobilite
+        cursor curMobilite(p_id_saisie_candidat in T_V5_KRHTAL_SAISIE_CANDIDAT.ID%TYPE) is
+            select
+                mob.ORIGINE,
+                mob.COMMENTAIRE,
+                itm_del_mob.ORDRE as ORDRE_ITEM_DEL_MOB,
+                itm_typ_mob.ORDRE as ORDRE_ITEM_TYP_MOB
+            from T_V5_KRHTAL_SAISIE_MOBILITE mob
+            left join T_V5_KRHTAL_LISTE_ITEM_PRIM itm_del_mob on itm_del_mob.ID = mob.ID_DELAI
+            left join T_V5_KRHTAL_LISTE_ITEM_SECO itm_typ_mob on itm_typ_mob.ID = mob.ID_TYPE
+            where mob.ID_SAISIE_CANDIDAT = p_id_saisie_candidat
+            order by mob.ORDRE;
+
+        lineMobilite curMobilite%ROWTYPE;
+
+        -- Curseur pour les plans de remplacement
+        cursor curRempl(p_id_saisie_candidat in T_V5_KRHTAL_SAISIE_CANDIDAT.ID%TYPE) is
+            select
+                rempl.ID_REMPLACANT as MATRICULE_REMPLACANT,
+                rempl.TYPE,
+                rempl.COMMENTAIRE,
+                itm_del_rempl.ORDRE as ORDRE_ITEM
+            from T_V5_KRHTAL_SAISIE_REMPLACANT rempl
+            left join T_V5_KRHTAL_LISTE_ITEM_PRIM itm_del_rempl on itm_del_rempl.ID = rempl.ID_DELAI
+            where rempl.ID_SAISIE_CANDIDAT = p_id_saisie_candidat
+            order by rempl.TYPE, rempl.ORDRE;
+
+        lineRempl curRempl%ROWTYPE;
+
+        -- Curseur pour les propositions d'actions
+        cursor curAction(p_id_saisie_candidat in T_V5_KRHTAL_SAISIE_CANDIDAT.ID%TYPE) is
+            select itm_act.ORDRE as ORDRE_ITEM
+            from T_V5_KRHTAL_SAISIE_ACTION act
+            left join T_V5_KRHTAL_LISTE_ITEM_SECO itm_act on itm_act.ID = act.ID_TYPE
+            where act.ID_SAISIE_CANDIDAT = p_id_saisie_candidat
+            order by itm_act.ORDRE;
+
+        lineAction curAction%ROWTYPE;
+
+        -- Curseur pour les propositions d'objectifs
+        cursor curObjectif(p_id_saisie_candidat in T_V5_KRHTAL_SAISIE_CANDIDAT.ID%TYPE) is
+            select itm_obj.ORDRE as ORDRE_ITEM
+            from T_V5_KRHTAL_SAISIE_OBJECTIF obj
+            left join T_V5_KRHTAL_LISTE_ITEM_PRIM itm_obj on itm_obj.ID = obj.ID_TYPE
+            where obj.ID_SAISIE_CANDIDAT = p_id_saisie_candidat
+            order by itm_obj.ORDRE;
+
+        lineObjectif curObjectif%ROWTYPE;
+
+    begin
+        open curRevue;
+        loop
+            fetch curRevue into lineRevue;
+            exit when curRevue%NOTFOUND;
+
+            v_id_di_tal_revue := S_DI_TAL_REVUE.nextval;
+            v_id_candidat := PKG_DI_COLLABORATEUR.get_id_by_matricule(lineRevue.MATRICULE_CANDIDAT);
+            v_id_responsable := PKG_DI_COLLABORATEUR.get_id_by_matricule(lineRevue.MATRICULE_RESPONSABLE);
+            v_id_libelle_code_emploi := PKG_LIBELLE.get_id(
+                PKG_LIBELLE.CODE_LIBELLE_LIB_COD_EMPLOI,
+                lineRevue.LIBELLE_CODE_EMPLOI
+            );
+
+            --
+            -- Creation de la revue pour un candidat
+            --
+            insert into T_DI_TAL_REVUE (
+                ID,
+                POSTE_CLE,
+                TALENT_CLE,
+                VALEUR_PERFORMANCE,
+                VALEUR_POTENTIEL,
+                VALEUR_RISQUE_DE_DEPART,
+                VALEUR_IMPACT_DU_DEPART,
+                COMMENTAIRE_PERF_ET_POTENTIEL,
+                COMMENTAIRE_RISQ_IMPACT_DEPART,
+                COMMENTAIRE_FIN,
+                EST_MANAGER,
+                ID_TAL_CAMPAGNE,
+                ID_LIBELLE_LIBELLE_CODE_EMPLOI,
+                BENEFICIAIRE,
+                RESPONSABLE
+            )
+            values (
+                v_id_di_tal_revue,
+                lineRevue.POSTE_CLE,
+                lineRevue.TALENT_CLE,
+                lineRevue.VALEUR_PERFORMANCE,
+                lineRevue.VALEUR_POTENTIEL,
+                lineRevue.VALEUR_RISQUE,
+                lineRevue.VALEUR_IMPACT,
+                lineRevue.COMMENTAIRE_PERF_ET_POTENTIEL,
+                lineRevue.COMMENTAIRE_RISQ_IMPACT_DEPART,
+                lineRevue.COMMENTAIRE_FIN,
+                lineRevue.EST_MANAGER,
+                p_id_di_tal_campagne,
+                v_id_libelle_code_emploi,
+                v_id_candidat,
+                v_id_responsable
+            );
+
+            --
+            -- Insertion des mobilites
+            --
+            open curMobilite(lineRevue.ID_SAISIE_CANDIDAT);
+            loop
+                fetch curMobilite into lineMobilite;
+                exit when curMobilite%NOTFOUND;
+
+                -- Récupération de l'ID de l'item saisi pour ce type de mobilite
+                v_id_item := null;
+
+                if (lineMobilite.ORDRE_ITEM_TYP_MOB is not null) then
+	                v_id_item := get_id_item(
+	                    p_id_di_tal_campagne,
+	                    C_CODE_ITEM_TYPE_MOBILITE,
+	                    lineMobilite.ORDRE_ITEM_TYP_MOB
+	                );
+                end if;
+
+                -- Récupération de l'ID de l'item saisi pour ce delai de mobilite
+                v_id_item_bis := null;
+
+                if (lineMobilite.ORDRE_ITEM_DEL_MOB is not null) then
+	                v_id_item_bis := get_id_item(
+	                    p_id_di_tal_campagne,
+	                    C_CODE_ITEM_DELAI_MOBILITE,
+	                    lineMobilite.ORDRE_ITEM_DEL_MOB
+	                );
+                end if;
+
+                insert into T_DI_TAL_PROPO_MOBILITE(
+                    ID,
+                    ORIGINE,
+                    COMMENTAIRE,
+                    ID_TAL_REVUE,
+                    ID_ITEM_TYPE_MOB,
+                    ID_ITEM_DELAI_MOB
+                )
+                values (
+                    S_DI_TAL_PROPO_MOBILITE.nextval,
+                    lineMobilite.ORIGINE,
+                    lineMobilite.COMMENTAIRE,
+                    v_id_di_tal_revue,
+                    v_id_item,
+                    v_id_item_bis
+                );
+
+            end loop;
+            close curMobilite;
+
+            --
+            -- Insertion des plans de remplacement
+            --
+            open curRempl(lineRevue.ID_SAISIE_CANDIDAT);
+            loop
+                fetch curRempl into lineRempl;
+                exit when curRempl%NOTFOUND;
+
+                -- Récupération de l'ID de l'item saisi pour ce delai de remplacement
+                v_id_item := null;
+
+                if (lineRempl.ORDRE_ITEM is not null) then
+	                v_id_item := get_id_item(
+	                    p_id_di_tal_campagne,
+	                    C_CODE_ITEM_DELAI_REMPLACEMENT,
+	                    lineRempl.ORDRE_ITEM
+	                );
+                end if;
+
+                -- Recuperation de l'ID_COLLABORATEUR du remplacant
+                v_id_remplacant := PKG_DI_COLLABORATEUR.get_id_by_matricule(lineRempl.MATRICULE_REMPLACANT);
+
+                insert into T_DI_TAL_PROPO_REMPLACANT(
+                    ID,
+                    TYPE,
+                    COMMENTAIRE,
+                    ID_TAL_REVUE,
+                    ID_COLLABORATEUR,
+                    ID_ITEM
+                )
+                values (
+                    S_DI_TAL_PROPO_REMPLACANT.nextval,
+                    lineRempl.TYPE,
+                    lineRempl.COMMENTAIRE,
+                    v_id_di_tal_revue,
+                    v_id_remplacant,
+                    v_id_item
+                );
+
+            end loop;
+            close curRempl;
+
+            --
+            -- Insertion des actions
+            --
+            open curAction(lineRevue.ID_SAISIE_CANDIDAT);
+            loop
+                fetch curAction into lineAction;
+                exit when curAction%NOTFOUND;
+
+                -- Récupération de l'ID de l'item saisi pour cette proposition d'action
+                v_id_item := null;
+
+                if (lineAction.ORDRE_ITEM is not null) then
+	                v_id_item := get_id_item(
+	                    p_id_di_tal_campagne,
+	                    C_CODE_ITEM_TYPE_ACTION,
+	                    lineAction.ORDRE_ITEM
+	                );
+                end if;
+
+                insert into T_DI_TAL_ACTION(
+                    ID,
+                    ID_TAL_REVUE,
+                    ID_ITEM
+                )
+                values (
+                    S_DI_TAL_ACTION.nextval,
+                    v_id_di_tal_revue,
+                    v_id_item
+                );
+
+            end loop;
+            close curAction;
+
+            --
+            -- Insertion des objectifs
+            --
+            open curObjectif(lineRevue.ID_SAISIE_CANDIDAT);
+            loop
+                fetch curObjectif into lineObjectif;
+                exit when curObjectif%NOTFOUND;
+
+                -- Récupération de l'ID de l'item saisi pour cette proposition d'objectif
+                v_id_item := null;
+
+                if (lineObjectif.ORDRE_ITEM is not null) then
+	                v_id_item := get_id_item(
+	                    p_id_di_tal_campagne,
+	                    C_CODE_ITEM_TYPE_OBJECTIF,
+	                    lineObjectif.ORDRE_ITEM
+	                );
+                end if;
+
+                insert into T_DI_TAL_OBJECTIF(
+                    ID,
+                    ID_TAL_REVUE,
+                    ID_ITEM
+                )
+                values (
+                    S_DI_TAL_OBJECTIF.nextval,
+                    v_id_di_tal_revue,
+                    v_id_item
+                );
+
+            end loop;
+            close curObjectif;
+
+        end loop;
+        close curRevue;
+
+    end;
+
+    /**
+     * Cloture une campagne et envoie les saisies dans le Dossier individuel Talent
+     */
+    procedure close_and_send_to_di(
+        p_krhtal_id_campagne in T_V5_KRHTAL_CAMPAGNE.ID%TYPE,
+        p_id_tache_maj_dossiers in T_V5_KRHTAL_CAMPAGNE.ID_TACHE_MAJ_DOSSIERS%TYPE
+    )
+    is
+        v_date_maj_dossiers T_V5_KRHTAL_CAMPAGNE.DATE_SITUATION_MAJ_DOSSIERS%TYPE;
+        v_id_di_tal_campagne T_DI_TAL_CAMPAGNE.ID%TYPE;
+    begin
+
+        --
+        -- Si la campagne a deja ete envoyee dans le Dossier Individuel, ne rien faire!!!
+        -- (Exemple: tache postee plusieurs fois, lancement manuel de la procedure, etc...)
+        --
+        select DATE_SITUATION_MAJ_DOSSIERS into v_date_maj_dossiers
+        from T_V5_KRHTAL_CAMPAGNE
+        where ID = p_krhtal_id_campagne;
+
+        if v_date_maj_dossiers is not null then
+            raise_application_error(
+                -20000,
+                'La campagne ' || p_krhtal_id_campagne || ' a deja ete envoyee dans le dossier individuel'
+            );
+        end if;
+
+        --
+        -- Traitement
+        --
+        v_id_di_tal_campagne := create_di_tal_campagne(p_krhtal_id_campagne);
+        send_revues_to_di(p_krhtal_id_campagne, v_id_di_tal_campagne);
+        close_campagne(p_krhtal_id_campagne, v_id_di_tal_campagne, p_id_tache_maj_dossiers);
+    end;
+
+end PKG_KRHTAL_TO_DI

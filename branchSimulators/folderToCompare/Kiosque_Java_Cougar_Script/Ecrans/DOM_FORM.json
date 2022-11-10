@@ -1,0 +1,37 @@
+{
+  boutons : "INT",
+  code : "DOM_FORM",
+  element : "ecran",
+  groupe : {
+    code : "ONGLET_GRP",
+    donnees : [ {
+      code : "DOM_FORM_GRP",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        pageAjout : "DOM_FORM_POP",
+        pageModif : "DOM_FORM_POP_M",
+        requete : "DOM_FORM_1"
+      } ],
+      element : "groupe",
+      libelle : "Domaines non historisés",
+      onglet : true
+    }, {
+      code : "DOM_FORM_HISTO_GRP",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        pageModif : "DOM_FORM_POP_M",
+        requete : "Dom_FORM_HISTO_1"
+      } ],
+      element : "groupe",
+      libelle : "Domaines Historisés",
+      onglet : true
+    } ],
+    element : "groupe",
+    libelle : "onglet grp"
+  },
+  libelle : "Gestion des domaines de formation ",
+  servicelet : "DomaineFormationJsonServlet",
+  type : "U"
+}

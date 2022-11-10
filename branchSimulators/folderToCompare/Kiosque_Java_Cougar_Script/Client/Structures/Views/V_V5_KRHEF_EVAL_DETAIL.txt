@@ -1,0 +1,170 @@
+##
+V_V5_KRHEF_EVAL_DETAIL
+=SQL=
+CREATE OR REPLACE VIEW V_V5_KRHEF_EVAL_DETAIL ("ID_INSCRIPTION_REF","MATRICULE","FORMULAIRE_ID","FORMULAIRE_TYPE","FORMULAIRE_DATE_CREATION","FORMULAIRE_DATE_CLOTURE","WF_DEMANDE_ID","WF_DEMANDE_ETAT","WF_ACTION","WF_REPONSE_ETAT","WF_REPONSE_DATE","WF_BY_USER_REF_ID") AS 
+select
+    inscr.ID_INSCRIPTION_REF,
+    inscr.COLLABORATEUR as MATRICULE,
+    ksqform.ID_KSQFORM_GEN_INSTANCE as FORMULAIRE_ID,
+    nvl(
+        ksqform.DEF_TYPE,
+        decode(
+            fdem.INTERNE,
+            1,
+            'FormEvalChaudInterne',
+            'FormEvalChaudExterne'
+        )
+    ) as FORMULAIRE_TYPE,
+    ksqform.DATE_CREATION as FORMULAIRE_DATE_CREATION,
+    ksqform.DATE_CLOTURE as FORMULAIRE_DATE_CLOTURE,
+    wfdem.ID_WF_DEMANDE as WF_DEMANDE_ID,
+    wfdem.DEMANDE_ETAT as WF_DEMANDE_ETAT,
+    wfact.ACTION as WF_ACTION,
+    wfact.REPONSE_ETAT as WF_REPONSE_ETAT,
+    wfact.REPONSE_DATE as WF_REPONSE_DATE,
+    wfact.BY_USER_REF_ID as WF_BY_USER_REF_ID
+
+from
+    T_V5_KRHEF_FORMATION_INSCR inscr
+
+    join T_V5_KRHEF_FORM_DEMANDE fdem
+    on fdem.ID_FORMATION_DEMANDE = inscr.ID_FORMATION_DEMANDE
+    and fdem.PLAN_GELE = 0
+
+    join T_V5_KRHEF_SESSION ses
+    on ses.ID_SESSION = inscr.ID_SESSION
+    and ses.NUM_SEQ = 1
+
+    join T_V5_KRH_PROFIL_USER pu
+    on pu.MATRICULE = inscr.COLLABORATEUR
+
+    left join (
+        select
+            ksqform_inst.ID_KSQFORM_GEN_INSTANCE,
+            to_number(ksqform_inst.EXT_ID) as EXT_ID,
+            ksqform_inst.DATE_CREATION,
+            ksqform_inst.DATE_CLOTURE,
+            ksqform_ref.DEF_TYPE
+        from
+            T_V5_KSQFORM_GEN_INSTANCE ksqform_inst
+            join T_V5_KSQFORM_GEN_REF ksqform_ref
+            on ksqform_ref.ID_KSQFORM_GEN_DEF = ksqform_inst.ID_KSQFORM_GEN_DEF
+        where
+            ksqform_inst.EXT_TBL = 'T_V5_KRHEF_FORMATION_INSCR'
+            and ksqform_inst.EXT_COL = 'ID_INSCRIPTION'
+            and (
+                ksqform_ref.DEF_TYPE = 'FormEvalChaudInterne'
+                or ksqform_ref.DEF_TYPE = 'FormEvalChaudExterne'
+            )
+    ) ksqform
+    on ksqform.EXT_ID = inscr.ID_INSCRIPTION
+
+    left join T_V5_WF_DEMANDE wfdem
+    on wfdem.ID_REFERENCE = to_char(inscr.ID_INSCRIPTION_REF)
+        and wfdem.TYPE_DEMANDE = 'FormEvalChaud'
+        and wfdem.DEMANDE_ETAT != 'S'
+
+    left join T_V5_WF_ACTION wfact
+    on wfact.ID_WF_DEMANDE = wfdem.ID_WF_DEMANDE
+        and wfact.ACTION != 'prevenir'
+
+where
+    inscr.NUM_SEQ = 0
+    and (
+        -- Ou bien l'instance de formulaire existe
+        ksqform.ID_KSQFORM_GEN_INSTANCE is not null
+        -- Ou bien la session est évaluable à chaud (paramétrage de la session et du profil)
+        or (
+            ses.EVAL_CHAUD = 1
+            and (
+                pu.OPT_KRH_FORM_DT_NO_EVAL_CHAUD is null
+                or pu.OPT_KRH_FORM_DT_NO_EVAL_CHAUD < ses.DATE_FIN
+            )
+        )
+    )
+
+union
+
+--
+-- Evaluations à froid
+--
+select
+    inscr.ID_INSCRIPTION_REF,
+    inscr.COLLABORATEUR as MATRICULE,
+    ksqform.ID_KSQFORM_GEN_INSTANCE as FORMULAIRE_ID,
+    nvl(
+        ksqform.DEF_TYPE,
+        decode(
+            fdem.INTERNE,
+            1,
+            'FormEvalFroidInterne',
+            'FormEvalFroidExterne'
+        )
+    ) as FORMULAIRE_TYPE,
+    ksqform.DATE_CREATION as FORMULAIRE_DATE_CREATION,
+    ksqform.DATE_CLOTURE as FORMULAIRE_DATE_CLOTURE,
+    wfdem.ID_WF_DEMANDE as WF_DEMANDE_ID,
+    wfdem.DEMANDE_ETAT as WF_DEMANDE_ETAT,
+    wfact.ACTION as WF_ACTION,
+    wfact.REPONSE_ETAT as WF_REPONSE_ETAT,
+    wfact.REPONSE_DATE as WF_REPONSE_DATE,
+    wfact.BY_USER_REF_ID as WF_BY_USER_REF_ID
+
+from
+    T_V5_KRHEF_FORMATION_INSCR inscr
+
+    join T_V5_KRHEF_FORM_DEMANDE fdem
+    on fdem.ID_FORMATION_DEMANDE = inscr.ID_FORMATION_DEMANDE
+    and fdem.PLAN_GELE = 0
+
+    join T_V5_KRHEF_SESSION ses
+    on ses.ID_SESSION = inscr.ID_SESSION
+    and ses.NUM_SEQ = 1
+
+    join T_V5_KRH_PROFIL_USER pu
+    on pu.MATRICULE = inscr.COLLABORATEUR
+
+    left join (
+        select
+            ksqform_inst.ID_KSQFORM_GEN_INSTANCE,
+            to_number(ksqform_inst.EXT_ID) as EXT_ID,
+            ksqform_inst.DATE_CREATION,
+            ksqform_inst.DATE_CLOTURE,
+            ksqform_ref.DEF_TYPE
+        from
+            T_V5_KSQFORM_GEN_INSTANCE ksqform_inst
+            join T_V5_KSQFORM_GEN_REF ksqform_ref
+            on ksqform_ref.ID_KSQFORM_GEN_DEF = ksqform_inst.ID_KSQFORM_GEN_DEF
+        where
+            ksqform_inst.EXT_TBL = 'T_V5_KRHEF_FORMATION_INSCR'
+            and ksqform_inst.EXT_COL = 'ID_INSCRIPTION'
+            and (
+                ksqform_ref.DEF_TYPE = 'FormEvalFroidInterne'
+                or ksqform_ref.DEF_TYPE = 'FormEvalFroidExterne'
+            )
+    ) ksqform
+    on ksqform.EXT_ID = inscr.ID_INSCRIPTION
+
+    left join T_V5_WF_DEMANDE wfdem
+    on wfdem.ID_REFERENCE = to_char(inscr.ID_INSCRIPTION_REF)
+        and wfdem.TYPE_DEMANDE = 'FormEvalFroid'
+        and wfdem.DEMANDE_ETAT != 'S'
+
+    left join T_V5_WF_ACTION wfact
+    on wfact.ID_WF_DEMANDE = wfdem.ID_WF_DEMANDE
+        and wfact.ACTION != 'prevenir'
+
+where
+    inscr.NUM_SEQ = 0
+    and (
+        -- Ou bien l'instance de formulaire existe
+        ksqform.ID_KSQFORM_GEN_INSTANCE is not null
+        -- Ou bien la session est évaluable à froid (paramétrage de la session et du profil)
+        or (
+            ses.EVAL_FROID = 1
+            and (
+                pu.OPT_KRH_FORM_DT_NO_EVAL_FROID is null
+                or pu.OPT_KRH_FORM_DT_NO_EVAL_FROID < ses.DATE_FIN
+            )
+        )
+    )

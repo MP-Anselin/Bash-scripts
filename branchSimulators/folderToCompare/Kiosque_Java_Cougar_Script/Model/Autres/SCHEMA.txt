@@ -1,0 +1,520 @@
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Référentiels','Acteurs','Ext.adp.Modules.RD.STD.EXP.ACTEUR_FORM.ACTEUR_FORM',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Référentiels','Axes stratégiques formation','Ext.adp.Modules.RD.STD.EXP.AXE_STR_FORM.AXE_STR_FORM',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Référentiels','Barèmes','EXP.FOR.REF.Baremes',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Référentiels','Catégories de barèmes','EXP.FOR.REF.Categoriesdebaremes',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Référentiels','Budgets','EXP.FOR.REF.Budgets',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Référentiels','Catégories de budget','Ext.adp.Modules.RD.STD.EXP.CATEGORIEBUD_FORM.CATEGORIEBUD_FORM',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Référentiels','Budgets responsables','EXP.FOR.REF.Budgetsresponsables',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Référentiels','Groupes de structures budgétaires','Ext.adp.Modules.RD.STD.EXP.STR_BDG_FORM.STR_BDG_FORM',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Référentiels','Structures budgétaires','EXP.FOR.REF.Structuresbudgetaires',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Référentiels','Types et dispositifs','Ext.adp.Modules.RD.STD.EXP.TYPEDESPO_FORM.TYPEDESPO_FORM',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Référentiels','Catalogues','EXP.FOR.REF.Catalogues',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Référentiels','Formations en ligne','EXP.FOR.REF.Formationsenligne',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Référentiels','Domaines','Ext.adp.Modules.RD.STD.EXP.DOM_FORM.DOM_FORM',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Référentiels','Filtres des formations','EXP.FOR.REF.Filtresdesformations',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Référentiels','Formulaires','EXP.FOR.REF.Formulaires',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Référentiels','Lieux de formation','Ext.adp.Modules.RD.STD.EXP.ADR_LIEU_FORM.ADR_LIEU_FORM',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Référentiels','Modalités d''évaluation','EXP.FOR.REF.Modalitesdevaluation',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Référentiels','Organismes de formation','Ext.adp.Modules.RD.STD.EXP.ORG_FORM.ORG_FORM',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Référentiels','Plan','Ext.adp.Modules.RD.STD.EXP.PLAN_FORM.PLAN_FORM',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Référentiels','Gestion des financeurs','Ext.adp.Modules.RD.STD.EXP.FIN_FORM.FIN_FORM',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Gérer la formation','Demandes individuelles','EXP.FOR.GER.Demandesindividuelles',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Gérer la formation','Demandes collectives','EXP.FOR.GER.Demandescollectives',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Gérer la formation','Construire le prévisionel','EXP.FOR.GER.Construireleprevisionel',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Gérer la formation','Tableau de bord des plans','EXP.FOR.GER.Tableaudeborddesplans',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Gérer la formation','Tableau de bord des stages','EXP.FOR.GER.Tableaudeborddesstages',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Gérer la formation','Gérer les stages','EXP.FOR.GER.Gererlesstages',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Gérer la formation','Inscrire aux sessions','EXP.FOR.GER.Inscrireauxsessions',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Gérer la formation','Suivre les inscriptions','EXP.FOR.GER.Suivrelesinscriptions',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Gérer la formation','Gérer le réalisé','EXP.FOR.GER.Gererlerealise',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Gérer la formation','Préparation bilan 6 ans','EXP.FOR.GER.Preparationbilan6ans',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Administration','Populations','EXP.FOR.ADM.Populations',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Administration','Strutures','EXP.FOR.ADM.Strutures',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Administration','Motifs d''absence','EXP.FOR.ADM.Motifsdabsence',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Administration','Emails','EXP.FOR.ADM.Emails',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Administration','Lettres et attestations','EXP.FOR.ADM.Lettresetattestations',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Administration','Sites d''attestations','EXP.FOR.ADM.Sitesdattestations',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Administration','Workflows en cours','EXP.FOR.ADM.Workflowsencours',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Administration','Messages d''informations','EXP.FOR.ADM.Messagesdinformations',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Administration','Mes traitements','EXP.FOR.ADM.Mestraitements',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Administration','Planifier les traitements','EXP.FOR.ADM.Planifierlestraitements',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Extractions','Indicateurs IRP','EXP.FOR.EXT.IndicateursIRP',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Extractions','Fichiers générés','EXP.FOR.EXT.Fichiersgeneres',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Informations RH','Catalogues des formations','EXP.FOR.INF.Cataloguesdesformations',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Informations RH','Fiches individuelles','EXP.FOR.INF.Fichesindividuelles',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Informations RH','Arbre des responsables','EXP.FOR.INF.Arbredesresponsables',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Alertes','Configurer les événements','EXP.FOR.ALE.Configurerlesevenements',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Formations','Alertes','Liste des échéances','EXP.FOR.ALE.Listedesecheances',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Entretiens','Référentiels','Axes stratégiques entreprise','EXP.ENT.REF.Axesstrategiquesentreprise',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Entretiens','Référentiels','Barèmes','EXP.ENT.REF.Baremes',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Entretiens','Référentiels','Catégories de barèmes','EXP.ENT.REF.Categoriesdebaremes',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Entretiens','Référentiels','Compétences','EXP.ENT.REF.Competences',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Entretiens','Référentiels','Catégories de compétences','EXP.ENT.REF.Categoriesdecompetences',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Entretiens','Référentiels','Descriptions','EXP.ENT.REF.Descriptions',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Entretiens','Référentiels','Echelles de délais','EXP.ENT.REF.Echellesdedelais',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Entretiens','Référentiels','Mémos','EXP.ENT.REF.Memos',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Entretiens','Référentiels','Mobilités','EXP.ENT.REF.Mobilites',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Entretiens','Référentiels','Modèles de mission','EXP.ENT.REF.Modelesdemission',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Entretiens','Référentiels','Catégories des missions','EXP.ENT.REF.Categoriesdesmissions',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Entretiens','Référentiels','Fiches de poste','EXP.ENT.REF.Fichesdeposte',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Entretiens','Référentiels','Objectifs','EXP.ENT.REF.Objectifs',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Entretiens','Référentiels','Catégories d''objectifs','EXP.ENT.REF.Categoriesdobjectifs',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Entretiens','Gérer les entretiens','Campagnes','EXP.ENT.GER.Campagnes',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Entretiens','Gérer les entretiens','A la demande','EXP.ENT.GER.Alademande',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Entretiens','Gérer les entretiens','Tableau de bord des entretiens','EXP.ENT.GER.Tableaudeborddesentretiens',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Entretiens','Gérer les entretiens','Affecter des entretiens','EXP.ENT.GER.Affecterdesentretiens',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Entretiens','Gérer les entretiens','Compléter un entretien','EXP.ENT.GER.Completerunentretien',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Entretiens','Gérer les entretiens','Tableau de bord des demandes de formations et des souhaits d''évolutions','EXP.ENT.GER.Tableaudeborddesdemandesdeformationsetdessouhaitsdevolutions',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Entretiens','Administration','Populations','EXP.ENT.ADM.Populations',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Entretiens','Administration','Structures','EXP.ENT.ADM.Structures',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Entretiens','Administration','Emails','EXP.ENT.ADM.Emails',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Entretiens','Administration','Messages d''informations','EXP.ENT.ADM.Messagesdinformations',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Entretiens','Administration','Workflows en cours','EXP.ENT.ADM.Workflowsencours',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Entretiens','Administration','Sites d''attestations','EXP.ENT.ADM.Sitesdattestations',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Entretiens','Administration','Mes traitements','EXP.ENT.ADM.Mestraitements',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Entretiens','Administration','Planifier les traitements','EXP.ENT.ADM.Planifierlestraitements',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Entretiens','Informations RH','Fiches individuelles','EXP.ENT.INF.Fichesindividuelles',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Entretiens','Informations RH','Catalogues des formations','EXP.ENT.INF.Cataloguesdesformations',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Entretiens','Informations RH','Fiches de poste','EXP.ENT.INF.Fichesdeposte',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Entretiens','Informations RH','Référentiel des missions','EXP.ENT.INF.Referentieldesmissions',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Entretiens','Informations RH','Liste des échéances','EXP.ENT.INF.Listedesecheances',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Entretiens','Informations RH','Arbre des responsables','EXP.ENT.INF.Arbredesresponsables',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Entretiens','Alertes','Configurer les événements','EXP.ENT.ALE.Configurerlesevenements',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Entretiens','Alertes','Liste des échéances','EXP.ENT.ALE.Listedesecheances',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Entretiens','Echanges de données','Importer les salariés','EXP.ENT.ECH.Importerlessalaries',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Entretiens','Délégations','Prendre une délégation','EXP.ENT.DEL.Prendreunedelegation',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Entretiens','Délégations','Déléguer mes droits','EXP.ENT.DEL.Deleguermesdroits',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Revue des talents','Gérer les revues','Mes revues en cours','EXP.REV.GER.Mesrevuesencours',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Revue des talents','Gérer les revues','Mes indicateurs','EXP.REV.GER.Mesindicateurs',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Revue des talents','Gérer les revues','Historique','EXP.REV.GER.Historique',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Revue des talents','Gérer les revues','Configuration des campagnes','EXP.REV.GER.Configurationdescampagnes',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Revue des talents','Gérer les revues','Configuration de l''accès aux indicateurs','EXP.REV.GER.Configurationdelaccesauxindicateurs',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Revue des talents','Administration','Populations','EXP.REV.ADM.Populations',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Revue des talents','Administration','Structures','EXP.REV.ADM.Structures',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Revue des talents','Administration','Export','EXP.REV.ADM.Export',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Revue des talents','Administration','Messages d''informations','EXP.REV.ADM.Messagesdinformations',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Revue des talents','Administration','Mes traitements','EXP.REV.ADM.Mestraitements',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Revue des talents','Administration','Planifier les traitements','EXP.REV.ADM.Planifierlestraitements',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Revue des talents','Informations RH','Arbre des responsables','EXP.REV.INF.Arbredesresponsables',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Revue des talents','Délégations','Prendre une délégation','EXP.REV.DEL.Prendreunedelegation',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert','Revue des talents','Délégations','Déléguer mes droits','EXP.REV.DEL.Deleguermesdroits',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert sécurité','Sécurité','Administration','Habilitations','Ext.adp.Modules.RD.STD.EXP.HAB_UTIL_SEC.HAB_UTIL_SEC',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert sécurité','Sécurité','Administration','Désignations','EXP.SEC.ADM.Designations',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert sécurité','Sécurité','Administration','Utilisateurs de l''annuaire','EXP.SEC.ADM.Utilisateursdelannuaire',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert sécurité','Sécurité','Administration','Utilisateurs uniquement KRH','EXP.SEC.ADM.UtilisateursuniquementKRH',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert sécurité','Sécurité','Administration','Délégations','EXP.SEC.ADM.Delegations',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Expert sécurité','Sécurité','Administration','Arbre des responsables','EXP.SEC.ADM.Arbredesresponsables',3)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Administrateur ADP','Support','Général','Informations générales du salarié','ADM.SUP.GEN.Informationsgeneralesdusalarie',4)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Administrateur ADP','Support','Général','Rapport de traduction','ADM.SUP.GEN.Rapportdetraduction',4)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Administrateur ADP','Support','Général','Outils du support','ADM.SUP.GEN.Outilsdusupport',4)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Administrateur ADP','Support','Formation','Reprise de l''historique formation','ADM.SUP.FOR.Reprisedelhistoriqueformation',4)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Administrateur ADP','Support','Entretien','Reprise de l''historique entretien','ADM.SUP.ENT.Reprisedelhistoriqueentretien',4)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Administrateur ADP','Paramétrage','Administration','Groupes','Ext.adp.Modules.RD.STD.EXP.GROUPE_FORM.GROUPE_FORM',4)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Administrateur ADP','Paramétrage','Administration','Profils','ADM.PAR.ADM.Profils',4)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Administrateur ADP','Paramétrage','Administration','Règles de validation','ADM.PAR.ADM.Reglesdevalidation',4)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Administrateur ADP','Paramétrage','Administration','Import des données','ADM.PAR.ADM.Importdesdonnees',4)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Administrateur ADP','Paramétrage','Administration','Modélisation import','ADM.PAR.ADM.Modelisationimport',4)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Administrateur ADP','Paramétrage','Administration','Pilotage du paramétrage des arbres','ADM.PAR.ADM.Pilotageduparametragedesarbres',4)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Administrateur ADP','Paramétrage','Administration','Variables système','Ext.adp.Moteur.ADP_ONLY.varSys.VarSys',4)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Administrateur ADP','Paramétrage','Administration','Appel table','Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.AppelsTableTools',4)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Administrateur ADP','Paramétrage','Administration','AtelierExtjs','Ext.adp.Moteur.ADP_ONLY.varSys.AtelierExtjs',4)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Administrateur ADP','Paramétrage','Administration','Paramétrage du pac','Ext.adp.Modules.RD.STD.EXP.PARAMPAC_PARAM.PARAMPAC_PARAM',4)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Administrateur ADP','Paramétrage','Administration','Atelier','Ext.adp.Moteur.ADP_ONLY.varSys.Atelier',4)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Administrateur ADP','Paramétrage','Administration','Habilitations','Ext.adp.Modules.RD.STD.EXP.HAB_UTIL_SEC_ADM.HAB_UTIL_SEC_ADM',4)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Administrateur ADP','Paramétrage','Traitements','Mes traitements','ADM.PAR.TRA.Mestraitements',4)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Administrateur ADP','Paramétrage','Traitements','Planifier les traitements','ADM.PAR.TRA.Planifierlestraitements',4)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Administrateur ADP','Paramétrage','Traitements','Traitements','ADM.PAR.TRA.Traitements',4)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Administrateur ADP','Paramétrage','Générateur','Paramétrage des écrans','Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageEcransExtjs',4)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Administrateur ADP','Paramétrage','Générateur','Paramétrage des groupes de données','Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageGroupesDonneesExtjs',4)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Administrateur ADP','Paramétrage','Générateur','Paramétrage des données','Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageDonneesExtjs',4)
+##
+ADM_ADD_PAGE_IN_SCHEMA
+=SQL=
+CALL ADM_ADD_PAGE_IN_SCHEMA('-1','Kiosque RH','Administrateur ADP','Paramétrage','Générateur','Paramétrage des règles de gestion','Moteur/ADP_ONLY/ParamEcranDyn/ParametrageReglesGestion_v2.jsp',4)

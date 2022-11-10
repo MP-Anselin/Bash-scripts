@@ -1,0 +1,47 @@
+##
+V_V5_GDE_PARAMS_MDT_ADA_R2
+=SQL=
+CREATE OR REPLACE VIEW V_V5_GDE_PARAMS_MDT_ADA_R2 ("ID_SIMULATION","MATRICULE","P_POP_DE","P_AGE_DEBUT_ACT","DATE_DEBUT_ACTIVITE","ANC_PROF","ANC_PROF_REEL","ANC_ENTR","ANC_GRP","OPTION_ANC") AS 
+SELECT
+  sim.ID AS id_simulation,
+  sal.matricule,
+  p_pop_de,
+  p_age_deb_act,
+  sal.DATE_DEBUT_ACTIVITE,
+  case
+    when infos.c_valnum is null or infos.c_valnum = 0
+      then (
+        GREATEST(case when sal.DATE_DEBUT_ACTIVITE is null then (sal.AGE - P_AGE_DEB_ACT)
+                      else round(PKG_UTIL.yearDifference(to_char(simdata.date_import, 'dd/mm/yyyy'), to_char(sal.DATE_DEBUT_ACTIVITE, 'dd/mm/yyyy')), 5) end, sal.ANCIENNETE)
+      )
+    when infos.c_valnum = 1
+      then sal.anciennete
+    when infos.c_valnum = 2
+      then (
+        case when sal.DATE_ENTREE_GROUPE is null then null
+             else round(PKG_UTIL.yearDifference(to_char(simdata.date_import, 'dd/mm/yyyy'), to_char(sal.DATE_ENTREE_GROUPE, 'dd/mm/yyyy')), 5) end
+      )
+  end as anc_prof,
+  GREATEST(case when sal.DATE_DEBUT_ACTIVITE is null then (sal.AGE - P_AGE_DEB_ACT)
+                else round(PKG_UTIL.yearDifference(to_char(simdata.date_import, 'dd/mm/yyyy'), to_char(sal.DATE_DEBUT_ACTIVITE, 'dd/mm/yyyy')), 5) end, sal.ANCIENNETE) as anc_prof_reel,
+  sal.anciennete as anc_entr,
+  case when sal.DATE_ENTREE_GROUPE is null then null
+       else round(PKG_UTIL.yearDifference(to_char(simdata.date_import, 'dd/mm/yyyy'), to_char(sal.DATE_ENTREE_GROUPE, 'dd/mm/yyyy')), 5) end as anc_grp,
+  infos.c_valnum as option_anc
+FROM
+  t_v5_gde_params params,
+  t_v5_gde_salarie sal,
+  t_v5_gde_salarie_pop sal_pop,
+  t_v5_gde_simulation sim,
+  t_v5_gde_simulation_data simdata,
+  t_v5_gde_infos infos
+WHERE params.p_pop_de = sal_pop.sal_pop_ada
+  AND params.p_pop_a = sal_pop.sal_pop_ada
+  AND sal.matricule = sal_pop.matricule
+  AND params.p_nature = 'ADA'
+  AND sal_pop.id_simulation = sim.ID
+  AND params.id_params = sim.id_params_hypothese
+  AND sal.id_data = sim.id_data
+  and sim.id_data = simdata.id
+  and infos.id_params (+) = sim.id_params_table
+  and infos.c_type (+) = 'ANC'

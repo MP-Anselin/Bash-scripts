@@ -1,0 +1,142 @@
+{
+  code : "AXE_STR_FORM_POP_MODIF",
+  element : "ecran",
+  groupe : {
+    code : "AXE_STR_FORM_M_GRP",
+    donnees : [ {
+      code : "AXE_FORM_IDAXE",
+      element : "donnee",
+      libelle : "ID_AXE",
+      longueur : 3999,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "AXE_FORM_LIB",
+      element : "donnee",
+      libelle : "Libellé",
+      longueur : 256,
+      obligatoire : true,
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "AXE_FORM_DESC",
+      element : "donnee",
+      libelle : "Description",
+      longueur : 128,
+      obligatoire : true,
+      saisie : "textarea",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "AXE_SRT_FORM_CODE",
+      element : "donnee",
+      libelle : "Code",
+      longueur : 8,
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Période",
+      style : "BoxLabel"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "du",
+      style : "BoxLabel"
+    }, {
+      code : "AXE_FORM_DATE_DEBUT",
+      element : "donnee",
+      format : "dd.MM.yyyy",
+      libelle : "Date de début",
+      masquerLibelle : true,
+      memeColonne : true,
+      saisie : "text",
+      style : "FDonneeG",
+      type : "D"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "au",
+      memeColonne : true,
+      style : "BoxLabel"
+    }, {
+      code : "AXE_FORM_DATE_FIN",
+      element : "donnee",
+      format : "dd.MM.yyyy",
+      libelle : "Date de fin",
+      masquerLibelle : true,
+      memeColonne : true,
+      saisie : "text",
+      style : "FDonneeG",
+      type : "D"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      affichage : "HISTOAXE",
+      code : "AXE_FORM_ACTIF",
+      element : "donnee",
+      libelle : "Actif",
+      longueur : 1,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      affichage : "ACTFTAXE",
+      code : "AXE_FORM_HISTO",
+      element : "donnee",
+      libelle : "Historiser",
+      longueur : 1,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#BOUTONPERSO",
+      element : "donnee",
+      libelle : "Dupliquer",
+      operation : "Dupliquer"
+    } ],
+    element : "groupe",
+    libelle : "Modifier un axe strategique"
+  },
+  libelle : "Modifier un axe stratégique",
+  servicelet : "FormationAxesStrategiquesJsonServlet",
+  type : "P"
+}

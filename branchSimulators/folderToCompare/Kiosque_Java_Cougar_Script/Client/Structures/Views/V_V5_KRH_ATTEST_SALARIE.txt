@@ -1,0 +1,10 @@
+##
+V_V5_KRH_ATTEST_SALARIE
+=SQL=
+CREATE OR REPLACE VIEW V_V5_KRH_ATTEST_SALARIE ("MATRICULE","ID_LETTRE","ID_FILTRE","NUM_RULE_VALIDATION") AS 
+SELECT sal.matricule, sal.id_lettre, sal.id_filtre, flt.NUM_RULE_VALIDATION
+FROM V_V5_KRH_ATT_SALARIE sal, V_V5_KRH_ATT_FILTRE flt, T_V5_KRH_USER usr
+WHERE flt.id_filtre = sal.id_filtre
+and usr.MATRICULE = sal.MATRICULE
+AND flt.id_lettre = sal.id_lettre
+ORDER BY sal.matricule, sal.id_lettre

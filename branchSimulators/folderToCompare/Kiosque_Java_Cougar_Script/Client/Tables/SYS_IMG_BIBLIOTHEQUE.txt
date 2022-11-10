@@ -1,0 +1,17 @@
+##
+SYS_IMG_BIBLIOTHEQUE
+=SQL IFNOTEXIST=SYS_IMG_BIBLIOTHEQUE=
+CREATE TABLE SYS_IMG_BIBLIOTHEQUE ( NOM VARCHAR2(30) NOT NULL ENABLE, CHEMIN VARCHAR2(250) NOT NULL ENABLE, TYPE VARCHAR2(3) NOT NULL ENABLE, ORDRE NUMBER NOT NULL ENABLE, EXTERNE VARCHAR2(1) NOT NULL ENABLE, PRIMARY KEY (NOM) ) 
+##
+SYS_IMG_TYPE
+==
+DELETE FROM SYS_IMG_TYPE
+'ACC','Accueil','100','300','1','500','310','Accueil','fr_fr'
+'BGD','Background du bureau','900','1600','7','1300','2000','Bureau','fr_fr'
+'BND','Bandeau','40','800','4','60','1024','Accueil','fr_fr'
+'FAV','Favicon','16','16','5','32','32','Accueil','fr_fr'
+'FOR','Formation','100','290','2','105','300','Accueil','fr_fr'
+'LGO','Logo de l''entreprise','30','66','10','44','81','Bureau','fr_fr'
+'LOG','Logo','40','50','6','50','60','Accueil','fr_fr'
+'PUB','Document','40','50','3','50','60','Accueil','fr_fr'
+'SLG','Petit logo de l''entreprise','12','28','11','12','28','Bureau','fr_fr'

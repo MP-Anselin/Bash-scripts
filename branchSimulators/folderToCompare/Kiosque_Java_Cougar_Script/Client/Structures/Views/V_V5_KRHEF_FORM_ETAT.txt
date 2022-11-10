@@ -1,0 +1,172 @@
+##
+V_V5_KRHEF_FORM_ETAT
+=SQL=
+CREATE OR REPLACE VIEW V_V5_KRHEF_FORM_ETAT ("ID_FORMATION_DEMANDE","ID_INSCRIPTION","ID_FORMATION_HISTO","CODE_ETAT","ARBITRAGE_EN_COURS") AS 
+select null as ID_FORMATION_DEMANDE,
+           null as ID_INSCRIPTION,
+           ID_FORMATION_HISTO,
+           decode(STATUT,
+                  'SUIVI_SEMI_EFFECTUE', 'FORM_HISTO_SUIVI_SEMI_EFFECTUE',
+                  'FORM_HISTO_SUIVI_EFFECTUE') as CODE_ETAT,
+           '0' as ARBITRAGE_EN_COURS
+      from T_V5_KRHEF_FORM_HISTO hisf
+
+    union
+
+    --
+    -- V_V5_KRHEF_FORM_DEMANDE
+    --
+    select dem.ID_FORMATION_DEMANDE,
+           ins.ID_INSCRIPTION,
+           null as ID_FORMATION_HISTO,
+           (
+               case
+                     --
+                     -- Demandes accordées par l'expert
+                     --
+                     when dem.STATUT_EXPERT = 1
+                     then
+                     (
+                      case -- Demandes reportées
+                           when ins.DATE_REPORT is not null
+                           then 'FORM_INSCR_REPORT'
+                           --
+                           -- Demandes inscrites
+                           --
+                           when ins.ID_INSCRIPTION is not null
+                           then
+                           (
+                            case -- Formation effectuée
+                                 when seq.NB_SEQ = seq.NB_EFFECTUE
+                                 then 'FORM_SUIVI_EFFECTUE'
+                                 -- Formation partiellement effectuée
+                                 when seq.NB_SEQ = seq.NB_SEMI_EFFECTUE
+                                 then 'FORM_SUIVI_SEMI_EFFECTUE'
+                                 -- Formation non suivie
+                                 when seq.NB_SEQ = seq.NB_ANNULATION_STAGIAIRE
+                                 then 'FORM_SUIVI_ANNULATION_STG'
+                                 -- Formation annulée par l'organisme
+                                 when seq.NB_SEQ = seq.NB_ANNULATION_ORGANISME
+                                 then 'FORM_SUIVI_ANNULATION_ORG'
+                                 -- Suivi en cours
+                                 when (seq.NB_EFFECTUE < (seq.NB_EFFECTUE
+                                                          + seq.NB_SEMI_EFFECTUE
+                                                          + seq.NB_ANNULATION_STAGIAIRE
+                                                          + seq.NB_ANNULATION_ORGANISME))
+                                 then 'FORM_SUIVI_EN_COURS'
+                                 -- Formation partiellement effectuée
+                                 when (seq.NB_EFFECTUE > 0 or seq.NB_SEMI_EFFECTUE > 0)
+                                 then 'FORM_SUIVI_SEMI_EFFECTUE'
+                                 -- Formation non suivie
+                                 when seq.NB_ANNULATION_STAGIAIRE > 0
+                                 then 'FORM_SUIVI_ANNULATION_STG'
+                                 -- Formation annulée par l'organisme
+                                 when seq.NB_ANNULATION_ORGANISME > 0
+                                 then 'FORM_SUIVI_ANNULATION_ORG'
+                                 --
+                                 -- Suivi non commencé => on tient compte du statut de l'inscription
+                                 -- avec éventuellement son WF
+                                 --
+                                 else decode(ins_status.STATUS,
+                                             -- Inscription effectuée
+                                             'validated',             'FORM_INSCR_VALID',
+                                             -- Inscription reportée
+                                             'postponed',             'FORM_INSCR_REPORT',
+                                             -- Demande d'inscription en attente de validation
+                                             'waitingForValid',       'FORM_INSCR_WF_WAIT',
+                                             -- Demande d'inscription en cours d'annulation
+                                             'waitingForInscrCancel', 'FORM_INSCR_WFANNUL_WAIT',
+                                             -- Demande d'inscription annulée
+                                             'canceled',              'FORM_INSCR_WF_CANCELED',
+                                             -- Demande de suppression d'inscription en attente de validation
+                                             'waitingForSuppr',       'FORM_INSCR_SUPPR_WF_WAIT',
+                                             -- Demande de suppression d'inscription en cours d'annulation
+                                             'waitingForSupprCancel', 'FORM_INSCR_SUPPR_WFANNUL_WAIT',
+                                             -- Ne devrait jamais se produire
+                                                                       'undefinedInscrStatus: ' || ins_status.STATUS)
+                            end
+                           )
+                           -- Demandes non inscrites => Accord XP
+                           else 'FORM_DEMANDE_ACCORD_XP'
+                      end
+                     )
+                     -- Demande refusée par l'expert
+                     when dem.STATUT_EXPERT = 2
+                     then 'FORM_DEMANDE_REFUS_XP'
+                     -- Demande de formation annulées
+                     when dem.STATUT_EXPERT = 4
+                     then 'FORM_DEMANDE_ANNULEE'
+                     --
+                     -- Demandes collaboratives
+                     --
+                     when dem.CREATED_BY_ROLE in ('resp', 'coll')
+                     then
+                     (
+                      case -- Demande validée (Demande collaborative non arbitrée par l'expert, avec WF accepté)
+                           when wf_form.DEMANDE_ETAT = 'O'
+                           then 'FORM_DEMANDE_ATTENTE_VALID_XP'
+                           -- Demande défavorable
+                           when wf_form.DEMANDE_ETAT = 'N'
+                           then 'FORM_DEMANDE_WF_KO'
+                           -- Demande en attente de validation
+                           when wf_form.DEMANDE_ETAT = 'W'
+                           then 'FORM_DEMANDE_WF_WAIT'
+                           -- Demande en cours de création
+                           else 'FORM_DEMANDE_BROUILLON'
+                      end
+                     )
+                     --
+                     -- Demande en attente de validation expert (demandes non collaboratives)
+                     --
+                     else 'FORM_DEMANDE_ATTENTE_VALID_XP'
+                end
+           ) as CODE_ETAT,
+           (case when pl.STATUT = 1 and ins.ID_INSCRIPTION is null
+            then '1'
+            else '0'
+            end) as ARBITRAGE_EN_COURS
+      from V_V5_KRHEF_FORM_DEMANDE dem
+           --
+           -- Inscription séquence 0
+           --
+ left join T_V5_KRHEF_FORMATION_INSCR ins
+        on ins.ID_FORMATION_DEMANDE = dem.ID_FORMATION_DEMANDE
+       and ins.NUM_SEQ = 0
+       and ins.ID_INSCRIPTION_REPORT is null
+           --
+           -- Détail de l'inscription (pour connaître le nombre de séquences prévues / effectuée / annulées...)
+           --
+ left join (
+            select ID_INSCRIPTION_REF,
+                   count(ID_INSCRIPTION_REF) as NB_SEQ,
+                   count(SESSION_EFFECTUE) as NB_EFFECTUE,
+                   count(SESSION_SEMI_EFFECTUE) as NB_SEMI_EFFECTUE,
+                   count(ANNULATION_STAGIAIRE) as NB_ANNULATION_STAGIAIRE,
+                   count(ANNULATION_ORGANISME) as NB_ANNULATION_ORGANISME
+              from T_V5_KRHEF_FORMATION_INSCR
+             where NUM_SEQ != 0
+             group by ID_INSCRIPTION_REF
+           ) seq
+        on seq.ID_INSCRIPTION_REF = ins.ID_INSCRIPTION_REF
+       and ins.NUM_SEQ = 0
+       and ins.ID_INSCRIPTION_REPORT is null
+           --
+           -- WF de la demande de formation
+           --
+ left join (select * from T_V5_WF_DEMANDE where TYPE_DEMANDE = 'FormDemande') wf_form
+        on wf_form.ID_REFERENCE = to_char(dem.ID_FORMATION_DEMANDE)
+ left join (select * from T_V5_WF_DEMANDE where TYPE_DEMANDE = 'AnnulationFormDemande') wf_form_annul
+        on wf_form_annul.ID_REFERENCE = to_char(dem.ID_FORMATION_DEMANDE)
+           --
+           -- statut de l'inscription (tient compte du WF)
+           --
+ left join V_V5_KRHEF_FORM_INSCR_STATUS ins_status
+        on ins_status.ID_INSCRIPTION_REF = ins.ID_INSCRIPTION_REF
+
+join T_V5_KRHEF_FORM_PLAN fp
+                       on dem.ID_FORMATION_DEMANDE = fp.ID_FORMATION_DEMANDE
+join T_V5_KRHEF_FORM_COUT_PLAN coutplan
+                       on coutplan.ID_FORM_PLAN = fp.ID_FORM_PLAN
+                       and coutplan.PLAN_GELE = fp.PLAN_GELE
+left join T_V5_KRHEF_PLAN pl
+   on fp.ID_PLAN = pl.ID_PLAN

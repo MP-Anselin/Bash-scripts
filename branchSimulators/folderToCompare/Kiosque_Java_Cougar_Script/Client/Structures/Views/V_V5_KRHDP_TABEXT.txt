@@ -1,0 +1,15 @@
+##
+V_V5_KRHDP_TABEXT
+=SQL=
+CREATE OR REPLACE VIEW V_V5_KRHDP_TABEXT ("PERSO","ID_TAB_EXT","NB_MAX","LANGUE","MULTIPLE","LIBELLE","SYSTEM","VUE_IMPORT","VUE_EXPORT","CLES_ORDRE") AS 
+select case when per.nb_max is null then 0 else 1 end AS perso, mdl.id_tab_ext, nvl(per.nb_max, mdl.nb_max) as nb_max
+, LANGUE
+, MULTIPLE
+, LIBELLE
+, SYSTEM
+, VUE_IMPORT
+, VUE_EXPORT
+, CLES_ORDRE
+ from t_v5_mdl_krhdp_tabext mdl, t_v5_krhdp_tabext per
+ where mdl.id_tab_ext = per.id_tab_ext (+)
+order by ID_TAB_EXT

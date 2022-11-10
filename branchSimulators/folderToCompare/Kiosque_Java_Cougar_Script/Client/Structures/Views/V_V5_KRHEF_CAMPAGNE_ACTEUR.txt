@@ -1,0 +1,24 @@
+##
+V_V5_KRHEF_CAMPAGNE_ACTEUR
+=SQL=
+CREATE OR REPLACE VIEW V_V5_KRHEF_CAMPAGNE_ACTEUR ("ID_CAMPAGNE","RESP","GEST","EXP","DIR_RH","RESP_RH","ACT_IND") AS 
+select ID_CAMPAGNE
+       , decode(RESP, null, 0, 1) as RESP
+       , decode(GEST, null, 0, 1) as GEST
+       , decode(EXP, null, 0, 1) as EXP
+       , decode(DIR_RH, null, 0, 1) as DIR_RH
+       , decode(RESP_RH, null, 0, 1) as RESP_RH
+       , decode(ACT_IND, null, 0, 1) as ACT_IND
+  from T_V5_KRHEF_CAMPAGNE_ACTEUR
+  pivot (
+    max(ACTEUR_ROLE)
+    for (ACTEUR_ROLE)
+    in (
+          'RESP' as RESP
+        , 'GEST' as GEST
+        , 'EXP' as EXP
+        , 'DIR_RH' as DIR_RH
+        , 'RESP_RH' as RESP_RH
+        , 'ACT_IND' as ACT_IND
+      )
+  )

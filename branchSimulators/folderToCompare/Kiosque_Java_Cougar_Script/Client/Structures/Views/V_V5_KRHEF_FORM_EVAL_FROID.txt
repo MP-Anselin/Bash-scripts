@@ -1,0 +1,164 @@
+##
+V_V5_KRHEF_FORM_EVAL_FROID
+=SQL=
+CREATE OR REPLACE VIEW V_V5_KRHEF_FORM_EVAL_FROID ("TYPE_EVAL","ID_SESSION","SESSION_EVALUABLE","PROFIL_EVALUABLE","MATRICULE","ID_INSCRIPTION","ID_INSCRIPTION_REF","NUM_SEQ","FORM_DEFINITION_ID","FORM_INSTANCE_ID","FORM_INSTANCE_DATE_CREATION","FORM_INSTANCE_DATE_CLOTURE","ENT_DATE_VALID","ENT_STATUT","FORMATION_STATUS","EVALUATION_STATUS","EVAL_FROID_DELAIS_JRS","WF_DEMANDE_ID","WF_DEMANDE_ETAT","WF_SAISIR_REPONSE_ETAT","WF_SAISIR_REPONSE_DATE","WF_VALIDER_REPONSE_ETAT","WF_VALIDER_REPONSE_DATE") AS 
+select
+                -- type
+                  'FormEvalFroid'                   as TYPE_EVAL
+
+                -- session
+                , sess_ef.ID_SESSION                as ID_SESSION
+                , sess_ef.EVAL_FROID                as SESSION_EVALUABLE
+
+                -- évaluable selon l'option du profil OPT_KRH_FORM_DT_NO_EVAL_FROID
+                , case when sess_ef.DATE_FIN >= profil_ef.OPT_KRH_FORM_DT_NO_EVAL_FROID
+                       then 1
+                       else 0
+                       end as PROFIL_EVALUABLE
+
+                -- inscription collaborateur
+                , insc_ef.COLLABORATEUR             as MATRICULE
+                , insc_ef.ID_INSCRIPTION            as ID_INSCRIPTION
+                , insc_ef.ID_INSCRIPTION_REF        as ID_INSCRIPTION_REF
+                , insc_ef.NUM_SEQ                   as NUM_SEQ
+
+                -- identifiant du formulaire
+                , inst_ef.ID_KSQFORM_GEN_DEF        as FORM_DEFINITION_ID
+
+                -- instance du formulaire d'évaluation
+                , inst_ef.ID_KSQFORM_GEN_INSTANCE   as FORM_INSTANCE_ID
+                , inst_ef.DATE_CREATION             as FORM_INSTANCE_DATE_CREATION
+                , inst_ef.DATE_CLOTURE              as FORM_INSTANCE_DATE_CLOTURE
+
+                -- evaluation lors d'un entretien (bilf)
+                , nvl(entr_ef.DATE_VALID_COLLABO, entr_ef.DATE_VALID_MANAGER)
+                                                    as ENT_DATE_VALID
+
+                -- statut de l'entretien pour evaluation a froid
+                , entr_ef.STATUT                    as ENT_STATUT
+
+                -- statut de la formation effectué ou non
+                , case  -- formation effectuée
+                        when (insc_ef.SESSION_EFFECTUE is not null
+                              or insc_ef.SESSION_SEMI_EFFECTUE is not null)
+                        then 'EVALUATION_FORM_EFFECTUEE'
+
+                        -- formation reportée
+                        when (insc_ef.DATE_REPORT is not null)
+                        then 'EVALUATION_FORM_REPORTEE'
+
+                        -- formation annulée
+                        when (insc_ef.ANNULATION_STAGIAIRE is not null
+                              or insc_ef.ANNULATION_ORGANISME is not null)
+                        then 'EVALUATION_FORM_ANNULEE'
+
+                        -- formation non effectuée
+                        else 'EVALUATION_FORM_NON_EFFECTUE'
+                  end                                     as FORMATION_STATUS
+
+                -- la session doit etre evaluée a froid
+                , case
+                       -- évaluation à froid éffectuée lors de l'entretien
+                       when (nvl(entr_ef.DATE_VALID_COLLABO, entr_ef.DATE_VALID_MANAGER) is not null
+                             and insc_ef.ID_KSQFORM_GEN_INST_FROID is null)
+                       then 'EVALUATION_STATIQUE'
+
+                       -- évaluation à froid cloturée
+                       -- (quels que soient les statuts du WF et de la formation)
+                       when (inst_ef.DATE_CLOTURE is not null)
+                       then 'EVALUATION_CLOTUREE'
+
+                        -- formation effectuée
+                        when (insc_ef.GESTION_HEURES_EFFECTUE is not null
+                            and (insc_ef.SESSION_EFFECTUE is not null
+                                 or insc_ef.SESSION_SEMI_EFFECTUE is not null)
+                            and insc_ef.DATE_REPORT is null
+                            and sess_ef.DATE_FIN >= profil_ef.OPT_KRH_FORM_DT_NO_EVAL_FROID
+                            and sess_ef.EVAL_FROID = 1
+                        )
+                        then (
+                                case
+                                    -- Action de validation en attente
+                                    when (inst_ef.ID_KSQFORM_GEN_INSTANCE is not null
+                                          and insc_wf.WF_STATUS_EVAL_FROID = 'W'
+                                          and insc_wf.WF_ACT_STATUS_EVF_VALIDER = 'W')
+                                    then 'EVALUATION_A_VALIDER'
+
+                                    -- évaluation à froid en cours (informatif)
+                                    when (inst_ef.ID_KSQFORM_GEN_INSTANCE is not null)
+                                    then 'EVALUATION_EN_COURS'
+
+                                    -- évaluation à froid hors entretien à venir
+                                    when (nvl(trunc(sysdate)-sess_ef.DATE_FIN, -1)
+                                          >= profil_ef.OPT_KRH_FORM_NBJRS_EVAL_FROID
+                                          and insc_wf.WF_STATUS_EVAL_FROID = 'W'
+                                          and insc_wf.WF_ACT_STATUS_EVF_SAISIR = 'W')
+                                    then 'EVALUATION_A_SAISIR'
+
+                                    -- configuration du pac : évaluations à froid au cours de l'entretiens
+                                    when ((info_ef.VALEUR=1))
+                                    then 'EVALUATION_EN_ENTRETIEN'
+
+                                    -- évaluation à froid hors entretien à effectuer
+                                    else 'EVALUATION_EN_ATTENTE'
+                                 end
+                             )
+
+                       -- évaluation à froid à ne pas faire
+                       else 'EVALUATION_INACTIVE'
+                  end                                   as EVALUATION_STATUS
+
+                -- gestion du délais d'évaluation à froid
+                , profil_ef.OPT_KRH_FORM_NBJRS_EVAL_FROID
+                   - nvl(trunc(sysdate)-sess_ef.DATE_FIN, -1)
+                                                        as EVAL_FROID_DELAIS_JRS
+
+                , insc_wf.ID_WF_DEM_EVAL_FROID          as WF_DEMANDE_ID
+                , insc_wf.WF_STATUS_EVAL_FROID          as WF_DEMANDE_ETAT
+                , insc_wf.WF_ACT_STATUS_EVF_SAISIR      as WF_SAISIR_REPONSE_ETAT
+                , insc_wf.WF_ACT_DATE_EVF_SAISIR        as WF_SAISIR_REPONSE_DATE
+                , insc_wf.WF_ACT_STATUS_EVF_VALIDER     as WF_VALIDER_REPONSE_ETAT
+                , insc_wf.WF_ACT_DATE_EVF_VALIDER       as WF_VALIDER_REPONSE_DATE
+
+             from T_V5_KRHEF_FORMATION_INSCR insc_ef
+
+        -- Jointure KsqFormGenInstance
+        left join T_V5_KSQFORM_GEN_INSTANCE inst_ef
+               on inst_ef.EXT_ID = insc_ef.ID_INSCRIPTION
+              and inst_ef.EXT_TBL = 'T_V5_KRHEF_FORMATION_INSCR'
+              and inst_ef.ID_KSQFORM_GEN_DEF in (
+
+                -- filtrage des définitions pour évaluation a froid uniquement
+                select distinct def_ef.ID_KSQFORM_GEN_DEF
+                  from T_V5_KSQFORM_GEN_DEF def_ef
+                 where def_ef.DEF_TYPE in ('FormEvalFroidExterne',
+                                           'FormEvalFroidInterne')
+                   )
+
+        -- Jointure session
+        left join T_V5_KRHEF_SESSION sess_ef
+               on sess_ef.ID_SESSION = insc_ef.ID_SESSION
+
+        -- Jointure bilan formation
+        left join T_V5_KRHEF_ENTRETIEN_BILF bilf_ef
+               on bilf_ef.ID_FORMATION_DEMANDE = insc_ef.ID_FORMATION_DEMANDE
+
+        -- Jointure entretiens
+        left join T_V5_KRHEF_ENTRETIEN entr_ef
+               on entr_ef.ID_ENT = bilf_ef.ID_ENT_BILF
+
+        -- Jointure T_V5_KRHEF_FORMATION_INSCR_WF
+        left join T_V5_KRHEF_FORMATION_INSCR_WF insc_wf
+               on insc_wf.ID_INSCRIPTION_REF = insc_ef.ID_INSCRIPTION_REF
+              and insc_wf.WF_STATUS_EVAL_FROID != 'S'
+
+        -- Jointure profil utilisateur
+        left join T_V5_KRH_PROFIL_USER profil_ef
+               on profil_ef.MATRICULE = insc_ef.COLLABORATEUR
+
+        -- Jointure informations PAC
+        left join T_V5_INFO info_ef
+               on info_ef.CODE = 'OPT_KRH_ENTR_EVAL_FROID'
+
+            where insc_ef.NUM_SEQ = 0
+              and insc_ef.ID_ACTEUR_FORM is null

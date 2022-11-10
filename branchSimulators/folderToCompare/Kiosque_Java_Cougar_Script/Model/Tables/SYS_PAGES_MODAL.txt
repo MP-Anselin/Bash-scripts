@@ -1,0 +1,89 @@
+##
+SYS_PAGES_MODAL
+=SQL IFNOTEXIST=SYS_PAGES_MODAL=
+CREATE TABLE SYS_PAGES_MODAL ( NOM_PAGE VARCHAR2(255) NOT NULL ENABLE, LIBELLE VARCHAR2(100), PRIMARY KEY (NOM_PAGE) ) 
+##
+SYS_PAGES_MODAL
+==
+DELETE FROM SYS_PAGES_MODAL WHERE NOM_PAGE IN ('Ext.adp.MainDesk.view.eastregion.gestionProjet.GestionProjetCM#C','Ext.adp.MainDesk.view.eastregion.gestionProjet.GestionProjetCM#M')
+'Ext.adp.MainDesk.view.eastregion.gestionProjet.GestionProjetCM#C','Création d''un nouveau projet'
+'Ext.adp.MainDesk.view.eastregion.gestionProjet.GestionProjetCM#M','Modification d''un projet'
+##
+SYS_PAGES_MODAL
+==
+DELETE FROM SYS_PAGES_MODAL WHERE NOM_PAGE IN ('Moteur/ADP_ONLY/ParamEcranDyn/ParametrageReglesGestion_Test.jsp', 'Moteur/ADP_ONLY/ParamEcranDyn/ParametrageReglesGestion_Creation.jsp', 'Moteur/ADP_ONLY/ParamEcranDyn/ParametrageReglesGestion_Description.jsp')
+'Moteur/ADP_ONLY/ParamEcranDyn/ParametrageReglesGestion_Creation.jsp','Création d''une règle de gestion'
+'Moteur/ADP_ONLY/ParamEcranDyn/ParametrageReglesGestion_Description.jsp','Description d''une règle de gestion'
+'Moteur/ADP_ONLY/ParamEcranDyn/ParametrageReglesGestion_Test.jsp','Test d''une règle de gestion'
+##
+SYS_PAGES_MODAL
+==
+DELETE FROM SYS_PAGES_MODAL WHERE nom_page IN ('Ext.adp.Modules.RD.STD.EXP.FIN_FORM_POP_MODIF.FIN_FORM_POP_MODIF','Ext.adp.Modules.RD.STD.EXP.FIN_FORM_POP.FIN_FORM_POP','Ext.adp.Modules.RD.STD.EXP.ACTEUR_FORM_POP.ACTEUR_FORM_POP','Ext.adp.Modules.RD.STD.EXP.ACTEUR_FORM_POP_M.ACTEUR_FORM_POP_M','Ext.adp.Modules.RD.STD.EXP.ADR_LIEU_FORM_POP.ADR_LIEU_FORM_POP','Ext.adp.Modules.RD.STD.EXP.ADR_LIEU_FORM_POP_M.ADR_LIEU_FORM_POP_M','Ext.adp.Modules.RD.STD.EXP.DOM_FORM_POP.DOM_FORM_POP','Ext.adp.Modules.RD.STD.EXP.DOM_FORM_POP_M.DOM_FORM_POP_M','Ext.adp.Modules.RD.STD.EXP.ORG_FORM_POP.ORG_FORM_POP','Ext.adp.Modules.RD.STD.EXP.ORG_FORM_POP_MODIF.ORG_FORM_POP_MODIF','Ext.adp.Modules.RD.STD.EXP.AXE_STR_FORM_POP.AXE_STR_FORM_POP','Ext.adp.Modules.RD.STD.EXP.AXE_STR_FORM_POP_MODIF.AXE_STR_FORM_POP_MODIF')
+'Ext.adp.Modules.RD.STD.EXP.FIN_FORM_POP_MODIF.FIN_FORM_POP_MODIF','Modifier un financeur'
+'Ext.adp.Modules.RD.STD.EXP.ACTEUR_FORM_POP.ACTEUR_FORM_POP','Ajouter un acteur de formation'
+'Ext.adp.Modules.RD.STD.EXP.ACTEUR_FORM_POP_M.ACTEUR_FORM_POP_M','Modifier un acteur formation'
+'Ext.adp.Modules.RD.STD.EXP.ADR_LIEU_FORM_POP.ADR_LIEU_FORM_POP','Ajouter ou modifier un lieu de formation'
+'Ext.adp.Modules.RD.STD.EXP.DOM_FORM_POP.DOM_FORM_POP','Ajouter domaine formation'
+'Ext.adp.Modules.RD.STD.EXP.DOM_FORM_POP_M.DOM_FORM_POP_M','Modifier un domaine'
+'Ext.adp.Modules.RD.STD.EXP.ORG_FORM_POP.ORG_FORM_POP','Ajouter un organisme'
+'Ext.adp.Modules.RD.STD.EXP.ORG_FORM_POP_MODIF.ORG_FORM_POP_MODIF','Modifier un organisme'
+'Ext.adp.Modules.RD.STD.EXP.ADR_LIEU_FORM_POP_M.ADR_LIEU_FORM_POP_M','Modifier un lieu de formation'
+'Ext.adp.Modules.RD.STD.EXP.AXE_STR_FORM_POP.AXE_STR_FORM_POP','Ajouter un axe stratégique'
+'Ext.adp.Modules.RD.STD.EXP.AXE_STR_FORM_POP_MODIF.AXE_STR_FORM_POP_MODIF','Modifier un axe stratégique'
+'Ext.adp.Modules.RD.STD.EXP.FIN_FORM_POP.FIN_FORM_POP','Ajouter un financeur'
+##
+SYS_PAGES_MODAL
+==
+DELETE FROM SYS_PAGES_MODAL WHERE nom_page like 'Ext.adp.Modules.RD.STD.EXP.TYPEDESPO_POP_FORM.TYPEDESPO_POP_FORM'
+'Ext.adp.Modules.RD.STD.EXP.TYPEDESPO_POP_FORM.TYPEDESPO_POP_FORM','Ajouter un type et un dispositif'
+##
+SYS_PAGES_MODAL
+==
+DELETE FROM SYS_PAGES_MODAL WHERE nom_page like 'Ext.adp.Modules.RD.STD.EXP.TYPEDESPO_POP_M_FORM.TYPEDESPO_POP_M_FORM'
+'Ext.adp.Modules.RD.STD.EXP.TYPEDESPO_POP_M_FORM.TYPEDESPO_POP_M_FORM','Modifier un type et un dispositif'
+##
+SYS_PAGES_MODAL
+==
+DELETE FROM SYS_PAGES_MODAL WHERE nom_page in ('Ext.adp.Modules.RD.STD.EXP.PLAN_FORM_POP.PLAN_FORM_POP','Ext.adp.Modules.RD.STD.EXP.PLAN_FORM_POP_M.PLAN_FORM_POP_M')
+'Ext.adp.Modules.RD.STD.EXP.PLAN_FORM_POP.PLAN_FORM_POP','Ajouter Plan'
+'Ext.adp.Modules.RD.STD.EXP.PLAN_FORM_POP_M.PLAN_FORM_POP_M','Modifier un plan'
+##
+SYS_PAGES_MODAL
+==
+DELETE FROM SYS_PAGES_MODAL WHERE nom_page in ('Ext.adp.Modules.RD.STD.EXP.CATEGORIEBUD_FORM_POP.CATEGORIEBUD_FORM_POP','Ext.adp.Modules.RD.STD.EXP.CATEGORIEBUD_FORM_POP_M.CATEGORIEBUD_FORM_POP_M')
+'Ext.adp.Modules.RD.STD.EXP.CATEGORIEBUD_FORM_POP.CATEGORIEBUD_FORM_POP','Créer une catégorie de budget'
+'Ext.adp.Modules.RD.STD.EXP.CATEGORIEBUD_FORM_POP_M.CATEGORIEBUD_FORM_POP_M','Modifier une catégorie de budget'
+##
+SYS_PAGES_MODAL
+==
+DELETE FROM SYS_PAGES_MODAL WHERE nom_page = 'Ext.adp.Modules.RD.STD.EXP.CATEGORIEBUD_FORM_POP.CATEGORIEBUD_FORM_POP'
+'Ext.adp.Modules.RD.STD.EXP.CATEGORIEBUD_FORM_POP.CATEGORIEBUD_FORM_POP','Ajout d''une catégorie de budgets'
+##
+SYS_PAGES_MODAL
+==
+DELETE FROM SYS_PAGES_MODAL WHERE nom_page = 'Ext.adp.Modules.RD.STD.EXP.CATEGORIEBUD_FORM_POP_M.CATEGORIEBUD_FORM_POP_M'
+'Ext.adp.Modules.RD.STD.EXP.CATEGORIEBUD_FORM_POP_M.CATEGORIEBUD_FORM_POP_M','Modification d''une catégorie de budgets'
+##
+SYS_PAGES_MODAL
+==
+DELETE FROM SYS_PAGES_MODAL WHERE nom_page IN ('Ext.adp.Modules.RD.STD.EXP.HAB_FORM_POP_M.HAB_FORM_POP_M', 'Ext.adp.Modules.RD.STD.EXP.HAB_ENT_POP_M.HAB_ENT_POP_M','Ext.adp.Modules.RD.STD.EXP.HAB_TALENT_POP_M.HAB_TALENT_POP_M', 'Ext.adp.Modules.RD.STD.EXP.HAB_SEC_POP_M.HAB_SEC_POP_M','Ext.adp.Modules.RD.STD.EXP.HAB_UTI_CONF_POP_M.HAB_UTI_CONF_POP_M', 'Ext.adp.Modules.RD.STD.EXP.HAB_UTI_GRIL_POP_M.HAB_UTI_GRIL_POP_M')
+'Ext.adp.Modules.RD.STD.EXP.HAB_ENT_POP_M.HAB_ENT_POP_M','Modifier les habilitations entretien'
+'Ext.adp.Modules.RD.STD.EXP.HAB_FORM_POP_M.HAB_FORM_POP_M','Modifier les habilitations formation'
+'Ext.adp.Modules.RD.STD.EXP.HAB_SEC_POP_M.HAB_SEC_POP_M','Modifier les habilitations sécurité'
+'Ext.adp.Modules.RD.STD.EXP.HAB_TALENT_POP_M.HAB_TALENT_POP_M','Modifier les habilitations revue des talents'
+'Ext.adp.Modules.RD.STD.EXP.HAB_UTI_CONF_POP_M.HAB_UTI_CONF_POP_M','Modifier les habilitations'
+##
+SYS_PAGES_MODAL
+==
+DELETE FROM SYS_PAGES_MODAL WHERE nom_page like 'Ext.adp.Modules.RD.STD.EXP.STR_BDG_GRPOUPE_POP_FORM.STR_BDG_GRPOUPE_POP_FORM'
+'Ext.adp.Modules.RD.STD.EXP.STR_BDG_GRPOUPE_POP_FORM.STR_BDG_GRPOUPE_POP_FORM','Ajouter un groupe de structures budgétaires'
+##
+SYS_PAGES_MODAL
+==
+DELETE FROM SYS_PAGES_MODAL WHERE nom_page like 'Ext.adp.Modules.RD.STD.EXP.STR_BDG_GRPOUPE_POP_M_FORM.STR_BDG_GRPOUPE_POP_M_FORM'
+'Ext.adp.Modules.RD.STD.EXP.STR_BDG_GRPOUPE_POP_M_FORM.STR_BDG_GRPOUPE_POP_M_FORM','Modifier un groupe de structures budgétaires'
+##
+SYS_PAGES_MODAL
+==
+DELETE FROM SYS_PAGES_MODAL WHERE nom_page like 'Ext.adp.Modules.RD.STD.EXP.STR_BDG_LIST_FORM.STR_BDG_LIST_FORM'
+'Ext.adp.Modules.RD.STD.EXP.STR_BDG_LIST_FORM.STR_BDG_LIST_FORM','Ajouter ou modifier une structure budgétaire'

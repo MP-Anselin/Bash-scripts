@@ -1,0 +1,44 @@
+##
+TRG_V5_KRHEF_COMPETENCE
+=SQL=
+create or replace TRIGGER "TRG_V5_KRHEF_COMPETENCE" 
+BEFORE DELETE
+ON T_V5_KRHEF_COMPETENCE
+FOR EACH ROW
+DECLARE
+nbUses NUMBER;
+/******************************************************************************
+   NAME:       TRG_V5_KRHEF_COMPETENCE
+   PURPOSE:
+
+   REVISIONS:
+   Ver        Date        Author           Description
+   ---------  ----------  ---------------  ------------------------------------
+   1.0        05/07/2010                   1. Created this trigger.
+
+   NOTES:
+
+   Automatically available Auto Replace Keywords:
+      Object Name:     TRG_V5_KRHEF_COMPETENCE
+      Sysdate:         05/07/2010
+      Date and Time:   05/07/2010, 10:23:26, and 05/07/2010 10:23:26
+      Username:
+      Table Name:      T_V5_KRHEF_COMPETENCE
+      Trigger Options:
+******************************************************************************/
+BEGIN
+    -- Nombre de demande en attente
+    select count(*) into nbUses
+    from T_V5_KRHEF_MISSION_MORE
+    where TABLE_LIEE = 'ID_COMPETENCE'
+    and to_char(ID_TABLE) = to_char(:OLD.ID_COMPETENCE);
+
+    if nbUses > 0 then
+       raise_application_error(-20001, 'Cette compétence est déjà  utilisée dans une mission modèle');
+    end if;
+
+EXCEPTION
+WHEN OTHERS THEN
+-- Consider logging the error and then re-raise
+RAISE;
+END TRG_V5_KRHEF_COMPETENCE;

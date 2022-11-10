@@ -1,0 +1,28 @@
+##
+V_V5_KSQFORM_GEN_CHOICES
+=SQL=
+CREATE OR REPLACE VIEW V_V5_KSQFORM_GEN_CHOICES ("ID_KSQFORM_GEN_DEF_ELT","CHOICE_FILTERS","MLT_KEY","CHOICE_LOCALE","CHOICE_KEY","CHOICE_VALUE") AS 
+SELECT ID_KSQFORM_GEN_DEF_ELT
+        , CHOICE_FILTERS
+        , REGEXP_SUBSTR(CHOICE_FILTERS, '.*([0-9]+).*[A-Z]{2}$', 1, 1, 'i', 1)             AS MLT_KEY
+        , REGEXP_SUBSTR(CHOICE_FILTERS, '¢([A-Z]{2})$', 1, 1, 'i', 1)                      AS CHOICE_LOCALE
+        , REGEXP_SUBSTR(CHOICE_FILTERS, '(option|branche[0-9]+¢)([^¢]+).*$', 1, 1, 'i', 2) AS CHOICE_KEY
+        , CHOICE_VALUE
+     FROM ( SELECT OPT_REF_ID                                               AS ID_KSQFORM_GEN_DEF_ELT
+                 , lag(OPT_DETAILS, 1, 0) over (ORDER BY OPT_ID)            AS CHOICE_FILTERS
+                 , OPT_VALEUR                                               AS CHOICE_VALUE
+              FROM (
+                    SELECT ID_KSQFORM_GEN_DEF_OPT                           AS OPT_ID
+                         , OPT_REF_ID                                       AS OPT_REF_ID
+                         , IS_LAST                                          AS IS_LAST
+                         , OPT_TYPE || sys_connect_by_path(OPT_VALEUR, '¢') AS OPT_DETAILS
+                         , OPT_VALEUR                                       AS OPT_VALEUR
+                         , level                                            AS OPT_LEVEL
+                      FROM T_V5_KSQFORM_GEN_DEF_OPT
+                     WHERE OPT_REF_TBL = 'T_V5_KSQFORM_GEN_DEF_ELT'
+                start WITH OPT_PARENT IS null
+                connect BY prior ID_KSQFORM_GEN_DEF_OPT = OPT_PARENT
+             )
+          ORDER BY OPT_ID
+         )
+    WHERE REGEXP_LIKE (CHOICE_FILTERS, '^(option.+¢.+|value|branch.+¢.+)¢[A-Z]{2}$')

@@ -1,0 +1,125 @@
+##
+V_Z2X_BATCH_DONPAIE
+=SQL=
+CREATE OR REPLACE VIEW V_Z2X_BATCH_DONPAIE ("MATRIC","MATPAIE","DATDEB","DATFIN","ANNEE","MOIS","RUB_1","RUB_2","RUB_3","RUB_4","RUB_7","RUB_8","RUB_9","RUB_10","RUB_11","RUB_12","RUB_13","RUB_14","RUB_15","BULLETIN","MTS16","MTS15","MTS14","RESALB","NBM","MTINDEMNITES","MTSALTPSCOMPLET","MTSALREEL","MTSALANST","NBHREPAYEES","MTPRIMMENS","MTPRIMPONCT","MTBRUTREEL","CUMAJOUR43","CUMMJOUR43","NBPOINTSAUT","NBPOINTSANC","NBPOINTSBASE","NDPOINTSDIPLO","NDPOINTSDIV","NBPOINTSLANG","NBPOINTSPERSO","NTTOTALPOINTS") AS 
+select dos.MATRIC,
+       dos.MATRIC as MATPAIE,
+       (
+        case when dos.DTDEBSOCIETE is not null
+                  and dos.DTDEBSOCIETE > to_date('01-' || MOIS || '-' || ANNEE, 'dd-mm-yyyy')
+                  and dos.DTDEBSOCIETE <= last_day(to_date('01-' || MOIS || '-' || ANNEE, 'dd-mm-yyyy'))
+             then dos.DTDEBSOCIETE
+             else to_date('01-' || MOIS || '-' || ANNEE, 'dd-mm-yyyy')
+        end
+       ) as DATDEB,
+       (
+        case when dos.DTFINSOCIETE is not null
+                  and dos.DTFINSOCIETE < last_day(to_date('01-' || MOIS || '-' || ANNEE, 'dd-mm-yyyy'))
+                  and dos.DTFINSOCIETE >= to_date('01-' || MOIS || '-' || ANNEE, 'dd-mm-yyyy')
+             then dos.DTFINSOCIETE
+             else (case when ANNEE = last_period.LAST_ANNEE and MOIS = last_period.LAST_MOIS
+                        then null
+                        else last_day(to_date('01-' || MOIS || '-' || ANNEE, 'dd-mm-yyyy'))
+                   end)
+        end
+       ) as DATFIN,
+       ANNEE,
+       MOIS,
+       RUB_1,
+       RUB_2,
+       RUB_3,
+       RUB_4,
+       RUB_7,
+       RUB_8,
+       RUB_9,
+       RUB_10,
+       RUB_11,
+       RUB_12,
+       RUB_13,
+       RUB_14,
+       RUB_15,
+       null as BULLETIN,
+       MTS16,
+       MTS15,
+       MTS14,
+       RESALB,
+       NBM,
+       MTINDEMNITES,
+       MTSALTPSCOMPLET,
+       MTSALREEL,
+       MTSALANST,
+       NBHREPAYEES,
+       MTPRIMMENS,
+       MTPRIMPONCT,
+       MTBRUTREEL,
+       CUMAJOUR43,
+       CUMMJOUR43,
+       NBPOINTSAUT,
+       NBPOINTSANC,
+       NBPOINTSBASE,
+       NDPOINTSDIPLO,
+       NDPOINTSDIV,
+       NBPOINTSLANG,
+       NBPOINTSPERSO,
+       NTTOTALPOINTS
+from
+    Z2X_BATCH_DONPAIE dp
+    left join Z2X_BATCH_DOSSIER dos on (dp.MATRIC = dos.MATRIC)
+    left join (select MATRIC as MATRIC,
+                      substr(LAST_ANNEE_MOIS, 1, 4) as LAST_ANNEE,
+                      substr(LAST_ANNEE_MOIS, 6, 2) as LAST_MOIS
+                 from (
+                       select MATRIC,
+                              max(ANNEE || '-' || MOIS) as LAST_ANNEE_MOIS
+                         from Z2X_BATCH_DONPAIE
+                        group by MATRIC
+                      )
+              ) last_period
+           on (last_period.MATRIC = dp.MATRIC
+               and last_period.LAST_ANNEE = dp.ANNEE
+               and last_period.LAST_MOIS = dp.MOIS)
+union
+select MATRIC,
+       MATPAIE,
+       H1DDEB as DATDEB,
+       H1DFIN as DATFIN,
+       to_char(H1DDEB, 'YYYY') as ANNEE,
+       to_char(H1DDEB, 'MM') as MOIS,
+       RUB_1,
+       RUB_2,
+       RUB_3,
+       RUB_4,
+       RUB_7,
+       RUB_8,
+       RUB_9,
+       RUB_10,
+       RUB_11,
+       RUB_12,
+       RUB_13,
+       RUB_14,
+       RUB_15,
+       BULLETIN,
+       null as MTS16,
+       null as MTS15,
+       null as MTS14,
+       null as RESALB,
+       null as NBM,
+       MTINDEMNITES,
+       MTSALTPSCOMPLET,
+       MTSALREEL,
+       MTSALANST,
+       NBHREPAYEES,
+       MTPRIMMENS,
+       MTPRIMPONCT,
+       MTBRUTREEL,
+       CUMAJOUR43,
+       CUMMJOUR43,
+       NBPOINTSAUT,
+       NBPOINTSANC,
+       NBPOINTSBASE,
+       NDPOINTSDIPLO,
+       NDPOINTSDIV,
+       NBPOINTSLANG,
+       NBPOINTSPERSO,
+       NTTOTALPOINTS
+from Z2X_BATCH_DONPAIE_MP

@@ -1,0 +1,37 @@
+{
+  boutons : "INT",
+  code : "TYPEDESPO_FORM",
+  element : "ecran",
+  groupe : {
+    code : "TYPEDISPOSITIF_FORM_GRP",
+    donnees : [ {
+      code : "TYPEDISPOSITIF_NHISTO_FORM_GRP",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        pageAjout : "TYPEDESPO_POP_FORM",
+        pageModif : "TYPEDESPO_POP_M_FORM",
+        requete : "TYP_DIP_FORM_1"
+      } ],
+      element : "groupe",
+      libelle : "Types et dispositifs non historisés",
+      onglet : true
+    }, {
+      code : "TYPEDISPOSITIF_HISTO_FORM_GRP",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        pageModif : "TYPEDESPO_POP_M_FORM",
+        requete : "TYP_DIP_FORM_2"
+      } ],
+      element : "groupe",
+      libelle : "Types et dispositifs historisés",
+      onglet : true
+    } ],
+    element : "groupe",
+    libelle : "Groupe général"
+  },
+  libelle : "Liste des types et des dispositifs",
+  servicelet : "FormationTypeDespositifJsonServlet",
+  type : "U"
+}

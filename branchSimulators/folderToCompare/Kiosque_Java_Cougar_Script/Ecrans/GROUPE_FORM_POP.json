@@ -1,0 +1,16 @@
+{
+  code : "GROUPE_FORM_POP",
+  element : "ecran",
+  groupe : {
+    code : "GROUPE_FORM_POP_GRP",
+    donnees : [ {
+      code : "#EOL",
+      element : "donnee"
+    } ],
+    element : "groupe",
+    libelle : "Ajout d'un groupe"
+  },
+  libelle : "Ajout d'un groupe",
+  servicelet : "GroupeJsonServlet",
+  type : "P"
+}

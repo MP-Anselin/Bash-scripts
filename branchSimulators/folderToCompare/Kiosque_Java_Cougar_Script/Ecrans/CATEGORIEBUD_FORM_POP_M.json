@@ -1,0 +1,69 @@
+{
+  code : "CATEGORIEBUD_FORM_POP_M",
+  element : "ecran",
+  groupe : {
+    code : "CATEGORIEBUD_FORM_POP_M_GRP",
+    donnees : [ {
+      code : "ID_CATEGORIE",
+      element : "donnee",
+      libelle : "ID CAT",
+      longueur : 2000,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "CAT_BUD_LIBELLE_FORM",
+      element : "donnee",
+      libelle : "Libellé ",
+      longueur : 256,
+      obligatoire : true,
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "CAT_BUD_DES_FORM",
+      element : "donnee",
+      libelle : "Description ",
+      longueur : 3999,
+      obligatoire : true,
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      affichage : "CATBUDHISTO",
+      code : "CAT_BUD_ETAT_FORM",
+      element : "donnee",
+      libelle : "Actif",
+      longueur : 1,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      affichage : "CATACTIF",
+      code : "CAT_BUD_HISTOR_FORM",
+      element : "donnee",
+      libelle : "Historisé",
+      longueur : 1,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    } ],
+    element : "groupe",
+    libelle : "Modification d'une catégorie de budget"
+  },
+  libelle : "Modification d'une catégorie de budget",
+  servicelet : "FormationCategorieBudgetJsonServlet",
+  type : "P"
+}

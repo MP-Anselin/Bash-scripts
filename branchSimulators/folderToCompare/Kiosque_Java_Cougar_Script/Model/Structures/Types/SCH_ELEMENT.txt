@@ -1,0 +1,4 @@
+##
+SCH_ELEMENT
+=SQL IF_TYPE_NOTEXIST=SCH_ELEMENT=
+create or replace TYPE SCH_ELEMENT AS OBJECT (  code_schema       NUMBER(38,3),  code_element      NUMBER(38,3),  libelle           VARCHAR2(512, BYTE),  nom_page          VARCHAR2(512, BYTE),  code_asso         NUMBER(38,3),  code_asso_pere    NUMBER(38,3),  niveau            NUMBER(38,3));

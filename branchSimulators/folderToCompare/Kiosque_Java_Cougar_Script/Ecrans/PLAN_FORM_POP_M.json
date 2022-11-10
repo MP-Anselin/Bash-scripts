@@ -1,0 +1,98 @@
+{
+  code : "PLAN_FORM_POP_M",
+  element : "ecran",
+  groupe : {
+    code : "PLAN_FORM_POP_M_GRP",
+    donnees : [ {
+      code : "PLAN_FORM_ID_PLAN",
+      element : "donnee",
+      libelle : "id plan",
+      longueur : 1000,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "PLAN_FORM_LIBELLE",
+      element : "donnee",
+      libelle : "Libellé",
+      longueur : 3900,
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "PLAN_FORM_STATUS",
+      element : "donnee",
+      libelle : "Statut",
+      longueur : 1,
+      saisie : "radio",
+      style : "FDonneeG",
+      type : "X",
+      valeurs : [ {
+        code : "OUVERT",
+        libelle : "Ouvert"
+      }, {
+        code : "CLOTURÉ",
+        libelle : "Cloturé"
+      }, {
+        code : "FERMÉ",
+        libelle : "Fermé"
+      } ]
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "PLAN_FORM_DATE_DEB",
+      element : "donnee",
+      format : "dd.MM.yyyy",
+      libelle : "Date de début de réalisation du plan",
+      saisie : "text",
+      style : "FDonneeG",
+      type : "D"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "PLAN_FORM_DATE_FIN",
+      element : "donnee",
+      format : "dd.MM.yyyy",
+      libelle : "Date de fin de réalisation du plan",
+      saisie : "text",
+      style : "FDonneeG",
+      type : "D"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "PLAN_FORM_ANNEE_M",
+      element : "donnee",
+      libelle : "Année",
+      longueur : 80,
+      requete : "PLAN_FORM_POP_M_ANNEE_1",
+      saisie : "select",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "PLAN_FORM_DEMANDE",
+      element : "donnee",
+      libelle : "Ouverture de la demande collective",
+      longueur : 500,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    } ],
+    element : "groupe",
+    libelle : "Modifier plan "
+  },
+  libelle : "Modifier un plan",
+  servicelet : "FormationPlanJsonServlet",
+  type : "P"
+}

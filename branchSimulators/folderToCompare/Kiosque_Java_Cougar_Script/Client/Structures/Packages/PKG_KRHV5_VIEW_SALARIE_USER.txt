@@ -1,0 +1,58 @@
+##
+PKG_KRHV5_VIEW_SALARIE_USER
+=SQL=
+create or replace PACKAGE PKG_KRHV5_VIEW_SALARIE_USER
+AS
+
+    FUNCTION decoupe_code_affectation
+        (
+            P_CODE_AFFECTATION IN T_V5_KRH_SALARIE.CODE_AFFECTATION%TYPE
+        )
+    RETURN T_V5_KRH_SALARIE.CODE_AFFECTATION%TYPE;
+
+END PKG_KRHV5_VIEW_SALARIE_USER
+##
+PKG_KRHV5_VIEW_SALARIE_USER
+=SQL=
+create or replace PACKAGE BODY PKG_KRHV5_VIEW_SALARIE_USER AS
+
+    FUNCTION decoupe_code_affectation
+        (
+            P_CODE_AFFECTATION IN T_V5_KRH_SALARIE.CODE_AFFECTATION%TYPE
+        )
+    RETURN T_V5_KRH_SALARIE.CODE_AFFECTATION%TYPE
+    IS
+       STRUCTURE_ORGA T_V5_INFO.VALEUR%TYPE;
+       AFF_APARTIR T_V5_INFO.VALEUR%TYPE;
+       AFF_JUSQUA T_V5_INFO.VALEUR%TYPE;
+    BEGIN
+
+        select VALEUR into STRUCTURE_ORGA
+        from T_V5_INFO
+        where APPLI = 'krhv5'
+        and CODE = 'STRUCTURE_ORGA';
+
+        select VALEUR into AFF_APARTIR
+        from T_V5_INFO
+        where APPLI = 'krhv5'
+        and CODE = 'AFF_APARTIR';
+
+        select VALEUR into AFF_JUSQUA
+        from T_V5_INFO
+        where APPLI = 'krhv5'
+        and CODE = 'AFF_JUSQUA';
+
+        if ((STRUCTURE_ORGA is not null) and (STRUCTURE_ORGA = '-1') and
+             REGEXP_LIKE(AFF_APARTIR, '^[0-9]+$') and (cast(AFF_APARTIR as number) > 0) and
+             REGEXP_LIKE(AFF_JUSQUA, '^[0-9]+$') and (cast(AFF_JUSQUA as number) > 0)) then
+            return substr(P_CODE_AFFECTATION, AFF_APARTIR, AFF_JUSQUA);
+        else
+            return P_CODE_AFFECTATION;
+        end if;
+
+    EXCEPTION
+        WHEN OTHERS THEN
+        RETURN P_CODE_AFFECTATION;
+    END;
+
+END PKG_KRHV5_VIEW_SALARIE_USER

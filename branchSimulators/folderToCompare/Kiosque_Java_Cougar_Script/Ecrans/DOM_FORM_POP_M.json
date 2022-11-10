@@ -1,0 +1,69 @@
+{
+  code : "DOM_FORM_POP_M",
+  element : "ecran",
+  groupe : {
+    code : "DOM_FORM_POP_M_GRP",
+    donnees : [ {
+      code : "DOM_FORM_ID",
+      element : "donnee",
+      libelle : "ID",
+      longueur : 50,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "DOM_FORM_NOM_DOMAINE",
+      element : "donnee",
+      libelle : "Nom domaine",
+      longueur : 100,
+      obligatoire : true,
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "DOM_FORM_DESCRIPTION",
+      element : "donnee",
+      libelle : "Description",
+      longueur : 3999,
+      obligatoire : true,
+      saisie : "text",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      affichage : "HISTODOM",
+      code : "DOM_FORM_ACTIF",
+      element : "donnee",
+      libelle : "Actif(ETAT)",
+      longueur : 1,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      affichage : "ACTFTDOM",
+      code : "DOM_FORM_HISTORISE",
+      element : "donnee",
+      libelle : "Historiser",
+      longueur : 1,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    } ],
+    element : "groupe",
+    libelle : "Modifier domaine"
+  },
+  libelle : "Modifier un domaine",
+  servicelet : "DomaineFormationJsonServlet",
+  type : "P"
+}

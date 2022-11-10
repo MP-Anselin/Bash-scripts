@@ -1,0 +1,199 @@
+##
+V_V5_KRHEF_FORM_CP_GP_AFF
+=SQL=
+CREATE OR REPLACE VIEW V_V5_KRHEF_FORM_CP_GP_AFF ("NB_AFF_BDG","ID_FORMATION_DEMANDE","ID_PLAN","ID_PLAN_REPORT","ORDRE_PLAN","DATE_CREATION","DATE_MAJ","MATRICULE_MAJ","DATE_RECALCUL_COUTFORMATEUR","PRISE_EN_CHARGE_EMPLOYEUR","ID_FORM_PLAN","COUT","COUT_SALARIAL","COUT_SAL_FORMATEUR","COUT_TRANSPORT","COUT_HEBERGEMENT","COUT_TUTEUR","PRISE_EN_CHARGE_OPCA","PEC_FONCTIONNEMENT_PEDAGO","PEC_SAL_FORMATEUR","PEC_SAL_STAGIAIRE","PEC_TRANSPORT","PEC_HEBERGEMENT","PEC_TUTEUR","MONTANT_PEC_OPCA","MONTANT_SUBV_IND","PREV_JOURS","PREV_HEURES","PREV_TEMPS_TRAVAIL","PREV_HORS_TEMPS_TRAVAIL","PREV_DIF_TEMPS_TRAVAIL","PREV_DIF_HORS_TEMPS_TRAVAIL","PERCENT_TEMPS_TRAVAIL","PERCENT_HORS_TEMPS_TRAVAIL","PERCENT_DIF_TEMPS_TRAVAIL","PERCENT_DIF_HORS_TEMPS_TRAVAIL","AFF1_ID_AFF_BDG_DETAIL","AFF1_COUT","AFF1_COUT_SALARIAL","AFF1_COUT_SAL_FORMATEUR","AFF1_COUT_TRANSPORT","AFF1_COUT_HEBERGEMENT","AFF1_COUT_TUTEUR","AFF1_PRISE_EN_CHARGE_OPCA","AFF1_PEC_FONCTIONNEMENT_PEDAGO","AFF1_PEC_SAL_FORMATEUR","AFF1_PEC_SAL_STAGIAIRE","AFF1_PEC_TRANSPORT","AFF1_PEC_HEBERGEMENT","AFF1_PEC_TUTEUR","AFF1_MONTANT_PEC_OPCA","AFF1_MONTANT_SUBV_IND","AFF1_PREV_JOURS","AFF1_PREV_HEURES","AFF1_PREV_TT","AFF1_PREV_HTT","AFF1_PREV_DIF_TT","AFF1_PREV_DIF_HTT","AFF1_PERCENT_TT","AFF1_PERCENT_HTT","AFF1_PERCENT_DIF_TT","AFF1_PERCENT_DIF_HTT","AFF2_ID_AFF_BDG_DETAIL","AFF2_COUT","AFF2_COUT_SALARIAL","AFF2_COUT_SAL_FORMATEUR","AFF2_COUT_TRANSPORT","AFF2_COUT_HEBERGEMENT","AFF2_COUT_TUTEUR","AFF2_PRISE_EN_CHARGE_OPCA","AFF2_PEC_FONCTIONNEMENT_PEDAGO","AFF2_PEC_SAL_FORMATEUR","AFF2_PEC_SAL_STAGIAIRE","AFF2_PEC_TRANSPORT","AFF2_PEC_HEBERGEMENT","AFF2_PEC_TUTEUR","AFF2_MONTANT_PEC_OPCA","AFF2_MONTANT_SUBV_IND","AFF2_PREV_JOURS","AFF2_PREV_HEURES","AFF2_PREV_TT","AFF2_PREV_HTT","AFF2_PREV_DIF_TT","AFF2_PREV_DIF_HTT","AFF2_PERCENT_TT","AFF2_PERCENT_HTT","AFF2_PERCENT_DIF_TT","AFF2_PERCENT_DIF_HTT") AS 
+select sum_aff.NB_AFF_BDG,
+       -- =======================================================
+       -- Champs communs aux différentes affectations
+       -- (issus de FORM_DEMANDE et FORM_PLAN)
+       -- =======================================================
+       sum_aff.ID_FORMATION_DEMANDE,
+       sum_aff.ID_PLAN,
+       sum_aff.ID_PLAN_REPORT,
+       sum_aff.ORDRE_PLAN,
+       sum_aff.DATE_CREATION,
+       sum_aff.DATE_MAJ,
+       sum_aff.MATRICULE_MAJ,
+       sum_aff.DATE_RECALCUL_COUTFORMATEUR,
+       sum_aff.PRISE_EN_CHARGE_EMPLOYEUR,
+       sum_aff.ID_FORM_PLAN,
+      -- ======================================================
+       -- Sommes et moyennes sur les 2 affectations budgétaires
+       -- ======================================================
+       -- Somme des couts
+       sum_aff.COUT,
+       sum_aff.COUT_SALARIAL,
+       sum_aff.COUT_SAL_FORMATEUR,
+       sum_aff.COUT_TRANSPORT,
+       sum_aff.COUT_HEBERGEMENT,
+       sum_aff.COUT_TUTEUR,
+       -- Indique si au moins une des 2 affectation a une prise en charge
+       sum_aff.PRISE_EN_CHARGE_OPCA,
+       -- Somme des prises en charge
+       sum_aff.PEC_FONCTIONNEMENT_PEDAGO,
+       sum_aff.PEC_SAL_FORMATEUR,
+       sum_aff.PEC_SAL_STAGIAIRE,
+       sum_aff.PEC_TRANSPORT,
+       sum_aff.PEC_HEBERGEMENT,
+       sum_aff.PEC_TUTEUR,
+       sum_aff.MONTANT_PEC_OPCA,
+       sum_aff.MONTANT_SUBV_IND,
+       -- Somme des durées
+       sum_aff.PREV_JOURS,
+       sum_aff.PREV_HEURES,
+       sum_aff.PREV_TEMPS_TRAVAIL,
+       sum_aff.PREV_HORS_TEMPS_TRAVAIL,
+       sum_aff.PREV_DIF_TEMPS_TRAVAIL,
+       sum_aff.PREV_DIF_HORS_TEMPS_TRAVAIL,
+       sum_aff.PERCENT_TEMPS_TRAVAIL,
+       sum_aff.PERCENT_HORS_TEMPS_TRAVAIL,
+       sum_aff.PERCENT_DIF_TEMPS_TRAVAIL,
+       sum_aff.PERCENT_DIF_HORS_TEMPS_TRAVAIL,
+       -- =======================================================
+       -- Donnée relatives à l'affectation budgétaire principale
+       -- =======================================================
+       aff_princ.ID_AFF_BDG_DETAIL as AFF1_ID_AFF_BDG_DETAIL,
+       -- Couts
+       aff_princ.COUT as AFF1_COUT,
+       aff_princ.COUT_SALARIAL as AFF1_COUT_SALARIAL,
+       aff_princ.COUT_SAL_FORMATEUR as AFF1_COUT_SAL_FORMATEUR,
+       aff_princ.COUT_TRANSPORT as AFF1_COUT_TRANSPORT,
+       aff_princ.COUT_HEBERGEMENT as AFF1_COUT_HEBERGEMENT,
+       aff_princ.COUT_TUTEUR as AFF1_COUT_TUTEUR,
+       -- Avec prise en charge
+       aff_princ.PRISE_EN_CHARGE_OPCA as AFF1_PRISE_EN_CHARGE_OPCA,
+       -- Prises en charge
+       aff_princ.PEC_FONCTIONNEMENT_PEDAGO as AFF1_PEC_FONCTIONNEMENT_PEDAGO,
+       aff_princ.PEC_SAL_FORMATEUR as AFF1_PEC_SAL_FORMATEUR,
+       aff_princ.PEC_SAL_STAGIAIRE as AFF1_PEC_SAL_STAGIAIRE,
+       aff_princ.PEC_TRANSPORT as AFF1_PEC_TRANSPORT,
+       aff_princ.PEC_HEBERGEMENT as AFF1_PEC_HEBERGEMENT,
+       aff_princ.PEC_TUTEUR as AFF1_PEC_TUTEUR,
+       aff_princ.MONTANT_PEC_OPCA as AFF1_MONTANT_PEC_OPCA,
+       aff_princ.MONTANT_SUBV_IND as AFF1_MONTANT_SUBV_IND,
+       -- Durées
+       aff_princ.PREV_JOURS as AFF1_PREV_JOURS,
+       aff_princ.PREV_HEURES as AFF1_PREV_HEURES,
+       aff_princ.PREV_TEMPS_TRAVAIL as AFF1_PREV_TT,
+       aff_princ.PREV_HORS_TEMPS_TRAVAIL as AFF1_PREV_HTT,
+       aff_princ.PREV_DIF_TEMPS_TRAVAIL as AFF1_PREV_DIF_TT,
+       aff_princ.PREV_DIF_HORS_TEMPS_TRAVAIL as AFF1_PREV_DIF_HTT,
+       aff_princ.PERCENT_TEMPS_TRAVAIL as AFF1_PERCENT_TT,
+       aff_princ.PERCENT_HORS_TEMPS_TRAVAIL as AFF1_PERCENT_HTT,
+       aff_princ.PERCENT_DIF_TEMPS_TRAVAIL as AFF1_PERCENT_DIF_TT,
+       aff_princ.PERCENT_DIF_HORS_TEMPS_TRAVAIL as AFF1_PERCENT_DIF_HTT,
+       -- =======================================================
+       -- Donnée relatives à l'affectation budgétaire secondaire
+       -- =======================================================
+       aff_sec.ID_AFF_BDG_DETAIL as AFF2_ID_AFF_BDG_DETAIL,
+       -- Couts
+       aff_sec.COUT as AFF2_COUT,
+       aff_sec.COUT_SALARIAL as AFF2_COUT_SALARIAL,
+       aff_sec.COUT_SAL_FORMATEUR as AFF2_COUT_SAL_FORMATEUR,
+       aff_sec.COUT_TRANSPORT as AFF2_COUT_TRANSPORT,
+       aff_sec.COUT_HEBERGEMENT as AFF2_COUT_HEBERGEMENT,
+       aff_sec.COUT_TUTEUR as AFF2_COUT_TUTEUR,
+       -- Avec prise en charge
+       aff_sec.PRISE_EN_CHARGE_OPCA as AFF2_PRISE_EN_CHARGE_OPCA,
+       -- Prises en charge
+       aff_sec.PEC_FONCTIONNEMENT_PEDAGO as AFF2_PEC_FONCTIONNEMENT_PEDAGO,
+       aff_sec.PEC_SAL_FORMATEUR as AFF2_PEC_SAL_FORMATEUR,
+       aff_sec.PEC_SAL_STAGIAIRE as AFF2_PEC_SAL_STAGIAIRE,
+       aff_sec.PEC_TRANSPORT as AFF2_PEC_TRANSPORT,
+       aff_sec.PEC_HEBERGEMENT as AFF2_PEC_HEBERGEMENT,
+       aff_sec.PEC_TUTEUR as AFF2_PEC_TUTEUR,
+       aff_sec.MONTANT_PEC_OPCA as AFF2_MONTANT_PEC_OPCA,
+       aff_sec.MONTANT_SUBV_IND as AFF2_MONTANT_SUBV_IND,
+       -- Durées
+       aff_sec.PREV_JOURS as AFF2_PREV_JOURS,
+       aff_sec.PREV_HEURES as AFF2_PREV_HEURES,
+       aff_sec.PREV_TEMPS_TRAVAIL as AFF2_PREV_TT,
+       aff_sec.PREV_HORS_TEMPS_TRAVAIL as AFF2_PREV_HTT,
+       aff_sec.PREV_DIF_TEMPS_TRAVAIL as AFF2_PREV_DIF_TT,
+       aff_sec.PREV_DIF_HORS_TEMPS_TRAVAIL as AFF2_PREV_DIF_HTT,
+       aff_sec.PERCENT_TEMPS_TRAVAIL as AFF2_PERCENT_TT,
+       aff_sec.PERCENT_HORS_TEMPS_TRAVAIL as AFF2_PERCENT_HTT,
+       aff_sec.PERCENT_DIF_TEMPS_TRAVAIL as AFF2_PERCENT_DIF_TT,
+       aff_sec.PERCENT_DIF_HORS_TEMPS_TRAVAIL as AFF2_PERCENT_DIF_HTT
+  from (select max(cp.ORDRE_AFF_BDG) as NB_AFF_BDG,
+               -- Somme des couts
+               sum(cp.COUT) as COUT,
+               sum(cp.COUT_SALARIAL) as COUT_SALARIAL,
+               sum(cp.COUT_SAL_FORMATEUR) as COUT_SAL_FORMATEUR,
+               sum(cp.COUT_TRANSPORT) as COUT_TRANSPORT,
+               sum(cp.COUT_HEBERGEMENT) as COUT_HEBERGEMENT,
+               sum(cp.COUT_TUTEUR) as COUT_TUTEUR,
+               -- Indique si au moins une des 2 affectation a une prise en charge
+               max(cp.PRISE_EN_CHARGE_OPCA) as PRISE_EN_CHARGE_OPCA,
+               -- Somme des prises en charge
+               sum(cp.PEC_FONCTIONNEMENT_PEDAGO) as PEC_FONCTIONNEMENT_PEDAGO,
+               sum(cp.PEC_SAL_FORMATEUR) as PEC_SAL_FORMATEUR,
+               sum(cp.PEC_SAL_STAGIAIRE) as PEC_SAL_STAGIAIRE,
+               sum(cp.PEC_TRANSPORT) as PEC_TRANSPORT,
+               sum(cp.PEC_HEBERGEMENT) as PEC_HEBERGEMENT,
+               sum(cp.PEC_TUTEUR) as PEC_TUTEUR,
+               sum(cp.MONTANT_PEC_OPCA) as MONTANT_PEC_OPCA,
+               sum(cp.MONTANT_SUBV_IND) as MONTANT_SUBV_IND,
+               -- Somme des durées
+               sum(cp.PREV_JOURS) as PREV_JOURS,
+               sum(cp.PREV_HEURES) as PREV_HEURES,
+               sum(cp.PREV_TEMPS_TRAVAIL) as PREV_TEMPS_TRAVAIL,
+               sum(cp.PREV_HORS_TEMPS_TRAVAIL) as PREV_HORS_TEMPS_TRAVAIL,
+               sum(cp.PREV_DIF_TEMPS_TRAVAIL) as PREV_DIF_TEMPS_TRAVAIL,
+               sum(cp.PREV_DIF_HORS_TEMPS_TRAVAIL) as PREV_DIF_HORS_TEMPS_TRAVAIL,
+               case when sum(cp.PREV_HEURES) = 0
+                         then 100
+                         else 100 * sum(cp.PREV_TEMPS_TRAVAIL) / sum(cp.PREV_HEURES)
+                    end as PERCENT_TEMPS_TRAVAIL,
+               case when sum(cp.PREV_HEURES) = 0
+                         then 0
+                         else 100 * sum(cp.PREV_HORS_TEMPS_TRAVAIL) / sum(cp.PREV_HEURES)
+                    end as PERCENT_HORS_TEMPS_TRAVAIL,
+               case when sum(cp.PREV_HEURES) = 0
+                         then 0
+                         else 100 * sum(cp.PREV_DIF_TEMPS_TRAVAIL) / sum(cp.PREV_HEURES)
+                    end as PERCENT_DIF_TEMPS_TRAVAIL,
+               case when sum(cp.PREV_HEURES) = 0
+                         then 0
+                         else 100 * sum(cp.PREV_DIF_HORS_TEMPS_TRAVAIL) / sum(cp.PREV_HEURES)
+                    end as PERCENT_DIF_HORS_TEMPS_TRAVAIL,
+               --
+               -- Champs communs aux différentes affectations
+               -- (issus de FORM_DEMANDE et FORM_PLAN)
+               --
+               cp.ID_FORMATION_DEMANDE,
+               cp.ID_PLAN,
+               cp.ID_PLAN_REPORT,
+               cp.ORDRE_PLAN,
+               cp.DATE_CREATION,
+               cp.DATE_MAJ,
+               cp.MATRICULE_MAJ,
+               cp.DATE_RECALCUL_COUTFORMATEUR,
+               cp.PRISE_EN_CHARGE_EMPLOYEUR,
+               cp.ID_FORM_PLAN
+          from V_V5_KRHEF_FORM_COUT_PLAN cp
+         group by
+               --
+               -- Champs communs aux différentes affectations
+               -- (issus de FORM_DEMANDE et FORM_PLAN)
+               --
+               cp.ID_FORMATION_DEMANDE,
+               cp.ID_PLAN,
+               cp.ID_PLAN_REPORT,
+               cp.ORDRE_PLAN,
+               cp.DATE_CREATION,
+               cp.DATE_MAJ,
+               cp.MATRICULE_MAJ,
+               cp.DATE_RECALCUL_COUTFORMATEUR,
+               cp.PRISE_EN_CHARGE_EMPLOYEUR,
+               cp.ID_FORM_PLAN) sum_aff,
+       (select *
+          from V_V5_KRHEF_FORM_COUT_PLAN
+         where ORDRE_AFF_BDG = 1) aff_princ,
+       (select *
+          from V_V5_KRHEF_FORM_COUT_PLAN
+         where ORDRE_AFF_BDG = 2) aff_sec
+ where sum_aff.ID_FORMATION_DEMANDE = aff_princ.ID_FORMATION_DEMANDE(+)
+   and sum_aff.ORDRE_PLAN = aff_princ.ORDRE_PLAN(+)
+   and aff_princ.ID_FORMATION_DEMANDE = aff_sec.ID_FORMATION_DEMANDE(+)
+   and aff_princ.ORDRE_PLAN = aff_sec.ORDRE_PLAN(+)

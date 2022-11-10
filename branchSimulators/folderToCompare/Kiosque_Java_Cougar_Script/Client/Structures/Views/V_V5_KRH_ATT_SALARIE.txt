@@ -1,0 +1,20 @@
+##
+V_V5_KRH_ATT_SALARIE
+=SQL=
+CREATE OR REPLACE VIEW V_V5_KRH_ATT_SALARIE ("MATRICULE","ID_LETTRE","ID_FILTRE") AS 
+SELECT pop.matricule AS MATRICULE, flt.id_lettre, flt.id_filtre
+  FROM V_V5_KRH_ATT_FILTRE flt, V_V5_KRH_ATT_SAL_POP pop, V_V5_KRH_ATT_SAL_STRUCT struct
+ WHERE flt.ID_FILTRE = pop.ID_FILTRE
+   AND pop.ID_FILTRE = struct.ID_FILTRE
+   AND pop.MATRICULE = struct.MATRICULE
+UNION
+SELECT struct.matricule AS MATRICULE, flt.id_lettre, flt.id_filtre
+  FROM V_V5_KRH_ATT_FILTRE flt, V_V5_KRH_ATT_SAL_STRUCT struct
+ WHERE flt.ID_POPULATION IS NULL
+   AND flt.ID_FILTRE = struct.ID_FILTRE
+UNION
+SELECT pop.matricule AS MATRICULE, flt.id_lettre, flt.id_filtre
+  FROM V_V5_KRH_ATT_FILTRE flt, V_V5_KRH_ATT_SAL_POP pop
+ WHERE flt.ID_STRUCTURE IS NULL
+   AND flt.ID_FILTRE = pop.ID_FILTRE
+ORDER BY matricule, id_filtre

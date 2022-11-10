@@ -1,0 +1,75 @@
+##
+SYS_SCH_JSON
+=SQL IFNOTEXIST=SYS_SCH_JSON=
+CREATE TABLE SYS_SCH_JSON ( NOM_PAGE VARCHAR2(250) NOT NULL ENABLE, NOM_JSON VARCHAR2(250) NOT NULL ENABLE, PRIMARY KEY (NOM_PAGE, NOM_JSON) ) 
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Moteur.ADP_ONLY.varSys.VarSys'
+'Ext.adp.Moteur.ADP_ONLY.varSys.VarSys','VarSysJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE IN ('Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageEcransExtjs','Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageGroupesDonneesExtjs','Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageDonneesExtjs')
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageDonneesExtjs','CreationSysRequetesJspJsonServlet'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageDonneesExtjs','GestionProjetJsonServlet'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageDonneesExtjs','InfoProjetCourantJsonServlet'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageDonneesExtjs','ParametrageDonneesJsonServlet'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageEcransExtjs','CreationSysRequetesJspJsonServlet'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageEcransExtjs','GestionProjetJsonServlet'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageEcransExtjs','InfoProjetCourantJsonServlet'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageEcransExtjs','ParametrageEcransJsonServlet'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageGroupesDonneesExtjs','CreationSysRequetesJspJsonServlet'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageGroupesDonneesExtjs','GestionProjetJsonServlet'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageGroupesDonneesExtjs','InfoProjetCourantJsonServlet'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageGroupesDonneesExtjs','ParametrageGroupesDonneesJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Moteur/ADP_ONLY/ParamEcranDyn/ParametrageReglesGestion_v2.jsp'
+'Moteur/ADP_ONLY/ParamEcranDyn/ParametrageReglesGestion_v2.jsp','ParametrageReglesGestionJsonServicelet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE IN ('Ext.adp.Modules.RD.STD.EXP.FIN_FORM.FIN_FORM', 'Ext.adp.Modules.RD.STD.EXP.AXE_STR_FORM.AXE_STR_FORM', 'Ext.adp.Modules.RD.STD.EXP.ACTEUR_FORM.ACTEUR_FORM', 'Ext.adp.Modules.RD.STD.EXP.ADR_LIEU_FORM.ADR_LIEU_FORM', 'Ext.adp.Modules.RD.STD.EXP.DOM_FORM.DOM_FORM', 'Ext.adp.Modules.RD.STD.EXP.ORG_FORM.ORG_FORM')
+'Ext.adp.Modules.RD.STD.EXP.ACTEUR_FORM.ACTEUR_FORM','FormationActeurJsonServlet'
+'Ext.adp.Modules.RD.STD.EXP.ADR_LIEU_FORM.ADR_LIEU_FORM','FormationLieuJsonServlet'
+'Ext.adp.Modules.RD.STD.EXP.AXE_STR_FORM.AXE_STR_FORM','FormationAxesStrategiquesJsonServlet'
+'Ext.adp.Modules.RD.STD.EXP.DOM_FORM.DOM_FORM','DomaineFormationJsonServlet'
+'Ext.adp.Modules.RD.STD.EXP.FIN_FORM.FIN_FORM','FormationFinanceursJsonServlet'
+'Ext.adp.Modules.RD.STD.EXP.ORG_FORM.ORG_FORM','FormationOrganismesJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Modules.RD.STD.EXP.PARAMPAC_PARAM.PARAMPAC_PARAM'
+'Ext.adp.Modules.RD.STD.EXP.PARAMPAC_PARAM.PARAMPAC_PARAM','ParamPacClientJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Modules.RD.STD.EXP.TYPEDESPO_FORM.TYPEDESPO_FORM'
+'Ext.adp.Modules.RD.STD.EXP.TYPEDESPO_FORM.TYPEDESPO_FORM','FormationTypeDespositifJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Modules.RD.STD.EXP.PLAN_FORM.PLAN_FORM'
+'Ext.adp.Modules.RD.STD.EXP.PLAN_FORM.PLAN_FORM','FormationPlanJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Modules.RD.STD.EXP.CATEGORIEBUD_FORM.CATEGORIEBUD_FORM'
+'Ext.adp.Modules.RD.STD.EXP.CATEGORIEBUD_FORM.CATEGORIEBUD_FORM','FormationCategorieBudgetJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Modules.RD.STD.EXP.STR_BDG_FORM.STR_BDG_FORM'
+'Ext.adp.Modules.RD.STD.EXP.STR_BDG_FORM.STR_BDG_FORM','FormationStructureBudgetaireJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Modules.RD.STD.EXP.HAB_UTIL_SEC.HAB_UTIL_SEC'
+'Ext.adp.Modules.RD.STD.EXP.HAB_UTIL_SEC.HAB_UTIL_SEC','HabilitationUtilsateurJsonServlet'
+##
+SYs_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.AppelsTableTools'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.AppelsTableTools','AppelTableToolsJsonServlet'

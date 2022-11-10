@@ -1,0 +1,86 @@
+{
+  code : "TYPEDESPO_POP_FORM",
+  element : "ecran",
+  groupe : {
+    code : "TYPDISP_FORM_POP_GRP",
+    donnees : [ {
+      code : "TYPE_TYPDIS_FORM",
+      element : "donnee",
+      entier : 6,
+      libelle : "Type",
+      obligatoire : true,
+      saisie : "text",
+      style : "FDonneeG",
+      type : "N"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "DISPOSI_TYPDIS_FORM",
+      element : "donnee",
+      libelle : "Dispositif",
+      longueur : 50,
+      obligatoire : true,
+      saisie : "select",
+      style : "FDonneeG",
+      type : "X",
+      valeurs : [ {
+        code : "1",
+        libelle : "PLAN"
+      }, {
+        code : "4",
+        libelle : "CPF"
+      }, {
+        code : "3",
+        libelle : "CIF"
+      }, {
+        code : "5",
+        libelle : "PROF"
+      }, {
+        code : "6",
+        libelle : "SPFPP"
+      } ]
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "COMENT_TYPDIS_FORM",
+      element : "donnee",
+      libelle : "TYPDIS_COMENT_FORM",
+      longueur : 3999,
+      obligatoire : true,
+      saisie : "textarea",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      affichage : "HISTOTYPDISAJOUT",
+      code : "ACTIF_TYPDIS_FORM",
+      element : "donnee",
+      libelle : "Actif",
+      longueur : 1,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      affichage : "ACTFTYPDIS",
+      code : "HISTO_TYPDIS_FORM",
+      element : "donnee",
+      libelle : "Historiser",
+      longueur : 1,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      type : "X"
+    } ],
+    element : "groupe",
+    libelle : "Ajouter un type et un dispositif"
+  },
+  libelle : "Ajouter un type et un dispositif",
+  servicelet : "FormationTypeDespositifJsonServlet",
+  type : "P"
+}

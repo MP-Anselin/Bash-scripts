@@ -1,0 +1,2540 @@
+##
+PKG_GDE_IMPORT
+=SQL=
+create or replace PACKAGE PKG_GDE_IMPORT AS
+
+  /*OK                 CONSTANT NUMBER(1) := PKG_TRACE.OK;
+  NOTICE           CONSTANT NUMBER(1) := PKG_TRACE.NOTICE;
+  WARNING          CONSTANT NUMBER(1) := PKG_TRACE.WARNING;
+  ERROR            CONSTANT NUMBER(1) := PKG_TRACE.ERROR;
+  SQL_ERROR        CONSTANT NUMBER(1) := PKG_TRACE.SQL_ERROR;
+  INTERNAL_ERROR   CONSTANT NUMBER(1) := PKG_TRACE.INTERNAL_ERROR;*/
+
+  OK                CONSTANT NUMBER(1) := 1;
+  NOTICE            CONSTANT NUMBER(1) := 2;
+  WARNING           CONSTANT NUMBER(1) := 3;
+  ERROR             CONSTANT NUMBER(1) := 4;
+  SQL_ERROR         CONSTANT NUMBER(1) := 5;
+  INTERNAL_ERROR    CONSTANT NUMBER(1) := 6;
+
+  CHECK_SIZE    CONSTANT NUMBER(1) := 1;
+  CHECK_FORMAT  CONSTANT NUMBER(1) := 2;
+  CHECK_UNICITY CONSTANT NUMBER(1) := 3;
+
+  FUNCTION importFile(logDbLink IN VARCHAR2,
+                      pac                   IN VARCHAR2,
+                      tacheId               IN INTEGER,
+                      idData                IN INTEGER,
+                      logonLdap             IN VARCHAR2,
+                      idClient              IN NUMBER,
+                      keyOfFile             IN NUMBER,
+                      periode               IN DATE,
+                      suffixe               IN VARCHAR2,
+                      isClientVision        IN NUMBER,
+                      isEnteteModele        IN NUMBER,
+                      avecModelisation      IN NUMBER,
+                      hasOptionMDT          IN NUMBER,
+                      hasOptionIFRS         IN NUMBER,
+                      hasOptionHabilitation IN NUMBER,
+                      hasOptionMultipac     IN NUMBER,
+                      avecRemunerationVide  IN NUMBER)
+  RETURN NUMBER;
+
+  FUNCTION importBdd(logDbLink              IN VARCHAR2,
+                     pac                    IN VARCHAR2,
+                     tacheId                IN INTEGER,
+                     idData                 IN INTEGER,
+                     logonLdap              IN VARCHAR2,
+                     idClient               IN NUMBER,
+                     keyOfFile              IN NUMBER,
+                     periode                IN DATE,
+                     isClientVision         IN NUMBER,
+                     avecModelisation       IN NUMBER,
+                     hasOptionMDT           IN NUMBER,
+                     hasOptionIFRS          IN NUMBER,
+                     hasOptionHabilitation  IN NUMBER,
+                     hasOptionMultipac      IN NUMBER,
+                     avecRemunerationVide   IN NUMBER)
+  RETURN NUMBER;
+
+END PKG_GDE_IMPORT
+##
+PKG_GDE_IMPORT
+=SQL=
+create or replace PACKAGE BODY PKG_GDE_IMPORT AS
+
+  G_tacheId                 INTEGER;
+  G_pac                     VARCHAR2(50);
+  G_idData                  INTEGER;
+  G_logonLdap               VARCHAR2(50);
+  G_suffixe                 VARCHAR2(32);
+  G_keyOfFile               NUMBER;
+  G_periode                 DATE;
+  G_periodeMoinsUnAn        DATE;
+  G_numPeriodeTraitee       NUMBER;
+  G_numPeriodeMoinsUnAn     NUMBER;
+  G_isClientVision          BOOLEAN := false;
+  G_isEnteteModele          BOOLEAN := false;
+  G_avecModelisation        BOOLEAN := false;
+  G_avecRemunerationVide    BOOLEAN := false;
+  G_hasOptionMDT            BOOLEAN := false;
+  G_hasOptionIFRS           BOOLEAN := false;
+  G_hasOptionHabilitation   BOOLEAN := false;
+  G_hasOptionMultipac       BOOLEAN := false;
+  G_idClient                NUMBER;
+  G_codeDossier             VARCHAR2(20);
+  G_logDbLink               VARCHAR2(50);
+
+  G_nbErrorTransco          NUMBER := 0;
+  G_hasErreurCheckedColumn  BOOLEAN := false;
+
+  E_CHECK_COLUMN            EXCEPTION;
+
+  -- Tableau de curseur dont la clé est un varchar
+  TYPE tbCursor IS TABLE OF INTEGER
+  INDEX BY VARCHAR2(100);
+
+  tbCurUpdatePivot tbCursor;
+
+  /**
+   * Curseur de sélection des salariés dans la table PIVOT
+   */
+  CURSOR curSalarie
+  IS
+  select PAC, p.MATRICULE, NOM, PRENOM, CODE_SEXE,
+         to_date(DATE_ENTREE, 'dd/mm/YYYY') as DATE_ENTREE,
+         to_date(DATE_SORTIE, 'dd/mm/YYYY') as DATE_SORTIE,
+         to_date(DATE_NAISSANCE, 'dd/mm/YYYY') as DATE_NAISSANCE,
+         to_date(DATE_ANCIENNETE, 'dd/mm/YYYY') as DATE_ANCIENNETE,
+         CONV_COD, CONV_LIB, SOC_COD, SOC_LIB, ETA_COD, ETA_LIB, CAT_COD, CAT_LIB,
+         CONTRAT_COD, CONTRAT_LIB, CLASSIF_COD, CLASSIF_LIB, METIER_COD, METIER_LIB,
+         PKG_UTIL.formatNumber(COEFFICIENT, ',') as COEFFICIENT,
+         PKG_UTIL.formatNumber(MINIMUM_COEFFICIENT, ',') as MINIMUM_COEFFICIENT,
+         PKG_UTIL.formatNumber(REMUNERATION, ',') as REMUNERATION,
+         PKG_UTIL.formatNumber(CHARGES_PATRONALES, ',') as CHARGES_PATRONALES,
+         PKG_UTIL.formatNumber(BRUT_REEL, ',') as BRUT_REEL,
+         PKG_UTIL.formatNumber(SALAIRE_BASE, ',') as SALAIRE_BASE,
+         to_date(DATE_ENTREE_GROUPE, 'dd/mm/YYYY') as DATE_ENTREE_GROUPE,
+         NVL(AGE_DEP_RET, 0) as AGE_DEP_RET,
+         NVL(i.DATE_DEBUT_ACTIVITE, to_date(p.DATE_DEBUT_ACTIVITE, 'dd/mm/YYYY')) as DATE_DEBUT_ACTIVITE,
+         LIBRE1, LIBRE2, CODE_HABILITATION, PKG_UTIL.formatNumber(INDEMNITE_DEPART, ',') as INDEMNITE_DEPART, NATURE_DEPART, NVL(ESTEXCIND, 0) as ESTEXCIND
+  from T_V5_GDE_PIVOT p, T_V5_GDE_INFOS_PERENNES i
+  where KEYFIC = G_keyOfFile
+  and LOGON = G_logonLdap
+  and p.CODE_DOSSIER = G_codeDossier
+  and i.ID_CLIENT (+)= G_idClient
+  and case when p.pac is null then p.MATRICULE
+           else p.pac||'_'||p.MATRICULE end = i.MATRICULE (+);
+
+  lineSalarie curSalarie%ROWTYPE;
+
+  -- Matricule du salarie avec ou non concaténation selon si Multipac ou non
+  S_matricule               T_V5_GDE_SALARIE.MATRICULE%TYPE           := null;
+  -- Matricule sans concaténation : celui du fichier
+  S_matricule_simple        T_V5_GDE_SALARIE.MATRICULE%TYPE           := null;
+
+  S_convCod                 T_V5_GDE_SALARIE.CONV_COD%TYPE            := null;
+  S_convLib                 T_V5_GDE_SALARIE.CONV_LIB%TYPE            := null;
+  S_catCod                  T_V5_GDE_SALARIE.CAT_COD%TYPE             := null;
+  S_catLib                  T_V5_GDE_SALARIE.CAT_LIB%TYPE             := null;
+  S_contCod                 T_V5_GDE_SALARIE.CONTRAT_COD%TYPE         := null;
+  S_contLib                 T_V5_GDE_SALARIE.CONTRAT_LIB%TYPE         := null;
+  S_civilite                T_V5_GDE_SALARIE.CIVILITE%TYPE            := null;
+  S_anneeNaissance          T_V5_GDE_SALARIE.ANNEE_NAISSANCE%TYPE     := null;
+  S_dateNaissance           T_V5_GDE_SALARIE.DATE_NAISSANCE%TYPE      := null;
+  S_age                     T_V5_GDE_SALARIE.AGE%TYPE                 := null;
+  S_anciennete              T_V5_GDE_SALARIE.ANCIENNETE%TYPE          := null;
+  S_ancienneteProf          T_V5_GDE_SALARIE.ANCIENNETE_PROF%TYPE     := null;
+  S_socCod                  T_V5_GDE_SALARIE.SOC_COD%TYPE             := null;
+  S_socLib                  T_V5_GDE_SALARIE.SOC_LIB%TYPE             := null;
+  S_etaCod                  T_V5_GDE_SALARIE.ETA_COD%TYPE             := null;
+  S_etaLib                  T_V5_GDE_SALARIE.ETA_LIB%TYPE             := null;
+  S_metierCod               T_V5_GDE_SALARIE.METIER_COD%TYPE          := null;
+  S_metierLib               T_V5_GDE_SALARIE.METIER_LIB%TYPE          := null;
+
+  /**
+   * Log des messages
+   *
+   * @var string Message
+   * @var int    Type de message (NOTICE, WARNING, ERROR)
+   * @return void
+   */
+  PROCEDURE log(message IN VARCHAR2, typeMessage IN NUMBER) IS
+    no_trace BOOLEAN := false;
+    logInserted BOOLEAN := false;
+  BEGIN
+       /*case typeMessage
+       when OK then
+           PKG_TRACE.trace(message, typeMessage);
+       when NOTICE then
+           PKG_TRACE.trace(message, typeMessage);
+       when ERROR then
+           PKG_TRACE.trace(message, typeMessage);
+       when WARNING then
+           PKG_TRACE.trace(message, typeMessage);
+       when INTERNAL_ERROR then
+           PKG_TRACE.trace(message, typeMessage);
+       else
+           no_trace := true;
+       end case;
+       */
+
+       if not PKG_SQL.dbIsParsed('PKG_IMPORT.log'||typeMessage) then
+        PKG_SQL.dbParse('BEGIN PKG_TACHE.log@'||G_logDbLink||'(:STATUS, :MESSAGE); END;');
+       end if;
+
+       case typeMessage
+       when OK then
+           if G_tacheId is not null then
+              PKG_SQL.dbSet('STATUS', 1);
+              PKG_SQL.dbSet('MESSAGE', message);
+              logInserted := PKG_SQL.dbExecute();
+           else
+              PKG_TRACE.trace(message, typeMessage);
+           end if;
+       when NOTICE then
+           if G_tacheId is not null then
+              PKG_SQL.dbSet('STATUS', 0);
+              PKG_SQL.dbSet('MESSAGE', message);
+              logInserted := PKG_SQL.dbExecute();
+           else
+              PKG_TRACE.trace(message, typeMessage);
+           end if;
+       when WARNING then
+           if G_tacheId is not null then
+              PKG_SQL.dbSet('STATUS', 2);
+              PKG_SQL.dbSet('MESSAGE', message);
+              logInserted := PKG_SQL.dbExecute();
+           else
+              PKG_TRACE.trace(message, typeMessage);
+           end if;
+       when ERROR then
+           if G_tacheId is not null then
+              PKG_SQL.dbSet('STATUS', 3);
+              PKG_SQL.dbSet('MESSAGE', message);
+              logInserted := PKG_SQL.dbExecute();
+           else
+              PKG_TRACE.trace(message, typeMessage);
+           end if;
+       when INTERNAL_ERROR then
+           PKG_TRACE.trace(message, typeMessage);
+       when SQL_ERROR then
+           PKG_TRACE.trace(message, typeMessage);
+       else
+           PKG_TRACE.trace(message, PKG_TRACE.NOTICE);
+       end case;
+
+  END;
+
+  PROCEDURE insertImportLog(type in NUMBER, status IN NUMBER, columnName IN VARCHAR2,
+                            message IN VARCHAR2, matricule IN VARCHAR2 := '')
+  IS
+  BEGIN
+       if matricule is not null then
+       log('Matricule : ' || matricule || ' => ' || message, status);
+       else
+       log(message, status);
+       end if;
+
+       /*if not PKG_SQL.dbIsParsed('PKG_GDE_IMPORT.insertImportLog') then
+
+          PKG_SQL.dbParse('insert into T_V5_GDE_IMPORTLOG '
+                        ||'( '
+                        ||'ID, ID_DATA, KEYFIC, CODE_DOSSIER, TYPE, '
+                        ||'STATUS, COLUMN_NAME, MATRICULE, MESSAGE '
+                        ||') values ('
+                        ||'S_V5_GDE_IMPORTLOG.nextVal, :ID_DATA, :KEYFIC, :CODE_DOSSIER, :TYPE, '
+                        ||':STATUS, :COLUMN_NAME, :MATRICULE, :MESSAGE '
+                        ||') ');
+       end if;
+
+       PKG_SQL.dbSet('ID_DATA',      G_idData);
+       PKG_SQL.dbSet('KEYFIC',       G_keyOfFile);
+       PKG_SQL.dbSet('CODE_DOSSIER', G_idClient);
+       PKG_SQL.dbSet('TYPE',         type);
+       PKG_SQL.dbSet('STATUS',       status);
+       PKG_SQL.dbSet('COLUMN_NAME',  columnName);
+       PKG_SQL.dbSet('MATRICULE',    matricule);
+       PKG_SQL.dbSet('MESSAGE',      message);
+
+       if PKG_SQL.dbExecute then
+          PKG_SQL.dbCommit;
+       end if;*/
+
+  EXCEPTION
+  WHEN OTHERS THEN
+    log('error occured in insertImportLog', INTERNAL_ERROR);
+    raise;
+  END;
+
+  /**
+   * Gestion des erreurs de transcodification des dates
+   *
+   * @var int    Clé du fichier concerné
+   * @var string Colonne du fichier concernée
+   * @var date   Chaine de caractère à transformer
+   * @var string Format d'origine de la chaine à transformer
+   * @return void
+   */
+  PROCEDURE addErreurTranscoDate(columnName IN VARCHAR2, entryDate IN VARCHAR2, dateFormat IN VARCHAR2) IS
+  BEGIN
+      if dateFormat is null then
+          insertImportLog(1, ERROR, columnName, 'Aucun format de transcodification  n''a été trouvé pour cette colonne');
+      else
+          insertImportLog(1, ERROR, columnName, 'Date invalide ('''|| entryDate ||''') pour le format spécifié ('''|| dateFormat ||''')');
+      end if;
+
+      /*DBMS_OUTPUT.PUT_LINE('--------------------------------');
+      DBMS_OUTPUT.PUT_LINE('FICHIER => '|| G_keyOfFile);
+      DBMS_OUTPUT.PUT_LINE('COLONNE => '|| columnName);
+      if dateFormat is null then
+          DBMS_OUTPUT.PUT_LINE('ERREUR  => Aucun format de transcodification  n''a été trouvé pour cette colonne');
+      else
+          DBMS_OUTPUT.PUT_LINE('ERREUR  => Date invalide ('''|| entryDate ||''') pour le format spécifié ('''|| dateFormat ||''')');
+      end if;
+      DBMS_OUTPUT.PUT_LINE('--------------------------------');*/
+
+      G_nbErrorTransco := G_nbErrorTransco + 1;
+  END;
+
+  /**
+   * Gestion des erreurs de transcodification des valeurs vision
+   *
+   * @var int    Clé du fichier concerné
+   * @var string Colonne du fichier concernée
+   * @var date   Chaine de caractère à transformer
+   * @return void
+   */
+  PROCEDURE addErreurTranscoVision(columnName IN VARCHAR2, entryValue IN VARCHAR2) IS
+  BEGIN
+
+      insertImportLog(1, ERROR, columnName, 'Pas de valeur modèle Vision pour l''entrée '''|| entryValue ||'''');
+
+      /*DBMS_OUTPUT.PUT_LINE('--------------------------------');
+      DBMS_OUTPUT.PUT_LINE('FICHIER => '|| G_keyOfFile);
+      DBMS_OUTPUT.PUT_LINE('COLONNE => '|| columnName);
+      DBMS_OUTPUT.PUT_LINE('ERREUR  => Pas de valeur modèle Vision pour l''entrée '|| entryValue);
+      DBMS_OUTPUT.PUT_LINE('--------------------------------');*/
+
+      G_nbErrorTransco := G_nbErrorTransco + 1;
+  END;
+
+  /**
+   * Gestion des erreurs de transcodification des valeurs vision
+   *
+   * @var int    Clé du fichier concerné
+   * @var string Colonne du fichier concernée
+   * @var date   Chaine de caractère à transformer
+   * @return void
+   */
+  PROCEDURE addErreurTransco(columnName IN VARCHAR2, entryValue IN VARCHAR2) IS
+  BEGIN
+
+      if entryValue is null then
+          insertImportLog(1, ERROR, columnName, 'Valeur nulle');
+      else
+          insertImportLog(1, ERROR, columnName, 'Pas de valeur transcodifiée pour l''entrée '|| entryValue);
+      end if;
+
+      /*DBMS_OUTPUT.PUT_LINE('--------------------------------');
+      DBMS_OUTPUT.PUT_LINE('FICHIER => '|| G_keyOfFile);
+      DBMS_OUTPUT.PUT_LINE('COLONNE => '|| columnName);
+      if entryValue is null then
+          DBMS_OUTPUT.PUT_LINE('ERREUR  => Valeur nulle');
+      else
+          DBMS_OUTPUT.PUT_LINE('ERREUR  => Pas de valeur transcodifiée pour l''entrée '|| entryValue);
+      end if;
+      DBMS_OUTPUT.PUT_LINE('--------------------------------');*/
+
+      G_nbErrorTransco := G_nbErrorTransco + 1;
+  END;
+
+  /**
+   * Gestion des erreurs de transcodification des valeurs vision
+   *
+   * @var int    Clé du fichier concerné
+   * @var string Colonne du fichier concernée
+   * @var date   Chaine de caractère à transformer
+   * @return void
+   */
+  PROCEDURE addErreurGenerateCode(columnName IN VARCHAR2, entryValue IN VARCHAR2, message IN VARCHAR2) IS
+  BEGIN
+
+      if message is null then
+          insertImportLog(1, ERROR, columnName, 'Erreur lors de la génération d''un code pour l''entrée '''|| entryValue ||'''');
+      else
+          insertImportLog(1, ERROR, columnName, message);
+      end if;
+
+      /*DBMS_OUTPUT.PUT_LINE('--------------------------------');
+      DBMS_OUTPUT.PUT_LINE('COLONNE => '|| columnName);
+      if message is null then
+          DBMS_OUTPUT.PUT_LINE('ERREUR  => Erreur lors de la génération d''un code pour l''entrée '|| entryValue);
+      else
+          DBMS_OUTPUT.PUT_LINE('ERREUR  => ' || message || ' pour l''entrée '|| entryValue);
+      end if;
+      DBMS_OUTPUT.PUT_LINE('--------------------------------');*/
+
+      G_nbErrorTransco := G_nbErrorTransco + 1;
+  END;
+
+  /**
+   * Gestion des erreurs de données salariés
+   *
+   * @var string Matricule concerné
+   * @var string Colonne du fichier concernée
+   * @var date   Chaine de caractère à transformer
+   * @return void
+   */
+  PROCEDURE addErreurCheckColumn(columnName IN VARCHAR2, matricule in VARCHAR2, message IN VARCHAR2, status IN NUMBER := ERROR)
+  IS
+  BEGIN
+      if lineSalarie.DATE_SORTIE is null then
+          insertImportLog(2, status, columnName, message, matricule);
+
+          /*DBMS_OUTPUT.PUT_LINE('--------------------------------');
+          DBMS_OUTPUT.PUT_LINE('COLONNE => '  || columnName);
+          DBMS_OUTPUT.PUT_LINE('MATRICULE => '|| matricule);
+          DBMS_OUTPUT.PUT_LINE('ERREUR  => '  || message);
+          DBMS_OUTPUT.PUT_LINE('--------------------------------');*/
+
+          if status = ERROR then
+              G_hasErreurCheckedColumn := true;
+          end if;
+      end if;
+  END;
+
+  /**
+   * Y'a-t-il eu des erreurs de transcodification
+   *
+   * @return bool
+   */
+  FUNCTION hasErrorTransco RETURN BOOLEAN IS
+  BEGIN
+      if G_nbErrorTransco > 0 then
+          return true;
+      else
+          return false;
+      end if;
+  END;
+
+  /**
+   * Y'a-t-il eu des erreurs lors de la vérification des colonnes générée à partir
+   * des valeurs d'entrée du fichier pour le salarié en cours
+   *
+   * @return bool
+   */
+  FUNCTION hasErrorCheckedColumn RETURN BOOLEAN IS
+  BEGIN
+      return G_hasErreurCheckedColumn;
+  END;
+
+  /**
+   * Mise à jour d'une valeur dans la table pivot
+   *
+   * @return bool
+   */
+  PROCEDURE updateValue(columnName IN VARCHAR2, entryValue IN VARCHAR2, updateValue IN VARCHAR2)
+  IS
+    isParsed BOOLEAN;
+  BEGIN
+      if entryValue is not null then
+          if not PKG_SQL.dbIsParsed('updateValueNotNull' || columnName) then
+             PKG_SQL.dbParse('update T_V5_GDE_PIVOT set '
+                            || columnName || ' = :UPDATE_VALUE'
+                            || ' where ' || columnName || ' = :ENTRY_VALUE'
+                            || ' and code_dossier = :CODE_DOSSIER'
+                            || ' and keyFic = :KEY_FIC'
+                            || ' and logon = :LOGON');
+          end if;
+      else
+          if not PKG_SQL.dbIsParsed('updateValueNull' || columnName) then
+             PKG_SQL.dbParse('update T_V5_GDE_PIVOT set '
+                            || columnName || ' = :UPDATE_VALUE'
+                            || ' where ' || columnName || ' IS NULL'
+                            || ' and code_dossier = :CODE_DOSSIER'
+                            || ' and keyFic = :KEY_FIC'
+                            || ' and logon = :LOGON');
+          end if;
+      end if;
+
+      PKG_SQL.dbSet('UPDATE_VALUE', updateValue);
+      PKG_SQL.dbSet('KEY_FIC',      G_keyOfFile);
+      PKG_SQL.dbSet('LOGON',        G_logonLdap);
+      PKG_SQL.dbSet('CODE_DOSSIER', G_codeDossier);
+
+      if entryValue is not null then
+         PKG_SQL.dbSet('ENTRY_VALUE',   entryValue);
+      end if;
+
+      if not PKG_SQL.dbExecute then
+         log('Impossible de mettre à jour la valeur '''|| entryValue ||''' avec la valeur '''|| updateValue ||'''', WARNING);
+      end if;
+
+  EXCEPTION
+  WHEN OTHERS THEN
+      log('occured in updateValue('|| columnName ||', '|| entryValue ||', '|| updateValue ||') : ' || SQLERRM, SQL_ERROR);
+  END;
+
+  /**
+   * Mise à jour d'une valeur dans la table pivot
+   *
+   * @return bool
+   */
+  PROCEDURE updateCodeForLibelle(columnName IN VARCHAR2, libelle IN VARCHAR2, code IN VARCHAR2)
+  IS
+    isParsed BOOLEAN;
+    libelleColumnName VARCHAR2(50);
+
+    E_INTERNAL_COLUMN_NAME EXCEPTION;
+  BEGIN
+
+      case columnName
+        when 'CONV_COD' then
+             libelleColumnName := 'CONV_LIB';
+        when 'CONTRAT_COD' then
+             libelleColumnName := 'CONTRAT_LIB';
+        when 'CAT_COD' then
+             libelleColumnName := 'CAT_LIB';
+        when 'ETA_COD' then
+             libelleColumnName := 'ETA_LIB';
+        when 'SOC_COD' then
+             libelleColumnName := 'SOC_LIB';
+        when 'METIER_COD' then
+             libelleColumnName := 'METIER_LIB';
+        else
+             raise E_INTERNAL_COLUMN_NAME;
+      end case;
+
+      if libelle is not null then
+          if not PKG_SQL.dbIsParsed('PKG_GDE_IMPORT.updateCodeForLibelleNull_' || columnName) then
+             PKG_SQL.dbParse('update T_V5_GDE_PIVOT set '
+                            || columnName || ' = :CODE'
+                            || ' where ' || libelleColumnName || ' = :LIBELLE'
+                            || ' and code_dossier = :CODE_DOSSIER'
+                            || ' and keyFic = :KEY_FIC'
+                            || ' and logon = :LOGON');
+          end if;
+      else
+          if not PKG_SQL.dbIsParsed('PKG_GDE_IMPORT.updateCodeForLibelleNotNull_' || columnName) then
+             PKG_SQL.dbParse('update T_V5_GDE_PIVOT set '
+                            || columnName || ' = :CODE'
+                            || ' where ' || libelleColumnName || ' IS NULL'
+                            || ' and code_dossier = :CODE_DOSSIER'
+                            || ' and keyFic = :KEY_FIC'
+                            || ' and logon = :LOGON');
+          end if;
+      end if;
+
+      PKG_SQL.dbSet('CODE',      code);
+      PKG_SQL.dbSet('LIBELLE',   libelle);
+      PKG_SQL.dbSet('KEY_FIC',   G_keyOfFile);
+      PKG_SQL.dbSet('LOGON',     G_logonLdap);
+      PKG_SQL.dbSet('CODE_DOSSIER', G_codeDossier);
+
+      if not PKG_SQL.dbExecute then
+         log('Impossible de mettre à jour le code '''|| code ||''' à partir du libelle '''|| libelle ||'''', WARNING);
+      end if;
+
+  EXCEPTION
+  WHEN E_INTERNAL_COLUMN_NAME THEN
+      log('occured in updateValue('|| columnName ||', '|| libelle ||', '|| code ||') : Invalid column name', SQL_ERROR);
+  WHEN OTHERS THEN
+      log('occured in updateValue('|| columnName ||', '|| libelle ||', '|| code ||') : ' || SQLERRM, SQL_ERROR);
+  END;
+
+ /*
+  * Le code habilitation existe déjà ?
+  *
+  * @var string Code
+  * @return bool
+  */
+  FUNCTION isAlreadySavedCodeHabilitation(codeHabilitation IN VARCHAR2) RETURN BOOLEAN
+  IS
+    exist NUMBER;
+  BEGIN
+       select count(code) into exist from T_V5_GDE_CODES
+       where type = 'LFP'
+       and code = codeHabilitation;
+
+       if exist > 0 then
+           return true;
+       end if;
+
+       return false;
+
+  EXCEPTION
+  WHEN OTHERS THEN
+       log('occured in isAlreadySavedCodeHabilitation('|| codeHabilitation ||' : ' || SQLERRM, INTERNAL_ERROR);
+       return false;
+  END;
+
+ /*
+  * Sauvegarde du nouveau code habilitation
+  *
+  * @var string Code
+  * @return void
+  */
+  PROCEDURE saveCodeHabilitation(codeHabilitation IN VARCHAR2)
+  IS
+  BEGIN
+       if not PKG_SQL.dbIsParsed('saveCodeHabilitation') then
+
+          PKG_SQL.dbParse('insert into T_V5_GDE_CODES '
+                        ||'(TYPE, CODE, LIBELLE) '
+                        ||'values '
+                        ||'(:TYPE, :CODE, :LIBELLE) ');
+
+       end if;
+
+       PKG_SQL.dbSet('TYPE',    'LFP');
+       PKG_SQL.dbSet('CODE',    codeHabilitation);
+       PKG_SQL.dbSet('LIBELLE', 'Code ' || codeHabilitation);
+
+       if not PKG_SQL.dbExecute then
+          log('Impossible d''insérer le code habilitation  : '''|| codeHabilitation ||'''', WARNING);
+       end if;
+
+  EXCEPTION
+  WHEN OTHERS THEN
+       log('occured in saveCodeHabilitation('|| codeHabilitation ||' : ' || SQLERRM, INTERNAL_ERROR);
+  END;
+
+  /**
+   * Retourne la valeur modèle correspondant à une valeur transcodifiée
+   *
+   * @var string Suffixe MD5 du fichier transcodifié
+   * @var string Colonne à traiter
+   * @var string Valeur transcodifiée
+   * @return string
+   */
+  FUNCTION getNextGenerateCode(columnName in VARCHAR2, libelle IN VARCHAR2) RETURN NUMBER
+  is
+  PRAGMA AUTONOMOUS_TRANSACTION;
+
+    code        VARCHAR2(10);
+    value       NUMBER;
+    maxVal      NUMBER;
+    nextValue   NUMBER := 1;
+    typeCode    VARCHAR2(3);
+    sqlQuery    VARCHAR2(500);
+
+    TYPE CurTyp IS REF CURSOR;
+    gcCur       CurTyp;
+
+  BEGIN
+
+     CASE columnName
+       WHEN 'CONV_COD' THEN
+            typeCode := 'CNV';
+            maxVal := 99;
+       WHEN 'CAT_COD' THEN
+            typeCode := 'CAT';
+            maxVal := 99;
+       WHEN 'CONTRAT_COD' THEN
+            typeCode := 'CTR';
+            maxVal := 9999;
+       WHEN 'ETA_COD' THEN
+            typeCode := 'E';
+            maxVal := 99999;
+       WHEN 'METIER_COD' THEN
+            typeCode := 'M';
+            maxVal := 9999999999;
+       WHEN 'SOC_COD' THEN
+            typeCode := 'S';
+            maxVal := 99999;
+       ELSE
+            log('Colonne ' || columnName || ' non valide', WARNING);
+            return null;
+    END CASE;
+
+    BEGIN
+
+        -- Recherche du prochain code disponible
+        select min(code+1) into nextValue
+        from T_V5_GDE_CODES
+        where type = typeCode
+        and id_client = G_idClient
+        and to_char(code+1) not in
+        (
+         select code
+         from T_V5_GDE_CODES
+         where type = typeCode
+         and id_client = G_idClient
+        );
+
+
+    EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+       log('Colonne ' || columnName || ' : Génération du code initial => 1', NOTICE);
+    WHEN OTHERS THEN
+       log('Colonne ' || columnName || ' : Erreur lors de la récupération du prochain code libre', WARNING);
+       rollback;
+       return null;
+    END;
+
+    if nextValue is null then
+       nextValue := 1;
+    end if;
+
+    if nextValue > maxVal then
+       log('Colonne ' || columnName || ' : Code maximum dépassé', ERROR);
+       rollback;
+       return null;
+    else
+       insert into T_V5_GDE_CODES (type, code, libelle, id_client) values (typeCode, nextValue, libelle, G_idClient);
+       commit;
+       return nextValue;
+    end if;
+
+  EXCEPTION
+    WHEN OTHERS then
+        log('occured in getNextGenerateCode('||columnName||', '||libelle||') : ' || SQLERRM, SQL_ERROR);
+        rollback;
+        return null;
+  END;
+
+  /*
+  * Retourne la requête de sélection des valeurs pour une colonne dans la table pivot
+  *
+  * @var string     Nom de la colonne concerné
+  * @return string  Requête
+  */
+  FUNCTION getSqlQueySelectComplement(columnName IN VARCHAR2) RETURN VARCHAR2 IS
+  BEGIN
+        if columnName <> 'DATE_SORTIE' then
+           return ' and (DATE_SORTIE is null '
+                      || 'or to_date(DATE_SORTIE ,''dd/mm/yyyy'') '
+                      || '>= to_date('''||G_periodeMoinsUnAn||''' ,''dd/mm/yyyy''))';
+        else
+           return '';
+        end if;
+  END;
+
+  /*
+  * Retourne la requête de sélection des valeurs pour une colonne dans la table pivot
+  *
+  * @var string     Nom de la colonne concerné
+  * @return string  Requête
+  */
+  FUNCTION getSqlQueySelect(columnName IN VARCHAR2, withNullValue IN BOOLEAN := false) RETURN VARCHAR2 IS
+
+    sqlComplementLibSize VARCHAR2(100);
+
+  BEGIN
+
+       -- Sélection des libellés d'une longueur inférieure à 50 caractères
+       CASE columnName
+       WHEN 'CONV_LIB' THEN
+            sqlComplementLibSize := ' and length(trim(' || columnName || ')) <= 50';
+       WHEN 'CONTRAT_LIB' THEN
+            sqlComplementLibSize := ' and length(trim(' || columnName || ')) <= 50';
+       WHEN 'CAT_LIB' THEN
+            sqlComplementLibSize := ' and length(trim(' || columnName || ')) <= 50';
+       WHEN 'ETA_LIB' THEN
+            sqlComplementLibSize := ' and length(trim(' || columnName || ')) <= 50';
+       WHEN 'SOC_LIB' THEN
+            sqlComplementLibSize := ' and length(trim(' || columnName || ')) <= 50';
+       WHEN 'METIER_LIB' THEN
+            sqlComplementLibSize := ' and length(trim(' || columnName || ')) <= 50';
+       ELSE
+            sqlComplementLibSize := '';
+       END CASE;
+
+       if not withNullValue then
+           return 'select distinct trim('|| columnName ||')'
+                  || ' from T_V5_GDE_PIVOT where '
+                  || columnName ||' is not null'
+                  || ' and logon = '''|| G_logonLdap || ''''
+                  || ' and code_dossier = '''|| G_codeDossier || ''''
+                  || ' and keyFic = '''|| G_keyOfFile || ''''
+                  || ' and logon = '''|| G_logonLdap || ''''
+                  || sqlComplementLibSize
+                  || getSqlQueySelectComplement(columnName);
+       else
+           return 'select distinct trim('|| columnName ||')'
+                  || ' from T_V5_GDE_PIVOT  '
+                  || ' where logon = '''|| G_logonLdap || ''''
+                  || ' and code_dossier = '''|| G_codeDossier || ''''
+                  || ' and keyFic = '''|| G_keyOfFile || ''''
+                  || ' and logon = '''|| G_logonLdap || ''''
+                  || sqlComplementLibSize
+                  || getSqlQueySelectComplement(columnName);
+       end if;
+  END;
+
+  /**
+   * Retourne la valeur modèle correspondant à une valeur transcodifiée
+   *
+   * @var string Suffixe MD5 du fichier transcodifié
+   * @var string Colonne à traiter
+   * @var string Valeur transcodifiée
+   * @return string
+   */
+  FUNCTION getSavedTransco(columnName in VARCHAR2, entryValue in VARCHAR2) RETURN VARCHAR2
+  is
+    value VARCHAR2(50);
+  BEGIN
+       select transco_value into value from T_V5_GDE_TRANSCO
+       where suffixe = G_suffixe
+       and column_name = columnName
+       and entry_value = entryValue;
+
+       return value;
+
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        log('Colonne '|| columnName || ' : Aucune valeur transcodifiée pour la valeur ' || entryValue, NOTICE);
+        return null;
+    WHEN OTHERS then
+        log('occured in getSavedTransco('||columnName||', '||entryValue||') : ' || SQLERRM, SQL_ERROR);
+        return null;
+  END;
+
+  /**
+   * Teste si une chaine de caractère est de type numérique
+   *
+   * @var string Colonne à traiter
+   * @var string
+   * @return bool
+   */
+  FUNCTION getCodeModeleVision(columnName in VARCHAR2, entryValue in VARCHAR2) return VARCHAR2 is
+    typeCode VARCHAR2(20);
+    modele   VARCHAR2(50);
+  BEGIN
+
+       if trim(entryValue) is null then
+          return null;
+       end if;
+
+       CASE columnName
+       WHEN 'CONV_LIB' THEN
+            typeCode := 'CONV';
+       WHEN 'CONTRAT_LIB' THEN
+            typeCode := 'CONT';
+       WHEN 'CAT_LIB' THEN
+            typeCode := 'CAT';
+       WHEN 'CIVILITE' THEN
+            typeCode := 'CIV';
+       ELSE
+            return null;
+       END CASE;
+
+       BEGIN
+            select code into modele FROM T_V5_GDE_MOD_CODES where type = typeCode and LIBELLE like '%' || entryValue;
+            return modele;
+       EXCEPTION
+       WHEN NO_DATA_FOUND THEN
+            log('Colonne '|| columnName ||' : Aucune valeur modèle vision n''a été trouvée pour l''entrée ' || entryValue, ERROR);
+            return null;
+       END;
+
+  EXCEPTION
+  WHEN OTHERS THEN
+      log('occured in getCodeModeleVision('||columnName||', '||entryValue||')', SQL_ERROR);
+      return null;
+  END;
+
+  /**
+   * Retourne la valeur modèle correspondant à une valeur transcodifiée
+   *
+   * @var string Suffixe MD5 du fichier transcodifié
+   * @var string Colonne à traiter
+   * @var string Valeur transcodifiée
+   * @return string
+   */
+  FUNCTION getLibelleModeleVision(columnName in VARCHAR2, transcoValue in VARCHAR2) RETURN VARCHAR2
+  is
+    typeCode VARCHAR2(20);
+    value VARCHAR2(50);
+  BEGIN
+       CASE columnName
+       WHEN 'CONV_LIB' THEN
+            typeCode := 'CONV';
+       WHEN 'CONTRAT_LIB' THEN
+            typeCode := 'CONT';
+       WHEN 'CAT_LIB' THEN
+            typeCode := 'CAT';
+       WHEN 'CIVILITE' THEN
+            typeCode := 'CIV';
+       ELSE
+            return null;
+       END CASE;
+
+       select libelle into value
+       FROM T_V5_GDE_MOD_CODES
+       where type = typeCode
+       and code = transcoValue;
+
+       return value;
+
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        log('Colonne '|| columnName || ' : Aucun libelle modèle vision pour la valeur transcodifiée ' || transcoValue, ERROR);
+        return null;
+    WHEN OTHERS then
+        log('occured in getEntryValueForSavedTranscoVision('||columnName||', '||transcoValue||') : ' || SQLERRM, SQL_ERROR);
+        return null;
+  END;
+
+  /**
+   * Application des transcodifications de date
+   *
+   * @var string Suffixe MD5 du fichier transcodifié
+   * @var int Clé du fichier à traiter
+   * @var string Colonne du fichier à traiter
+   * @return void
+   */
+  PROCEDURE transcoDate(columnName IN VARCHAR2) IS
+
+    TYPE CurTyp IS REF CURSOR;
+
+    value           VARCHAR2(50) := '';
+    updatedValue    VARCHAR2(50) := '';
+    cPivot          CurTyp;
+
+    dateFormat      VARCHAR2(50) := '';
+
+    E_INTERNAL_TRANSCO_DATE EXCEPTION;
+
+  BEGIN
+
+    -- récupération du format spécifié pour cette colonne
+    CASE getSavedTransco(columnName, 'D')
+    WHEN 'jma' THEN
+        dateFormat := 'dd/mm/yyyy';
+    WHEN 'mja' THEN
+        dateFormat := 'mm/dd/yyyy';
+    WHEN 'amj' THEN
+        dateFormat := 'yyyy/mm/dd';
+    ELSE
+        raise E_INTERNAL_TRANSCO_DATE;
+    END CASE;
+
+    BEGIN
+         updatedValue := PKG_UTIL.formatDate('01/01/2001', dateFormat);
+    EXCEPTION
+    WHEN OTHERS THEN
+         updatedValue := null;
+         log('Erreur premiere ligne', WARNING);
+    END;
+
+    open cPivot for getSqlQueySelect(columnName);
+
+        LOOP
+        fetch cPivot into value;
+        EXIT WHEN cPivot%NOTFOUND;
+
+            BEGIN
+                updatedValue := PKG_UTIL.formatDate(value, dateFormat);
+
+                if updatedValue is not null and updatedValue <> value then
+                    updateValue(columnName, value, updatedValue);
+                elsif updatedValue is null then
+                    addErreurTranscoDate(columnName, value, dateFormat);
+                end if;
+
+            EXCEPTION
+            WHEN OTHERS THEN
+                 --log('Value : ' || value || ', updateValue : ' || updatedValue || ' => ' || SQLERRM, WARNING);
+                 addErreurTranscoDate(columnName, value, dateFormat);
+            END;
+
+        END LOOP;
+    close cPivot;
+
+  EXCEPTION
+  WHEN E_INTERNAL_TRANSCO_DATE THEN
+      addErreurTranscoDate(columnName, value, null);
+  WHEN OTHERS then
+      log('occured in transcoDate('||columnName||') : ' || SQLERRM, SQL_ERROR);
+  END;
+
+  /**
+   * Application des transcodifications des valeurs modèles vision
+   *
+   * @var int Clé du fichier à traiter
+   * @var string Colonne du fichier à traiter
+   * @return void
+   */
+  PROCEDURE transcoVision(columnName IN VARCHAR2) IS
+    TYPE CurTyp IS REF CURSOR;
+
+    libelle        VARCHAR2(50);
+    libelleModele  VARCHAR2(50);
+    isnum          BOOLEAN;
+    codeModele     VARCHAR2(50);
+    squery         VARCHAR2(500);
+    cPivot         CurTyp;
+
+    updateColumnName VARCHAR2(50);
+
+    sqlQuery    VARCHAR2(1000);
+
+    -- code permettant de gérer les conventions libres
+    codeComplement NUMBER := 1;
+
+    E_INTERNAL_COLUMN_NAME EXCEPTION;
+
+  BEGIN
+
+    case columnName
+    when 'CONV_LIB' then
+         updateColumnName := 'CONV_COD';
+    when 'CONTRAT_LIB' then
+         updateColumnName := 'CONTRAT_COD';
+    when 'CAT_LIB' then
+         updateColumnName := 'CAT_COD';
+    else
+         raise E_INTERNAL_COLUMN_NAME;
+    end case;
+
+    open cPivot for getSqlQueySelect(columnName);
+
+        LOOP
+        fetch cPivot into libelle;
+        EXIT WHEN cPivot%NOTFOUND;
+
+            BEGIN
+                 codeModele := getCodeModeleVision(columnName, libelle);
+
+                 if columnName = 'CONV_LIB' and codeModele is null then
+                    if codeComplement > 9 then
+                       codeModele := '99';
+                    else
+                       codeModele := getCodeModeleVision(columnName, 'Z'||codeComplement);
+                       codeComplement := codeComplement + 1;
+                    end if;
+                 elsif columnName = 'CONTRAT_LIB' and codeModele is null then
+                    codeModele := '99';
+                 elsif codeModele is null then
+                    addErreurTranscoVision(columnName, libelle);
+                 end if;
+
+                 libelleModele := getLibelleModeleVision(columnName, codeModele);
+                 updateValue(columnName, libelle, libelleModele);
+
+                 updateCodeForLibelle(updateColumnName, libelle, codeModele);
+
+            EXCEPTION
+            WHEN OTHERS THEN
+               log('Erreur lors de la récupération de la valeur Modèle vision pour la valeur : ' || libelle, WARNING);
+            END;
+
+        END LOOP;
+    close cPivot;
+
+  EXCEPTION
+  WHEN E_INTERNAL_COLUMN_NAME THEN
+       log('occured in transcoVision('||columnName||') : Invalid column name', SQL_ERROR);
+  WHEN OTHERS THEN
+       log('occured in transcoVision('||columnName||') : ' || SQLERRM, SQL_ERROR);
+  END;
+
+  /**
+   * Application des transcodifications
+   * choisies lors du processus de transcodification des valeurs du fichier
+   *
+   * @var string Suffixe MD5 du fichier transcodifié
+   * @var int Clé du fichier à traiter
+   * @var string Colonne du fichier à traiter
+   * @return void
+   */
+  PROCEDURE transcoValues(columnName IN VARCHAR2) IS
+
+    TYPE CurTyp IS REF CURSOR;
+
+    libelle         VARCHAR2(50);
+    libelleModele   VARCHAR2(50);
+    isnum           BOOLEAN;
+    updatedValue    VARCHAR2(50);
+    squery          VARCHAR2(500);
+    cPivot          CurTyp;
+
+    updateColumnName VARCHAR2(50);
+
+    E_INTERNAL_COLUMN_NAME EXCEPTION;
+
+  BEGIN
+
+    case columnName
+    when 'CONV_LIB' then
+         updateColumnName := 'CONV_COD';
+    when 'CONTRAT_LIB' then
+         updateColumnName := 'CONTRAT_COD';
+    when 'CAT_LIB' then
+         updateColumnName := 'CAT_COD';
+    when 'CODE_SEXE' then
+         updateColumnName := null;
+    when 'NATURE_DEPART' then
+         updateColumnName := null;
+    else
+         raise E_INTERNAL_COLUMN_NAME;
+    end case;
+
+    open cPivot for getSqlQueySelect(columnName, true);
+
+        LOOP
+        fetch cPivot into libelle;
+        EXIT WHEN cPivot%NOTFOUND;
+
+            BEGIN
+                if libelle is null then
+                   updatedValue := getSavedTransco(columnName, 'vide');
+                else
+                   updatedValue := getSavedTransco(columnName, libelle);
+                end if;
+
+                if updatedValue is null then
+                   addErreurTransco(columnName, libelle);
+                   updatedValue := libelle;
+                else
+                    if updateColumnName is null then
+                        updateValue(columnName, libelle, updatedValue);
+                    else
+                        -- Cas spécifique des libellés transcodifié mais ayant un libellé null dans le fichier
+                        -- et donc transcodifiés avec "vide"
+                        -- alors on essaie de récupérer un libellé modèle
+                        if libelle is null and updatedValue <> 'EXC' then
+                           libelleModele := getLibelleModeleVision(columnName, updatedValue);
+                           updateValue(columnName, null, libelleModele);
+                        else
+                           libelleModele := getLibelleModeleVision(columnName, updatedValue);
+                           updateValue(columnName, libelle, libelleModele);
+                        end if;
+
+                        updateCodeForLibelle(updateColumnName, libelleModele, updatedValue);
+
+                    end if;
+                end if;
+
+            EXCEPTION
+            WHEN OTHERS THEN
+               log('Erreur lors de la récupération de la valeur transcodifiée pour la valeur : ' || libelle, WARNING);
+            END;
+
+        END LOOP;
+    close cPivot;
+
+  EXCEPTION
+  WHEN E_INTERNAL_COLUMN_NAME THEN
+       log('occured in transcoValues('||columnName||') : Invalid column name', SQL_ERROR);
+  WHEN OTHERS THEN
+       log('occured in transcoValues('||columnName||') : ' || SQLERRM, SQL_ERROR);
+  END;
+
+  /**
+   * Retourne la valeur modèle correspondant à une valeur transcodifiée
+   *
+   * @var string Suffixe MD5 du fichier transcodifié
+   * @var string Colonne à traiter
+   * @var string Valeur transcodifiée
+   * @return string
+   */
+  FUNCTION getGeneratedCode(columnName in VARCHAR2, entryValue in VARCHAR2) RETURN VARCHAR2
+  is
+    value       NUMBER;
+    typeCode    VARCHAR2(3);
+  BEGIN
+
+       CASE columnName
+       WHEN 'CONV_COD' THEN
+            typeCode := 'CNV';
+       WHEN 'CAT_COD' THEN
+            typeCode := 'CAT';
+       WHEN 'CONTRAT_COD' THEN
+            typeCode := 'CTR';
+       WHEN 'ETA_COD' THEN
+            typeCode := 'E';
+       WHEN 'METIER_COD' THEN
+            typeCode := 'M';
+       WHEN 'SOC_COD' THEN
+            typeCode := 'S';
+       ELSE
+            return null;
+       END CASE;
+
+       select code into value from T_V5_GDE_CODES
+       where type = typeCode
+       and libelle = entryValue
+       and ID_CLIENT = G_idClient;
+
+       return value;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        log('Colonne '|| columnName || ' : Aucun code déjà généré pour la valeur ' || entryValue, NOTICE);
+        return null;
+    WHEN OTHERS then
+        log('occured in getGeneratedCode('||columnName||', '||entryValue||') : ' || SQLERRM, SQL_ERROR);
+        return null;
+  END;
+
+  /**
+   * Retourne la valeur modèle correspondant à une valeur transcodifiée
+   *
+   * @var string Suffixe MD5 du fichier transcodifié
+   * @var string Colonne à traiter
+   * @var string Valeur transcodifiée
+   * @return string
+   */
+  FUNCTION getLibelleForGeneratedCode(columnName in VARCHAR2, entryCode in VARCHAR2) RETURN VARCHAR2
+  is
+    value       VARCHAR2(50);
+    typeCode    VARCHAR2(3);
+  BEGIN
+
+       CASE columnName
+       WHEN 'CONVENTION' THEN
+            typeCode := 'CNV';
+       WHEN 'CATEGORIE' THEN
+            typeCode := 'CAT';
+       WHEN 'CONTRAT' THEN
+            typeCode := 'CTR';
+       WHEN 'ETABLISSEMENT' THEN
+            typeCode := 'E';
+       WHEN 'METIER' THEN
+            typeCode := 'M';
+       WHEN 'SOCIETE' THEN
+            typeCode := 'S';
+       ELSE
+            return null;
+       END CASE;
+
+       select libelle into value from T_V5_GDE_CODES
+       where type = typeCode
+       and code = entryCode
+       and ID_CLIENT = G_idClient;
+
+       return value;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        log('Colonne '|| columnName || ' : Le code ' || entryCode || ' n''existe pas', WARNING);
+        return null;
+    WHEN OTHERS then
+        log('occured in getLibelleForGeneratedCode('||columnName||', '||entryCode||') : ' || SQLERRM, SQL_ERROR);
+        return null;
+  END;
+
+  /**
+   * Application des transcodifications
+   * choisies lors du processus de transcodification des valeurs du fichier
+   *
+   * @var string Suffixe MD5 du fichier transcodifié
+   * @var int Clé du fichier à traiter
+   * @var string Colonne du fichier à traiter
+   * @return void
+   */
+  PROCEDURE generateCodes(columnName IN VARCHAR2) IS
+
+    TYPE CurTyp IS REF CURSOR;
+
+    libelle                 VARCHAR2(50);
+    isnum                   BOOLEAN;
+    generatedCode           NUMBER;
+    alreadyGeneratedCode    NUMBER;
+    squery                  VARCHAR2(500);
+    cPivot                  CurTyp;
+    errorMessage            VARCHAR2(100);
+    updateColumnName        VARCHAR2(50);
+
+    E_INTERNAL_COLUMN_NAME EXCEPTION;
+
+  BEGIN
+
+    case columnName
+    when 'CONV_LIB' then
+         updateColumnName := 'CONV_COD';
+    when 'CONTRAT_LIB' then
+         updateColumnName := 'CONTRAT_COD';
+    when 'CAT_LIB' then
+         updateColumnName := 'CAT_COD';
+    when 'ETA_LIB' then
+         updateColumnName := 'ETA_COD';
+    when 'SOC_LIB' then
+         updateColumnName := 'SOC_COD';
+    when 'METIER_LIB' then
+         updateColumnName := 'METIER_COD';
+    else
+         raise E_INTERNAL_COLUMN_NAME;
+    end case;
+
+    open cPivot for getSqlQueySelect(columnName);
+
+        LOOP
+        fetch cPivot into libelle;
+        EXIT WHEN cPivot%NOTFOUND;
+
+            BEGIN
+                /*if not PKG_UTIL.checkFormat(value, PKG_UTIL.ALPHANUM_ETENDU, errorMessage) then
+                  addErreurGenerateCode(columnName, value, errorMessage);
+                else*/
+                    alreadyGeneratedCode := getGeneratedCode(updateColumnName, libelle);
+
+                    if alreadyGeneratedCode is null then
+                       generatedCode := getNextGenerateCode(updateColumnName, libelle);
+
+                       if generatedCode is null then
+                           addErreurGenerateCode(updateColumnName, libelle, null);
+                       else
+                           updateCodeForLibelle(updateColumnName, libelle, generatedCode);
+                       end if;
+                    else
+                        updateCodeForLibelle(updateColumnName, libelle, alreadyGeneratedCode);
+                    end if;
+                --end if;
+
+            EXCEPTION
+            WHEN OTHERS THEN
+               log('Erreur lors de la récupération de la valeur transcodifiée pour le libelle : ' || libelle || ' : ' || SQLERRM, WARNING);
+            END;
+
+        END LOOP;
+    close cPivot;
+
+  EXCEPTION
+  WHEN E_INTERNAL_COLUMN_NAME THEN
+       log('occured in generateCodes('||columnName||') : Invalid column name', SQL_ERROR);
+  WHEN OTHERS THEN
+       log('occured in generateCodes('||columnName||') : ' || SQLERRM, SQL_ERROR);
+  END;
+
+  /**
+   * Gestion des erreurs de vérification du format d'une valeur pour une colonne
+   *
+   * @var string Nom de la colonne concernée
+   * @var string Matricule de la personne concernée
+   * @var bool   Résultat de la vérification
+   * @var string Message d'erreur
+   *
+   * @return void
+   */
+  PROCEDURE manageCheckColumn(columnName IN VARCHAR2, matricule in VARCHAR2, checkResult IN BOOLEAN, errorMessage IN VARCHAR2)
+  IS
+    message VARCHAR2(500) := '';
+  BEGIN
+       if checkresult = false then
+          addErreurCheckColumn(columnName, matricule, errorMessage);
+       end if;
+  EXCEPTION
+  WHEN OTHERS THEN
+      log('occured in manageCheckColumn('||columnName||', '||matricule||', bool, '|| errorMessage|| ')', SQL_ERROR);
+      raise;
+  END;
+
+  /**
+   * Vérification du format d'une valeur pour une colonne
+   *
+   * @var string Nom de la colonne concernée
+   * @var bool   Matricule à vérifiée
+   *
+   * @return bool
+   */
+  FUNCTION isValidMatricule RETURN BOOLEAN
+  IS
+    errorMessage VARCHAR2(100) := '';
+    alreadyInsert NUMBER := 0;
+    E_INVALID EXCEPTION;
+  BEGIN
+       if G_hasOptionMultipac then
+          if lineSalarie.PAC is not null then
+             lineSalarie.MATRICULE := lineSalarie.PAC || '_' || lineSalarie.MATRICULE;
+          else
+             lineSalarie.MATRICULE := G_pac || '_' || lineSalarie.MATRICULE;
+          end if;
+       end if;
+
+       if not PKG_UTIL.checkSize(lineSalarie.matricule, 1, 50, errorMessage) then
+          addErreurCheckColumn('MATRICULE', null, errorMessage);
+       end if;
+
+       if not PKG_UTIL.checkFormat(lineSalarie.matricule, PKG_UTIL.ALPHANUM_ETENDU, errorMessage) then
+          addErreurCheckColumn('MATRICULE', null, errorMessage);
+       end if;
+
+       if errorMessage is not null then
+          raise E_CHECK_COLUMN;
+       end if;
+
+       BEGIN
+       S_matricule := lineSalarie.matricule;
+       EXCEPTION
+       WHEN OTHERS THEN
+            raise E_INVALID;
+       END;
+
+       -- On vérifie si le matricule est en doublon
+       select count(MATRICULE) into alreadyInsert
+       from T_V5_GDE_SALARIE
+       where ID_DATA = G_idData
+       and matricule = S_matricule;
+
+       if alreadyInsert > 0 then
+          addErreurCheckColumn('MATRICULE', null, 'Matricule '''||S_matricule||''' en doublon');
+          return false;
+       end if;
+
+       return true;
+  EXCEPTION
+  WHEN E_INVALID THEN
+       addErreurCheckColumn('MATRICULE', null, 'format invalide');
+       return false;
+  WHEN E_CHECK_COLUMN THEN
+      log('occured in checkColumnMatricule for Matricule : '|| lineSalarie.matricule, SQL_ERROR);
+      return false;
+  WHEN OTHERS THEN
+      log('occured in checkColumnMatricule for Matricule : '|| lineSalarie.matricule || ' => ' || SQLERRM , SQL_ERROR);
+      return false;
+  END;
+ /*
+  * Calcul de la valeur d'une colonne
+  *
+  * string Nom de la colonne
+  */
+  PROCEDURE calculColumn(columnName IN VARCHAR2)
+  IS
+  BEGIN
+        case columnName
+        when 'ANNEE_NAISSANCE' then
+
+             if lineSalarie.DATE_NAISSANCE is not null then
+                S_anneeNaissance := to_char(lineSalarie.DATE_NAISSANCE, 'YYYY');
+             else
+                S_anneeNaissance := 0;
+             end if;
+
+        when 'AGE' then
+
+             if lineSalarie.DATE_NAISSANCE is not null then
+                S_age := PKG_UTIL.yearDifference(G_periode, lineSalarie.DATE_NAISSANCE);
+             else
+                S_age := 0;
+             end if;
+
+        when 'ANCIENNETE' then
+
+             if lineSalarie.DATE_ANCIENNETE is not null then
+                S_anciennete := PKG_UTIL.yearDifference(G_periode, lineSalarie.DATE_ANCIENNETE);
+             elsif lineSalarie.DATE_ENTREE is not null then
+                S_anciennete := PKG_UTIL.yearDifference(G_periode, lineSalarie.DATE_ENTREE);
+             else
+                addErreurCheckColumn('ANCIENNETE', lineSalarie.matricule, 'Date d''entrée et date d''ancienneté absentes');
+                S_anciennete := 0;
+             end if;
+
+        when 'ANCIENNETE_PROF' then
+
+             if S_anciennete = 0 and lineSalarie.DATE_DEBUT_ACTIVITE is not null then
+                S_ancienneteProf := PKG_UTIL.yearDifference(G_periode, lineSalarie.DATE_DEBUT_ACTIVITE);
+             elsif S_anciennete = 0 and lineSalarie.DATE_DEBUT_ACTIVITE is null then
+                 S_ancienneteProf := 0;
+             else
+                 S_ancienneteProf := S_anciennete;
+             end if;
+
+        else
+            log('occured in calculColumn('|| columnName || ')', SQL_ERROR);
+        end case;
+
+  EXCEPTION
+  WHEN OTHERS THEN
+       log('occured in calculColumn('|| columnName || ')', SQL_ERROR);
+  END;
+
+
+  /**
+   * Vérification du format d'une valeur pour une colonne
+   *
+   * @var string Nom de la colonne concernée
+   * @var string Matricule de la personne concernée
+   * @var bool   Valeur à vérifiée
+   *
+   * @return bool
+   */
+  PROCEDURE checkColumn(columnName IN VARCHAR2)
+  IS
+
+    errorMessage VARCHAR2(100) := '';
+    hasInternalCheckColumnError BOOLEAN := false;
+
+    --E_INVALID_FORMAT EXCEPTION;
+  BEGIN
+       CASE columnName
+       WHEN 'NOM' THEN
+
+            if not PKG_UTIL.checkFormat(lineSalarie.NOM, PKG_UTIL.NOMPRENOM, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Nom : ' ||errorMessage);
+              hasInternalCheckColumnError := true;
+            end if;
+
+            -- Si le nom a été masqué (vide ou contenant des étoiles), on le remplace par 6 étoiles
+            lineSalarie.NOM := replace(lineSalarie.NOM, '*');
+            if not hasInternalCheckColumnError and lineSalarie.NOM is null then
+              lineSalarie.NOM := '******';
+            end if;
+
+       WHEN 'PRENOM' THEN
+
+            if not PKG_UTIL.checkFormat(lineSalarie.PRENOM, PKG_UTIL.NOMPRENOM, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Prénom : ' ||errorMessage);
+              hasInternalCheckColumnError := true;
+            end if;
+            -- Si le prénom a été masqué (vide ou contenant des étoiles), on le remplace par 6 étoiles
+            lineSalarie.PRENOM := replace(lineSalarie.PRENOM, '*');
+            if not hasInternalCheckColumnError and lineSalarie.PRENOM is null then
+              lineSalarie.PRENOM := '******';
+            end if;
+
+       WHEN 'NOMPRENOM' THEN
+
+            if lineSalarie.NOM = '******' and lineSalarie.PRENOM = '******' then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Le nom et le prénom ne sont pas renseignés');
+            end if;
+
+       WHEN 'CODE_SEXE' THEN
+
+            if lineSalarie.CODE_SEXE is null then
+                addErreurCheckColumn(columnName, lineSalarie.matricule, 'Code sexe absent');
+            end if;
+
+       WHEN 'CIVILITE' THEN
+
+            if lineSalarie.CODE_SEXE is not null then
+               S_civilite := getLibelleModeleVision(columnName, lineSalarie.CODE_SEXE);
+            end if;
+
+       WHEN 'COEFFICIENT' THEN
+
+            if not PKG_UTIL.checkFormat(lineSalarie.COEFFICIENT, PKG_UTIL.NUM, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Coefficient : ' ||errorMessage);
+              hasInternalCheckColumnError := true;
+            end if;
+            if not PKG_UTIL.checkSize(lineSalarie.COEFFICIENT, 0, 8, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Coefficient : ' ||errorMessage);
+              hasInternalCheckColumnError := true;
+            end if;
+            if not hasInternalCheckColumnError and trim(lineSalarie.COEFFICIENT) is null then
+                lineSalarie.COEFFICIENT := '99999,99';
+            end if;
+
+       WHEN 'CLASSIF_COD' THEN
+
+            if not PKG_UTIL.checkFormat(lineSalarie.CLASSIF_COD, PKG_UTIL.ALPHANUM_ETENDU, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Code classification : ' ||errorMessage);
+              hasInternalCheckColumnError := true;
+            end if;
+
+            if not PKG_UTIL.checkSize(lineSalarie.CLASSIF_COD, 0, 8, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Code classification : ' ||errorMessage);
+              hasInternalCheckColumnError := true;
+            end if;
+            if not hasInternalCheckColumnError and trim(lineSalarie.CLASSIF_COD) is null then
+                lineSalarie.CLASSIF_COD := 'XXXXXXXX';
+            end if;
+
+       WHEN 'CLASSIF_LIB' THEN
+
+            /*if not PKG_UTIL.checkFormat(lineSalarie.CLASSIF_LIB, PKG_UTIL.ALPHANUM_ETENDU, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Libellé classification : ' ||errorMessage);
+              hasInternalCheckColumnError := true;
+            end if;*/
+
+            if not PKG_UTIL.checkSize(lineSalarie.CLASSIF_LIB, 0, 50, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Libellé classification : ' ||errorMessage);
+              hasInternalCheckColumnError := true;
+            end if;
+
+            if not hasInternalCheckColumnError and trim(lineSalarie.CLASSIF_LIB) is null then
+                lineSalarie.CLASSIF_LIB := 'Indéterminée';
+            end if;
+
+       WHEN 'LIBRE1' THEN
+
+            if not PKG_UTIL.checkFormat(lineSalarie.LIBRE1, PKG_UTIL.ALPHANUM_ETENDU, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Libre1 : ' ||errorMessage);
+            end if;
+
+            if not PKG_UTIL.checkSize(lineSalarie.LIBRE1, 0, 32, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Libre1 : ' ||errorMessage);
+            end if;
+
+       WHEN 'LIBRE2' THEN
+
+            if not  PKG_UTIL.checkFormat(lineSalarie.LIBRE2, PKG_UTIL.ALPHANUM_ETENDU, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Libre2 : ' ||errorMessage);
+            end if;
+
+            if not PKG_UTIL.checkSize(lineSalarie.LIBRE2, 0, 32, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Libre2 : ' ||errorMessage);
+            end if;
+
+       WHEN 'METIER_COD' THEN
+
+            if not PKG_UTIL.checkFormat(lineSalarie.METIER_COD, PKG_UTIL.ALPHANUM, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Code métier : ' ||errorMessage);
+              hasInternalCheckColumnError := true;
+            end if;
+
+            if not PKG_UTIL.checkSize(lineSalarie.METIER_COD, 0, 10, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Code métier : ' ||errorMessage);
+              hasInternalCheckColumnError := true;
+            end if;
+
+            if not hasInternalCheckColumnError and trim(lineSalarie.METIER_COD) is null then
+                lineSalarie.METIER_COD := 'XXXXXXXXXX';
+            end if;
+
+       WHEN 'METIER_LIB' THEN
+
+            /*if not PKG_UTIL.checkFormat(lineSalarie.METIER_LIB, PKG_UTIL.ALPHANUM_ETENDU, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Libellé métier : ' ||errorMessage);
+              hasInternalCheckColumnError := true;
+            end if;*/
+
+            if not PKG_UTIL.checkSize(lineSalarie.METIER_LIB, 0, 50, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Libellé métier : ' ||errorMessage);
+              hasInternalCheckColumnError := true;
+            end if;
+
+            if not hasInternalCheckColumnError and trim(lineSalarie.METIER_LIB) is null then
+                lineSalarie.METIER_LIB := 'Indéterminé';
+            end if;
+
+       WHEN 'CONV_COD' THEN
+
+            if not PKG_UTIL.checkFormat(lineSalarie.CONV_COD, PKG_UTIL.ALPHANUM, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, errorMessage);
+              hasInternalCheckColumnError := true;
+            end if;
+
+            if not PKG_UTIL.checkSize(lineSalarie.CONV_COD, 0, 2, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, errorMessage);
+              hasInternalCheckColumnError := true;
+            end if;
+
+            if not hasInternalCheckColumnError and trim(lineSalarie.CONV_COD) is null then
+                addErreurCheckColumn(columnName, lineSalarie.matricule, 'Code convention absent');
+            end if;
+
+       WHEN 'CONV_LIB' THEN
+
+            /*if not PKG_UTIL.checkFormat(lineSalarie.CONV_LIB, PKG_UTIL.ALPHANUM_ETENDU, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, errorMessage);
+              hasInternalCheckColumnError := true;
+            end if;*/
+
+            if not PKG_UTIL.checkSize(lineSalarie.CONV_LIB, 0, 50, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, errorMessage);
+              hasInternalCheckColumnError := true;
+            end if;
+
+            if not hasInternalCheckColumnError and trim(lineSalarie.CONV_LIB) is null then
+                addErreurCheckColumn(columnName, lineSalarie.matricule, 'Libellé convention absent');
+            end if;
+
+       WHEN 'SOC_COD' THEN
+
+            if not PKG_UTIL.checkFormat(lineSalarie.SOC_COD, PKG_UTIL.ALPHANUM, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Code société : ' || errorMessage);
+              hasInternalCheckColumnError := true;
+            end if;
+
+            if not PKG_UTIL.checkSize(lineSalarie.SOC_COD, 0, 5, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Code société : ' || errorMessage);
+              hasInternalCheckColumnError := true;
+            end if;
+
+            if not hasInternalCheckColumnError and trim(lineSalarie.SOC_COD) is null then
+                addErreurCheckColumn(columnName, lineSalarie.matricule, 'Code société absent');
+            end if;
+
+       WHEN 'SOC_LIB' THEN
+
+            /*if not PKG_UTIL.checkFormat(lineSalarie.SOC_LIB, PKG_UTIL.ALPHANUM_ETENDU, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Libellé société : ' ||errorMessage);
+              hasInternalCheckColumnError := true;
+            end if;*/
+
+            if not PKG_UTIL.checkSize(lineSalarie.SOC_LIB, 0, 50, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Libellé société : ' ||errorMessage);
+              hasInternalCheckColumnError := true;
+            end if;
+
+            if not hasInternalCheckColumnError and trim(lineSalarie.SOC_LIB) is null then
+                addErreurCheckColumn(columnName, lineSalarie.matricule, 'Libellé société absent');
+            end if;
+
+       WHEN 'ETA_COD' THEN
+
+            if not PKG_UTIL.checkFormat(lineSalarie.ETA_COD, PKG_UTIL.ALPHANUM, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Code établissement : ' || errorMessage);
+              hasInternalCheckColumnError := true;
+            end if;
+
+            if not PKG_UTIL.checkSize(lineSalarie.ETA_COD, 0, 5, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Code établissement : ' ||errorMessage);
+              hasInternalCheckColumnError := true;
+            end if;
+
+            if not hasInternalCheckColumnError and trim(lineSalarie.ETA_COD) is null then
+                addErreurCheckColumn(columnName, lineSalarie.matricule, 'Code établissement absent');
+            end if;
+
+       WHEN 'ETA_LIB' THEN
+
+            /*if not PKG_UTIL.checkFormat(lineSalarie.ETA_LIB, PKG_UTIL.ALPHANUM_ETENDU, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Libellé établissement : ' || errorMessage);
+              hasInternalCheckColumnError := true;
+            end if;*/
+
+            if not PKG_UTIL.checkSize(lineSalarie.ETA_LIB, 0, 50, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Libellé établissement : ' ||errorMessage);
+              hasInternalCheckColumnError := true;
+            end if;
+
+            if not hasInternalCheckColumnError and trim(lineSalarie.ETA_LIB) is null then
+                addErreurCheckColumn(columnName, lineSalarie.matricule, 'Libellé établissement absent');
+            end if;
+
+       WHEN 'CAT_COD' THEN
+
+            if not PKG_UTIL.checkFormat(lineSalarie.CAT_COD, PKG_UTIL.ALPHANUM, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Code catégorie : ' ||errorMessage);
+              hasInternalCheckColumnError := true;
+            end if;
+
+            if not PKG_UTIL.checkSize(lineSalarie.CAT_COD, 0, 5, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Code catégorie : ' ||errorMessage);
+              hasInternalCheckColumnError := true;
+            end if;
+
+            if not hasInternalCheckColumnError and trim(lineSalarie.CAT_COD) is null then
+                addErreurCheckColumn(columnName, lineSalarie.matricule, 'Code catégorie absent');
+            end if;
+
+       WHEN 'CAT_LIB' THEN
+
+            /*if not PKG_UTIL.checkFormat(lineSalarie.CAT_LIB, PKG_UTIL.ALPHANUM_ETENDU, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Libellé catégorie : ' ||errorMessage);
+              hasInternalCheckColumnError := true;
+            end if;*/
+
+            if not PKG_UTIL.checkSize(lineSalarie.CAT_LIB, 0, 50, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Libellé catégorie : ' ||errorMessage);
+              hasInternalCheckColumnError := true;
+            end if;
+
+            if not hasInternalCheckColumnError and trim(lineSalarie.CAT_LIB) is null then
+                addErreurCheckColumn(columnName, lineSalarie.matricule, 'Libellé catégorie absent');
+            end if;
+
+       WHEN 'CONTRAT_COD' THEN
+
+            if not PKG_UTIL.checkFormat(lineSalarie.CONTRAT_COD, PKG_UTIL.ALPHANUM, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Code contrat : ' ||errorMessage);
+              hasInternalCheckColumnError := true;
+            end if;
+
+            if not PKG_UTIL.checkSize(lineSalarie.CONTRAT_COD, 0, 4, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Code contrat : ' ||errorMessage);
+              hasInternalCheckColumnError := true;
+            end if;
+
+            if not hasInternalCheckColumnError and trim(lineSalarie.CONTRAT_COD) is null then
+                addErreurCheckColumn(columnName, lineSalarie.matricule, 'Code contrat absent');
+            end if;
+
+       WHEN 'CONTRAT_LIB' THEN
+
+            /*if not PKG_UTIL.checkFormat(lineSalarie.CONTRAT_LIB, PKG_UTIL.ALPHANUM_ETENDU, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Libellé contrat : ' ||errorMessage);
+              hasInternalCheckColumnError := true;
+            end if;*/
+
+            if not PKG_UTIL.checkSize(lineSalarie.CONTRAT_LIB, 0, 50, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Libellé contrat : ' ||errorMessage);
+              hasInternalCheckColumnError := true;
+            end if;
+
+            if not hasInternalCheckColumnError and trim(lineSalarie.CONTRAT_LIB) is null then
+                addErreurCheckColumn(columnName, lineSalarie.matricule, 'Libellé contrat absent');
+            end if;
+
+       WHEN 'REMUNERATION' THEN
+
+            if not PKG_UTIL.checkFormat(lineSalarie.REMUNERATION, PKG_UTIL.NUM, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Rémunération : ' ||errorMessage);
+            end if;
+
+            if not PKG_UTIL.checkSize(lineSalarie.REMUNERATION, 1, 11, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Rémunération : ' ||errorMessage);
+            end if;
+
+            if not hasInternalCheckColumnError and lineSalarie.REMUNERATION <= 0 then
+              lineSalarie.REMUNERATION := 0;
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Rémunération égale à 0', WARNING);
+            end if;
+
+       WHEN 'CHARGES_PATRONALES' THEN
+
+            if not PKG_UTIL.checkFormat(lineSalarie.CHARGES_PATRONALES, PKG_UTIL.NUM, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Charges patronales : ' ||errorMessage);
+            end if;
+
+            if not PKG_UTIL.checkSize(lineSalarie.CHARGES_PATRONALES, 0, 11, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Charges patronales : ' ||errorMessage);
+            end if;
+
+            if not hasInternalCheckColumnError and lineSalarie.CHARGES_PATRONALES is null then
+               lineSalarie.CHARGES_PATRONALES := 0;
+            end if;
+
+       WHEN 'BRUT_REEL' THEN
+            if G_isClientVision then
+
+                if not PKG_UTIL.checkFormat(lineSalarie.BRUT_REEL, PKG_UTIL.NUM, errorMessage) then
+                  addErreurCheckColumn(columnName, lineSalarie.matricule, 'Brut réel : ' ||errorMessage);
+                end if;
+
+                if not PKG_UTIL.checkSize(lineSalarie.BRUT_REEL, 0, 11, errorMessage) then
+                  addErreurCheckColumn(columnName, lineSalarie.matricule, 'Brut réel : ' ||errorMessage);
+                end if;
+
+                if not hasInternalCheckColumnError and lineSalarie.BRUT_REEL is null then
+                   lineSalarie.BRUT_REEL := 0;
+                end if;
+            else
+                if lineSalarie.REMUNERATION >= 0 then
+                    lineSalarie.BRUT_REEL := lineSalarie.REMUNERATION;
+                else
+                    lineSalarie.BRUT_REEL := 0;
+                end if;
+            end if;
+
+       WHEN 'SALAIRE_BASE' THEN
+
+            if not PKG_UTIL.checkFormat(lineSalarie.SALAIRE_BASE, PKG_UTIL.NUM, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Salaire de base : ' ||errorMessage);
+            end if;
+
+            if not PKG_UTIL.checkSize(lineSalarie.SALAIRE_BASE, 0, 11, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Salaire de base : ' ||errorMessage);
+            end if;
+
+            if not hasInternalCheckColumnError and lineSalarie.SALAIRE_BASE is null then
+               lineSalarie.SALAIRE_BASE := 0;
+            end if;
+
+       WHEN 'MINIMUM_COEFFICIENT' THEN
+
+            if not PKG_UTIL.checkFormat(lineSalarie.MINIMUM_COEFFICIENT, PKG_UTIL.NUM, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Minimum du coefficient : ' ||errorMessage);
+            end if;
+            if not PKG_UTIL.checkSize(lineSalarie.MINIMUM_COEFFICIENT, 0, 8, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Minimum du coefficient : ' ||errorMessage);
+            end if;
+
+            if not hasInternalCheckColumnError and lineSalarie.MINIMUM_COEFFICIENT is null then
+               lineSalarie.MINIMUM_COEFFICIENT := 0;
+            end if;
+
+       WHEN 'CODE_HABILITATION' THEN
+
+            if not PKG_UTIL.checkFormat(lineSalarie.CODE_HABILITATION, PKG_UTIL.ALPHANUM, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Code habilitation : ' ||errorMessage);
+            end if;
+            if not PKG_UTIL.checkSize(lineSalarie.CODE_HABILITATION, 0, 3, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Code habilitation : ' ||errorMessage);
+            end if;
+
+            if lineSalarie.CODE_HABILITATION is null then
+               lineSalarie.CODE_HABILITATION := 'ZZZ';
+            end if;
+
+            -- Gestion des filtres habilitations
+            if not isAlreadySavedCodeHabilitation(lineSalarie.CODE_HABILITATION) then
+               saveCodeHabilitation(lineSalarie.CODE_HABILITATION);
+            end if;
+
+        WHEN 'NATURE_DEPART' THEN
+
+            if not PKG_UTIL.checkFormat(lineSalarie.NATURE_DEPART, PKG_UTIL.ALPHANUM_ETENDU, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Nature départ : ' ||errorMessage);
+            end if;
+
+            if not PKG_UTIL.checkSize(lineSalarie.NATURE_DEPART, 0, 2, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Nature départ : ' ||errorMessage);
+            end if;
+
+        WHEN 'INDEMNITE_DEPART' THEN
+
+            if not PKG_UTIL.checkFormat(lineSalarie.INDEMNITE_DEPART, PKG_UTIL.NUM, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Indemnité départ : ' ||errorMessage);
+            end if;
+
+            if not PKG_UTIL.checkSize(lineSalarie.INDEMNITE_DEPART, 0, 11, errorMessage) then
+              addErreurCheckColumn(columnName, lineSalarie.matricule, 'Indemnité départ : ' ||errorMessage);
+            end if;
+
+            if not hasInternalCheckColumnError and lineSalarie.INDEMNITE_DEPART is not null and lineSalarie.DATE_SORTIE is null then
+               log('Indemnité de départ : pas de date de sortie pour le matricule '||lineSalarie.matricule , WARNING);
+            end if;
+
+            if not hasInternalCheckColumnError and lineSalarie.INDEMNITE_DEPART is null then
+               lineSalarie.INDEMNITE_DEPART := 0;
+            end if;
+
+       ELSE
+           log('invalid columnName in function checkColumn('||columnName||')', WARNING);
+       END CASE;
+
+  EXCEPTION
+  --WHEN E_INVALID_FORMAT THEN
+  --      log('occured in checkColumn('||columnName||') : Matricule : '|| matricule || ' => Format invalide pour la colonne ' || columnName || SQLERRM, SQL_ERROR);
+  WHEN OTHERS THEN
+      log('occured in checkColumn('||columnName||') : ' || SQLERRM, SQL_ERROR);
+  END;
+
+  /**
+   * Insertion d'un salarie dans la base
+   *
+   * @return bool
+   */
+  FUNCTION insertSalarie RETURN BOOLEAN
+  IS
+    E_PARSE EXCEPTION;
+  BEGIN
+
+      if not PKG_SQL.dbIsParsed('insertSalarie') then
+         BEGIN
+
+         PKG_SQL.dbParse( 'insert into T_V5_GDE_SALARIE '
+                       || '( '
+                       || 'ID_DATA, MATRICULE, NOM, PRENOM, CIVILITE, SEXE, DATE_ENTREE, DATE_SORTIE, '
+                       || 'CONV_COD, CONV_LIB, SOC_COD, SOC_LIB, ETA_COD, ETA_LIB, CAT_COD, '
+                       || 'CAT_LIB, COEFF_COD, CLASSIF_COD, CLASSIF_LIB, METIER_COD, METIER_LIB, '
+                       || 'CONTRAT_COD, CONTRAT_LIB, LIBRE1, LIBRE2, ANNEE_NAISSANCE, DATE_NAISSANCE, AGE, '
+                       || 'ANCIENNETE, REMUNERATION, CHARGES, SALAIRE_BASE, ANCIENNETE_PROF, '
+                       || 'BRUT_CHARGES, AGE_DEP_RET, ESTEXCIND, FILTRE, '
+                       || 'DATE_ENTREE_GROUPE, MINI_DU_COEFF, DATE_DEBUT_ACTIVITE, '
+                       || 'NATURE_DEPART, MONTANT_DEPART '
+                       || ') '
+                       || 'values '
+                       || '( '
+                       || ':ID_DATA, :MATRICULE, :NOM, :PRENOM, :CIVILITE, :SEXE, :DATE_ENTREE, :DATE_SORTIE, '
+                       || ':CONV_COD, :CONV_LIB, :SOC_COD, :SOC_LIB, :ETA_COD, :ETA_LIB, :CAT_COD, '
+                       || ':CAT_LIB, :COEFF_COD, :CLASSIF_COD, :CLASSIF_LIB, :METIER_COD, :METIER_LIB, '
+                       || ':CONTRAT_COD, :CONTRAT_LIB, :LIBRE1, :LIBRE2, :ANNEE_NAISSANCE, :DATE_NAISSANCE, :AGE, '
+                       || ':ANCIENNETE, :REMUNERATION, :CHARGES, :SALAIRE_BASE, :ANCIENNETE_PROF, '
+                       || ':BRUT_CHARGES, :AGE_DEP_RET, :ESTEXCIND, :FILTRE, '
+                       || ':DATE_ENTREE_GROUPE, :MINI_DU_COEFF, :DATE_DEBUT_ACTIVITE, '
+                       || ':NATURE_DEPART, :MONTANT_DEPART '
+                       || ') ');
+
+         EXCEPTION
+         WHEN OTHERS THEN
+              log('parse error in function insertSalarie : ' || SQLERRM, SQL_ERROR);
+              raise E_PARSE;
+         END;
+      end if;
+
+
+      PKG_SQL.dbset('ID_DATA',                G_idData);
+      PKG_SQL.dbset('MATRICULE',              S_matricule);
+      PKG_SQL.dbset('NOM',                    lineSalarie.NOM);
+      PKG_SQL.dbset('PRENOM',                 lineSalarie.PRENOM);
+      PKG_SQL.dbset('CIVILITE',               S_civilite);
+      PKG_SQL.dbset('SEXE',                   lineSalarie.CODE_SEXE);
+      PKG_SQL.dbset('DATE_ENTREE',            lineSalarie.DATE_ENTREE);
+      PKG_SQL.dbset('DATE_SORTIE',            lineSalarie.DATE_SORTIE);
+      PKG_SQL.dbset('CONV_COD',               lineSalarie.CONV_COD);
+      PKG_SQL.dbset('CONV_LIB',               lineSalarie.CONV_LIB);
+      PKG_SQL.dbset('SOC_COD',                lineSalarie.SOC_COD);
+      PKG_SQL.dbset('SOC_LIB',                lineSalarie.SOC_LIB);
+      PKG_SQL.dbset('ETA_COD',                lineSalarie.ETA_COD);
+      PKG_SQL.dbset('ETA_LIB',                lineSalarie.ETA_LIB);
+      PKG_SQL.dbset('CAT_COD',                lineSalarie.CAT_COD);
+      PKG_SQL.dbset('CAT_LIB',                lineSalarie.CAT_LIB);
+      PKG_SQL.dbset('COEFF_COD',              lineSalarie.COEFFICIENT);
+      PKG_SQL.dbset('CLASSIF_COD',            lineSalarie.CLASSIF_COD);
+      PKG_SQL.dbset('CLASSIF_LIB',            lineSalarie.CLASSIF_LIB);
+      PKG_SQL.dbset('METIER_COD',             lineSalarie.METIER_COD);
+      PKG_SQL.dbset('METIER_LIB',             lineSalarie.METIER_LIB);
+      PKG_SQL.dbset('CONTRAT_COD',            lineSalarie.CONTRAT_COD);
+      PKG_SQL.dbset('CONTRAT_LIB',            lineSalarie.CONTRAT_LIB);
+      PKG_SQL.dbset('LIBRE1',                 lineSalarie.LIBRE1);
+      PKG_SQL.dbset('LIBRE2',                 lineSalarie.LIBRE2);
+      PKG_SQL.dbset('ANNEE_NAISSANCE',        S_anneeNaissance);
+      PKG_SQL.dbset('DATE_NAISSANCE',         lineSalarie.DATE_NAISSANCE);
+      PKG_SQL.dbset('AGE',                    S_age);
+      PKG_SQL.dbset('ANCIENNETE',             S_anciennete);
+      PKG_SQL.dbset('REMUNERATION',           lineSalarie.REMUNERATION);
+      PKG_SQL.dbset('CHARGES',                lineSalarie.CHARGES_PATRONALES);
+      PKG_SQL.dbset('SALAIRE_BASE',           lineSalarie.SALAIRE_BASE);
+      PKG_SQL.dbset('ANCIENNETE_PROF',        S_ancienneteProf);
+      PKG_SQL.dbset('BRUT_CHARGES',           lineSalarie.BRUT_REEL);
+      PKG_SQL.dbset('AGE_DEP_RET',            lineSalarie.AGE_DEP_RET);
+      PKG_SQL.dbset('ESTEXCIND',              lineSalarie.ESTEXCIND);
+      PKG_SQL.dbset('FILTRE',                 lineSalarie.CODE_HABILITATION);
+      PKG_SQL.dbset('DATE_ENTREE_GROUPE',     lineSalarie.DATE_ENTREE_GROUPE);
+      PKG_SQL.dbset('MINI_DU_COEFF',          lineSalarie.MINIMUM_COEFFICIENT);
+      PKG_SQL.dbset('DATE_DEBUT_ACTIVITE',    lineSalarie.DATE_DEBUT_ACTIVITE);
+      PKG_SQL.dbset('NATURE_DEPART',          lineSalarie.NATURE_DEPART);
+      PKG_SQL.dbset('MONTANT_DEPART',         lineSalarie.INDEMNITE_DEPART);
+
+      return PKG_SQL.dbExecute;
+
+  EXCEPTION
+  WHEN OTHERS THEN
+      log('occured in insertSalarie : ' || SQLERRM, SQL_ERROR);
+      return false;
+  END;
+
+  /**
+   * Enregistrement des salariés dans la table T_V5_GDE_SALARIE
+   *
+   * @return bool
+   */
+  PROCEDURE processLoadSalarie
+  IS
+    nbSalarieLu             NUMBER := 0;
+    nbSalarieExclu          NUMBER := 0;
+    nbSalarieSorti          NUMBER := 0;
+    nbSalarieSortiPlusUnAn  NUMBER := 0;
+    nbSalariePresent        NUMBER := 0;
+    nbSalarieInsert         NUMBER := 0;
+    nbSalarieErreur         NUMBER := 0;
+    nbSalarieMatInvalide    NUMBER := 0;
+
+  BEGIN
+
+    log('Début du processus d''enregistrement des données salariés', OK);
+
+    PKG_SQL.dbSetNbStmtAvantCommit(500);
+
+    open curSalarie;
+
+        LOOP
+        fetch curSalarie into lineSalarie;
+        EXIT WHEN curSalarie%NOTFOUND;
+
+            log('Traitement du matricule : ' || lineSalarie.MATRICULE, NOTICE);
+
+            nbSalarieLu := nbSalarieLu + 1;
+
+            G_hasErreurCheckedColumn := false;
+
+            if isValidMatricule then
+
+                BEGIN
+                     if lineSalarie.DATE_SORTIE > G_periode then
+                       lineSalarie.DATE_SORTIE := null;
+                     end if;
+
+                     if lineSalarie.DATE_SORTIE is null or lineSalarie.DATE_SORTIE >= G_periodeMoinsUnAn then
+
+                         if lineSalarie.DATE_SORTIE is null then
+                           nbSalariePresent := nbSalariePresent + 1;
+                         else
+                           nbSalarieSorti := nbSalarieSorti + 1;
+                         end if;
+
+                         if (lineSalarie.CONTRAT_COD is null or lineSalarie.CONTRAT_COD <> 'EXC')
+                          and (lineSalarie.CONV_COD is null or lineSalarie.CONV_COD <> 'EXC')
+                          and (lineSalarie.CAT_COD is null or lineSalarie.CAT_COD <> 'EXC')
+                          and (lineSalarie.NATURE_DEPART is null or lineSalarie.NATURE_DEPART <> 'EXC') then
+
+                            checkColumn('NOM');
+                            checkColumn('PRENOM');
+                            checkColumn('NOMPRENOM');
+                            checkColumn('CONV_COD');
+                            checkColumn('CONV_LIB');
+                            checkColumn('CONTRAT_COD');
+                            checkColumn('CONTRAT_LIB');
+                            checkColumn('CAT_COD');
+                            checkColumn('CAT_LIB');
+                            checkColumn('SOC_COD');
+                            checkColumn('SOC_LIB');
+                            checkColumn('ETA_COD');
+                            checkColumn('ETA_LIB');
+                            checkColumn('CODE_SEXE');
+                            checkColumn('CIVILITE');
+                            checkColumn('COEFFICIENT');
+                            checkColumn('CLASSIF_COD');
+                            checkColumn('CLASSIF_LIB');
+                            checkColumn('METIER_COD');
+                            checkColumn('METIER_LIB');
+                            checkColumn('CHARGES_PATRONALES');
+                            checkColumn('BRUT_REEL');
+
+                            -- Mise à zéro de la rémunération en fonction de l'option
+                            if G_avecRemunerationVide and lineSalarie.REMUNERATION is null then
+                              lineSalarie.REMUNERATION := 0;
+                            end if;
+                            checkColumn('REMUNERATION');
+
+                             if G_hasOptionMDT then
+                                checkColumn('SALAIRE_BASE');
+                                checkColumn('MINIMUM_COEFFICIENT');
+                             end if;
+
+                             if G_hasOptionHabilitation then
+                                checkColumn('CODE_HABILITATION');
+                             end if;
+
+                             checkColumn('LIBRE1');
+                             checkColumn('LIBRE2');
+
+                             if G_hasOptionIFRS then
+                                checkColumn('NATURE_DEPART');
+                                checkColumn('INDEMNITE_DEPART');
+                             end if;
+
+                             if not G_hasOptionMDT then
+                                lineSalarie.DATE_ENTREE_GROUPE := null;
+                                lineSalarie.DATE_DEBUT_ACTIVITE := null;
+                             end if;
+
+                             calculColumn('ANNEE_NAISSANCE');
+                             calculColumn('AGE');
+                             calculColumn('ANCIENNETE');
+                             calculColumn('ANCIENNETE_PROF');
+
+                             if not hasErrorCheckedColumn then
+                                if insertSalarie then
+                                    nbSalarieInsert := nbSalarieInsert + 1;
+                                else
+                                   log('Matricule : ' || lineSalarie.MATRICULE || ' : erreur lors de l''insertion', SQL_ERROR);
+                                   nbSalarieErreur := nbSalarieErreur + 1;
+                                end if;
+                             else
+                                log('Matricule : ' || lineSalarie.MATRICULE || ' non importé', ERROR);
+                                nbSalarieErreur := nbSalarieErreur + 1;
+                             end if;
+                         else
+                             nbSalarieExclu := nbSalarieExclu + 1;
+                         end if;
+                      else
+                        log('Le salarie ayant pour matricule ' || lineSalarie.MATRICULE || ' est sorti', NOTICE);
+                        nbSalarieSortiPlusUnAn := nbSalarieSortiPlusUnAn + 1;
+                      end if;
+
+                EXCEPTION
+                WHEN OTHERS THEN
+                    log('Erreur lors du traitement pour le matricule ' || lineSalarie.MATRICULE || SQLERRM, ERROR);
+                END;
+            else
+                log('Matricule : ' || lineSalarie.MATRICULE || ' non importé', ERROR);
+                nbSalarieMatInvalide := nbSalarieMatInvalide + 1;
+            end if;
+
+            log('Fin de traitement du matricule : ' || lineSalarie.MATRICULE, NOTICE);
+
+        END LOOP;
+    close curSalarie;
+
+    log('Fin du processus d''enregistrement des données salariés', OK);
+
+    log('Nombre de salariés lus : ' || nbSalarieLu, OK);
+
+    if nbSalarieMatInvalide > 0 then
+       log('Nombre de salariés dont le matricule est en erreur : ' || nbSalarieMatInvalide, OK);
+    end if;
+
+    if nbSalarieErreur > 0 then
+       log('Nombre de salariés présent : ' || nbSalariePresent || ' dont '|| nbSalarieErreur ||' en erreur ', OK);
+    else
+       log('Nombre de salariés présent : ' || nbSalariePresent, OK);
+    end if;
+
+    log('Nombre de salariés exclus lors de l''import : ' || nbSalarieExclu, OK);
+    log('Nombre de salariés sortis depuis plus d''un an : ' || nbSalarieSortiPlusUnAn, OK);
+    log('Nombre de salariés sortis au cours de l''année : ' || nbSalarieSorti, OK);
+    log('Nombre de salariés importés : ' || nbSalarieInsert, OK);
+
+    PKG_SQL.dbCommit;
+
+  EXCEPTION
+  WHEN OTHERS THEN
+      PKG_SQL.dbRollback;
+      log('occured in processLoadSalarie : ' || SQLERRM, SQL_ERROR);
+      raise;
+  END;
+
+  /**
+   * Constructeur
+   *
+   * @var string Suffixe MD5 du fichier transcodifié
+   * @var string Clé du fichier concernée
+   * @return void
+   */
+  PROCEDURE processTransco
+  IS
+  BEGIN
+       log('Transcodification des valeurs du fichier', OK);
+
+       PKG_SQL.dbSetNbStmtAvantCommit(500);
+
+       log('-- Transcodification des dates de sortie', NOTICE);
+       transcoDate('DATE_SORTIE');
+
+       if G_isClientVision and G_isEnteteModele then
+           log('-- Transcodification des conventions collectives Vision', NOTICE);
+           transcoVision('CONV_LIB');
+           log('-- Transcodification des catégories Vision', NOTICE);
+           transcoVision('CAT_LIB');
+           log('-- Transcodification des contrats Vision', NOTICE);
+           transcoVision('CONTRAT_LIB');
+
+           log('-- Génération des codes établissement', NOTICE);
+           generateCodes('ETA_LIB');
+           log('-- Génération des codes société', NOTICE);
+           generateCodes('SOC_LIB');
+           log('-- Génération des codes métier', NOTICE);
+           generateCodes('METIER_LIB');
+
+       else
+
+           if not hasErrorTransco then
+
+               if G_avecModelisation then
+                  log('-- Transcodification des conventions collectives', NOTICE);
+                  transcoValues('CONV_LIB');
+                  log('-- Transcodification des catégories', NOTICE);
+                  transcoValues('CAT_LIB');
+                  log('-- Transcodification des contrats', NOTICE);
+                  transcoValues('CONTRAT_LIB');
+               else
+                  log('-- Génération des codes convention', NOTICE);
+                  generateCodes('CONV_LIB');
+                  log('-- Génération des codes catégorie', NOTICE);
+                  generateCodes('CAT_LIB');
+                  log('-- Génération des codes contrat', NOTICE);
+                  generateCodes('CONTRAT_LIB');
+               end if;
+
+               if G_hasOptionIFRS then
+                  log('-- Transcodification des natures de départ', NOTICE);
+                  transcoValues('NATURE_DEPART');
+               end if;
+
+               log('-- Transcodification des codes sexe', NOTICE);
+               transcoValues('CODE_SEXE');
+               log('-- Transcodification des dates d''entrée', NOTICE);
+               transcoDate('DATE_ENTREE');
+               log('-- Transcodification des dates de naissance', NOTICE);
+               transcoDate('DATE_NAISSANCE');
+               log('-- Transcodification des dates d''ancienneté', NOTICE);
+               transcoDate('DATE_ANCIENNETE');
+
+               if G_hasOptionMDT then
+                  log('-- Transcodification des dates d''entrée groupe', NOTICE);
+                  transcoDate('DATE_ENTREE_GROUPE');
+                  log('-- Transcodification des dates de début d''activité', NOTICE);
+                  transcoDate('DATE_DEBUT_ACTIVITE');
+               end if;
+
+               log('-- Génération des codes établissement', NOTICE);
+               generateCodes('ETA_LIB');
+               log('-- Génération des codes société', NOTICE);
+               generateCodes('SOC_LIB');
+               log('-- Génération des codes métier', NOTICE);
+               generateCodes('METIER_LIB');
+            end if;
+       end if;
+
+       PKG_SQL.dbCommit;
+
+       log('Transcodification terminée', OK);
+
+  EXCEPTION
+  WHEN OTHERS THEN
+       log('occured in processTransco : ' || SQLERRM, SQL_ERROR);
+       PKG_SQL.dbRollback;
+       raise;
+  END;
+
+ /**
+  * Initialisation du contexte
+  *
+  * @return void
+  */
+  PROCEDURE init(logDbLink              IN VARCHAR2,
+                 pac                    IN VARCHAR2,
+                 tacheId                IN INTEGER,
+                 idData                 IN INTEGER,
+                 logonLdap              IN VARCHAR2,
+                 idClient               IN NUMBER,
+                 keyOfFile              IN NUMBER,
+                 periode                IN DATE,
+                 suffixe                IN VARCHAR2,
+                 isClientVision         IN NUMBER,
+                 isEnteteModele         IN NUMBER,
+                 avecModelisation       IN NUMBER,
+                 hasOptionMDT           IN NUMBER,
+                 hasOptionIFRS          IN NUMBER,
+                 hasOptionHabilitation  IN NUMBER,
+                 hasOptionMultipac      IN NUMBER,
+                 avecRemunerationVide   IN NUMBER)
+  IS
+  BEGIN
+       /*log('--------------------------------------', NOTICE);
+       log('        Initialisation de l''import',    NOTICE);
+       log('--------------------------------------', NOTICE);
+       log('idData : ' || idData,                    NOTICE);
+       log('logonLdap : ' || idData,                 NOTICE);
+       log('idClient : ' || idClient,                NOTICE);
+       log('suffixe : ' || suffixe,                  NOTICE);
+       log('keyOfFile : ' || keyOfFile,              NOTICE);
+       log('periode : ' || periode,                  NOTICE);
+       if isClientVision then
+           log('isClientVision : true',              NOTICE);
+       else
+           log('isClientVision : false',             NOTICE);
+       end if;
+       if isClientVision then
+           log('isEnteteModele : true',              NOTICE);
+       else
+           log('isEnteteModele : false',             NOTICE);
+       end if;
+       if isClientVision then
+           log('hasOptionMDT : true',                NOTICE);
+       else
+           log('hasOptionMDT : false',               NOTICE);
+       end if;
+       if isClientVision then
+           log('hasOptionIFRS : true',               NOTICE);
+       else
+           log('hasOptionIFRS : false',              NOTICE);
+       end if;
+       if isClientVision then
+           log('hasOptionHabilitation : true',       NOTICE);
+       else
+           log('hasOptionHabilitation : false',      NOTICE);
+       end if;
+       log('--------------------------------------', NOTICE);*/
+
+       G_logDbLink          := logDbLink;
+       G_pac                := pac;
+       G_tacheId            := tacheId;
+       G_idData             := idData;
+       G_logonLdap          := logonLdap;
+       G_idClient           := idClient;
+       G_suffixe            := suffixe;
+       G_keyOfFile          := keyOfFile;
+       G_periode            := periode;
+       G_periodeMoinsUnAn   := add_months(periode, -12);
+
+       if isClientVision = 1 then
+          G_isClientVision := true;
+       end if;
+
+       if isEnteteModele = 1 then
+          G_isEnteteModele := true;
+       end if;
+
+       if avecModelisation = 1 then
+          G_avecModelisation := true;
+       end if;
+
+       if avecRemunerationVide = 1 then
+          G_avecRemunerationVide := true;
+       end if;
+
+       if hasOptionMDT = 1 then
+          G_hasOptionMDT := true;
+       end if;
+
+       if hasOptionIFRS = 1 then
+          G_hasOptionIFRS := true;
+       end if;
+
+        if hasOptionHabilitation = 1 then
+          G_hasOptionHabilitation := true;
+       end if;
+
+       if hasOptionMultipac = 1 then
+          G_hasOptionMultipac := true;
+       end if;
+
+       G_nbErrorTransco := 0;
+
+       PKG_SQL.dbSetId('PKG_GDE_IMPORT.importAlterSession_alterDateFormat');
+       PKG_SQL.dbParse('alter session set nls_date_format='||chr(39)||'DD/MM/YYYY'||chr(39));
+       if PKG_SQL.dbExecute then
+          log('Prise en compte du format de date DD/MM/YYYY', NOTICE);
+       end if;
+
+       PKG_SQL.dbSetId('PKG_GDE_IMPORT.importAlterSession_alterNumberFormat');
+       PKG_SQL.dbParse('alter session set nls_numeric_characters='||chr(39)||',.'||chr(39));
+       if PKG_SQL.dbExecute then
+          log('Prise de la virgule comme séparateur numérique', NOTICE);
+       end if;
+
+  EXCEPTION
+  WHEN OTHERS THEN
+      log('occured in PKG_GDE_IMPORT.init : ' || SQLERRM, SQL_ERROR);
+      raise;
+  END;
+
+  /**
+   * Constructeur
+   *
+   * @var string Suffixe MD5 du fichier transcodifié
+   * @var string Clé du fichier concernée
+   * @return void
+   */
+  FUNCTION importFile(logDbLink             IN VARCHAR2,
+                      pac                   IN VARCHAR2,
+                      tacheId               IN INTEGER,
+                      idData                IN INTEGER,
+                      logonLdap             IN VARCHAR2,
+                      idClient              IN NUMBER,
+                      keyOfFile             IN NUMBER,
+                      periode               IN DATE,
+                      suffixe               IN VARCHAR2,
+                      isClientVision        IN NUMBER,
+                      isEnteteModele        IN NUMBER,
+                      avecModelisation      IN NUMBER,
+                      hasOptionMDT          IN NUMBER,
+                      hasOptionIFRS         IN NUMBER,
+                      hasOptionHabilitation IN NUMBER,
+                      hasOptionMultipac     IN NUMBER,
+                      avecRemunerationVide  IN NUMBER)
+  RETURN NUMBER
+  IS
+  BEGIN
+       init(logDbLink,
+            pac,
+            tacheId,
+            idData,
+            logonLdap,
+            idClient,
+            keyOfFile,
+            periode,
+            suffixe,
+            isClientVision,
+            isEnteteModele,
+            avecModelisation,
+            hasOptionMDT,
+            hasOptionIFRS,
+            hasOptionHabilitation,
+            hasOptionMultipac,
+            avecRemunerationVide);
+
+       -- Initialisation du code dossier
+       if G_idClient = 0 then
+          G_codeDossier := 0;
+       else
+           BEGIN
+               select code_dossier into G_codeDossier
+               from T_V5_GDE_CLIENT
+               where ID = G_idClient;
+
+           EXCEPTION
+           WHEN OTHERS THEN
+                log('Code dossier inexistant', ERROR);
+                return 0;
+           END;
+       end if;
+
+
+       log('Démarrage du processus d''import', OK);
+
+       -- Processus de transcodification
+       processTransco;
+       PKG_SQL.dbCommit;
+
+       if hasErrorTransco then
+          log('Arrêt du processus d''import suite à des erreurs de transcodifications (nbErreur = '|| G_nbErrorTransco ||')', ERROR);
+          return 0;
+       end if;
+
+       -- Processus de chargement des données salariés
+       processLoadSalarie;
+
+       PKG_SQL.dbCommit;
+       return 1;
+
+  EXCEPTION
+  WHEN OTHERS THEN
+       log('occured in importFile : ' || SQLERRM, SQL_ERROR);
+       PKG_SQL.dbRollBack;
+       return 0;
+  END;
+
+  /**
+   * Constructeur
+   *
+   * @var string Suffixe MD5 du fichier transcodifié
+   * @var string Clé du fichier concernée
+   * @return void
+   */
+  FUNCTION importBdd(logDbLink              IN VARCHAR2,
+                     pac                    IN VARCHAR2,
+                     tacheId                IN INTEGER,
+                     idData                 IN INTEGER,
+                     logonLdap              IN VARCHAR2,
+                     idClient               IN NUMBER,
+                     keyOfFile              IN NUMBER,
+                     periode                IN DATE,
+                     isClientVision         IN NUMBER,
+                     avecModelisation       IN NUMBER,
+                     hasOptionMDT           IN NUMBER,
+                     hasOptionIFRS          IN NUMBER,
+                     hasOptionHabilitation  IN NUMBER,
+                     hasOptionMultipac      IN NUMBER,
+                     avecRemunerationVide   IN NUMBER)
+  RETURN NUMBER
+  IS
+  BEGIN
+       init(logDbLink,
+            pac,
+            tacheId,
+            idData,
+            logonLdap,
+            idClient,
+            keyOfFile,
+            periode,
+            '',
+            isClientVision,
+            1,
+            avecModelisation,
+            hasOptionMDT,
+            hasOptionIFRS,
+            hasOptionHabilitation,
+            hasOptionMultipac,
+            avecRemunerationVide);
+
+       -- Initialisation du code dossier
+       if G_idClient = 0 then
+           G_codeDossier := 0;
+       else
+           BEGIN
+               select code_dossier into G_codeDossier
+               from T_V5_GDE_CLIENT
+               where ID = G_idClient;
+
+           EXCEPTION
+           WHEN OTHERS THEN
+                log('Code dossier inexistant', ERROR);
+                return 0;
+           END;
+       end if;
+
+
+       log('Démarrage du processus d''import', OK);
+
+       -- Processus de chargement des données salariés
+       processLoadSalarie;
+
+       PKG_SQL.dbCommit;
+       return 1;
+
+  EXCEPTION
+  WHEN OTHERS THEN
+       log('occured in importBdd : ' || SQLERRM, SQL_ERROR);
+       PKG_SQL.dbRollBack;
+       return 0;
+  END;
+
+END PKG_GDE_IMPORT

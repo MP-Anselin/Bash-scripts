@@ -1,0 +1,21 @@
+##
+V_V5_KRH_SALARIE_COMPTEUR_KRH
+=SQL=
+CREATE OR REPLACE VIEW V_V5_KRH_SALARIE_COMPTEUR_KRH ("DROITS","SOLDE","MATRICULE","ID_COMPTEUR","PRIS","SOLDE_SIMULE_VALIDE","SOLDE_SIMULE_NON_VALIDE") AS 
+select NVL(case when ID_COMPTEUR in  
+(select ID_COMPTEUR from T_V5_KRH_BANDEAU_KRH_CPT where NUM_IMPORT = 0) and sal.HORS_PAIE = 0 then 
+(select sum(mot.NBRE_MAX) from T_V5_KRH_BANDEAU_KRH_CPT_MOT cm, T_V5_KRH_MOTIF_KRH mot 
+where cm.MOTIF = mot.MOTIF and cm.ID_COMPTEUR = salcpt.ID_COMPTEUR and usr.LANGUE = mot.LANGUE) 
+else salcpt.DROITS end, 0) as DROITS 
+, NVL(case when ID_COMPTEUR in 
+(select ID_COMPTEUR from T_V5_KRH_BANDEAU_KRH_CPT where NUM_IMPORT = 0) and sal.HORS_PAIE = 0 then 
+(select sum(mot.NBRE_MAX) from T_V5_KRH_BANDEAU_KRH_CPT_MOT cm, T_V5_KRH_MOTIF_KRH mot 
+where cm.MOTIF = mot.MOTIF and cm.ID_COMPTEUR = salcpt.ID_COMPTEUR and usr.LANGUE = mot.LANGUE) 
+else salcpt.SOLDE end, 0) as SOLDE 
+, salcpt.MATRICULE
+, salcpt.ID_COMPTEUR
+, salcpt.PRIS
+, salcpt.SOLDE_SIMULE_VALIDE
+, salcpt.SOLDE_SIMULE_NON_VALIDE
+from T_V5_KRH_SALARIE_COMPTEUR_KRH salcpt, T_V5_KRH_SALARIE sal, T_V5_KRH_PROFIL_USER usr 
+where salcpt.MATRICULE = sal.MATRICULE and usr.MATRICULE = sal.MATRICULE

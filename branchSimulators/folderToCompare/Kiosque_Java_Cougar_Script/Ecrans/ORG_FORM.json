@@ -1,0 +1,37 @@
+{
+  boutons : "INT",
+  code : "ORG_FORM",
+  element : "ecran",
+  groupe : {
+    code : "ORG_FORM_ONGLET_GRP",
+    donnees : [ {
+      code : "ORG_FORM_GRP",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        pageAjout : "ORG_FORM_POP",
+        pageModif : "ORG_FORM_POP_MODIF",
+        requete : "ORG_FORM_1"
+      } ],
+      element : "groupe",
+      libelle : "Organismes non historisés",
+      onglet : true
+    }, {
+      code : "ORG_FORM_HISTO_GRP",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        pageModif : "ORG_FORM_POP_MODIF",
+        requete : "ORG_FORM_HISTO_1"
+      } ],
+      element : "groupe",
+      libelle : "Organismes historisés",
+      onglet : true
+    } ],
+    element : "groupe",
+    libelle : "onglet grp organismes de formation"
+  },
+  libelle : "Gestion des organismes de formations",
+  servicelet : "FormationOrganismesJsonServlet",
+  type : "U"
+}

@@ -1,0 +1,17 @@
+##
+V_V5_KRH_MOTIFS_KRH_SAL_STRUCT
+=SQL=
+CREATE OR REPLACE VIEW V_V5_KRH_MOTIFS_KRH_SAL_STRUCT ("MATRICULE","MOTIF","ORDRE","ID_FILTRE") AS 
+SELECT matricule, motif, ordre, id_filtre
+FROM V_V5_KRH_MOTIFS_KRH_FILTRE flt, T_V5_POPULATION_STRUCTURE ps, T_V5_KRH_SALARIE_STRUCTURE struct
+WHERE flt.id_structure = ps.id_pop_structure
+AND struct.ID_ITEM
+IN
+(
+ SELECT ID_ITEM FROM T_V5_STRUCTURE_ITEM itm
+                WHERE ID_STRUCTURE = ps.id_structure
+                START WITH
+                ID_ITEM = ps.id_item
+                CONNECT BY PRIOR itm.ID_ITEM = ID_PARENT_ITEM
+)
+ORDER BY matricule, motif, ordre

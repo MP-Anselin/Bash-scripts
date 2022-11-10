@@ -1,0 +1,162 @@
+##
+TAG_CHARSET=@€éèç
+##
+GET_USER_HABILITATION
+=SQL=
+create or replace FUNCTION GET_USER_HABILITATION RETURN table_krhef_aff_user_habilitation AS
+
+    user_habilitaion_groupe table_krhef_aff_user_habilitation := table_krhef_aff_user_habilitation();
+    numlig                  NUMBER := 0;
+    CURSOR cur IS
+    SELECT
+        vuser.matricule      matricule,
+        vuser.nom|| ' '|| vuser.prenom      np,
+        vuser.matricule_paie matricule_paie,
+        CASE
+            WHEN vuser.est_utilisateur_form = 1 AND vuser.est_utilisateur_entr = 0 AND vuser.est_utilisateur_tal = 0 THEN
+                'Formation'
+            WHEN vuser.est_utilisateur_form = 1 AND vuser.est_utilisateur_entr = 1 AND vuser.est_utilisateur_tal = 0 THEN
+                'Formation, Entretien'
+            WHEN vuser.est_utilisateur_form = 1 AND vuser.est_utilisateur_entr = 0 AND vuser.est_utilisateur_tal = 1 THEN
+                'Formation, Talent'
+            WHEN vuser.est_utilisateur_form = 1 AND vuser.est_utilisateur_entr = 1  AND vuser.est_utilisateur_tal = 1 THEN
+                'Formation, Entretien, Talent'
+            WHEN vuser.est_utilisateur_form = 0  AND vuser.est_utilisateur_entr = 0 AND vuser.est_utilisateur_tal = 1 THEN
+                'Talent'
+            WHEN vuser.est_utilisateur_form = 0  AND vuser.est_utilisateur_entr = 1 AND vuser.est_utilisateur_tal = 0 THEN
+                'Entretien'
+            WHEN vuser.est_utilisateur_form = 0  AND vuser.est_utilisateur_entr = 1 AND vuser.est_utilisateur_tal = 1 THEN
+                'Entretien, Talent'
+            WHEN vuser.est_utilisateur_form = 0  AND vuser.est_utilisateur_entr = 0 AND vuser.est_utilisateur_tal = 0 THEN
+                '-'
+        END                  est_utilisateur,
+        CASE
+            WHEN vuser.est_responsable_form = 1 AND vuser.est_responsable_entr = 0 AND vuser.est_responsable_tal = 0 THEN
+                'Formation'
+            WHEN vuser.est_responsable_form = 1 AND vuser.est_responsable_entr = 1 AND vuser.est_responsable_tal = 0 THEN
+                'Formation, Entretien'
+            WHEN vuser.est_responsable_form = 1 AND vuser.est_responsable_entr = 0 AND vuser.est_responsable_tal = 1 THEN
+                'Formation, Talent'
+            WHEN vuser.est_responsable_form = 1 AND vuser.est_responsable_entr = 1  AND vuser.est_responsable_tal = 1 THEN
+                'Formation, Entretien, Talent'
+            WHEN vuser.est_responsable_form = 0  AND vuser.est_responsable_entr = 0 AND vuser.est_responsable_tal = 1 THEN
+                'Talent'
+            WHEN vuser.est_responsable_form = 0  AND vuser.est_responsable_entr = 1 AND vuser.est_responsable_tal = 0 THEN
+                'Entretien'
+            WHEN vuser.est_responsable_form = 0  AND vuser.est_responsable_entr = 1 AND vuser.est_responsable_tal = 1 THEN
+                'Entretien, Talent'
+            WHEN vuser.est_responsable_form = 0  AND vuser.est_responsable_entr = 0 AND vuser.est_responsable_tal = 0 THEN
+                '-'   
+        END                  est_responsable,
+        CASE
+            WHEN vuser.est_expert_form = 1 AND vuser.est_expert_entr = 0 AND vuser.est_expert_tal = 0 THEN
+                'Formation'
+            WHEN vuser.est_expert_form = 1 AND vuser.est_expert_entr = 1 AND vuser.est_expert_tal = 0 THEN
+                'Formation, Entretien'
+            WHEN vuser.est_expert_form = 1 AND vuser.est_expert_entr = 0 AND vuser.est_expert_tal = 1 THEN
+                'Formation, Talent'
+            WHEN vuser.est_expert_form = 1 AND vuser.est_expert_entr = 1  AND vuser.est_expert_tal = 1 THEN
+                'Formation, Entretien,Talent'
+            WHEN vuser.est_expert_form = 0  AND vuser.est_expert_entr = 0 AND vuser.est_expert_tal = 1 THEN
+                'Talent'
+            WHEN vuser.est_expert_form = 0  AND vuser.est_expert_entr = 1 AND vuser.est_expert_tal = 0 THEN
+                'Entretien'
+            WHEN vuser.est_expert_form = 0  AND vuser.est_expert_entr = 1 AND vuser.est_expert_tal = 1 THEN
+                'Entretien, Talent'
+            WHEN vuser.est_expert_form = 0  AND vuser.est_expert_entr = 0 AND vuser.est_expert_tal = 0 THEN
+                '-'  
+        END                  est_expert,
+        CASE
+             WHEN vuser.est_gestionnaire_form = 1 AND vuser.est_gestionnaire_entr = 0 AND vuser.est_gestionnaire_tal = 0 THEN
+                'Formation'
+            WHEN vuser.est_gestionnaire_form = 1 AND vuser.est_gestionnaire_entr = 1 AND vuser.est_gestionnaire_tal = 0 THEN
+                'Formation, Entretien'
+            WHEN vuser.est_gestionnaire_form = 1 AND vuser.est_gestionnaire_entr = 0 AND vuser.est_gestionnaire_tal = 1 THEN
+                'Formation, Talent'
+            WHEN vuser.est_gestionnaire_form = 1 AND vuser.est_gestionnaire_entr = 1  AND vuser.est_gestionnaire_tal = 1 THEN
+                'Formation, Entretien,Talent'
+            WHEN vuser.est_gestionnaire_form = 0  AND vuser.est_gestionnaire_entr = 0 AND vuser.est_gestionnaire_tal = 1 THEN
+                'Talent'
+            WHEN vuser.est_gestionnaire_form = 0  AND vuser.est_gestionnaire_entr = 1 AND vuser.est_gestionnaire_tal = 0 THEN
+                'Entretien'
+            WHEN vuser.est_gestionnaire_form = 0  AND vuser.est_gestionnaire_entr = 1 AND vuser.est_gestionnaire_tal = 1 THEN
+                'Entretien, Talent'
+            WHEN vuser.est_gestionnaire_form = 0  AND vuser.est_gestionnaire_entr = 0 AND vuser.est_gestionnaire_tal = 0 THEN
+                '-'  
+        END                  est_gestionnaire,
+        CASE 
+            WHEN vuser.est_directeur_rh_entr = 1 AND vuser.est_directeur_rh_tal = 0 THEN
+                'Entretien'
+            WHEN vuser.est_directeur_rh_entr = 1  AND vuser.est_directeur_rh_tal = 1 THEN
+                'Entretien, Talent'
+            WHEN vuser.est_directeur_rh_entr = 0  AND vuser.est_directeur_rh_tal = 1 THEN
+                'Talent'
+            WHEN vuser.est_directeur_rh_entr = 0  AND vuser.est_directeur_rh_tal = 0 THEN
+                '-'
+        END                  est_directeur_rh,
+        CASE
+            WHEN vuser.est_responsable_rh_entr = 1  AND vuser.est_responsable_rh_tal = 0 THEN
+                'Entretien'
+            WHEN vuser.est_responsable_rh_entr = 1  AND vuser.est_responsable_rh_tal = 1 THEN
+                'Entretien, Talent'
+            WHEN vuser.est_responsable_rh_entr = 0  AND vuser.est_responsable_rh_tal = 1 THEN
+                'Talent'
+            WHEN vuser.est_responsable_rh_entr = 0 AND vuser.est_responsable_rh_tal = 0 THEN
+                '-'
+        END                  est_responsable_rh,
+        CASE
+            WHEN vuser.est_acteur_indirect_entr = 1  AND vuser.est_acteur_indirect_tal = 0 THEN
+                'Entretien'
+            WHEN vuser.est_acteur_indirect_entr = 1  AND vuser.est_acteur_indirect_tal = 1 THEN
+                'Entretien, Talent'
+            WHEN vuser.est_acteur_indirect_entr = 0  AND vuser.est_acteur_indirect_tal = 1 THEN
+                'Talent'
+            WHEN vuser.est_acteur_indirect_entr = 0  AND vuser.est_acteur_indirect_tal = 0 THEN
+                '-'
+        END                  est_acteur_indirect,
+        CASE
+            WHEN vuser.est_expert_securite = 1 THEN
+                'Expert Sécurité'
+            WHEN vuser.est_expert_securite = 0 THEN
+                '-'
+        END                  est_expert_securite,
+        CASE
+            WHEN vuser.est_utilisateur_form = 1  AND vuser.est_utilisateur_entr = 1 AND vuser.est_utilisateur_tal = 1 THEN
+                'Formation, Entretien, Talent'
+        END                  est_utilisateur_all,
+        CASE
+            WHEN vuser.est_responsable_form = 1 AND vuser.est_responsable_entr = 1 AND vuser.est_responsable_tal = 1 THEN
+                'Formation, Entretien, Talent'
+        END                  est_responsable_all
+    FROM
+        v_v5_krh_salarie_user vuser;
+
+    lig                     cur%rowtype;
+BEGIN
+    OPEN cur;
+    LOOP
+        FETCH cur INTO lig;
+        EXIT WHEN cur%notfound;
+        numlig := numlig + 1;
+        user_habilitaion_groupe.extend;
+        user_habilitaion_groupe(numlig) := krhef_aff_user_habilitation(NULL, NULL, NULL, NULL, NULL,
+                                                                      NULL, NULL, NULL, NULL, NULL,
+                                                                      NULL, NULL, NULL);
+
+        user_habilitaion_groupe(numlig).matricule := lig.matricule;
+        user_habilitaion_groupe(numlig).matricule_paie := lig.matricule_paie;
+        user_habilitaion_groupe(numlig).np := lig.np;
+        user_habilitaion_groupe(numlig).est_utilisateur := lig.est_utilisateur;
+        user_habilitaion_groupe(numlig).est_responsable := lig.est_responsable;
+        user_habilitaion_groupe(numlig).est_expert := lig.est_expert;
+        user_habilitaion_groupe(numlig).est_gestionnaire := lig.est_gestionnaire;
+        user_habilitaion_groupe(numlig).est_directeur_rh := lig.est_directeur_rh;
+        user_habilitaion_groupe(numlig).est_responsable_rh := lig.est_responsable_rh;
+        user_habilitaion_groupe(numlig).est_acteur_indirect := lig.est_acteur_indirect;
+        user_habilitaion_groupe(numlig).est_expert_securite := lig.est_expert_securite;
+        user_habilitaion_groupe(numlig).est_utilisateur_all := lig.est_utilisateur_all;
+        user_habilitaion_groupe(numlig).est_responsable_all := lig.est_responsable_all;
+    END LOOP;
+
+    RETURN user_habilitaion_groupe;
+END get_user_habilitation;

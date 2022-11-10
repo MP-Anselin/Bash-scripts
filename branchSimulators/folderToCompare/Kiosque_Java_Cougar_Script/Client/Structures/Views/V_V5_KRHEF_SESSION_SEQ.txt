@@ -1,0 +1,23 @@
+##
+V_V5_KRHEF_SESSION_SEQ
+=SQL=
+CREATE OR REPLACE VIEW V_V5_KRHEF_SESSION_SEQ ("ID_SESSION_REF","ID_SESSION","ID_SESSION_SEQ","NUM_SEQ","ACTIF","NBRE_JOURS_SEQ","NBRE_HEURES_SEQ","DATE_MAJ","DATE_SEQ_DEBUT","DATE_SEQ_FIN","HEURE_SEQ_DEBUT","HEURE_SEQ_FIN","LASTID","ORDRE_PLAN") AS 
+select ses_ref.ID_SESSION_REF,
+       ses_ref.ID_SESSION as ID_SESSION,
+       ses.ID_SESSION as ID_SESSION_SEQ,
+       ses.NUM_SEQ,
+       ses.ACTIF,
+       ses.NBRE_JOURS_SEQ,
+       ses.NBRE_HEURES_SEQ,
+       ses.DATE_MAJ,
+       ses.DATE_SEQ_DEBUT,
+       ses.DATE_SEQ_FIN,
+       ses.HEURE_SEQ_DEBUT,
+       ses.HEURE_SEQ_FIN,
+       ses.LASTID,
+       (to_char(ses.DATE_SEQ_DEBUT, 'yyyy') - to_char(ses.DATE_DEBUT, 'yyyy') + 1) as ORDRE_PLAN
+from
+  T_V5_KRHEF_SESSION ses,
+  V_V5_KRHEF_SESSION ses_ref
+where ses_ref.ID_FORM_CATALOGUE = ses.ID_FORM_CATALOGUE
+  and ses_ref.CODE_SESSION = ses.CODE_SESSION

@@ -1,0 +1,100 @@
+##
+V_V5_KRHEF_FORM_REPONSE_CHAUD
+=SQL=
+CREATE OR REPLACE VIEW V_V5_KRHEF_FORM_REPONSE_CHAUD ("ID_INSCRIPTION_REF","EVALUATION_STATUS","FORM_INSTANCE_ID","ORDRE_GROUPE","LEGENDE_GROUPE","QUESTION_LANGUE","QUESTION_MODELE","QUESTION_TYPE","QUESTION_ORDRE","QUESTION_ID","QUESTION_INDEX","QUESTION_LIBELLE","QUESTION_DESCRIPTION","REPONSE_INDEX","REPONSE_CHOIX","REPONSE_CHAINE") AS 
+select
+         -- Instance
+           evc.ID_INSCRIPTION_REF        as ID_INSCRIPTION_REF
+         , evc.EVALUATION_STATUS         as EVALUATION_STATUS
+         , evc.FORM_INSTANCE_ID          as FORM_INSTANCE_ID
+         -- Groupes
+         , grp.ORDRE                     as ORDRE_GROUPE
+         , grp.LEGEND                    as LEGENDE_GROUPE
+         -- Questions
+         , elt.LANGUE                    as QUESTION_LANGUE
+         , elt.MODELE                    as QUESTION_MODELE
+         , elt.ELT_TYPE                  as QUESTION_TYPE
+         , elt.ORDRE                     as QUESTION_ORDRE
+         , elt.ID_KSQFORM_GEN_DEF_ELT    as QUESTION_ID
+         , nvl(chx.MLT_KEY, 0)           as QUESTION_INDEX
+         , case
+                when (elt.ELT_TYPE IN ('AraigneeEvaluation', 'Questions'))
+                then chx.CHOICE_VALUE
+                else elt.LABEL
+           end                           as QUESTION_LIBELLE
+         , case
+                when (elt.ELT_TYPE = 'AraigneeEvaluation')
+                then (select chdsc.CHOICE_VALUE
+                        from V_V5_KSQFORM_GEN_CHOICES chdsc
+                       where chdsc.ID_KSQFORM_GEN_DEF_ELT = elt.ID_KSQFORM_GEN_DEF_ELT
+                         and chdsc.CHOICE_KEY             = 'description'
+                         and chdsc.MLT_KEY                = chx.MLT_KEY
+                         and chdsc.CHOICE_LOCALE          = elt.LANGUE
+                         )
+                else elt.DESCRIPTION
+           end                           as QUESTION_DESCRIPTION
+
+         -- Réponse
+         , val.MLT_KEY as REPONSE_INDEX
+         , val.CHOICE  as REPONSE_CHOIX
+         , case
+         -- réponses texte en FR
+              when (elt.ELT_TYPE = 'AraigneeEvaluation')
+              then
+                case
+                     when (val.CHOICE = 100)
+                     then decode(elt.LANGUE, 'EN', 'Very well', 'CH', 'Sehr gut', 'Très bien')
+                     when (val.CHOICE = 75)
+                     then decode(elt.LANGUE, 'EN', 'Well', 'CH', 'Gut', 'Bien')
+                     when (val.CHOICE = 50)
+                     then decode(elt.LANGUE, 'EN', 'Average', 'CH', 'Durchschnittlich', 'Moyen')
+                     when (val.CHOICE = 25)
+                     then decode(elt.LANGUE, 'EN', 'Insufficient', 'CH', 'Unzureichend', 'Insuffisant')
+                end
+                when (elt.ELT_TYPE = 'NotationSmiley')
+                then
+                  case
+                       when (val.CHOICE = 100)
+                       then decode(elt.LANGUE, 'EN', 'Very satisfying', 'CH', 'Sehr zufriedenstellend', 'Très satisfaisant')
+                       when (val.CHOICE = 75)
+                       then decode(elt.LANGUE, 'EN', 'Satisfying', 'CH', 'Zufriedenstellend', 'Satisfaisant')
+                       when (val.CHOICE = 50)
+                       then decode(elt.LANGUE, 'EN', 'Insufficient', 'CH', 'Ungenügend', 'Insuffisant')
+                       when (val.CHOICE = 25)
+                       then decode(elt.LANGUE, 'EN', 'Very insufficient', 'CH', 'Sehr ungenügend', 'Très insuffisant')
+                  end
+                else val.STRING
+           end                           as REPONSE_CHAINE
+
+
+      from V_V5_KRHEF_FORM_EVAL_CHAUD evc
+
+      join T_V5_KRHEF_FORMATION_INSCR ins
+        on ins.ID_INSCRIPTION_REF = evc.ID_INSCRIPTION_REF
+       and ins.NUM_SEQ = 0
+
+      join T_V5_KSQFORM_GEN_DEF def
+        on def.ID_KSQFORM_GEN_DEF = evc.FORM_DEFINITION_ID
+
+      join T_V5_KSQFORM_GEN_DEF_GRP grp
+        on grp.ID_KSQFORM_GEN_DEF = def.ID_KSQFORM_GEN_DEF
+       and grp.LANGUE = def.LANGUE
+
+      join T_V5_KSQFORM_GEN_DEF_ELT elt
+        on elt.ID_KSQFORM_GEN_DEF_GRP = grp.ID_KSQFORM_GEN_DEF_GRP
+       and elt.LANGUE = grp.LANGUE
+
+ left join V_V5_KSQFORM_GEN_CHOICES chx
+        on chx.ID_KSQFORM_GEN_DEF_ELT = elt.ID_KSQFORM_GEN_DEF_ELT
+       and chx.CHOICE_LOCALE = elt.LANGUE
+       and chx.CHOICE_KEY not in ('description', 'Values')
+
+ left join T_V5_KSQFORM_GEN_INSTANCE inst
+        on inst.ID_KSQFORM_GEN_INSTANCE = evc.FORM_INSTANCE_ID
+
+ left join T_V5_KSQFORM_GEN_VAL val
+        on val.ID_KSQFORM_GEN_INSTANCE = inst.ID_KSQFORM_GEN_INSTANCE
+       and val.ID_KSQFORM_GEN_DEF_ELT = elt.ID_KSQFORM_GEN_DEF_ELT
+       and nvl(regexp_substr(val.MLT_KEY, '^.*([0-9]+).*$', 1, 1, 'i', 1), -1) = nvl(chx.MLT_KEY, -1)
+
+     where evc.EVALUATION_STATUS <> 'EVALUATION_INACTIVE'

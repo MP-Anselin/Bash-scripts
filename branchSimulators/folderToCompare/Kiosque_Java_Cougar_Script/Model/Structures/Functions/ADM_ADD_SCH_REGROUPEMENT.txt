@@ -1,0 +1,79 @@
+##
+ADM_ADD_SCH_REGROUPEMENT
+=SQL=
+create or replace FUNCTION ADM_ADD_SCH_REGROUPEMENT(
+  p_code_schema            IN NUMBER,
+  p_lib_1                  IN VARCHAR2,
+  p_lib_2                  IN VARCHAR2,
+  p_obj_application        IN SCH_ELEMENT,
+  p_description            IN VARCHAR2,
+  p_code_role              IN NUMBER DEFAULT NULL
+) RETURN SCH_ELEMENT
+
+IS
+  p_obj_regroup              SCH_ELEMENT;
+  ordreRegroup    NUMBER;
+BEGIN
+  p_obj_regroup := sch_element(p_code_schema, 0, p_lib_2, NULL, 0, 0, 2);
+
+  BEGIN
+    /* VERIFICATION DANS SYS_SCH_ELEMENT*/
+    SELECT NVL(code_element, 0) INTO p_obj_regroup.code_element
+     FROM sys_sch_element
+      WHERE (libelle = p_lib_2 AND niveau = 2) AND ROWNUM = 1 ;
+  EXCEPTION WHEN NO_DATA_FOUND THEN
+    NULL;
+  END;
+
+  IF (p_obj_regroup.code_element = 0) THEN
+    /* CREATION ELEMENT DANS SYS_SCH_ELEMENT */
+    SELECT MAX(code_element) + 1 INTO p_obj_regroup.code_element FROM sys_sch_element;
+
+    INSERT INTO sys_sch_element(niveau, code_element, libelle, nom_page, code_role, description, tags, type)
+     VALUES(p_obj_regroup.niveau, p_obj_regroup.code_element, p_obj_regroup.libelle, NULL, p_code_role, p_description, NULL, NULL);
+    --dbms_output.put_line('ADM_ADD_SCH_REGROUP: (C) [code_element] ' || p_obj_regroup.code_element || ' [libelle] ' || p_obj_regroup.libelle || ' [niveau] ' || p_obj_regroup.niveau);
+    --FIXME utiliser la procédure trace_dbms_output()
+  --ELSE
+    --dbms_output.put_line('ADM_ADD_SCH_REGROUP: (E) [code_element] ' || p_obj_regroup.code_element || ' [libelle] ' || p_obj_regroup.libelle || ' [niveau] ' || p_obj_regroup.niveau);
+    --FIXME utiliser la procédure trace_dbms_output()
+  END IF;
+
+  /* VERIFICATION DANS SYS_SCHEMAS */
+  BEGIN
+    SELECT s2.code_asso, s2.code_asso_pere INTO p_obj_regroup.code_asso, p_obj_regroup.code_asso_pere
+     FROM sys_sch_element e1, sys_sch_element e2, sys_schemas s1, sys_schemas s2
+      WHERE s1.code_schema = p_code_schema
+       AND s2.code_schema = p_code_schema
+       AND s2.code_elt = e2.code_element AND s2.niveau = e2.niveau
+       AND s1.code_elt = e1.code_element AND s1.niveau = e1.niveau
+       AND s2.niveau ='2'
+       AND s1.niveau ='1'
+       AND s2.code_asso_pere = s1.code_asso 
+       AND e1.libelle = p_lib_1
+       AND e2.libelle = p_lib_2;
+    EXCEPTION WHEN NO_DATA_FOUND THEN
+      NULL;
+  END;
+
+  IF (p_obj_regroup.code_asso = 0) THEN
+    /* CREATION ELEMENT DANS SYS_SCHEMAS */
+    SELECT MAX(code_asso) + 1 INTO p_obj_regroup.code_asso FROM sys_schemas;
+    p_obj_regroup.code_asso_pere := p_obj_application.code_asso;
+
+    /*RECUPERATION DE L ORDRE pour ajouter à la fin */
+    SELECT MAX(NVL(ORDRE,0))+1 INTO ordreRegroup FROM SYS_SCHEMAS WHERE code_schema = p_obj_regroup.code_schema AND code_asso_pere = p_obj_regroup.code_asso_pere ;
+    IF ordreRegroup is NULL THEN
+      ordreRegroup := 0;
+    END IF;
+
+    INSERT INTO sys_schemas(code_schema, code_asso, code_asso_pere, code_elt, niveau, ordre)
+     VALUES(p_obj_regroup.code_schema, p_obj_regroup.code_asso, p_obj_regroup.code_asso_pere, p_obj_regroup.code_element, p_obj_regroup.niveau, ordreRegroup);
+    --dbms_output.put_line('ADM_ADD_SCH_REGROUP: (C) [code_schema] ' || p_obj_regroup.code_schema || ' [code_asso] ' || p_obj_regroup.code_asso || ' [code_asso_pere) ' || p_obj_regroup.code_asso_pere || ' [niveau] ' || p_obj_regroup.niveau);
+    --FIXME utiliser la procédure trace_dbms_output()
+  --ELSE
+    --dbms_output.put_line('ADM_ADD_SCH_REGROUP: (E) [code_schema] ' || p_obj_regroup.code_schema || ' [code_asso] ' || p_obj_regroup.code_asso || ' [code_asso_pere) ' || p_obj_regroup.code_asso_pere || ' [niveau] ' || p_obj_regroup.niveau);
+    --FIXME utiliser la procédure trace_dbms_output()
+  END IF ;
+
+  RETURN p_obj_regroup;
+END ADM_ADD_SCH_REGROUPEMENT;

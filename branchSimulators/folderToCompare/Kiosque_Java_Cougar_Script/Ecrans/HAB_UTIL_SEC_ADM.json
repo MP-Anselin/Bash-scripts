@@ -1,0 +1,69 @@
+{
+  boutons : "INT",
+  code : "HAB_UTIL_SEC_ADM",
+  element : "ecran",
+  groupe : {
+    code : "HABILITATIONS_GRP",
+    donnees : [ {
+      code : "HABILITATIONS_GENARAL_CONFONDUS",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        pageModif : "HAB_UTI_CONF_POP_M",
+        requete : "HAB_UTIL_CONFONDUS_1"
+      } ],
+      element : "groupe",
+      libelle : "Informations générales",
+      onglet : true
+    }, {
+      code : "HABILITATIONS_ENTR",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        pageModif : "HAB_ENT_POP_M",
+        requete : "HAB_UTIL_ENTR_1"
+      } ],
+      element : "groupe",
+      libelle : "Entretien",
+      onglet : true
+    }, {
+      code : "HABILITATIONS_FORM",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        pageModif : "HAB_FORM_POP_M",
+        requete : "HAB_UTIL_FORM_1"
+      } ],
+      element : "groupe",
+      libelle : "Formation",
+      onglet : true
+    }, {
+      code : "HABILITATIONS_TALENTS",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        pageModif : "HAB_TALENT_POP_M",
+        requete : "HAB_UTIL_TALENT_1"
+      } ],
+      element : "groupe",
+      libelle : "Revue des talents",
+      onglet : true
+    }, {
+      code : "HABILITATIONS_SECURITE",
+      donnees : [ {
+        code : "#TABLEAU",
+        element : "donnee",
+        pageModif : "HAB_SEC_POP_M",
+        requete : "HAB_UTIL_SEC_1"
+      } ],
+      element : "groupe",
+      libelle : "Sécurité",
+      onglet : true
+    } ],
+    element : "groupe",
+    libelle : "Habilitations"
+  },
+  libelle : "Habilitations",
+  servicelet : "HabilitationUtilsateurJsonServlet",
+  type : "U"
+}

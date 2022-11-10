@@ -1,0 +1,164 @@
+##
+V_V5_KRH_ABS_INTERFACE_STA_KRH
+=SQL=
+CREATE OR REPLACE VIEW V_V5_KRH_ABS_INTERFACE_STA_KRH ("NUM_ROW","MATRICULE","ID_ABSENCE_KRH","CODE_ACTION","CODE_STATUT","DATE_STATUT","LIBELLE_STATUT") AS 
+select ROWNUM as NUM_ROW, int."MATRICULE",int."ID_ABSENCE_KRH",int."CODE_ACTION",int."CODE_STATUT",int."DATE_STATUT",int."LIBELLE_STATUT" from (
+-------------------------------------
+-- En attente d accord
+-------------------------------------
+select abs.MATRICULE, abs.ID_ABSENCE_KRH,
+       -------------------------------------
+       'C' as CODE_ACTION,
+       1 as CODE_STATUT,
+       abs.DATE_CREATION as DATE_STATUT,
+       'AttAccord' as LIBELLE_STATUT
+       -------------------------------------
+  from T_V5_KRH_ABSENCE_KRH abs, T_V5_WF_DEMANDE dem
+ where dem.appli = 'krhv5'
+   and abs.ID_ABSENCE_KRH = dem.ID_REFERENCE
+   and abs.DATE_EXPORT_INTERFACE is null
+   and abs.ID_EXPORT_INTERFACE is null
+   -------------------------------------
+   and dem.TYPE_DEMANDE = 'Absence'
+   -------------------------------------
+union
+-------------------------------------
+-- Accordée
+-------------------------------------
+select abs.MATRICULE, abs.ID_ABSENCE_KRH,
+          -------------------------------------
+          'V' as CODE_ACTION,
+          2 as CODE_STATUT,
+          abs.DATE_SIGNATURE as DATE_STATUT,
+          'Accordee' as LIBELLE_STATUT
+          -------------------------------------
+  from T_V5_KRH_ABSENCE_KRH abs, T_V5_WF_DEMANDE dem
+ where dem.appli = 'krhv5'
+   and abs.ID_ABSENCE_KRH = dem.ID_REFERENCE
+   -------------------------------------
+   and dem.TYPE_DEMANDE = 'Absence'
+   and abs.DATE_SIGNATURE is not null
+   -------------------------------------
+union
+-------------------------------------
+-- Refusée
+-------------------------------------
+select abs.MATRICULE, abs.ID_ABSENCE_KRH,
+       -------------------------------------
+       'V' as CODE_ACTION,
+       3 as CODE_STATUT,
+       dem.REPONSE_DATE as DATE_STATUT,
+       'Refusee' as LIBELLE_STATUT
+       -------------------------------------
+  from T_V5_KRH_ABSENCE_KRH abs, T_V5_WF_DEMANDE dem
+ where dem.appli = 'krhv5'
+   and abs.ID_ABSENCE_KRH = dem.ID_REFERENCE
+   -------------------------------------
+   and dem.TYPE_DEMANDE = 'Absence'
+   and dem.REPONSE_DATE is not null
+   and dem.DEMANDE_ETAT = 'N'
+   -------------------------------------
+union
+-------------------------------------
+-- Annulée par demande d'annulation
+-------------------------------------
+select abs.MATRICULE, abs.ID_ABSENCE_KRH,
+       -------------------------------------
+       'V' as CODE_ACTION,
+       6 as CODE_STATUT,
+       dem.REPONSE_DATE as DATE_STATUT,
+       'Annulee' as LIBELLE_STATUT
+       -------------------------------------
+  from T_V5_KRH_ABSENCE_KRH abs, T_V5_WF_DEMANDE dem
+ where dem.appli = 'krhv5'
+   and abs.ID_ABSENCE_KRH = dem.ID_REFERENCE
+   -------------------------------------
+   and abs.STATUS = 'N'
+   and dem.TYPE_DEMANDE = 'AnnulationAbsence'
+   and dem.REPONSE_DATE is not null
+   and dem.DEMANDE_ETAT = 'O'
+   -------------------------------------
+union
+-------------------------------------
+-- Annulée
+-------------------------------------
+select abs.MATRICULE, abs.ID_ABSENCE_KRH,
+       -------------------------------------
+       'V' as CODE_ACTION,
+       6 as CODE_STATUT,
+       dem.REPONSE_DATE as DATE_STATUT,
+       'Annulee' as LIBELLE_STATUT
+       -------------------------------------
+  from T_V5_KRH_ABSENCE_KRH abs, T_V5_WF_DEMANDE dem
+ where dem.appli = 'krhv5'
+   and abs.ID_ABSENCE_KRH = dem.ID_REFERENCE
+   -------------------------------------
+   and abs.STATUS = 'S'
+   and dem.TYPE_DEMANDE = 'Absence'
+   and dem.REPONSE_DATE is not null
+   and dem.DEMANDE_ETAT = 'S'
+   -------------------------------------
+union
+-------------------------------------
+-- Accord pour traitement
+-------------------------------------
+select abs.MATRICULE, abs.ID_ABSENCE_KRH,
+       -------------------------------------
+       'V' as CODE_ACTION,
+       7 as CODE_STATUT,
+       dem.REPONSE_DATE as DATE_STATUT,
+       'AccTraitt' as LIBELLE_STATUT
+       -------------------------------------
+  from T_V5_KRH_ABSENCE_KRH abs, T_V5_WF_DEMANDE dem
+ where dem.appli = 'krhv5'
+   and abs.ID_ABSENCE_KRH = dem.ID_REFERENCE
+   -------------------------------------
+   and dem.TYPE_DEMANDE = 'Absence'
+   and dem.REPONSE_DATE is not null
+   and dem.DEMANDE_ETAT = 'O'
+   and abs.STATUS = 'O'
+   -------------------------------------
+union
+-------------------------------------
+-- Envoyé en paie
+-------------------------------------
+select abs.MATRICULE, abs.ID_ABSENCE_KRH,
+       -------------------------------------
+       'V' as CODE_ACTION,
+       9 as CODE_STATUT,
+       abs.DATE_ENVOI_PAIE as DATE_STATUT,
+       'EnvoiPaie' as LIBELLE_STATUT
+       -------------------------------------
+  from T_V5_KRH_ABSENCE_KRH abs, T_V5_WF_DEMANDE dem
+ where dem.appli = 'krhv5'
+   and abs.ID_ABSENCE_KRH = dem.ID_REFERENCE
+   -------------------------------------
+   and dem.TYPE_DEMANDE = 'Absence'
+   and abs.DATE_ENVOI_PAIE is not null
+   -------------------------------------
+union
+-------------------------------------
+-- Enregistrée
+-------------------------------------
+select abs.MATRICULE, abs.ID_ABSENCE_KRH,
+       -------------------------------------
+       'C' as CODE_ACTION,
+       2 as CODE_STATUT,
+       abs.DATE_CREATION as DATE_STATUT,
+       'Enregistree' as LIBELLE_STATUT
+       -------------------------------------
+  from T_V5_KRH_ABSENCE_KRH abs, T_V5_WF_DEMANDE dem
+ where dem.appli = 'krhv5'
+   and abs.ID_ABSENCE_KRH = dem.ID_REFERENCE
+   -------------------------------------
+   and dem.TYPE_DEMANDE = 'Absence'
+   and abs.DATE_VISA is null
+   and abs.STATUS_CODE in (
+       select CODE
+         from V_V5_STATUT
+        where LANGUE = (select VALEUR from T_V5_INFO where APPLI = 'krhv5' and CODE = 'LANGUE')
+          and EXPORT_GTA_SI_NON_VISE = 1
+   )
+   -------------------------------------
+) int
+order by MATRICULE, ID_ABSENCE_KRH, CODE_STATUT, DATE_STATUT

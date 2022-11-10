@@ -1,0 +1,138 @@
+{
+  code : "HAB_ENT_POP_M",
+  element : "ecran",
+  groupe : {
+    code : "HAB_ENTR_MODIF",
+    donnees : [ {
+      code : "HAB_MATRICULE",
+      element : "donnee",
+      entier : 50,
+      libelle : "Matricule",
+      masquerLibelle : true,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "N"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "#TEXTE",
+      element : "donnee",
+      libelle : "Collaborateur : ",
+      style : "FormTitre"
+    }, {
+      code : "HAB_NOMCOLLAB",
+      element : "donnee",
+      libelle : "NomPrenom",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "span",
+      style : "FDonneeG",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "HAB_ENTR_UTIL",
+      element : "donnee",
+      libelle : "Utilisateur",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      suffixe : "Utilisateur",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "HAB_ENTR_RESP",
+      element : "donnee",
+      libelle : "Responsable",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      suffixe : "Responsable",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "HAB_ENTR_EXP",
+      element : "donnee",
+      libelle : "Expert",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      suffixe : "Expert",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "HAB_ENTR_GEST",
+      element : "donnee",
+      libelle : "Gestionnaire",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      suffixe : "Gestionnaire",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "HAB_ENTR_DRH",
+      element : "donnee",
+      libelle : "Directeur RH",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      suffixe : "Directeur RH",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "HAB_ENTR_RRH",
+      element : "donnee",
+      libelle : "Responsable RH",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      suffixe : "Responsable RH",
+      type : "X"
+    }, {
+      code : "#EOL",
+      element : "donnee"
+    }, {
+      code : "HAB_ENTR_ACT",
+      element : "donnee",
+      libelle : "Acteur indirect",
+      longueur : 1,
+      masquerLibelle : true,
+      saisie : "checkbox",
+      style : "FDonneeG",
+      suffixe : "Acteur indirect",
+      type : "X"
+    }, {
+      code : "HAB_ENTR_ONGLET",
+      element : "donnee",
+      libelle : "Onglet Entretien",
+      longueur : 1,
+      saisie : "hidden",
+      style : "FDonneeG",
+      type : "X"
+    } ],
+    element : "groupe",
+    libelle : "modifier les habilitations d'un utilisateur"
+  },
+  libelle : "Modifier les habilitations entretien",
+  servicelet : "HabilitationUtilsateurJsonServlet",
+  type : "P"
+}

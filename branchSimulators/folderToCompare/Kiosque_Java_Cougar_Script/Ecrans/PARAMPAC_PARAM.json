@@ -1,0 +1,1346 @@
+{
+  boutons : "INT,MOD",
+  code : "PARAMPAC_PARAM",
+  element : "ecran",
+  groupe : {
+    code : "PARAMPAC_GRP",
+    donnees : [ {
+      code : "PARAMPAC_GENERAL_GRP",
+      donnees : [ {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_LANGUE",
+        element : "donnee",
+        libelle : "Langue par défaut",
+        longueur : 50,
+        saisie : "select-readonly",
+        style : "FDonneeG",
+        type : "X",
+        valeurs : [ {
+          code : "FR",
+          libelle : "FR"
+        }, {
+          code : " EN",
+          libelle : " EN"
+        } ]
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Gestion des arbres confondus",
+        style : "BoxLabel"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Option de gestion des arbres signataires et responsables",
+        style : "FDonneeG"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_AFF_ARBRES",
+        element : "donnee",
+        libelle : "Option d'affichage de l'arbre des signataires/responsables",
+        longueur : 100,
+        requete : "OptAffArbSignaResp_1",
+        retour : "#NON,#OUI",
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Utilisateurs hors paie (hors salariés importés en paie)",
+        style : "FormTitreItalic"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_HORSPAIE",
+        element : "donnee",
+        libelle : "Utilisateurs hors paie (hors salariés importés en paie) : Option de création",
+        longueur : 50,
+        requete : "HorsPaieOptCreation_1",
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_HPAIEHABIL",
+        element : "donnee",
+        libelle : "Utilisateurs hors paie (hors salariés importés en paie) : Option d'habilitation",
+        longueur : 50,
+        saisie : "select-readonly",
+        style : "FDonneeG",
+        type : "X",
+        valeurs : [ {
+          code : "0",
+          libelle : "Toutes sauf Collaborateur"
+        }, {
+          code : "2",
+          libelle : " Toutes"
+        } ]
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Affectation des collaborateurs",
+        style : "FormTitreItalic"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_STRORGA",
+        element : "donnee",
+        libelle : "Utilisation des structures organisationnelles",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        affichage : "GESTNONAFF",
+        code : " ORGAVISIBLE_GRP",
+        donnees : [ {
+          code : "PAC_PARAM_STRORGAID",
+          element : "donnee",
+          libelle : "Choix de la structure",
+          longueur : 50,
+          saisie : "select-readonly",
+          style : "FDonneeG",
+          type : "X",
+          valeurs : [ {
+            code : "2",
+            libelle : "Administrative"
+          }, {
+            code : "1",
+            libelle : "Juridique"
+          } ]
+        }, {
+          code : "#EOL",
+          element : "donnee"
+        }, {
+          code : "PAC_PARAM_STRORGALEV",
+          element : "donnee",
+          libelle : "Choix du niveau de structure",
+          longueur : 50,
+          saisie : "select-readonly",
+          style : "FDonneeG",
+          type : "X",
+          valeurs : [ {
+            code : "0",
+            libelle : "Tous"
+          }, {
+            code : "1",
+            libelle : " Region"
+          }, {
+            code : "2",
+            libelle : " Fonction"
+          }, {
+            code : "3",
+            libelle : " Direction"
+          }, {
+            code : "4",
+            libelle : " Filière"
+          }, {
+            code : "5",
+            libelle : "Centre de gestion"
+          }, {
+            code : "6",
+            libelle : " Service"
+          } ]
+        } ],
+        element : "groupe",
+        libelle : "orga visible"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        affichage : "GESTAFF",
+        code : " ORGANONVISIBLE_GRP",
+        donnees : [ {
+          code : "PAC_PARAM_LTRPERSO",
+          element : "donnee",
+          libelle : "Nom de la zone affectation",
+          longueur : 50,
+          saisie : "text",
+          style : "FDonneeG",
+          type : "X"
+        }, {
+          code : "#EOL",
+          element : "donnee"
+        }, {
+          affichage : "GESTAFF",
+          code : "PARAM_TEXTE",
+          donnees : [ {
+            code : "#TEXTE",
+            element : "donnee",
+            libelle : "Choix du LTR",
+            style : "BoxLabel"
+          }, {
+            code : "#TEXTE",
+            element : "donnee",
+            libelle : "Option non disponible pour les clients HRV non Decidium",
+            style : "FDonneeG"
+          }, {
+            code : "#EOL",
+            element : "donnee"
+          }, {
+            code : "#TEXTE",
+            element : "donnee",
+            libelle : "",
+            style : "FDonneeG"
+          }, {
+            code : "#TEXTE",
+            element : "donnee",
+            libelle : "Le choix du LTR peut être modifié en personnalisant l'import des zones CODE_SERVICE et LIBELLE_SERVI",
+            style : "FDonneeG"
+          } ],
+          element : "groupe",
+          libelle : "Texte"
+        } ],
+        element : "groupe",
+        libelle : ""
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Divers",
+        style : "FormTitreItalic"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_DELRETEN",
+        element : "donnee",
+        libelle : "Délai de rétention des fichiers (jours)",
+        longueur : 2,
+        saisie : "text",
+        style : "FDonneeG",
+        suffixe : "Jours",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      } ],
+      element : "groupe",
+      libelle : "Général",
+      onglet : true
+    }, {
+      code : "PARAMPAC_ENTRETIEN_GRP",
+      donnees : [ {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_OPT_MPE",
+        element : "donnee",
+        libelle : "Option de mise en place \"Entretien\"",
+        longueur : 50,
+        requete : "OPT_MEP_ENTR_1",
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_NGE",
+        element : "donnee",
+        libelle : "Niveau de gestion des entretiens",
+        longueur : 50,
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X",
+        valeurs : [ {
+          code : "1",
+          libelle : "niveau RH1"
+        }, {
+          code : "2",
+          libelle : "niveau RH2"
+        } ]
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_GAS",
+        element : "donnee",
+        libelle : "Gestion des axes stratégiques entreprise",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Bilan formation",
+        style : "FormTitreItalic"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_FROID",
+        element : "donnee",
+        libelle : "Présence du bilan formation dans les entretiens",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Fiches de poste",
+        style : "FormTitreItalic"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_EMISSION",
+        element : "donnee",
+        libelle : "Gestion de la visualisation des missions",
+        longueur : 50,
+        requete : "GEST_VISU_MISSION_1",
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARA_POSTE_COLL",
+        element : "donnee",
+        libelle : "Suivi de sa fiche de poste par le collaborateur",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_FICHE_INDI",
+        element : "donnee",
+        libelle : "Gestion de la visualisation des fiches individuelles",
+        longueur : 50,
+        requete : "GEST_VISU_FICHE_INDIV_1",
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Fiches individuelles",
+        style : "FormTitreItalic"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_FICHE_COLL",
+        element : "donnee",
+        libelle : "Suivi de sa fiche individuelle par le collaborateur",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Visualisation des onglets \"Rémunération\"",
+        style : "BoxLabel"
+      }, {
+        code : "PAC_PARAM_REM_COLL",
+        element : "donnee",
+        libelle : "Visualisation des onglets \"Rémunération\" et \"Modèle de rémunération\" par le collaborateur",
+        longueur : 1,
+        masquerLibelle : true,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        suffixe : "Par le collaborateur",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "et \"Modèle de rémunération\"",
+        style : "BoxLabel"
+      }, {
+        code : "PAC_PARAM_REM_RESP",
+        element : "donnee",
+        libelle : "Visualisation des onglets \"Rémunération\" et \"Modèle de rémunération\" par le responsable",
+        longueur : 1,
+        masquerLibelle : true,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        suffixe : "Par le responsable",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "PAC_PARAM_REM_GEST",
+        element : "donnee",
+        libelle : "Visualisation des onglets \"Rémunération\" et \"Modèle de rémunération\" par le gestionnaire",
+        longueur : 1,
+        masquerLibelle : true,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        suffixe : "Par le gestionnaire",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Historisation",
+        style : "FormTitreItalic"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_ANN_HISTO",
+        element : "donnee",
+        libelle : "Nombre d'années visualisables",
+        longueur : 50,
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X",
+        valeurs : [ {
+          code : "0",
+          libelle : "Année en cours"
+        }, {
+          code : "1",
+          libelle : "1 an"
+        }, {
+          code : "2",
+          libelle : "2 ans"
+        } ]
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      } ],
+      element : "groupe",
+      libelle : "Entretien",
+      onglet : true
+    }, {
+      code : "PARAMPAC_FORM_GRP",
+      donnees : [ {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_OPT_MF",
+        element : "donnee",
+        libelle : "Option de mise en place \"Formation\"",
+        longueur : 50,
+        requete : "OPT_MEP_FORM_1",
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_GASF",
+        element : "donnee",
+        libelle : "Gestion des axes stratégiques formation",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "CPF",
+        style : "FormTitreItalic"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_DRDF",
+        element : "donnee",
+        libelle : "Délai pour répondre à une demande de formation",
+        longueur : 2,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Délais d'alerte tableau de bord",
+        style : "FormTitreItalic"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_DAAFFALT",
+        element : "donnee",
+        libelle : "Délai avant affichage des alertes dans le tableau de bord de l'expert",
+        longueur : 5,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_DAEXP",
+        element : "donnee",
+        libelle : "Délai pour alerte avant expiration d'une formation à durée de validité",
+        longueur : 5,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Délai avant/après la fin de session/séquence pour la saisie des absences",
+        style : "BoxLabel"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "avant",
+        style : "BoxLabel"
+      }, {
+        code : "PAC_PARAM_DAFS",
+        element : "donnee",
+        libelle : "Délai avant la fin de session/séquence pour la saisie des absences",
+        longueur : 5,
+        masquerLibelle : true,
+        saisie : "text",
+        style : "FDonneeG",
+        suffixe : "Jours",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_DAPFS",
+        element : "donnee",
+        libelle : "Délai après la fin de session/séquence pour la saisie des absences",
+        longueur : 5,
+        saisie : "text",
+        style : "FDonneeG",
+        suffixe : "Jours",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Sessions / Séquences",
+        style : "FormTitreItalic"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_DJF",
+        element : "donnee",
+        libelle : "Durée d'une journée de formation",
+        longueur : 5,
+        saisie : "text",
+        style : "FDonneeG",
+        suffixe : "heures",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_HDF",
+        element : "donnee",
+        libelle : "Heure de début des séquences (par défaut)",
+        longueur : 5,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_HFS",
+        element : "donnee",
+        libelle : "Heure de fin des séquences (par défaut)",
+        longueur : 5,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Demandes de formation",
+        style : "FormTitreItalic"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAMGDINDIVCOLL",
+        element : "donnee",
+        libelle : "Gestion des demandes individuelles par le collaborateur",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAMGDINDIVRESP",
+        element : "donnee",
+        libelle : "Gestion des demandes individuelles par le responsable",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAMGDCOLL",
+        element : "donnee",
+        libelle : "Gestion des demandes collectives par le collaborateur",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Inscription aux sessions",
+        style : "FormTitreItalic"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Gestion des inscriptions",
+        style : "BoxLabel"
+      }, {
+        code : "PAC_PARAM_GINSCRESP",
+        element : "donnee",
+        libelle : "Gestion des inscriptions par le responsable",
+        longueur : 1,
+        masquerLibelle : true,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        suffixe : "Par le responsable",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "PAC_PARAMGINSCRICOLL",
+        element : "donnee",
+        libelle : "Gestion des inscriptions par le collaborateur",
+        longueur : 1,
+        masquerLibelle : true,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        suffixe : "Par le collaborateur",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Délai minimum entre la demande d'inscription par le responsable ou le collaborateur",
+        style : "BoxLabel"
+      }, {
+        code : "PAC_PARAM_DDINS",
+        element : "donnee",
+        libelle : "Délai minimum session",
+        longueur : 3,
+        masquerLibelle : true,
+        saisie : "text",
+        style : "FDonneeG",
+        suffixe : "jours ouvrés",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "et le début de la session",
+        style : "BoxLabel"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Délai minimum entre la demande de suppression d'inscription par le responsable",
+        style : "BoxLabel"
+      }, {
+        code : "PAC_PARAM_DMEDISUPP",
+        element : "donnee",
+        libelle : "Délai minimum entre la demande de suppression ",
+        longueur : 3,
+        masquerLibelle : true,
+        saisie : "text",
+        style : "FDonneeG",
+        suffixe : "jours ouvrés",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "ou le collaborateur et le début de la session",
+        style : "BoxLabel"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Fiches individuelles",
+        style : "FormTitreItalic"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_FICHEINDIF",
+        element : "donnee",
+        libelle : "Gestion de la visualisation des fiches individuelles",
+        longueur : 50,
+        requete : "OPT_KRH_FORM_FICHE_INDIV_1",
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_FICHECOLLF",
+        element : "donnee",
+        libelle : "Suivi de sa fiche individuelle par le collaborateur",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Visualisation du salaire horaire formation dans l'onglet \"Informations générales\"",
+        style : "BoxLabel"
+      }, {
+        code : "PAC_PARAM_SCOLL",
+        element : "donnee",
+        libelle : " par le collaborateur",
+        longueur : 1,
+        masquerLibelle : true,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        suffixe : "Par le collaborateur",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "PAC_PARAM_SRESP",
+        element : "donnee",
+        libelle : " par le responsable",
+        longueur : 1,
+        masquerLibelle : true,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        suffixe : "Par le responsable",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "PAC_PARAM_SGEST",
+        element : "donnee",
+        libelle : " par le gestionnaire",
+        longueur : 1,
+        masquerLibelle : true,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        suffixe : "Par le gestionnaire",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Gestion des frais réels",
+        style : "FormTitreItalic"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_CH",
+        element : "donnee",
+        libelle : "Coût horaire (imputabilité de l'organisation administrative)",
+        longueur : 5,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_TH",
+        element : "donnee",
+        libelle : "Taux horaire formation moyen",
+        longueur : 5,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "(Laisser le champ à vide si vous ne souhaitez pas gérer l'estimation des coûts salariaux dans",
+        style : "FDonneeG"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "le cas d'une demande collective non nominative.)",
+        style : "FDonneeG"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Historisation",
+        style : "FormTitreItalic"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_FORMAHIST",
+        element : "donnee",
+        libelle : "Nombre d'années visualisables",
+        longueur : 50,
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X",
+        valeurs : [ {
+          code : "0",
+          libelle : "Année en cours"
+        }, {
+          code : "1",
+          libelle : "1 an"
+        }, {
+          code : "2",
+          libelle : "2 ans"
+        } ]
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "Interface avec absence",
+        style : "FormTitreItalic"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_MAJP",
+        element : "donnee",
+        libelle : "Mise à jour du planning",
+        longueur : 1,
+        saisie : "checkbox",
+        style : "FDonneeG",
+        type : "X"
+      } ],
+      element : "groupe",
+      libelle : "Formation",
+      onglet : true
+    }, {
+      code : "PARAMPAC_RDT_GRP",
+      donnees : [ {
+        code : "#TEXTE",
+        element : "donnee",
+        libelle : "",
+        style : "FDonneeG"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_OPT_MPRDT",
+        element : "donnee",
+        libelle : "Option de mise en place \"Revue des Talents\"",
+        longueur : 50,
+        requete : "OPT_MEP_RDT_1",
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X"
+      } ],
+      element : "groupe",
+      libelle : "Revue des Talents",
+      onglet : true
+    }, {
+      code : "PARAMPAC_MAIL_GRP",
+      donnees : [ {
+        code : "PAC_PARAM_OPTMHTML",
+        element : "donnee",
+        libelle : "Option de construction des textes des emails",
+        longueur : 50,
+        saisie : "select",
+        style : "FDonneeG",
+        type : "X",
+        valeurs : [ {
+          code : "MHTML",
+          libelle : "Textes en Mime HTML"
+        }, {
+          code : "TSM",
+          libelle : "Textes simples Mime"
+        }, {
+          code : "HTML",
+          libelle : "Textes en HTML"
+        }, {
+          code : "TS",
+          libelle : "Textes simples"
+        } ]
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_MRETADP",
+        element : "donnee",
+        libelle : "Email ADP en cas de retour",
+        longueur : 50,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_MRFROMADP",
+        element : "donnee",
+        libelle : "Adresses des emails internes transmis par ADP (Anti-SPAM)",
+        longueur : 50,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_MAILVERIF",
+        element : "donnee",
+        libelle : "Contenu pour vérification des emails utilisateurs séparés par des points-virgules",
+        longueur : 50,
+        saisie : "text",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_DELAIRETEN",
+        element : "donnee",
+        libelle : "Délai de rétention des emails",
+        longueur : 50,
+        saisie : "text",
+        style : "FDonneeG",
+        suffixe : "min",
+        type : "X"
+      } ],
+      element : "groupe",
+      libelle : "Mail",
+      onglet : true
+    }, {
+      code : "PARAMPAC_IMG_GRP",
+      donnees : [ {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_IMG1",
+        element : "donnee",
+        libelle : "Image n°1",
+        longueur : 4000,
+        minuscle : true,
+        saisie : "asynchroneUploadFile",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_IMG2",
+        element : "donnee",
+        libelle : "Image n°2",
+        longueur : 4000,
+        minuscle : true,
+        saisie : "asynchroneUploadFile",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_IMG3",
+        element : "donnee",
+        libelle : "Image n°3",
+        longueur : 4000,
+        minuscle : true,
+        saisie : "asynchroneUploadFile",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_IMG4",
+        element : "donnee",
+        libelle : "Image n°4",
+        longueur : 4000,
+        minuscle : true,
+        saisie : "asynchroneUploadFile",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_IMG5",
+        element : "donnee",
+        libelle : "Image n°5",
+        longueur : 4000,
+        minuscle : true,
+        saisie : "asynchroneUploadFile",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_IMG6",
+        element : "donnee",
+        libelle : "Image n°6",
+        longueur : 4000,
+        minuscle : true,
+        saisie : "asynchroneUploadFile",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_IMG7",
+        element : "donnee",
+        libelle : "Image n°7",
+        longueur : 4000,
+        minuscle : true,
+        saisie : "asynchroneUploadFile",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_IMG8",
+        element : "donnee",
+        libelle : "Image n°8",
+        longueur : 4000,
+        minuscle : true,
+        saisie : "asynchroneUploadFile",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_IMG9",
+        element : "donnee",
+        libelle : "Image n°9",
+        longueur : 4000,
+        minuscle : true,
+        saisie : "asynchroneUploadFile",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_IMG10",
+        element : "donnee",
+        libelle : "Image n°10",
+        longueur : 4000,
+        minuscle : true,
+        saisie : "asynchroneUploadFile",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_IMG11",
+        element : "donnee",
+        libelle : "Image n°11",
+        longueur : 4000,
+        minuscle : true,
+        saisie : "asynchroneUploadFile",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_IMG12",
+        element : "donnee",
+        libelle : "Image n°12",
+        longueur : 4000,
+        minuscle : true,
+        saisie : "asynchroneUploadFile",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_IMG13",
+        element : "donnee",
+        libelle : "Image n°13",
+        longueur : 4000,
+        minuscle : true,
+        saisie : "asynchroneUploadFile",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_IMG14",
+        element : "donnee",
+        libelle : "Image n°14",
+        longueur : 4000,
+        minuscle : true,
+        saisie : "asynchroneUploadFile",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_IMG15",
+        element : "donnee",
+        libelle : "Image n°15",
+        longueur : 4000,
+        minuscle : true,
+        saisie : "asynchroneUploadFile",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_IMG16",
+        element : "donnee",
+        libelle : "Image n°16",
+        longueur : 4000,
+        minuscle : true,
+        saisie : "asynchroneUploadFile",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_IMG17",
+        element : "donnee",
+        libelle : "Image n°17",
+        longueur : 4000,
+        minuscle : true,
+        saisie : "asynchroneUploadFile",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_IMG18",
+        element : "donnee",
+        libelle : "Image n°18",
+        longueur : 4000,
+        minuscle : true,
+        saisie : "asynchroneUploadFile",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_IMG19",
+        element : "donnee",
+        libelle : "Image n°19",
+        longueur : 4000,
+        minuscle : true,
+        saisie : "asynchroneUploadFile",
+        style : "FDonneeG",
+        type : "X"
+      }, {
+        code : "#EOL",
+        element : "donnee"
+      }, {
+        code : "PAC_PARAM_IMG20",
+        element : "donnee",
+        libelle : "Image n°20",
+        longueur : 4000,
+        minuscle : true,
+        saisie : "asynchroneUploadFile",
+        style : "FDonneeG",
+        type : "X"
+      } ],
+      element : "groupe",
+      libelle : "Image",
+      onglet : true
+    } ],
+    element : "groupe",
+    libelle : "PARAMPAC_GRP"
+  },
+  libelle : "Paramétrage du pac",
+  servicelet : "ParamPacClientJsonServlet",
+  type : "U"
+}

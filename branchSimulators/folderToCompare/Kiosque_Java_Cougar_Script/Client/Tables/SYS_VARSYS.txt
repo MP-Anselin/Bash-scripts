@@ -1,0 +1,14 @@
+##
+SYS_VARSYS
+=SQL IFNOTEXIST=SYS_VARSYS=
+CREATE TABLE SYS_VARSYS ( MODULE VARCHAR2(3) NOT NULL ENABLE, CODVAR VARCHAR2(50) NOT NULL ENABLE, VALVAR VARCHAR2(4000), TYPVAR VARCHAR2(10), DESCRIPTION VARCHAR2(2000), PRIMARY KEY (MODULE, CODVAR) ) 
+##
+SYS_VARSYS
+==
+DELETE FROM SYS_VARSYS WHERE module='SYS' and codvar='TGE'
+'SYS','TGE','true','Booléen','TRUE : si on gère les écrans dans le cadre d''un client Zadig TGE, FALSE sinon.'
+##
+SYS_VARSYS
+==
+DELETE FROM SYS_VARSYS WHERE MODULE = 'STD' AND CODVAR = 'DESK_NOM_CLIENT'
+'STD','DESK_NOM_CLIENT','ADP','Texte','A la place du logo de l''entreprise, il est possible d''afficher le nom du client au format texte'

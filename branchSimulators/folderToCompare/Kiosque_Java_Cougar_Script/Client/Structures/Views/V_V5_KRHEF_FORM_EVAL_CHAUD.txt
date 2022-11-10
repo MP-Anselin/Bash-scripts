@@ -1,0 +1,169 @@
+##
+V_V5_KRHEF_FORM_EVAL_CHAUD
+=SQL=
+CREATE OR REPLACE VIEW V_V5_KRHEF_FORM_EVAL_CHAUD ("TYPE_EVAL","TYPE_EVAL_FULL","ID_SESSION","SESSION_EVALUABLE","PROFIL_EVALUABLE","MATRICULE","ID_INSCRIPTION","ID_INSCRIPTION_REF","NUM_SEQ","FORM_DEFINITION_ID","FORM_INSTANCE_ID","FORM_INSTANCE_DATE_CREATION","FORM_INSTANCE_DATE_CLOTURE","FORMATION_STATUS","EVALUATION_STATUS","WF_DEMANDE_ID","WF_DEMANDE_ETAT","WF_SAISIR_REPONSE_ETAT","WF_SAISIR_REPONSE_DATE","WF_VALIDER_REPONSE_ETAT","WF_VALIDER_REPONSE_DATE") AS 
+select
+                  'FormEvalChaud'                   as TYPE_EVAL
+                , kgrbt.DEF_TYPE                    as TYPE_EVAL_FULL
+
+                -- session
+                , sess_ec.ID_SESSION                as ID_SESSION
+                , sess_ec.EVAL_CHAUD                as SESSION_EVALUABLE
+
+                -- évaluable selon l'option du profil OPT_KRH_FORM_DT_NO_EVAL_CHAUD
+                , case when sess_ec.DATE_FIN >= profil_ec.OPT_KRH_FORM_DT_NO_EVAL_CHAUD
+                       then 1
+                       else 0
+                       end                          as PROFIL_EVALUABLE
+
+                -- inscription collaborateur
+                , insc_ec.COLLABORATEUR             as MATRICULE
+                , insc_ec.ID_INSCRIPTION            as ID_INSCRIPTION
+                , insc_ec.ID_INSCRIPTION_REF        as ID_INSCRIPTION_REF
+                , insc_ec.NUM_SEQ                   as NUM_SEQ
+
+                -- identifiant du formulaire par anticipation si aucune instance
+                , case
+                        -- Evaluation statiques (use 0)
+                        when (insc_ec.DATE_EVALUATION is not null
+                             and insc_ec.ID_KSQFORM_GEN_INST_CHAUD is null)
+                        then 0
+
+                        -- Evaluation à faire et non initialisée (use anticipation)
+                        when inst_ec.ID_KSQFORM_GEN_DEF is null
+                        then kgrbt.ID_KSQFORM_GEN_DEF
+
+                        -- Utilise la valeur standard
+                        else inst_ec.ID_KSQFORM_GEN_DEF
+                   end                              as FORM_DEFINITION_ID
+
+                -- instance du formulaire d'évaluation
+                , inst_ec.ID_KSQFORM_GEN_INSTANCE   as FORM_INSTANCE_ID
+                , inst_ec.DATE_CREATION             as FORM_INSTANCE_DATE_CREATION
+                , inst_ec.DATE_CLOTURE              as FORM_INSTANCE_DATE_CLOTURE
+
+                -- statut de la formation effectué ou non
+                , case  -- formation effectuée
+                        when (insc_ec.SESSION_EFFECTUE is not null
+                              or insc_ec.SESSION_SEMI_EFFECTUE is not null)
+                        then 'EVALUATION_FORM_EFFECTUEE'
+
+                        -- formation reportée
+                        when (insc_ec.DATE_REPORT is not null)
+                        then 'EVALUATION_FORM_REPORTEE'
+
+                        -- formation annulée
+                        when (insc_ec.ANNULATION_STAGIAIRE is not null
+                           or insc_ec.ANNULATION_ORGANISME is not null)
+                        then 'EVALUATION_FORM_ANNULEE'
+
+                        -- formation non effectuée
+                        else 'EVALUATION_FORM_NON_EFFECTUE'
+                  end                                     as FORMATION_STATUS
+
+                -- la session doit etre evaluée a chaud
+                , case
+                       -- évaluation à chaud effectuée précédemment
+                       when (insc_ec.DATE_EVALUATION is not null
+                             and insc_ec.ID_KSQFORM_GEN_INST_CHAUD is null)
+                       then 'EVALUATION_STATIQUE'
+
+                       -- évaluation à chaud cloturée
+                       -- (quels que soient les statuts du WF et de la formation)
+                       when (inst_ec.DATE_CLOTURE is not null)
+                       then 'EVALUATION_CLOTUREE'
+
+                        -- formation effectuée
+                        when (insc_ec.GESTION_HEURES_EFFECTUE is not null
+                            and (insc_ec.SESSION_EFFECTUE is not null
+                              or insc_ec.SESSION_SEMI_EFFECTUE is not null)
+                            and insc_ec.DATE_REPORT is null
+                            and sess_ec.DATE_FIN >= profil_ec.OPT_KRH_FORM_DT_NO_EVAL_CHAUD
+                            and sess_ec.EVAL_CHAUD = 1
+                        )
+                        then (
+                                case
+                                    when (inst_ec.ID_KSQFORM_GEN_INSTANCE is not null
+                                          and insc_wf.WF_STATUS_EVAL_CHAUD = 'W'
+                                          and insc_wf.WF_ACT_STATUS_EVC_VALIDER = 'W')
+                                    then 'EVALUATION_A_VALIDER'
+
+                                    -- évaluation à chaud en cours (informatif)
+                                    when (inst_ec.ID_KSQFORM_GEN_INSTANCE is not null)
+                                    then 'EVALUATION_EN_COURS'
+
+                                    -- évaluation à chaud hors entretien à venir
+                                    when (insc_wf.WF_STATUS_EVAL_CHAUD = 'W'
+                                          and insc_wf.WF_ACT_STATUS_EVC_SAISIR = 'W')
+                                    then 'EVALUATION_A_SAISIR'
+
+                                    -- évaluation à chaud à effectuer
+                                    else 'EVALUATION_EN_ATTENTE'
+                                 end
+                             )
+
+                       -- évaluation à chaud à ne pas faire
+                       else 'EVALUATION_INACTIVE'
+                  end                                   as EVALUATION_STATUS
+
+                , insc_wf.ID_WF_DEM_EVAL_CHAUD          as WF_DEMANDE_ID
+                , insc_wf.WF_STATUS_EVAL_CHAUD          as WF_DEMANDE_ETAT
+                , insc_wf.WF_ACT_STATUS_EVC_SAISIR      as WF_SAISIR_REPONSE_ETAT
+                , insc_wf.WF_ACT_DATE_EVC_SAISIR        as WF_SAISIR_REPONSE_DATE
+                , insc_wf.WF_ACT_STATUS_EVC_VALIDER     as WF_VALIDER_REPONSE_ETAT
+                , insc_wf.WF_ACT_DATE_EVC_VALIDER       as WF_VALIDER_REPONSE_DATE
+
+
+             from T_V5_KRHEF_FORMATION_INSCR insc_ec
+
+               -- Jointure de la demande
+             join V_V5_KRHEF_FORM_DEMANDE dem
+               on dem.ID_FORMATION_DEMANDE = insc_ec.ID_FORMATION_DEMANDE
+
+               -- Jointure session
+             join T_V5_KRHEF_SESSION sess_ec
+               on sess_ec.ID_SESSION = insc_ec.ID_SESSION
+
+               -- Jointure table d'anticipation des ID_KSQFORM_GEN_DEF
+             join T_V5_KSQFORM_GEN_REF kgrbt
+               on kgrbt.ID_KSQFORM_GEN_REF = (
+                select sr.ID_KSQFORM_GEN_REF
+                  from T_V5_KSQFORM_GEN_REF sr
+                 where sr.REFERENCES_V1 in (select ID_POPULATION from T_V5_KRH_POPULATION where MATRICULE = insc_ec.COLLABORATEUR)
+                   and sr.ORDRE = (
+                    select max(ORDRE)
+                      from T_V5_KSQFORM_GEN_REF
+                     where DEF_TYPE = sr.DEF_TYPE
+                       and REFERENCES_V1 in (select ID_POPULATION from T_V5_KRH_POPULATION where MATRICULE = insc_ec.COLLABORATEUR)
+                   )
+                   and sr.DEF_TYPE = decode(
+                  dem.INTERNE
+                , 1, 'FormEvalChaudInterne'
+                , 0, 'FormEvalChaudExterne')
+                )
+
+               -- Jointure KsqFormGenInstance
+        left join T_V5_KSQFORM_GEN_INSTANCE inst_ec
+               on inst_ec.EXT_ID = insc_ec.ID_INSCRIPTION
+              and inst_ec.EXT_TBL = 'T_V5_KRHEF_FORMATION_INSCR'
+              and inst_ec.ID_KSQFORM_GEN_DEF in (
+                -- filtrage des définitions pour évaluation a chaud uniquement
+                select distinct def_ec.ID_KSQFORM_GEN_DEF
+                  from T_V5_KSQFORM_GEN_DEF def_ec
+                 where def_ec.DEF_TYPE = decode(
+                  dem.INTERNE
+                , 1, 'FormEvalChaudInterne'
+                , 0, 'FormEvalChaudExterne')
+              )
+
+               -- Jointure T_V5_KRHEF_FORMATION_INSCR_WF
+        left join T_V5_KRHEF_FORMATION_INSCR_WF insc_wf
+               on insc_wf.ID_INSCRIPTION_REF = insc_ec.ID_INSCRIPTION_REF
+              and insc_wf.WF_STATUS_EVAL_CHAUD != 'S'
+
+               -- Jointure profil utilisateur
+        left join T_V5_KRH_PROFIL_USER profil_ec
+               on profil_ec.MATRICULE = insc_ec.COLLABORATEUR
+
+            where insc_ec.NUM_SEQ = 0
+              and insc_ec.ID_ACTEUR_FORM is null

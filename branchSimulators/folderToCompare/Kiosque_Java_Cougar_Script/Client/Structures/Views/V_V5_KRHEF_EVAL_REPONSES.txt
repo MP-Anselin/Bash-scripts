@@ -1,0 +1,108 @@
+##
+V_V5_KRHEF_EVAL_REPONSES
+=SQL=
+CREATE OR REPLACE VIEW V_V5_KRHEF_EVAL_REPONSES ("FORMULAIRE_ID","ORDRE_GROUPE","LEGENDE_GROUPE","QUESTION_LANGUE","QUESTION_TYPE","QUESTION_IS_REQUIS","QUESTION_ORDRE","QUESTION_BAREME_ID","QUESTION_INDEX","QUESTION_LIBELLE","REPONSE_CHOIX","REPONSE_CHAINE") AS 
+select
+                ins.ID_KSQFORM_GEN_INSTANCE         as FORMULAIRE_ID,
+                grp.ORDRE                           as ORDRE_GROUPE,
+                grp.LEGEND                          as LEGENDE_GROUPE,
+                elt.LANGUE                          as QUESTION_LANGUE,
+                elt.ELT_TYPE                        as QUESTION_TYPE,
+                elt.REQUIS                          as QUESTION_IS_REQUIS,
+                elt.ORDRE                           as QUESTION_ORDRE,
+                opt.OPT_VALEUR                      as QUESTION_BAREME_ID,
+                val.MLT_KEY                         as QUESTION_INDEX,
+                nvl(cxlib.CHOICE_VALUE, elt.LABEL)  as QUESTION_LIBELLE,
+                val.CHOICE                          as REPONSE_CHOIX,
+                case
+                    when (cxval.CHOICE_VALUE is not null )
+                    then cxval.CHOICE_VALUE
+                    when (bdi.LIBELLE is not null)
+                    then bdi.LIBELLE
+                    when (bdf.CODE in ('ETOILES3', 'ETOILES', 'JAUGE', 'VALEUR'))
+                    then val.CHOICE
+                    when (bdf.CODE = 'PLUS')
+                    then
+                        case
+                            when (val.CHOICE = 75)
+                            then '++'
+                            when (val.CHOICE = 50)
+                            then '+'
+                            when (val.CHOICE = 25)
+                            then '+-'
+                            when (val.CHOICE = 0)
+                            then '-'
+                            else NULL
+                        end
+                    when (elt.ELT_TYPE = 'AraigneeEvaluation')
+                    then
+                        case
+                            when (val.CHOICE = 100)
+                            then decode(elt.LANGUE, 'EN', 'Very well', 'CH', 'Sehr gut', 'Très bien')
+                            when (val.CHOICE = 75)
+                            then decode(elt.LANGUE, 'EN', 'Well', 'CH', 'Gut', 'Bien')
+                            when (val.CHOICE = 50)
+                            then decode(elt.LANGUE, 'EN', 'Average', 'CH', 'Durchschnittlich', 'Moyen')
+                            when (val.CHOICE = 25)
+                            then decode(elt.LANGUE, 'EN', 'Insufficient', 'CH', 'Unzureichend', 'Insuffisant')
+                        end
+                    when (elt.ELT_TYPE = 'NotationSmiley')
+                    then
+                        case
+                            when (val.CHOICE = 100)
+                            then decode(elt.LANGUE, 'EN', 'Very satisfying', 'CH', 'Sehr zufriedenstellend', 'Très satisfaisant')
+                            when (val.CHOICE = 75)
+                            then decode(elt.LANGUE, 'EN', 'Satisfying', 'CH', 'Zufriedenstellend', 'Satisfaisant')
+                            when (val.CHOICE = 50)
+                            then decode(elt.LANGUE, 'EN', 'Insufficient', 'CH', 'Ungenügend', 'Insuffisant')
+                            when (val.CHOICE = 25)
+                            then decode(elt.LANGUE, 'EN', 'Very insufficient', 'CH', 'Sehr ungenügend', 'Très insuffisant')
+                        end
+                    else val.STRING
+                end                                 as REPONSE_CHAINE
+
+        from T_V5_KSQFORM_GEN_INSTANCE ins
+
+        join T_V5_KSQFORM_GEN_VAL val
+          on val.ID_KSQFORM_GEN_INSTANCE = ins.ID_KSQFORM_GEN_INSTANCE
+
+        join T_V5_KSQFORM_GEN_DEF_ELT elt
+          on elt.ID_KSQFORM_GEN_DEF_ELT = val.ID_KSQFORM_GEN_DEF_ELT
+
+        join T_V5_KSQFORM_GEN_DEF_GRP grp
+          on grp.ID_KSQFORM_GEN_DEF_GRP = elt.ID_KSQFORM_GEN_DEF_GRP
+         and grp.LANGUE = elt.LANGUE
+
+        join T_V5_KSQFORM_GEN_DEF def
+          on def.ID_KSQFORM_GEN_DEF = grp.ID_KSQFORM_GEN_DEF
+         and def.LANGUE = grp.LANGUE
+
+   left join V_V5_KSQFORM_GEN_CHOICES cxlib
+          on cxlib.ID_KSQFORM_GEN_DEF_ELT = elt.ID_KSQFORM_GEN_DEF_ELT
+         and cxlib.CHOICE_LOCALE = elt.LANGUE
+         and cxlib.CHOICE_KEY in ('Labels', 'label')
+         and nvl(cxlib.MLT_KEY, -1) = nvl(regexp_substr(val.MLT_KEY, '^.*([0-9]+).*$', 1, 1, 'i', 1), -1)
+
+   left join V_V5_KSQFORM_GEN_CHOICES cxval
+          on cxval.ID_KSQFORM_GEN_DEF_ELT = elt.ID_KSQFORM_GEN_DEF_ELT
+         and cxval.CHOICE_LOCALE = elt.LANGUE
+         and cxval.CHOICE_KEY in ('Values')
+         and cxval.MLT_KEY = val.CHOICE
+
+   left join T_V5_KSQFORM_GEN_DEF_OPT opt
+          on opt.OPT_REF_ID = elt.ID_KSQFORM_GEN_DEF_ELT
+         and opt.OPT_TYPE = 'baremeId'
+         and val.MLT_KEY like '%bareme'
+
+   left join T_V5_KRHEF_BAREME_RH brh
+          on brh.ID_BAREME = opt.OPT_VALEUR
+
+   left join T_V5_KRHEF_BAREME_DEF bdf
+          on bdf.ID_BAREME_DEF = brh.ID_BAREME_DEF
+
+   left join T_V5_KRHEF_BAREME_DEF_ITEM bdi
+          on bdi.ID_BAREME_DEF = bdf.ID_BAREME_DEF
+         and bdi.LANGUE = elt.LANGUE
+         and bdi.POURCENTAGE = val.CHOICE
+
+       where elt.ELT_TYPE NOT IN ('StaticImage', 'EnteteEvaluation')

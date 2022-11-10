@@ -1,0 +1,23 @@
+##
+META_REGLEGESTION_ERREUR
+=SQL=
+CREATE OR REPLACE FORCE VIEW META_REGLEGESTION_ERREUR ("ID_REGLEGESTION", "OPERATEUR", "CODERR", "CODMOD", "CODLANG", "NIV_DEFINITION", "LIBERR", "TYPERR")
+AS
+  SELECT id_reglegestion,
+    operateur,
+    sys_def_erreurs."CODERR",
+    sys_def_erreurs."CODMOD",
+    sys_def_erreurs."CODLANG",
+    sys_def_erreurs."NIV_DEFINITION",
+    sys_def_erreurs."LIBERR",
+    sys_def_erreurs."TYPERR"
+  FROM
+    ( SELECT DISTINCT id_reglegestion,
+      operateur,
+      REPLACE(regexp_substr(SUBSTR(OPERANDE2,11),'[^£]*£?',1,2),'£') AS regerr
+    FROM META_REGLEGESTION
+    ),
+    sys_def_erreurs
+  WHERE operateur IN ('ERR','WAR','CONFIRM')
+  AND regerr       =coderr
+  

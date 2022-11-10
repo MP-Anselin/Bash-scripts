@@ -1,0 +1,20 @@
+{
+  boutons : "INT",
+  code : "PLAN_FORM",
+  element : "ecran",
+  groupe : {
+    code : "PLAN_FORM_GRP",
+    donnees : [ {
+      code : "#TABLEAU",
+      element : "donnee",
+      pageAjout : "PLAN_FORM_POP",
+      pageModif : "PLAN_FORM_POP_M",
+      requete : "PLAN_FORM_1"
+    } ],
+    element : "groupe",
+    libelle : "PLAN_FORM_GRP"
+  },
+  libelle : "Gestion des plans",
+  servicelet : "FormationPlanJsonServlet",
+  type : "U"
+}
