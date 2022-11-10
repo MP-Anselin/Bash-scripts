@@ -1,19 +1,23 @@
 #!/bin/bash
 
 ## Static global with the path ot the subfolder diff-project
-DIR='myGitDiffBranches'
-LOG_PATH="$DIR"'/log'
+CURRENT_FOLDER="./scripts/gitDiffMergeTxt"
+DIR="$CURRENT_FOLDER/results"
+LOG_PATH="$DIR/log"
+
+SCRIPT_NAME="gitdiff-branches-data"
+SCRIPT_PATH="$CURRENT_FOLDER/bash/$SCRIPT_NAME"
 
 GIT_DIFF_BRANCHES='git-diff-branches.log'
-GIT_DIFF_BRANCH_PATH="$LOG_PATH"/"$GIT_DIFF_BRANCHES"
+GIT_DIFF_BRANCH_PATH="$LOG_PATH/$GIT_DIFF_BRANCHES"
 
 DIFFERENCE='differences.log'
-DIFFERENCE_PATH="$LOG_PATH"/"$DIFFERENCE"
+DIFFERENCE_PATH="$LOG_PATH/$DIFFERENCE"
 
 MERGE_FILE='git-diff-merge-file-mod.txt'
-MERGE_PATH="$DIR"/"$MERGE_FILE"
+MERGE_PATH="$DIR/$MERGE_FILE"
 
-PATH_FIRST_SCRIPT="./scripts/gitdiff-with-line"
+PATH_FIRST_SCRIPT="$CURRENT_FOLDER/bash/gitdiff-with-line"
 
 #Function to check if the line receive as param content the git annotation of differences:
 #@@ -
@@ -340,7 +344,10 @@ createDiffFolder() {
 }
 
 help() {
-  echo ./gitdiff-branch-data '{ branch to be compare A }' '{branch to compareB}  {folder where are the file}'
+  echo ".$SCRIPT_PATH param1 param2 param3"
+  echo "param1: { branch to be compare A }"
+  echo "param2: {branch to compare B }"
+  echo "param3: { folder where are the file }"
   exit 0
 }
 
@@ -352,14 +359,16 @@ welcome() {
 
 main() {
   welcome
+  if [[ $1 == "--help" ]]; then
+    help
+  fi
+
   createDiffFolder
   local branchA=$1
   local branchB=$2
   local folderFilesPath=$3
 
-  if [[ $1 == "--help" ]]; then
-    help
-  fi
+  pwd
 
   # asking for the name of the branches to be compared
   if [[ -z "$branchA" ]]; then
