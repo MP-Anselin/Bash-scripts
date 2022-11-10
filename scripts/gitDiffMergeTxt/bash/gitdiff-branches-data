@@ -98,6 +98,18 @@ lineContentGitAnnotationAdd() {
   fi
 }
 
+printEnd() {
+  {
+    echo -e "\tEND OF THE SPRINT please check:"
+    echo -e "\tthe file: $MERGE_FILE"
+    echo -e "\tpath: $MERGE_PATH"
+  } >>"$GIT_DIFF_BRANCH_PATH"
+  echo -e "\tEND OF THE SPRINT PLEASE CHECK:"
+  echo -e "\tFILE: $MERGE_FILE"
+  echo -e "\tPATH: $MERGE_PATH"
+
+}
+
 #Function get the line has changed and add into .diff file.
 transferAllFileContent() {
   local -n _fileContent=$1
@@ -111,25 +123,31 @@ transferAllFileContent() {
     countOfLine=$((countOfLine + 1))
   done
 
-  echo "length: $length end L: $l" >>"$GIT_DIFF_BRANCH_PATH"
+  echo -e "ADD new file content \t=> length: $length end L: $l" >>"$GIT_DIFF_BRANCH_PATH"
 }
 
 #Function get the line has changed and add into .diff file.
 getModifFromFile() {
   local -n _fileContent=$1
   local line=$2
-  local specialChar='s@^[^0-9]*\([0-9]\+\).*@\1@'
+  local specialCharGetNum='s@^[^0-9]*\([0-9]\+\).*@\1@'
+  local specialCharBeforeDoteDote='s/:.*//'
+  local specialCharNotPrint='[[:print:]]'
   local linePosition=1
 
   if [[ "$line" != "" ]]; then
-    linePosition=$(echo "$line" | sed "$specialChar")
+    line=$(tr -dc "$specialCharNotPrint" <<<"$line")
+    line=$(echo "$line" | sed "$specialCharBeforeDoteDote")
+    echo -e "line: \t>$line<" >>myInfo.txt
+    linePosition=$(echo "$line" | sed "$specialCharGetNum")
+    echo -e "linePosition: \t>$linePosition<" >>myInfo.txt
   fi
 
   local countOfLine=0
   local length=${#_fileContent[@]}
   local firstHash=0
 
-  for ((l = "$linePosition" - 1; l < "$length"; )); do
+  for ((l = $((linePosition - 1)); l < "$length"; )); do
     local lineChangedData=${_fileContent[l]}
 
     ## check if we fund '##' 2 to stop the loop 0 to check on the lines above 1 to go to look for a second line with '##'
@@ -149,7 +167,7 @@ getModifFromFile() {
     countOfLine=$((countOfLine + 1))
   done
 
-  echo "linePosition: $((linePosition - 1)) length: $length end L: $l" >>"$GIT_DIFF_BRANCH_PATH"
+  echo -e "ADD new file block \t=> linePosition: $((linePosition - 1)) length: $length end L: $l" >>"$GIT_DIFF_BRANCH_PATH"
   ## if the l is equal to the number of line of the file we inform we have finished to read the file.
   if [[ $l -eq $length ]]; then
     return 0
@@ -195,11 +213,14 @@ mainLoop() {
   local fileExtractDataPath=''
   local isNewFile=1
   declare -a fileContent
+  local previousLine=""
 
   ## Read the file differences.log line.
   for ((dl = 0; dl < "$length"; dl++)); do
     line=${_differencesFileData[dl]}
-    local previousLine=${_differencesFileData[$((dl - 1))]}
+    if [[ $((dl - 1)) -gt 0 ]]; then
+      previousLine=${_differencesFileData[$((dl - 1))]}
+    fi
     printLineInfo $((dl + 1)) "$line" "$previousLine" "$endOfFile" "$nextLineIsDiff" "$fileExtractDataPath"
 
     #____________________________________________________________________________________________________________________#
@@ -246,9 +267,14 @@ mainLoop() {
       local folderName=${filePath%/*}
       fileExtractDataPath="$filePath"
 
-      if [[ "$folderName" != "$folderFilesPath" ]]; then
-        :
-      else
+      if [[ $dl -eq 4 ]]; then
+        echo " LINE: $line"
+        echo "PRVLINE: $previousLine"
+        echo "folderName: $folderName"
+        echo "folderFilesPath: $folderFilesPath"
+      fi
+
+      if [[ "$folderName" =~ .*"$folderFilesPath".* ]]; then
         local branchToExtractFileData=$branchB
         if [[ $isGitAnnotationAdd -eq 2 ]]; then
           branchToExtractFileData=$branchA
@@ -296,11 +322,12 @@ mainLoop() {
     countOfLine=$((countOfLine + 1))
   done
 
+  printEnd
 }
 
 setFilesDifference() {
   {
-    git diff "$branchA" "$branchB" -- "$folderFilesPath" -- '*.txt' | $PATH_FIRST_SCRIPT &>"$DIFFERENCE_PATH"
+    git diff "$branchA" "$branchB" -- "$folderFilesPath/*.txt" | $PATH_FIRST_SCRIPT &>"$DIFFERENCE_PATH"
   } || {
     echo "Error: git diff $branchA $branchB having a issue, please confirm that the branches are correct"
   }
@@ -343,11 +370,27 @@ createDiffFolder() {
   } >>"$GIT_DIFF_BRANCH_PATH"
 }
 
+checkIfFolderExist() {
+  {
+    git ls-tree -d "$branchA:$folderFilesPath" >/dev/null 2>&1
+  } || {
+    echo "Error: the folder path $folderFilesPath not found inside of branch $branchA, please confirm the path folder."
+    return 1
+  }
+  {
+    git ls-tree -d "$branchB:$folderFilesPath" >/dev/null 2>&1
+  } || {
+    echo "Error: the folder path $folderFilesPath not found inside of branch $branchB, please confirm the path folder."
+    return 1
+  }
+  return 0
+}
+
 help() {
   echo ".$SCRIPT_PATH param1 param2 param3"
   echo "param1: { branch to be compare A }"
   echo "param2: {branch to compare B }"
-  echo "param3: { folder where are the file }"
+  echo "param3: { folder where are the files }"
   exit 0
 }
 
@@ -363,7 +406,6 @@ main() {
     help
   fi
 
-  createDiffFolder
   local branchA=$1
   local branchB=$2
   local folderFilesPath=$3
@@ -388,11 +430,16 @@ main() {
   } >>$GIT_DIFF_BRANCH_PATH
 
   sleep 1
-
+  checkIfFolderExist
+  local isFolderExist=$?
   if [[ -z "$branchA" || -z "$branchB" || -z "$folderFilesPath" ]]; then
     help
+  elif [[ $isFolderExist -eq 1 ]]; then
+    echo "for help run: $SCRIPT_PATH --help"
+    exit 1
   fi
 
+  createDiffFolder
   executeAlgorithm "$branchA" "$branchB" "$folderFilesPath"
 }
 
