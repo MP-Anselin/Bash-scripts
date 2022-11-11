@@ -1,22 +1,22 @@
 #!/bin/bash
 
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+regexWithoutLastFolder="s,/*[^/]\+/*$,,"
+SCRIPT_PREV_DIR=$(echo "$SCRIPT_DIR" | sed "$regexWithoutLastFolder")
+
+echo "SCRIPT_PREV_DIR: $SCRIPT_PREV_DIR"
 ## Static global with the path ot the subfolder diff-project
-CURRENT_FOLDER="./scripts/gitDiffMergeTxt"
+CURRENT_FOLDER="$SCRIPT_PREV_DIR"
 RESULT_FOLDER="$CURRENT_FOLDER/results"
 LOG_PATH="$RESULT_FOLDER/log"
-
 SCRIPT_NAME="gitdiff-branches-data"
 SCRIPT_PATH="$CURRENT_FOLDER/bash/$SCRIPT_NAME"
-
 GIT_DIFF_BRANCHES='git-diff-branches.log'
 GIT_DIFF_BRANCH_PATH="$LOG_PATH/$GIT_DIFF_BRANCHES"
-
 DIFFERENCE='differences.log'
 DIFFERENCE_PATH="$LOG_PATH/$DIFFERENCE"
-
 MERGE_FILE='git-diff-merge-file-mod.txt'
 MERGE_PATH="$RESULT_FOLDER/$MERGE_FILE"
-
 PATH_FIRST_SCRIPT="$CURRENT_FOLDER/bash/gitdiff-with-line"
 
 #Function to check if the line receive as param content the git annotation of differences:
@@ -126,11 +126,7 @@ printEnd() {
     echo -e "\tEND OF THE SPRINT please check:"
     echo -e "\tthe file: $MERGE_FILE"
     echo -e "\tpath: $MERGE_PATH"
-  } >>"$GIT_DIFF_BRANCH_PATH"
-  echo -e "\tEND OF THE SPRINT PLEASE CHECK:"
-  echo -e "\tFILE: $MERGE_FILE"
-  echo -e "\tPATH: $MERGE_PATH"
-
+  } 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
 }
 
 #Function get the line has changed and add into .diff file.
@@ -142,7 +138,16 @@ transferAllFileContent() {
 
   for ((l = 0; l < "$length"; l++)); do
     local lineChangedData=${_fileContent[l]}
-    echo "$lineChangedData" >>"$MERGE_PATH"
+    {
+      echo "$lineChangedData" >>"$MERGE_PATH"
+    } || {
+      {
+        echo "Error: the script cannot insert:"
+        echo "line: $lineChangedData"
+        echo "to file: $MERGE_PATH"
+      } 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
+      exit 1
+    }
     countOfLine=$((countOfLine + 1))
   done
 
@@ -302,18 +307,9 @@ mainLoop() {
           branchToExtractFileData=$branchA
         fi
 
-        index=0
         fileContent=()
-        while read line || [ -n "$line" ]; do
-          if lineEndByHeaderNewLineHash "$line"; then
-            IFS=$'\n'$'\r' read -a cutLine <<<"$line"
-            fileContent[$index]=${cutLine[0]}
-            index=$(("$index" + 1))
-            fileContent[$index]=${cutLine[1]}
-          else
-            fileContent[$index]="$line"
-          fi
-          index=$(("$index" + 1))
+        while read -r line || [ -n "$line" ]; do
+          fileContent+=("$line")
         done < <(git show "$branchToExtractFileData:$filePath")
 
         endOfFile=1
@@ -321,8 +317,7 @@ mainLoop() {
         if [[ $isGitAnnotationAdd -ne 1 ]]; then
           isNewFile=0
         fi
-        echo "Parse file: $fileExtractDataPath" >>"$GIT_DIFF_BRANCH_PATH"
-        echo "Parse file: $fileExtractDataPath"
+        echo "Parse file: $fileExtractDataPath" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
       fi
     elif $nextLineIsDiff && [[ $endOfFile -eq 1 ]]; then
       ## File to extract the information from the file changed
@@ -349,9 +344,19 @@ mainLoop() {
 
 setFilesDifference() {
   {
-    git diff "$branchA" "$branchB" -- "$folderFilesPath/*.txt" | $PATH_FIRST_SCRIPT &>"$DIFFERENCE_PATH"
+    echo "git diff $branchA $branchB -- $folderFilesPath/*.txt | $PATH_FIRST_SCRIPT &> $DIFFERENCE_PATH" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
+    git diff "$branchA" "$branchB" -- "$folderFilesPath"/*.txt | $PATH_FIRST_SCRIPT &>"$DIFFERENCE_PATH"
+    if [ -s "$DIFFERENCE_PATH" ]; then
+      :
+    else
+      {
+        echo -e "\n\tTHERE IS NOTHING HAS CHANGED !!"
+        echo -e "\tThe script will stop."
+      } 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
+      exit 0
+    fi
   } || {
-    echo "Error: git diff $branchA $branchB having a issue, please confirm that the branches are correct"
+    echo "Error: git diff $branchA $branchB having a issue, please confirm that the branches are correct" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
   }
 }
 
@@ -359,13 +364,11 @@ setFilesDifference() {
 executeAlgorithm() {
   setFilesDifference "$branchA" "$branchB" "$folderFilesPath"
 
-  local index=0
   declare -a differencesFileData
   IFS=''
-  while read line; do
-    differencesFileData[$index]="$line"
-    index=$(("$index" + 1))
-  done <$DIFFERENCE_PATH
+  while read -r line; do
+    differencesFileData+=("$line")
+  done <"$DIFFERENCE_PATH"
 
   mainLoop differencesFileData "$folderFilesPath"
 }
@@ -384,7 +387,7 @@ createDiffFolder() {
   createLogPath="The folder $LOG_PATH has been created"
   touch "$MERGE_PATH"
 
-  touch $GIT_DIFF_BRANCH_PATH
+  touch "$GIT_DIFF_BRANCH_PATH"
   {
     echo "$deleteDir"
     echo "$createDirFile"
@@ -396,13 +399,13 @@ checkIfFolderExist() {
   {
     git ls-tree -d "$branchA:$folderFilesPath" >/dev/null 2>&1
   } || {
-    echo "Error: the folder path $folderFilesPath not found inside of branch $branchA, please confirm the path folder."
+    echo "Error: the folder path $folderFilesPath not found inside of branch $branchA, please confirm the path folder." 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
     return 1
   }
   {
     git ls-tree -d "$branchB:$folderFilesPath" >/dev/null 2>&1
   } || {
-    echo "Error: the folder path $folderFilesPath not found inside of branch $branchB, please confirm the path folder."
+    echo "Error: the folder path $folderFilesPath not found inside of branch $branchB, please confirm the path folder." 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
     return 1
   }
   return 0
@@ -441,15 +444,11 @@ main() {
     read -rp 'What is the name of the folder where there is the files ?: ' folderFilesPath
   fi
 
-  echo -e "\tParameter #1 branch A is: $branchA"
-  echo -e "\tParameter #2 branch B is: $branchB"
-  echo -e "\tParameter #3 the folder is: $folderFilesPath\n"
-
   {
     echo -e "\tParameter #1 branch A is: $branchA"
     echo -e "\tParameter #2 branch B is: $branchB"
     echo -e "\tParameter #3 folder is: $folderFilesPath\n"
-  } >>$GIT_DIFF_BRANCH_PATH
+  } 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
 
   sleep 1
   checkIfFolderExist
