@@ -363,12 +363,12 @@ setFilesDifference() {
     echo "SCRIPT RUN: cd $GIT_DIR" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
     echo "SCRIPT RUN: cd -" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
 
-    cd "$GIT_DIR" || {
+    cd "$GIT_DIR"  2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH" || {
       echo "SCRIPT ERROR: the script has to be in git repository"
       exit 1
     }
     git diff "$branchA" "$branchB" -- "$folderFilesPath"/*.txt | $PATH_FIRST_SCRIPT &>"$DIFFERENCE_PATH"
-    cd - || {
+    cd -  2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH" || {
       echo "SCRIPT ERROR: the script has to be in git repository"
       exit 1
     }
