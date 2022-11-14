@@ -343,9 +343,22 @@ mainLoop() {
   printEnd
 }
 
-setFilesDifference() {
+pullBranch() {
   {
+    git checkout "$branchA"
+    echo "run: git pull git checkout $branchA" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
+    echo "run: git pull -"
+    git checkout -
+  } || {
+    echo "Error: git pull $branchA or git checkout $branchA having a issue, please confirm that the branches are correct" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
+    exit 1
+  }
+}
 
+setFilesDifference() {
+  pullBranch
+
+  {
     echo "run: git diff $branchA $branchB -- $folderFilesPath/*.txt | $PATH_FIRST_SCRIPT &> $DIFFERENCE_PATH" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
     echo "run: cd $GIT_DIR" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
     echo "run: cd -" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
