@@ -20,6 +20,15 @@ MERGE_FILE='git-diff-merge-file-mod.txt'
 MERGE_PATH="$RESULT_FOLDER/$MERGE_FILE"
 PATH_FIRST_SCRIPT="$CURRENT_FOLDER/bash/gitdiff-with-line"
 
+## Special cases
+CASE1="Tables"
+CASE2="Structures"
+CASE3="Autres"
+FOLDER_FILES_PARSED="$RESULT_FOLDER/files-parsed"
+FOLDER_TABLES_FILES_PARSED="$FOLDER_FILES_PARSED/table-files-parsed.txt"
+FOLDER_STRUCTURES_FILES_PARSED="$FOLDER_FILES_PARSED/structures-files-parsed.txt"
+FOLDER_AUTRES_FILES_PARSED="$FOLDER_FILES_PARSED/autres-files-parsed.txt"
+
 #Function to check if the line receive as param content the git annotation of differences:
 #@@ -
 lineContentGitAnnotation() {
@@ -414,7 +423,13 @@ createDiffFolder() {
   createLogPath="The folder $LOG_PATH has been created"
   touch "$MERGE_PATH"
 
+  mkdir -p "$FOLDER_FILES_PARSED"
+
   touch "$GIT_DIFF_BRANCH_PATH"
+  touch "$FOLDER_TABLES_FILES_PARSED"
+  touch "$FOLDER_STRUCTURES_FILES_PARSED"
+  touch "$FOLDER_AUTRES_FILES_PARSED"
+
   {
     echo "$deleteDir"
     echo "$createDirFile"
