@@ -345,10 +345,10 @@ mainLoop() {
 
 pullBranch() {
   {
-    git checkout "$branchA"
-    echo "run: git pull git checkout $branchA" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
-    echo "run: git pull -"
-    git checkout -
+    git checkout "$branchA" >/dev/null 2>&1
+    echo "SCRIPT RUN: git pull git checkout $branchA" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
+    echo "SCRIPT RUN: git pull -" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
+    git checkout - >/dev/null 2>&1
   } || {
     echo "Error: git pull $branchA or git checkout $branchA having a issue, please confirm that the branches are correct" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
     exit 1
@@ -359,9 +359,9 @@ setFilesDifference() {
   pullBranch
 
   {
-    echo "run: git diff $branchA $branchB -- $folderFilesPath/*.txt | $PATH_FIRST_SCRIPT &> $DIFFERENCE_PATH" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
-    echo "run: cd $GIT_DIR" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
-    echo "run: cd -" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
+    echo "SCRIPT RUN: git diff $branchA $branchB -- $folderFilesPath/*.txt | $PATH_FIRST_SCRIPT &> $DIFFERENCE_PATH" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
+    echo "SCRIPT RUN: cd $GIT_DIR" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
+    echo "SCRIPT RUN: cd -" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
 
     cd "$GIT_DIR" || {
       echo "Error: the script has to be in git repository"
@@ -424,7 +424,7 @@ createDiffFolder() {
 
 checkIfFolderExist() {
   {
-    echo "run: git ls-tree -d $branchA:$folderFilesPath >/dev/null 2>&1 " 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
+    echo "SCRIPT RUN: git ls-tree -d $branchA:$folderFilesPath >/dev/null 2>&1 " 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
     git ls-tree -d "$branchA:$folderFilesPath" >/dev/null 2>&1
   } || {
     echo "Error: the folder path $folderFilesPath not found inside of branch $branchA, please confirm the path folder." 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
@@ -432,7 +432,7 @@ checkIfFolderExist() {
     return 1
   }
   {
-    echo "run: git ls-tree -d $branchB:$folderFilesPath >/dev/null 2>&1 " 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
+    echo "SCRIPT RUN: git ls-tree -d $branchB:$folderFilesPath >/dev/null 2>&1 " 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
     git ls-tree -d "$branchB:$folderFilesPath" >/dev/null 2>&1
   } || {
     echo "Error: the folder path $folderFilesPath not found inside of branch $branchB, please confirm the path folder." 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
