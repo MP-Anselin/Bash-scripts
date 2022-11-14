@@ -143,7 +143,7 @@ transferAllFileContent() {
       echo "$lineChangedData" >>"$MERGE_PATH"
     } || {
       {
-        echo "Error: the script cannot insert:"
+        echo "SCRIPT ERROR: the script cannot insert:"
         echo "line: $lineChangedData"
         echo "to file: $MERGE_PATH"
       } 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
@@ -318,7 +318,7 @@ mainLoop() {
         if [[ $isGitAnnotationAdd -ne 1 ]]; then
           isNewFile=0
         fi
-        echo "Parse file: $fileExtractDataPath" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
+        echo "SCRIPT PARSED FILE: $fileExtractDataPath" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
       fi
     elif $nextLineIsDiff && [[ $endOfFile -eq 1 ]]; then
       ## File to extract the information from the file changed
@@ -350,7 +350,7 @@ pullBranch() {
     echo "SCRIPT RUN: git pull -" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
     git checkout - >/dev/null 2>&1
   } || {
-    echo "Error: git pull $branchA or git checkout $branchA having a issue, please confirm that the branches are correct" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
+    echo "SCRIPT ERROR: git pull $branchA or git checkout $branchA having a issue, please confirm that the branches are correct" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
     exit 1
   }
 }
@@ -364,12 +364,12 @@ setFilesDifference() {
     echo "SCRIPT RUN: cd -" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
 
     cd "$GIT_DIR" || {
-      echo "Error: the script has to be in git repository"
+      echo "SCRIPT ERROR: the script has to be in git repository"
       exit 1
     }
     git diff "$branchA" "$branchB" -- "$folderFilesPath"/*.txt | $PATH_FIRST_SCRIPT &>"$DIFFERENCE_PATH"
     cd - || {
-      echo "Error: the script has to be in git repository"
+      echo "SCRIPT ERROR: the script has to be in git repository"
       exit 1
     }
 
@@ -383,7 +383,7 @@ setFilesDifference() {
       exit 0
     fi
   } || {
-    echo "Error: git diff $branchA $branchB having a issue, please confirm that the branches are correct" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
+    echo "SCRIPT ERROR: git diff $branchA $branchB having a issue, please confirm that the branches are correct" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
   }
 }
 
@@ -427,7 +427,7 @@ checkIfFolderExist() {
     echo "SCRIPT RUN: git ls-tree -d $branchA:$folderFilesPath >/dev/null 2>&1 " 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
     git ls-tree -d "$branchA:$folderFilesPath" >/dev/null 2>&1
   } || {
-    echo "Error: the folder path $folderFilesPath not found inside of branch $branchA, please confirm the path folder." 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
+    echo "SCRIPT ERROR: the folder path $folderFilesPath not found inside of branch $branchA, please confirm the path folder." 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
     help
     return 1
   }
@@ -435,7 +435,7 @@ checkIfFolderExist() {
     echo "SCRIPT RUN: git ls-tree -d $branchB:$folderFilesPath >/dev/null 2>&1 " 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
     git ls-tree -d "$branchB:$folderFilesPath" >/dev/null 2>&1
   } || {
-    echo "Error: the folder path $folderFilesPath not found inside of branch $branchB, please confirm the path folder." 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
+    echo "SCRIPT ERROR: the folder path $folderFilesPath not found inside of branch $branchB, please confirm the path folder." 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
     help
     return 1
   }
