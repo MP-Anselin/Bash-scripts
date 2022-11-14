@@ -428,6 +428,7 @@ checkIfFolderExist() {
     git ls-tree -d "$branchA:$folderFilesPath" >/dev/null 2>&1
   } || {
     echo "Error: the folder path $folderFilesPath not found inside of branch $branchA, please confirm the path folder." 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
+    help
     return 1
   }
   {
@@ -435,6 +436,7 @@ checkIfFolderExist() {
     git ls-tree -d "$branchB:$folderFilesPath" >/dev/null 2>&1
   } || {
     echo "Error: the folder path $folderFilesPath not found inside of branch $branchB, please confirm the path folder." 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
+    help
     return 1
   }
   return 0
@@ -480,13 +482,8 @@ main() {
   } 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
 
   sleep 1
-  checkIfFolderExist
-  local isFolderExist=$?
-  if [[ -z "$branchA" || -z "$branchB" || -z "$folderFilesPath" ]]; then
+  if [[ -z "$branchA" || -z "$branchB" ]]; then
     help
-  elif [[ $isFolderExist -eq 1 ]]; then
-    echo "for help run: $SCRIPT_PATH --help"
-    exit 1
   fi
 
   createDiffFolder
