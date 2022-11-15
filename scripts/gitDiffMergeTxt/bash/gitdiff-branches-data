@@ -21,13 +21,25 @@ MERGE_PATH="$RESULT_FOLDER/$MERGE_FILE"
 PATH_FIRST_SCRIPT="$CURRENT_FOLDER/bash/gitdiff-with-line"
 
 ## Special cases
-CASE1="Tables"
-CASE2="Structures"
-CASE3="Autres"
+TABLES_FILES_FOLDER="Tables"
+TABLES_STRUCTURES_FOLDER="Structures"
+TABLES_AUTRES_FOLDER="Autres"
 FOLDER_FILES_PARSED="$RESULT_FOLDER/files-parsed"
-FOLDER_TABLES_FILES_PARSED="$FOLDER_FILES_PARSED/table-files-parsed.txt"
-FOLDER_STRUCTURES_FILES_PARSED="$FOLDER_FILES_PARSED/structures-files-parsed.txt"
-FOLDER_AUTRES_FILES_PARSED="$FOLDER_FILES_PARSED/autres-files-parsed.txt"
+TABLES_FILES_PARSED="tables-files-parsed.txt"
+FOLDER_TABLES_FILES_PARSED="$FOLDER_FILES_PARSED/$TABLES_FILES_PARSED"
+STRUCTURES_FILES_PARSED="structures-files-parsed.txt"
+FOLDER_STRUCTURES_FILES_PARSED="$FOLDER_FILES_PARSED/$STRUCTURES_FILES_PARSED"
+AUTRES_FILES_PARSED="autres-files-parsed.txt"
+FOLDER_AUTRES_FILES_PARSED="$FOLDER_FILES_PARSED/$AUTRES_FILES_PARSED"
+
+##Function create array of special folder, if there is special folder to extract the data on special order
+## attention to the order inside of the array the script will merge the data related to the order of the array
+function arrayOfSpecialFolder() {
+  local -n SpecialFolder=$1
+  SpecialFolder[0]="$folderFilesPath/$TABLES_FILES_FOLDER $FOLDER_TABLES_FILES_PARSED $TABLES_FILES_PARSED "
+  SpecialFolder[1]="$folderFilesPath/$TABLES_STRUCTURES_FOLDER $FOLDER_STRUCTURES_FILES_PARSED $STRUCTURES_FILES_PARSED"
+  SpecialFolder[2]="$folderFilesPath/$TABLES_AUTRES_FOLDER $FOLDER_AUTRES_FILES_PARSED $AUTRES_FILES_PARSED"
+}
 
 #Function to check if the line receive as param content the git annotation of differences:
 #@@ -
@@ -77,6 +89,26 @@ lineContentFileNameA() {
     return 0
   fi
   return 1
+}
+
+#Function to check if content special folder name:
+lineContentSpecialFolderName() {
+  local line=$1
+  local specFolderFound=""
+
+  local listOfSpecialFolder
+  arrayOfSpecialFolder listOfSpecialFolder
+
+  for spcElement in "${listOfSpecialFolder[@]}"; do
+    IFS=' ' read -r -a folderInfoArray <<<"$spcElement"
+    if [[ "$line" == *"${folderInfoArray[0]}"* ]]; then
+      specFolderFound="${folderInfoArray[1]}"
+      break
+    else
+      specFolderFound=""
+    fi
+  done
+  echo "$specFolderFound"
 }
 
 ##Function to check breaking line.
@@ -131,6 +163,22 @@ lineContentGitAnnotationAdd() {
   fi
 }
 
+mergeFileOfSpecialFolder() {
+  local specialFolderList
+  arrayOfSpecialFolder specialFolderList
+
+  for spcElement in "${specialFolderList[@]}"; do
+    IFS=' ' read -r -a folderInfoArray <<<"$spcElement"
+    cat "${folderInfoArray[1]}" >> "$MERGE_PATH"
+    echo "SCRIPT MERGE FILE: ${folderInfoArray[3]} into $MERGE_FILE" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
+    rm -rf "${folderInfoArray[1]}"
+    echo "SCRIPT DELETE FILE: ${folderInfoArray[1]}" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
+  done
+
+  rmdir "$FOLDER_FILES_PARSED"
+  echo "SCRIPT DELETE FOLDER: $FOLDER_FILES_PARSED" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
+}
+
 printEnd() {
   {
     echo -e "\tEND OF THE SPRINT please check:"
@@ -142,6 +190,7 @@ printEnd() {
 #Function get the line has changed and add into .diff file.
 transferAllFileContent() {
   local -n _fileContent=$1
+  local fileRedirect=$2
 
   local countOfLine=0
   local length=${#_fileContent[@]}
@@ -149,12 +198,12 @@ transferAllFileContent() {
   for ((l = 0; l < "$length"; l++)); do
     local lineChangedData=${_fileContent[l]}
     {
-      echo "$lineChangedData" >>"$MERGE_PATH"
+      echo "$lineChangedData" >>"$fileRedirect"
     } || {
       {
         echo "SCRIPT ERROR: the script cannot insert:"
         echo "line: $lineChangedData"
-        echo "to file: $MERGE_PATH"
+        echo "to file: $fileRedirect"
       } 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
       exit 1
     }
@@ -168,6 +217,7 @@ transferAllFileContent() {
 getModifFromFile() {
   local -n _fileContent=$1
   local line=$2
+  local fileRedirect=$3
   local specialCharGetNum='s@^[^0-9]*\([0-9]\+\).*@\1@'
   local specialCharBeforeDoteDote='s/:.*//'
   local specialCharNotPrint='[[:print:]]'
@@ -197,7 +247,7 @@ getModifFromFile() {
       break
     else
       ## If firstHash == 1 mean we have found one line with '##' and we add the content between the line of '##'
-      echo "$lineChangedData" >>"$MERGE_PATH"
+      echo "$lineChangedData" >>"$fileRedirect"
       l=$((l + 1))
     fi
     countOfLine=$((countOfLine + 1))
@@ -253,6 +303,7 @@ mainLoop() {
   declare -a fileContent
   local previousLine=""
   local nextLine=""
+  local fileRedirectExtractData="$MERGE_PATH"
 
   ## Read the file differences.log line.
   for ((dl = 0; dl < "$length"; dl++)); do
@@ -266,7 +317,7 @@ mainLoop() {
     printLineInfo $((dl + 1)) "$line" "$previousLine" "$nextLine" "$endOfFile" "$nextLineIsDiff" "$fileExtractDataPath"
 
     #____________________________________________________________________________________________________________________#
-    ## Analyze the line to thing what is content
+    ## Analyze the line to see what is content
     lineContentGitAnnotationAdd "$line" "$previousLine"
     local isGitAnnotationAdd=$?
     local isGitAnnotation=1
@@ -297,6 +348,15 @@ mainLoop() {
     #____________________________________________________________________________________________________________________#
 
     if [[ $isContentFileName -eq 0 && $isGitAnnotationAdd -eq 1 ]] || [[ $isGitAnnotationAdd -ne 1 && $isNewFile -eq 1 ]]; then
+
+      local isSpcFolderName=""
+      isSpcFolderName=$(lineContentSpecialFolderName "$line")
+      if [[ -n "$isSpcFolderName" ]]; then
+        fileRedirectExtractData="$isSpcFolderName"
+      else
+        fileRedirectExtractData="$MERGE_PATH"
+      fi
+
       ## If to get the path of the file to extract
       local fileNameParse
       if [[ $isGitAnnotationAdd -eq 2 ]]; then
@@ -311,17 +371,18 @@ mainLoop() {
       local folderName=${filePath%/*}
       fileExtractDataPath="$filePath"
 
+      ## Check if the parsed folder is inside of the given path param
       if [[ "$folderName" =~ .*"$folderFilesPath".* ]]; then
         local branchToExtractFileData=$branchB
         if [[ $isGitAnnotationAdd -eq 2 ]]; then
           branchToExtractFileData=$branchA
         fi
 
+        ## Get The content of the file we want to parse
         fileContent=()
         while read -r line || [ -n "$line" ]; do
           fileContent+=("$line")
         done < <(git show "$branchToExtractFileData:$filePath")
-
         endOfFile=1
         passOnce=0
         if [[ $isGitAnnotationAdd -ne 1 ]]; then
@@ -332,11 +393,11 @@ mainLoop() {
     elif $nextLineIsDiff && [[ $endOfFile -eq 1 ]]; then
       ## File to extract the information from the file changed
       if [[ $isNewFile -eq 0 ]]; then
-        transferAllFileContent fileContent
+        transferAllFileContent fileContent "$fileRedirectExtractData"
         isNewFile=1
         endOfFile=0
       else
-        getModifFromFile fileContent "$line"
+        getModifFromFile fileContent "$line" "$fileRedirectExtractData"
         endOfFile=$?
       fi
       nextLineIsDiff=false
@@ -349,9 +410,12 @@ mainLoop() {
     countOfLine=$((countOfLine + 1))
   done
 
+  mergeFileOfSpecialFolder
+
   printEnd
 }
 
+##Function to get the last version of branch A
 pullBranch() {
   {
     git checkout "$branchA" >/dev/null 2>&1
@@ -365,19 +429,19 @@ pullBranch() {
 }
 
 setFilesDifference() {
-  pullBranch
+    pullBranch
 
   {
     echo "SCRIPT RUN: git diff $branchA $branchB -- $folderFilesPath/*.txt | $PATH_FIRST_SCRIPT &> $DIFFERENCE_PATH" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
     echo "SCRIPT RUN: cd $GIT_DIR" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
     echo "SCRIPT RUN: cd -" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
 
-    cd "$GIT_DIR"  || {
+    cd "$GIT_DIR" || {
       echo "SCRIPT ERROR: the script has to be in git repository"
       exit 1
     }
     git diff "$branchA" "$branchB" -- "$folderFilesPath"/*.txt | $PATH_FIRST_SCRIPT &>"$DIFFERENCE_PATH"
-    cd -  || {
+    cd - || {
       echo "SCRIPT ERROR: the script has to be in git repository"
       exit 1
     }
