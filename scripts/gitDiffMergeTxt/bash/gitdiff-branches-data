@@ -32,6 +32,10 @@ FOLDER_STRUCTURES_FILES_PARSED="$FOLDER_FILES_PARSED/$STRUCTURES_FILES_PARSED"
 AUTRES_FILES_PARSED="autres-files-parsed.txt"
 FOLDER_AUTRES_FILES_PARSED="$FOLDER_FILES_PARSED/$AUTRES_FILES_PARSED"
 
+## Credential of your git repository
+GIT_USERNAME=""
+GIT_PWD=""
+
 ##Function create array of special folder, if there is special folder to extract the data on special order
 ## attention to the order inside of the array the script will merge the data related to the order of the array
 function arrayOfSpecialFolder() {
@@ -420,12 +424,20 @@ pullBranch() {
   {
     ## Well get all the new branches
     git fetch >/dev/null 2>&1
+    expect "*?Username:*"
+    send "$GIT_USERNAME"
+    expect "*?Password:*"
+    send "$GIT_PWD"
     echo "SCRIPT RUN: git fetch" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
     ## Git checkout the branchA
     echo "SCRIPT RUN: git checkout $branchA" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
     git checkout "$branchA" >/dev/null 2>&1
     ## Git pull the branchA to get the last version
     git pull origin "$branchA" >/dev/null 2>&1
+    expect "*?Username:*"
+    send "$GIT_USERNAME"
+    expect "*?Password:*"
+    send "$GIT_PWD"
     ## Git checkout the the previous branch
     git checkout - >/dev/null 2>&1
     echo "SCRIPT RUN: git pull origin $branchA" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
