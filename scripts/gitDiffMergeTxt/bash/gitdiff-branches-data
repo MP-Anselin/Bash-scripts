@@ -169,7 +169,7 @@ mergeFileOfSpecialFolder() {
 
   for spcElement in "${specialFolderList[@]}"; do
     IFS=' ' read -r -a folderInfoArray <<<"$spcElement"
-    cat "${folderInfoArray[1]}" >> "$MERGE_PATH"
+    cat "${folderInfoArray[1]}" >>"$MERGE_PATH"
     echo "SCRIPT MERGE FILE: ${folderInfoArray[3]} into $MERGE_FILE" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
     rm -rf "${folderInfoArray[1]}"
     echo "SCRIPT DELETE FILE: ${folderInfoArray[1]}" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
@@ -418,10 +418,18 @@ mainLoop() {
 ##Function to get the last version of branch A
 pullBranch() {
   {
+    ## Well get all the new branches
+    git fetch >/dev/null 2>&1
+    echo "SCRIPT RUN: git fetch" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
+    ## Git checkout the branchA
+    echo "SCRIPT RUN: git checkout $branchA" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
     git checkout "$branchA" >/dev/null 2>&1
-    echo "SCRIPT RUN: git pull git checkout $branchA" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
-    echo "SCRIPT RUN: git pull -" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
+    ## Git pull the branchA to get the last version
+    git pull origin "$branchA" >/dev/null 2>&1
+    ## Git checkout the the previous branch
     git checkout - >/dev/null 2>&1
+    echo "SCRIPT RUN: git pull origin $branchA" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
+    echo "SCRIPT RUN: git checkout -" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
   } || {
     echo "SCRIPT ERROR: git pull $branchA or git checkout $branchA having a issue, please confirm that the branches are correct" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
     exit 1
@@ -429,7 +437,7 @@ pullBranch() {
 }
 
 setFilesDifference() {
-    pullBranch
+  pullBranch
 
   {
     echo "SCRIPT RUN: git diff $branchA $branchB -- $folderFilesPath/*.txt | $PATH_FIRST_SCRIPT &> $DIFFERENCE_PATH" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
