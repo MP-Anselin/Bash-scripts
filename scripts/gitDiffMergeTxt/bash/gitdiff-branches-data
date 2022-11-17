@@ -419,25 +419,42 @@ mainLoop() {
   printEnd
 }
 
+expectCredentialPull() {
+  expect <<END
+          set timeout -1
+          spawn git pull origin "$branchA"
+expect {
+    "*?sername*" { send "$GIT_USERNAME\r"; incr i; exp_continue }
+    "*?assword*" { send "$GIT_PWD\r"; incr i; exp_continue }
+    eof
+}
+END
+}
+
+expectCredentialFetch() {
+  expect <<END
+          set timeout -1
+          spawn git fetch
+
+expect {
+    "*?sername*" { send "$GIT_USERNAME\r"; incr i; exp_continue }
+    "*?assword*" { send "$GIT_PWD\r"; incr i; exp_continue }
+    eof
+}
+END
+}
+
 ##Function to get the last version of branch A
 pullBranch() {
   {
     ## Well get all the new branches
     echo "SCRIPT RUN: git fetch" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
-    git fetch >/dev/null 2>&1
-    expect "*?Username:*"
-    send "$GIT_USERNAME"
-    expect "*?Password:*"
-    send "$GIT_PWD"
+    expectCredentialFetch
     ## Git checkout the branchA
     echo "SCRIPT RUN: git checkout $branchA" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
     git checkout "$branchA" >/dev/null 2>&1
     ## Git pull the branchA to get the last version
-    git pull origin "$branchA" >/dev/null 2>&1
-    expect "*?Username:*"
-    send "$GIT_USERNAME"
-    expect "*?Password:*"
-    send "$GIT_PWD"
+    expectCredentialPull
     ## Git checkout the the previous branch
     git checkout - >/dev/null 2>&1
     echo "SCRIPT RUN: git pull origin $branchA" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
@@ -546,6 +563,8 @@ help() {
   echo "param1: { branch to be compare A }"
   echo "param2: {branch to compare B }"
   echo "param3: { folder where are the files }"
+  echo "param4: { git username of the repository }"
+  echo "param5: { git password of the repository }"
   exit 0
 }
 
@@ -564,20 +583,33 @@ main() {
   local branchA=$1
   local branchB=$2
   local folderFilesPath=$3
+  GIT_USERNAME=$4
+  GIT_PWD=$5
 
   # asking for the name of the branches to be compared
   if [[ -z "$branchA" ]]; then
     read -rp 'What is the name of the branch A ?: ' branchA
-  elif [[ -z "$branchB" ]]; then
+  fi
+  if [[ -z "$branchB" ]]; then
     read -rp 'What is the name of the branch B ?: ' branchB
-  elif [[ -z "$folderFilesPath" ]]; then
+  fi
+  if [[ -z "$folderFilesPath" ]]; then
     read -rp 'What is the name of the folder where there is the files ?: ' folderFilesPath
+  fi
+  if [[ -z "$GIT_USERNAME" ]]; then
+    read -rp 'What is the name git username: ' GIT_USERNAME
+  fi
+  if [[ -z "$GIT_PWD" ]]; then
+    read -rp 'What is the name git password: ' GIT_PWD
   fi
 
   {
     echo -e "\tParameter #1 branch A is: $branchA"
     echo -e "\tParameter #2 branch B is: $branchB"
-    echo -e "\tParameter #3 folder is: $folderFilesPath\n"
+    echo -e "\tParameter #3 folder is: $folderFilesPath"
+    echo -e "\tParameter #4 username is: $GIT_USERNAME"
+    echo -e "\tParameter #5 password is: $GIT_PWD\n"
+    exit 8
   } 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
 
   sleep 1
@@ -589,4 +621,4 @@ main() {
   executeAlgorithm "$branchA" "$branchB" "$folderFilesPath"
 }
 
-main "$1" "$2" "$3"
+main "$1" "$2" "$3" "$4" "$5"
