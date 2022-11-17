@@ -423,12 +423,12 @@ mainLoop() {
 pullBranch() {
   {
     ## Well get all the new branches
+    echo "SCRIPT RUN: git fetch" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
     git fetch >/dev/null 2>&1
     expect "*?Username:*"
     send "$GIT_USERNAME"
     expect "*?Password:*"
     send "$GIT_PWD"
-    echo "SCRIPT RUN: git fetch" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
     ## Git checkout the branchA
     echo "SCRIPT RUN: git checkout $branchA" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
     git checkout "$branchA" >/dev/null 2>&1
