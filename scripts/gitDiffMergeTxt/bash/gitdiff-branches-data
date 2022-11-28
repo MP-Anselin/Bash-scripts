@@ -21,9 +21,9 @@ MERGE_PATH="$RESULT_FOLDER/$MERGE_FILE"
 PATH_FIRST_SCRIPT="$CURRENT_FOLDER/bash/gitdiff-with-line"
 
 ## Special cases
-TABLES_FILES_FOLDER="Tables"
-TABLES_STRUCTURES_FOLDER="Structures"
-TABLES_AUTRES_FOLDER="Autres"
+TABLES_FOLDER="Tables"
+STRUCTURES_FOLDER="Structures"
+AUTRES_FOLDER="Autres"
 FOLDER_FILES_PARSED="$RESULT_FOLDER/files-parsed"
 TABLES_FILES_PARSED="tables-files-parsed.txt"
 FOLDER_TABLES_FILES_PARSED="$FOLDER_FILES_PARSED/$TABLES_FILES_PARSED"
@@ -40,9 +40,9 @@ GIT_PWD=""
 ## attention to the order inside of the array the script will merge the data related to the order of the array
 function arrayOfSpecialFolder() {
   local -n SpecialFolder=$1
-  SpecialFolder[0]="$folderFilesPath/$TABLES_FILES_FOLDER $FOLDER_TABLES_FILES_PARSED $TABLES_FILES_PARSED "
-  SpecialFolder[1]="$folderFilesPath/$TABLES_STRUCTURES_FOLDER $FOLDER_STRUCTURES_FILES_PARSED $STRUCTURES_FILES_PARSED"
-  SpecialFolder[2]="$folderFilesPath/$TABLES_AUTRES_FOLDER $FOLDER_AUTRES_FILES_PARSED $AUTRES_FILES_PARSED"
+  SpecialFolder[0]="$folderFilesPath/$STRUCTURES_FOLDER $FOLDER_STRUCTURES_FILES_PARSED $STRUCTURES_FILES_PARSED"
+  SpecialFolder[1]="$folderFilesPath/$TABLES_FOLDER $FOLDER_TABLES_FILES_PARSED $TABLES_FILES_PARSED "
+  SpecialFolder[2]="$folderFilesPath/$AUTRES_FOLDER $FOLDER_AUTRES_FILES_PARSED $AUTRES_FILES_PARSED"
 }
 
 #Function to check if the line receive as param content the git annotation of differences:
@@ -171,16 +171,18 @@ mergeFileOfSpecialFolder() {
   local specialFolderList
   arrayOfSpecialFolder specialFolderList
 
+  echo -e "\n" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
   for spcElement in "${specialFolderList[@]}"; do
     IFS=' ' read -r -a folderInfoArray <<<"$spcElement"
     cat "${folderInfoArray[1]}" >>"$MERGE_PATH"
-    echo "SCRIPT MERGE FILE: ${folderInfoArray[3]} into $MERGE_FILE" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
+    echo "SCRIPT MERGE FILE: ${folderInfoArray[2]} into $MERGE_FILE" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
     rm -rf "${folderInfoArray[1]}"
     echo "SCRIPT DELETE FILE: ${folderInfoArray[1]}" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
   done
 
   rmdir "$FOLDER_FILES_PARSED"
   echo "SCRIPT DELETE FOLDER: $FOLDER_FILES_PARSED" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
+  echo -e "" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
 }
 
 printEnd() {
@@ -348,13 +350,14 @@ mainLoop() {
       lineContentFileNameB "$line"
       isContentFileName=$?
     fi
-    echo -e "--------------\tisGitAnnotation: $isGitAnnotation \tisTeamAnnotation: $isTeamAnnotation \tisPrvGitAnnotation: $isPrvGitAnnotation \tisPrvTeamAnnotation: $isPrvTeamAnnotation \tisContentFileName: $isContentFileName \tisGitAnnotationAdd: $isGitAnnotationAdd isNewFile $isNewFile" >>"$GIT_DIFF_BRANCH_PATH"
+    echo -en "--------------\tisGitAnnotation: $isGitAnnotation \tisTeamAnnotation: $isTeamAnnotation \tisPrvGitAnnotation: $isPrvGitAnnotation \tisPrvTeamAnnotation: $isPrvTeamAnnotation \tisContentFileName: $isContentFileName \tisGitAnnotationAdd: $isGitAnnotationAdd isNewFile $isNewFile" >>"$GIT_DIFF_BRANCH_PATH"
     #____________________________________________________________________________________________________________________#
 
     if [[ $isContentFileName -eq 0 && $isGitAnnotationAdd -eq 1 ]] || [[ $isGitAnnotationAdd -ne 1 && $isNewFile -eq 1 ]]; then
 
       local isSpcFolderName=""
       isSpcFolderName=$(lineContentSpecialFolderName "$line")
+      echo -e "isSpcFolderName: $isSpcFolderName " >>"$GIT_DIFF_BRANCH_PATH"
       if [[ -n "$isSpcFolderName" ]]; then
         fileRedirectExtractData="$isSpcFolderName"
       else
