@@ -1,0 +1,4 @@
+##
+TGE_REF_CARTE_29
+==
+create or replace view TGE_REF_CARTE_29 as select * from ( select 'B050' CODE_ELEMENT,'**' INDICATIF from dual union all select 'A275' CODE_ELEMENT,'**' INDICATIF from dual union all select 'BA50' CODE_ELEMENT,'**' INDICATIF from dual union all select 'A456' CODE_ELEMENT,'**' INDICATIF from TGE_REF_PAC where  MPE in ('O','S') union all select 'A457' CODE_ELEMENT,substr(enregistrement,1,2) INDICATIF from tge_ref_vrval where code_table like '%DFR%' and substr(enregistrement,35,1)='D' and substr(enregistrement,1,2)<>'99' union all select 'A458' CODE_ELEMENT,substr(enregistrement,1,2) INDICATIF from tge_ref_vrval where code_table like '%DFR%' and substr(enregistrement,35,1)='D' and substr(enregistrement,1,2)<>'99'order by CODE_ELEMENT ) 

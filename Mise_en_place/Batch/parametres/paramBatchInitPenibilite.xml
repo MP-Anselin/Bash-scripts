@@ -1,0 +1,18 @@
+<interface idInterface="INITPENEBILITE">
+	<nomInterface>InitPenibilite</nomInterface>
+	<descriptionInterface>
+		INITPENEBILITE
+	</descriptionInterface>
+	<traitements>	
+		<traitement>
+			<descriptionTraitement>ajout d'une ligne penibilité en décembre</descriptionTraitement>
+			<typeTraitement>InterfaceInitPenibilite</typeTraitement>
+			<modeDebug>false</modeDebug>
+			<versionTraitement>V1</versionTraitement>
+			<fichierUsers></fichierUsers>
+			<activerMail>OUI</activerMail>
+			<fichierZIP></fichierZIP>
+			<continueSiErreur>OUI</continueSiErreur>
+		</traitement>
+	</traitements>
+</interface>

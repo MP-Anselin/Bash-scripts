@@ -1,0 +1,69 @@
+##
+TAG_CHARSET=@€éèç
+##
+R_PRESENT_FICHIER_PAIE
+=SQL=
+create or replace PROCEDURE R_PRESENT_FICHIER_PAIE( NUMPAC_TRAITEMENT IN SECUPACMAT.NUMPAC%Type , PACMAT_TRAITEMENT IN SECUPACMAT.PACMAT%Type ) IS 
+PERIODEENCOURS_TRAITEMENT TGE_REF_PAC.PERIODEENCOURS%type;
+BEGIN
+-- récupère la periode en cours du pac
+  BEGIN 
+   SELECT PERIODEENCOURS into PERIODEENCOURS_TRAITEMENT from TGE_REF_PAC where NUMPAC=NUMPAC_TRAITEMENT;
+   EXCEPTION
+   WHEN NO_DATA_FOUND then
+    RETURN;
+  END;
+--fait le merge ds secupacmat
+MERGE INTO SECUPACMAT A
+USING (
+SELECT NUMPAC,
+  PACMAT,
+  CASE
+    WHEN EXISTS
+      ( WITH table_dates_eff (pacmat,paiezad,date_eff) AS
+      ( SELECT DISTINCT dach2.pacmat,
+        dach2.paiezad,
+        MAX(date_eff) OVER(PARTITION BY dach2.pacmat,dach2.paiezad)
+      FROM dic_adm_contrat_histo dach2
+      WHERE dach2.numpac     = NUMPAC_TRAITEMENT
+      AND dach2.pacmat       = NVL(PACMAT_TRAITEMENT,dach2.pacmat) -- si PACMAT_TRAITEMENT est renseigné, on l'utilise, sinon on neutralise le and
+      AND dach2.date_eff    <= last_day(TO_DATE(PERIODEENCOURS_TRAITEMENT,'yyyymm') )
+      AND dach2.date_sortie_sit_bo >= add_months( (TO_DATE(PERIODEENCOURS_TRAITEMENT,'yyyymm') ), -
+        (SELECT valvar                                                                     -1
+        FROM sys_varsys
+        WHERE codvar ='NB_MOIS_PAIE_INIT'
+        AND module   ='GAP'
+        ) )
+      )
+    SELECT 1
+    FROM dic_adm_contrat_histo dach
+    INNER JOIN table_dates_eff t
+    ON dach.pacmat    = t.pacmat
+    AND dach.paiezad  = t.paiezad
+    AND dach.date_eff = t.date_eff
+    LEFT JOIN dic_tge_respaie_unique dtru
+    ON dtru.numpac                     = NUMPAC_TRAITEMENT
+    AND dtru.pacmat                    = dach.pacmat
+    AND dtru.paiezad                   = dach.paiezad
+    WHERE dach.numpac                  = NUMPAC_TRAITEMENT
+    AND dach.pacmat                    = NVL(PACMAT_TRAITEMENT,dach.pacmat) -- si PACMAT_TRAITEMENT est renseigné, on l'utilise, sinon on neutralise le and
+    AND sec.pacmat                     = dach.pacmat
+    AND (dtru.numpac                  IS NULL
+    OR ( NVL(dtru.prfpai, 'M')         != 'A'
+    OR NVL(dtru.dtfpai, TO_DATE('20991231','yyyyMMdd'))    > last_day(TO_DATE(PERIODEENCOURS_TRAITEMENT,'YYYYMM') )
+    OR ( dach.ZREACT                  IS NOT NULL
+    AND dtru.dtfpai                   <= dach.zreact
+    AND EXTRACT(YEAR FROM dach.zreact) = SUBSTR(PERIODEENCOURS_TRAITEMENT,1,4) )
+    OR dtru.dtfpai                     < dach.dssad ))
+      )
+    THEN 'O'
+    ELSE 'N'
+  END PRESENT_FICHIER_PAIE
+FROM SECUPACMAT SEC
+WHERE numpac     = NUMPAC_TRAITEMENT
+AND pacmat       = NVL(PACMAT_TRAITEMENT,pacmat) -- si PACMAT_TRAITEMENT est renseigné, on l'utilise, sinon on neutralise le and
+) B
+ON (A.NUMPAC = B.NUMPAC and A.PACMAT = B.PACMAT)
+WHEN MATCHED THEN UPDATE SET A.PRESENT_FICHIER_PAIE = B.PRESENT_FICHIER_PAIE ;
+
+END R_PRESENT_FICHIER_PAIE;

@@ -1,0 +1,333 @@
+##
+TAG_CHARSET=@€éèç
+##
+EDI_HISTO_LANCEMENTS_SUIVI_FUNCTION
+=SQL=
+CREATE OR REPLACE FUNCTION EDI_HISTO_LANCEMENTS_SUIVI_FUNCTION(
+  p_LOGIN IN VARCHAR2 DEFAULT NULL,
+  p_START_DATE IN VARCHAR2 DEFAULT NULL,
+  p_END_DATE IN VARCHAR2 DEFAULT NULL,
+  p_TYPE_DOC IN VARCHAR2 DEFAULT NULL,
+  p_ONLY_PROC_SIGN IN VARCHAR2 DEFAULT 'N',
+  p_SIGNATAIRE IN VARCHAR2 DEFAULT NULL,
+  p_EDITEUR IN VARCHAR2 DEFAULT NULL
+) RETURN EDI_HISTO_LANCEMENTS_SUIVI_TABLE IS
+
+  v_count NUMBER;
+  v_MODE_ADMIN VARCHAR2(10);
+  v_EDITEUR VARCHAR2(100);
+  v_CODTS_JUR VARCHAR2(4000);
+  v_ID_SECU_POP NUMBER;
+  v_ID_SECU_STRUCT_JUR NUMBER;
+  v_ID_SECU_PAC NUMBER;
+  retour EDI_HISTO_LANCEMENTS_SUIVI_TABLE;
+
+BEGIN
+
+  SELECT MIN(VALVAR) INTO v_CODTS_JUR FROM SYS_VARSYS WHERE CODVAR='STRUCTURE_JUR';
+  IF v_CODTS_JUR IS NULL THEN
+    v_CODTS_JUR := 1;
+  END IF;
+  v_count := 0;
+  v_ID_SECU_POP := -1;
+  v_ID_SECU_STRUCT_JUR := -1;
+  v_ID_SECU_PAC := -1;
+  IF p_LOGIN IS NOT NULL THEN
+    SELECT COUNT(*) INTO v_count FROM SYS_SCH_PROFIL_P E, SYS_USR_PROFIL U WHERE E.CODE_PROFIL=U.CODE_PROFIL AND LOGIN = p_LOGIN AND NOM_PAGE = 'Ext.adp.Modules.Signature.SuiviDocumentsEtSignaturesAdmin';
+    BEGIN
+      SELECT ID_SECU INTO v_ID_SECU_POP FROM SYS_SEC_RESOLUE_POP_REQ WHERE LOGIN=p_LOGIN;
+    EXCEPTION WHEN OTHERS THEN NULL; END;
+    BEGIN
+      SELECT ID_SECU INTO v_ID_SECU_STRUCT_JUR FROM SYS_SEC_RESOLUE_STRUCT_REQ WHERE LOGIN=p_LOGIN AND CODTS=v_CODTS_JUR;
+    EXCEPTION WHEN OTHERS THEN NULL; END;
+    BEGIN
+      SELECT ID_SECU INTO v_ID_SECU_PAC FROM SYS_SEC_RESOLUE_PAC_REQ WHERE LOGIN=p_LOGIN;
+    EXCEPTION WHEN OTHERS THEN NULL; END;
+  END IF;
+  v_MODE_ADMIN := 'false';
+  IF v_count>0 THEN
+    v_MODE_ADMIN := 'true';
+  END IF;
+
+  v_EDITEUR := p_EDITEUR;
+  IF v_MODE_ADMIN='false' THEN
+    IF v_EDITEUR='|#ME#|' THEN
+      v_EDITEUR := p_LOGIN;
+    ELSE
+      v_EDITEUR := '';
+    END IF;
+  END IF;
+
+  SELECT EDI_HISTO_LANCEMENTS_SUIVI_RECORD(
+    ID_LANCEMENT, 
+    CODEDI, 
+    FAMEDI, 
+    LOGIN, 
+    DATE_LANCEMENT, 
+    MATRIC, 
+    DATE_EFF, 
+    CHEMIN_FICHIER, 
+    ID_DOC_CONTAINER, 
+    SIGN_LISTE_MANDATAIRES, 
+    SIGN_PROCEDURE, 
+    SIGN_DATE_FIN, 
+    SIGN_MANDATAIRES, 
+    SIGN_CONTRACTANT, 
+    DATE_STATUTS, 
+    IS_BILLED, 
+    IS_PAPERLESS, 
+    IS_DIGIPOSTE, 
+    BENEFICIAIRE, 
+    SEXE, 
+    EMAIL, 
+    TELEPHONE, 
+    TRI_BENEFICIAIRE, 
+    CONTRAT, 
+    TRI_CONTRAT, 
+    FILTRE_CONTRAT, 
+    ETABLISSEMENT, 
+    MAQUETTE, 
+    STATUTEDITION, 
+    FILTRE_STATUTEDITION, 
+    DATECREATION, 
+    TRI_DATECREATION, 
+    DATEFIN, 
+    TRI_DATEFIN, 
+    SIGNATURE, 
+    FILTRE_SIGNATURE, 
+    DATEACTUALISATION, 
+    TRI_DATEACTUALISATION, 
+    EXTENSIONFICHIER, 
+    FILTRE_SOUMISSIGNATURE, 
+    FILTRE_SIGN_LISTE_MANDATAIRES, 
+    TYPEDOC, 
+    DISPLAY_ECRAN_SUIVI, 
+    ALLOW_EDIT, 
+    IS_AUTORIZED
+  ) 
+
+  BULK COLLECT INTO retour
+
+  FROM (
+    SELECT 
+      ID_LANCEMENT, 
+      CODEDI, 
+      FAMEDI, 
+      LOGIN, 
+      DATE_LANCEMENT, 
+      MATRIC, 
+      DATE_EFF, 
+      CHEMIN_FICHIER, 
+      ID_DOC_CONTAINER, 
+      SIGN_LISTE_MANDATAIRES, 
+      SIGN_PROCEDURE, 
+      SIGN_DATE_FIN, 
+      SIGN_MANDATAIRES, 
+      SIGN_CONTRACTANT, 
+      DATE_STATUTS, 
+      IS_BILLED, 
+      IS_PAPERLESS, 
+      IS_DIGIPOSTE, 
+      BENEFICIAIRE, 
+      SEXE, 
+      EMAIL, 
+      TELEPHONE, 
+      TRI_BENEFICIAIRE, 
+      CONTRAT, 
+      TRI_CONTRAT, 
+      FILTRE_CONTRAT, 
+      ETABLISSEMENT, 
+      MAQUETTE, 
+      STATUTEDITION, 
+      FILTRE_STATUTEDITION, 
+      DATECREATION, 
+      TRI_DATECREATION, 
+      DATEFIN, 
+      TRI_DATEFIN, 
+      SIGNATURE, 
+      FILTRE_SIGNATURE, 
+      DATEACTUALISATION, 
+      TRI_DATEACTUALISATION, 
+      EXTENSIONFICHIER, 
+      FILTRE_SOUMISSIGNATURE, 
+      FILTRE_SIGN_LISTE_MANDATAIRES, 
+      TYPEDOC, 
+      -- DISPLAY_ECRAN_SUIVI
+      --   On affiche l'édition sur l'écran de suivi si :
+      --   - On n'a pas de login pour faire le test
+      --   OU
+      --   - Le login a accès à l'écran en mode Admin et le bénéficiaire est autorisé par la sécu
+      --   OU
+      --   - L'utilisateur connecté a effectué l'édition
+      --   OU
+      --   - Une procédure de signature est en cours et le login est signataire
+      CASE 
+        WHEN p_LOGIN IS NULL THEN 'O' 
+        WHEN LOGIN=p_LOGIN THEN 'O' 
+        WHEN v_MODE_ADMIN = 'true' AND IS_AUTORIZED='O' THEN 'O' 
+        WHEN ','||SIGN_LISTE_MANDATAIRES||',' LIKE '%,'||p_LOGIN||',%' AND ID_DOC_CONTAINER IS NOT NULL THEN 'O' 
+        ELSE 'N' 
+      END AS DISPLAY_ECRAN_SUIVI, 
+      -- ALLOW_EDIT
+      --   On peut éditer une procédure (annuler, charger un document, modifier les coordonnées des signataires, ou lancer) si :
+      --   - On n'a pas de login pour faire le test
+      --   OU
+      --   - Le login a accès à l'écran en mode Admin et le bénéficiaire est autorisé par la sécu
+      --   OU
+      --   - L'utilisateur connecté a effectué l'édition
+      CASE 
+        WHEN p_LOGIN IS NULL THEN 'O' 
+        WHEN v_MODE_ADMIN = 'true' AND IS_AUTORIZED='O' THEN 'O' 
+        WHEN LOGIN=p_LOGIN THEN 'O' 
+        ELSE 'N' 
+      END AS ALLOW_EDIT, 
+      IS_AUTORIZED
+    FROM (
+      SELECT H.ID_LANCEMENT, 
+        H.CODEDI, 
+        H.FAMEDI, 
+        H.LOGIN, 
+        H.DATE_LANCEMENT, 
+        H.MATRIC, 
+        H.DATE_EFF, 
+        H.CHEMIN_FICHIER, 
+        H.ID_DOC_CONTAINER, 
+        H.SIGN_LISTE_MANDATAIRES, 
+        H.SIGN_PROCEDURE, 
+        H.SIGN_DATE_FIN, 
+        H.SIGN_MANDATAIRES, 
+        H.SIGN_CONTRACTANT, 
+        H.DATE_STATUTS, 
+        H.IS_BILLED, 
+        H.IS_PAPERLESS, 
+        H.IS_DIGIPOSTE, 
+        -- BENEFICIAIRE
+        '('||H.MATRIC||') '||H.NOM||' '||H.PRENOM AS BENEFICIAIRE, 
+        H.SEXE, 
+        H.EMAIL, 
+        H.TELEPHONE, 
+        -- TRI_BENEFICIAIRE
+        H.MATRIC AS TRI_BENEFICIAIRE, 
+        -- CONTRAT
+        CASE 
+          WHEN H.DATE_DEB_CNT IS NULL THEN NULL 
+          WHEN H.DATE_FIN_CNT IS NULL THEN 'A partir du '||TO_CHAR(H.DATE_DEB_CNT, 'dd.mm.yyyy') 
+          ELSE 'Du '||TO_CHAR(H.DATE_DEB_CNT, 'dd.mm.yyyy')||' au '||TO_CHAR(H.DATE_FIN_CNT, 'dd.mm.yyyy') 
+        END AS CONTRAT, 
+        -- TRI_CONTRAT
+        H.DATE_DEB_CNT AS TRI_CONTRAT, 
+        -- FILTRE_CONTRAT
+        TO_CHAR(H.DATE_DEB_CNT, 'dd.mm.yyyy') AS FILTRE_CONTRAT, 
+        -- ETABLISSEMENT
+        E.LIBELLE_ENTITE AS ETABLISSEMENT, 
+        -- MAQUETTE
+        CASE 
+          WHEN G.LIBELLE IS NULL THEN A.ATTEST_LIBELLE 
+          ELSE G.LIBELLE 
+        END AS MAQUETTE, 
+        -- STATUTEDITION
+        --   Pas de statut dans EDI_DS_LANCEMENT --> Edition Jasper
+        --   SIGN_PROCEDURE vide --> Edition Jasper non soumis à signature : on retourne
+        --   le statut 03 (Document généré)
+        --   SIGN_PROCEDURE renseignée --> Edition Jasper soumis à signature : on retourne
+        --   le statut 06 (Document soumis à signature)
+        CASE 
+          WHEN L.STATUT IS NULL AND H.SIGN_PROCEDURE IS NULL THEN 'Document récupéré' 
+          WHEN L.STATUT IS NULL THEN 'Document soumis à signature' 
+          ELSE DS.LIBELLE_STATUT 
+        END AS STATUTEDITION, 
+        -- FILTRE_STATUTEDITION
+        CASE 
+          WHEN L.STATUT IS NULL AND H.SIGN_PROCEDURE IS NULL THEN '03' 
+          WHEN L.STATUT IS NULL THEN '06' 
+          ELSE L.STATUT 
+        END AS FILTRE_STATUTEDITION, 
+        -- DATECREATION
+        TO_CHAR(H.DATE_LANCEMENT, 'dd.mm.yyyy') AS DATECREATION, 
+        -- TRI_DATECREATION
+        H.DATE_LANCEMENT AS TRI_DATECREATION, 
+        -- DATEFIN
+        TO_CHAR(H.SIGN_DATE_FIN, 'dd.mm.yyyy') AS DATEFIN, 
+        -- TRI_DATEFIN
+        H.SIGN_DATE_FIN AS TRI_DATEFIN, 
+        -- SIGNATURE
+        --   On ne retourne pas le libellé du statut G (Génération en cours)
+        CASE 
+          WHEN H.SIGN_PROCEDURE='G' THEN NULL 
+          ELSE PS.LIBELLE_STATUT 
+        END AS SIGNATURE, 
+        -- FILTRE_SIGNATURE
+        H.SIGN_PROCEDURE AS FILTRE_SIGNATURE, 
+        -- DATEACTUALISATION
+        CASE 
+          WHEN H.DATE_STATUTS IS NULL THEN NULL 
+          ELSE TO_CHAR(H.DATE_STATUTS, 'dd.mm.yyyy')||' à '||TO_CHAR(H.DATE_STATUTS, 'hh24:mi:ss') 
+        END AS DATEACTUALISATION, 
+        -- TRI_DATEACTUALISATION
+        H.DATE_STATUTS AS TRI_DATEACTUALISATION, 
+        -- EXTENSIONFICHIER
+        UPPER(SUBSTR(CHEMIN_FICHIER, INSTR(CHEMIN_FICHIER, '.', -1)+1)) AS EXTENSIONFICHIER, 
+        -- FILTRE_SOUMISSIGNATURE
+        CASE 
+          WHEN H.SIGN_PROCEDURE IS NULL THEN 'N' 
+          ELSE 'O' 
+        END AS FILTRE_SOUMISSIGNATURE, 
+        -- FILTRE_SIGN_LISTE_MANDATAIRES
+        ','||H.SIGN_LISTE_MANDATAIRES||',' AS FILTRE_SIGN_LISTE_MANDATAIRES, 
+        -- TYPEDOC
+        CASE 
+          WHEN G.TYPE IS NOT NULL THEN G.TYPE 
+          WHEN A.ATTEST_ID IS NOT NULL THEN 'A' 
+          ELSE H.TYPE_DOC
+        END AS TYPEDOC, 
+        -- IS_AUTORIZED
+        --   Application de la sécurité :
+        --   - Population PACMAT, si NUMPAC/PACMAT
+        --   - Population MATRIC, si pas de NUMPAC/PACMAT mais un MATRIC (seulement MATRIC en écriture pas en lecture)
+        --   - Structure juridique, si pas de NUMPAC/PACMAT ni de MATRIC, mais un ETABLISSEMENT
+        --   - PAC si pas de NUMPAC/PACMAT ni de MATRIC ni de ETABLISSEMENT, mais un NUMPAC
+        CASE 
+          WHEN H.NUMPAC IS NOT NULL AND H.PACMAT IS NOT NULL 
+            --AND (H.NUMPAC,H.PACMAT) IN (SELECT NUMPAC,PACMAT FROM SYS_SEC_RESOLUE_POP_PAC WHERE ID_SECU=v_ID_SECU_POP) 
+            AND EXISTS (SELECT 1 FROM SYS_SEC_RESOLUE_POP_PAC WHERE ID_SECU=v_ID_SECU_POP AND NUMPAC=H.NUMPAC AND PACMAT=H.PACMAT) 
+          THEN 'O' 
+          WHEN (H.NUMPAC IS NULL OR H.PACMAT IS NULL) AND H.MATRIC IS NOT NULL 
+            --AND H.MATRIC IN (SELECT MATRIC FROM SYS_SEC_RESOLUE_POP_MAT WHERE ID_SECU=v_ID_SECU_POP) 
+            AND EXISTS (SELECT 1 FROM SYS_SEC_RESOLUE_POP_MAT WHERE ID_SECU=v_ID_SECU_POP AND MATRIC=H.MATRIC and ACCES_ECR_LEC = 'E') 
+          THEN 'O' 
+          WHEN (H.NUMPAC IS NULL OR H.PACMAT IS NULL) AND H.MATRIC IS NULL AND H.ETABLISSEMENT IS NOT NULL 
+            --AND H.ETABLISSEMENT IN (SELECT CODE_ENTITE FROM SYS_SEC_RESOLUE_STRUCT WHERE ID_SECU=v_ID_SECU_STRUCT_JUR AND CODTS=v_CODTS_JUR) 
+             AND EXISTS (SELECT 1 FROM SYS_SEC_RESOLUE_STRUCT WHERE ID_SECU=v_ID_SECU_STRUCT_JUR AND CODTS=v_CODTS_JUR AND CODE_ENTITE=H.ETABLISSEMENT) 
+          THEN 'O' 
+          WHEN H.NUMPAC IS NOT NULL AND H.PACMAT IS NULL AND H.MATRIC IS NULL AND H.ETABLISSEMENT IS NULL 
+            --AND H.NUMPAC IN (SELECT NUMPAC FROM SYS_SEC_RESOLUE_PAC WHERE ID_SECU=v_ID_SECU_PAC) 
+            AND EXISTS (SELECT 1 FROM SYS_SEC_RESOLUE_PAC WHERE ID_SECU=v_ID_SECU_PAC AND NUMPAC=H.NUMPAC) 
+          THEN 'O' 
+          WHEN H.NUMPAC IS NULL AND H.PACMAT IS NULL AND H.MATRIC IS NULL AND H.ETABLISSEMENT IS NULL THEN 'O' 
+          ELSE 'N' 
+        END AS IS_AUTORIZED 
+      FROM 
+        EDI_HISTO_LANCEMENTS H 
+        LEFT OUTER JOIN STD_STRUC_ENTITE_VIEW E ON E.CODE_ENTITE=H.ETABLISSEMENT 
+        LEFT OUTER JOIN EDI_DS_LANCEMENT L ON L.ID_HISTO_LANCEMENT=H.ID_LANCEMENT 
+        LEFT OUTER JOIN EDI_DS_STATUTS DS ON DS.CODE_STATUT=L.STATUT 
+        LEFT OUTER JOIN GA_EDITIONS_GAP G ON G.CODE=L.ID_MAQUETTE 
+        LEFT OUTER JOIN GA_ATTESTATION_TYPES A ON A.FAMEDI=H.FAMEDI AND A.CODEDI=H.CODEDI 
+        LEFT OUTER JOIN SIGN_PROCEDURE_STATUTS PS ON PS.CODE_STATUT=H.SIGN_PROCEDURE 
+    ) 
+  )
+  WHERE 1=1 
+    -- Filtre sur la date de lancement
+    AND TRUNC(DATE_LANCEMENT,'dd') BETWEEN TO_DATE(NVL(p_START_DATE,'01.01.1901'),'dd.MM.yyyy') AND TO_DATE(NVL(p_END_DATE,'31.12.2099'),'dd.MM.yyyy') 
+    -- Filtre sur le type de document 
+    AND NVL(TYPEDOC,'_AUCUN_') = NVL(p_TYPE_DOC,NVL(TYPEDOC,'_AUCUN_')) 
+    --  Filtre sur les documents soumis à signature électronique
+    AND (NVL(p_ONLY_PROC_SIGN,'N') != 'O' OR FILTRE_SOUMISSIGNATURE = 'O') 
+    -- Filtre sur un signataire
+    AND (p_SIGNATAIRE is null OR ','||SIGN_LISTE_MANDATAIRES||',' LIKE '%,'||p_SIGNATAIRE||',%') 
+    -- Filtre sur un éditeur
+    AND LOGIN=NVL(v_EDITEUR,LOGIN);
+
+  RETURN retour;
+ 
+END EDI_HISTO_LANCEMENTS_SUIVI_FUNCTION;

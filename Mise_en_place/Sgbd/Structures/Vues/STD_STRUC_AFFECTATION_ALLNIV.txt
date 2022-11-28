@@ -1,0 +1,91 @@
+##
+STD_STRUC_AFFECTATION_ALLNIV
+=SQL=
+CREATE OR REPLACE FORCE VIEW STD_STRUC_AFFECTATION_ALLNIV (MATRIC, CODTS, DATE_EFF, CODE_ENTITE, DATE_FIN, TYPE_ENTITE, DATE_EFF_AFFECT_DIRECTE, CODE_ENTITE_AFFECT_DIRECTE, DATE_FIN_AFFECT_DIRECTE, TYPE_ENTITE_AFFECT_DIRECTE, EST_AFFEC_PRINCIPAL, PROFONDEUR, NIV_TECH) AS 
+  WITH affectations (matric, codts, date_eff, code_entite, date_fin, type_entite, date_eff_affec, code_entite_affec, date_fin_affec, type_entite_affec, est_affec_principal, profondeur, niv_tech) AS
+  (SELECT af.matric,
+    af.codts,
+    af.date_eff,
+    af.code_entite,
+    af.date_fin,
+    (SELECT type_entite
+    FROM std_struc_entite e
+    WHERE e.code_entite=af.code_entite
+    AND af.date_eff BETWEEN e.date_eff AND e.date_fin
+    ),
+    af.date_eff,
+    af.code_entite,
+    af.date_fin,
+    (SELECT type_entite
+    FROM std_struc_entite e
+    WHERE e.code_entite=af.code_entite
+    AND af.date_eff BETWEEN e.date_eff AND e.date_fin
+    ),
+    af.est_affec_principal,
+    0 AS profondeur,
+	(
+	  SELECT NVL(idx.niv_tech, -1) 
+	  FROM std_struc_index idx
+	  WHERE 
+        af.codts = idx.codts
+        -- TODO VRI : ZEU FE, il faudra gérer le CID lors du traitement de cette partie STD_STRUC_AFFECTATION
+        AND af.code_entite = idx.last_entite
+        AND af.date_eff BETWEEN idx.date_eff AND idx.date_fin
+    ) AS niv_tech 	
+  FROM std_struc_affectation af
+  UNION ALL
+  SELECT af.matric,
+    ar.codts,
+    CASE
+      WHEN ar.date_eff<af.date_eff
+      THEN af.date_eff
+      ELSE ar.date_eff
+    END AS date_eff,
+    ar.code_ent_mere,
+    CASE
+      WHEN ar.date_fin<af.date_fin
+      THEN ar.date_fin
+      ELSE af.date_fin
+    END AS date_fin,
+    (SELECT type_entite
+    FROM std_struc_entite e
+    WHERE e.code_entite=ar.code_ent_mere
+    AND ar.date_eff BETWEEN e.date_eff AND e.date_fin
+    ),
+    af.date_eff_affec,
+    af.code_entite_affec,
+    af.date_fin_affec,
+    af.type_entite_affec,
+    af.est_affec_principal,
+    profondeur+1,
+	(
+	  SELECT NVL(idx.niv_tech, -1) 
+	  FROM std_struc_index idx
+	  WHERE 
+        ar.codts = idx.codts
+        -- TODO VRI : ZEU FE, il faudra gérer le CID lors du traitement de cette partie STD_STRUC_AFFECTATION
+	    AND ar.code_ent_mere = idx.last_entite
+	    AND ar.date_eff BETWEEN idx.date_eff AND idx.date_fin
+    ) AS niv_tech
+  FROM affectations af,
+    std_struc_arbre ar
+  WHERE af.codts        =ar.codts
+  AND af.code_entite    =ar.code_entite
+  AND ar.date_eff      <=af.date_fin
+  AND ar.date_fin      >=af.date_eff
+  AND ar.code_ent_mere IS NOT NULL
+  )
+SELECT MATRIC,
+  CODTS,
+  DATE_EFF,
+  CODE_ENTITE,
+  DATE_FIN,
+  TYPE_ENTITE,
+  DATE_EFF_AFFEC,
+  CODE_ENTITE_AFFEC,
+  DATE_FIN_AFFEC,
+  TYPE_ENTITE_AFFEC,
+  EST_AFFEC_PRINCIPAL,
+  PROFONDEUR,
+  NIV_TECH
+FROM affectations

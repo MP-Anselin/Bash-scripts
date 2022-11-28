@@ -1,0 +1,46 @@
+##
+TAG_CHARSET=@€ιθη
+##
+META_AT_IMPACT_WORKFLOWS
+=SQL=
+BEGIN
+  EXECUTE_IMMEDIATE_STRING('DROP MATERIALIZED VIEW "META_AT_IMPACT_WORKFLOWS"',0);
+EXCEPTION WHEN OTHERS THEN NULL;
+END;
+##
+META_AT_IMPACT_WORKFLOWS
+=SQL=
+CREATE MATERIALIZED VIEW "META_AT_IMPACT_WORKFLOWS" ("DATE_MAJ", "PROC_NUM", "PROC_LIBELLE", "OP_NUM", "OP_LIBELLE", "OP_STATUTPROC", "DESTINATION", "EVT_UX", "ORDRE_REQ", "EST_UTILISE", "IS_WKF_UX")
+BUILD IMMEDIATE
+USING INDEX 
+REFRESH FORCE ON DEMAND START WITH sysdate+5/1400 NEXT SYSDATE + 1
+AS 
+  select
+    sysdate DATE_MAJ,
+    to_char(p.proc_num) PROC_NUM, 
+    p.proc_libelle, 
+    to_char(o.op_num) OP_NUM, 
+    o.op_libelle, 
+    CASE  o.op_statutproc
+      WHEN 'I' THEN 'Initiale'
+      WHEN 'N' THEN 'Normale'
+      WHEN 'F' THEN 'Finale'
+      WHEN 'TIF' THEN 'Initiale Finale Terminale'
+      WHEN 'TF' THEN 'Finale Terminale'
+      WHEN 'IF' THEN 'Intiale Finale'
+      ELSE op_statutproc
+    END op_statutproc, 
+    RTRIM(linearisereq('select code_retour from wkf_branch_gen br where br.op_emet_num=''' || o.op_num || '''', ', '), ', ') destination,
+    RTRIM(linearisereq('select ux.libelle from mp_ref_events ux where ux.op_num=''' || o.op_num || '''', ', '), ', ') evt_ux,
+    row_number() over (order by p.proc_libelle, CASE WHEN o.op_statutproc like '%I%' THEN 1 WHEN o.op_statutproc='N' THEN 2 WHEN o.op_statutproc like '%F%' THEN 3 ELSE 9 END, o.op_num) ordre_req,
+    CASE 
+      WHEN EXISTS (select t.proc_num from wkf_tracabilite t where t.op_num=o.op_num) THEN 'O' 
+      ELSE 'N' 
+    END EST_UTILISE,
+    CASE 
+      WHEN EXISTS(select * from mp_ref_events inner join wkf_operations o1 on o1.op_num=mp_ref_events.op_num inner join wkf_processus p1 on p1.proc_num=o1.proc_num where p1.proc_num=p.proc_num) THEN 'O' 
+      ELSE 'N' 
+    END is_wkf_ux
+  from 
+    wkf_processus p
+    inner join wkf_operations o on o.proc_num=p.proc_num

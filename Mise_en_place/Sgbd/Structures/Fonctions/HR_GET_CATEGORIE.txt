@@ -1,0 +1,63 @@
+##
+HR_GET_CATEGORIE
+=SQL=
+CREATE OR REPLACE
+  FUNCTION HR_GET_CATEGORIE(
+      anplan       IN VARCHAR2,
+      code_interne IN NUMBER,
+      type_info    IN VARCHAR2)
+    RETURN VARCHAR2
+  IS
+    anPlanCateg VARCHAR2(4);
+    ModeCateg   VARCHAR2(15);
+    retour      VARCHAR2(200);
+  BEGIN
+    SELECT valvar
+    INTO anPlanCateg
+    FROM sys_varsys
+    WHERE module='FOR'
+    AND codvar  ='CATEGORIE_ANPLAN';
+    IF (anplan IS NULL OR anPlanCateg IS NULL) THEN
+      SELECT valvar
+      INTO ModeCateg
+      FROM sys_varsys
+      WHERE module='FOR'
+      AND codvar  ='CATEGORIE_MODE';
+    ELSE
+      IF (anplan  < anPlanCateg) THEN
+        ModeCateg:='LEG2004';
+      ELSE
+        SELECT valvar
+        INTO ModeCateg
+        FROM sys_varsys
+        WHERE module='FOR'
+        AND codvar  ='CATEGORIE_MODE';
+      END IF;
+    END IF;
+    IF (ModeCateg IS NULL) THEN
+      ModeCateg   :='LEG2004';
+    END IF;
+    IF (type_info IS NULL OR type_info='CODE_CATEGORIE' OR type_info='CODE') THEN
+      SELECT CODE_CATEGORIE
+      INTO retour
+      FROM FOR_CATEGORIE
+      WHERE ID_INTERNE=code_interne
+      AND LEGAL       =ModeCateg;
+    END IF;
+    IF (type_info='LIBELLE_CATEGORIE' OR type_info='LIBELLE') THEN
+      SELECT LIBELLE_CATEGORIE
+      INTO retour
+      FROM FOR_CATEGORIE
+      WHERE ID_INTERNE=code_interne
+      AND LEGAL       =ModeCateg;
+    END IF;
+    IF (type_info='LIBCOURT_CATEGORIE' OR type_info='LIBCOURT') THEN
+      SELECT LIBCOURT_CATEGORIE
+      INTO retour
+      FROM FOR_CATEGORIE
+      WHERE ID_INTERNE=code_interne
+      AND LEGAL       =ModeCateg;
+    END IF;
+    RETURN retour;
+  END; 
+  

@@ -1,0 +1,22 @@
+##
+TAG_CHARSET=@€ιθη
+##
+DIC_PERIODES_RECEUIL_HISTO_AFTER_ROW
+=SQL=
+create or replace FUNCTION DIC_PERIOD_REC_HISTO_AFTER_ROW RETURN CLOB
+ AS
+ v_retour CLOB;
+ BEGIN
+ 
+ v_retour := '
+ v_numpac                 := NVL(v_ligNew.NUMPAC, v_ligOld.NUMPAC);
+ v_paiezad                := NVL(v_ligNew.paiezad, v_ligOld.paiezad);
+ v_periode                := NVL(v_ligNew.PRH_MOIS_PAIE, v_ligOld.PRH_MOIS_PAIE);
+ IF NOT IS_EQ_DATE(v_ligNew.PRH_DATE_DEBUT_1, v_ligOld.PRH_DATE_DEBUT_1) OR NOT IS_EQ_DATE(v_ligNew.PRH_DATE_FIN_1, v_ligOld.PRH_DATE_FIN_1) THEN
+  IF (not paiezadPacPeriodModifed.exists(v_numpac||''#''||v_paiezad) or paiezadPacPeriodModifed(v_numpac||''#''||v_paiezad).PERIODE > v_periode) THEN 
+   paiezadPacPeriodModifed(v_numpac||''#''||v_paiezad):= TGE_PAC_PAIEZAD_PERIOD_RETRO(v_paiezad,v_numpac,v_periode);
+  END IF;
+ END IF;
+ ';
+ RETURN v_retour;
+ END DIC_PERIOD_REC_HISTO_AFTER_ROW;

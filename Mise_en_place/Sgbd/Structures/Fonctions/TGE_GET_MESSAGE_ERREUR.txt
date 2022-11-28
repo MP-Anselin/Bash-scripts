@@ -1,0 +1,23 @@
+##
+TGE_GET_MESSAGE_ERREUR
+=SQL=
+create or replace FUNCTION TGE_GET_MESSAGE_ERREUR 
+(
+  p_ERRPREC in VARCHAR2,
+  p_MESSAGE IN VARCHAR2 
+, p_PARAMS IN VARCHAR2
+, P_CODLANG in VARCHAR2
+) RETURN VARCHAR2 AS 
+message clob;
+messageTropLong varchar2(5000);
+BEGIN
+  
+  message:=p_ERRPREC||GET_MESSAGE_ERREUR_PARAM(p_message,p_params)||CHR(10);
+  
+  if length(message)>3000 then  
+    messageTropLong:=get_message_erreur('TGE','TGE00094',P_CODLANG);  
+    message:=substr(message,0,3000-length(messageTropLong)-5);
+    message:=message||'...'||messageTropLong||CHR(10);  
+  end if;
+  return message;
+END TGE_GET_MESSAGE_ERREUR;

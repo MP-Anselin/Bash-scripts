@@ -1,0 +1,92 @@
+##
+TAG_CHARSET=@€éèç
+##
+TRG_CONTRAT_HISTO_AFTER_STMNT
+=SQL=
+CREATE OR REPLACE FUNCTION TRG_CONTRAT_HISTO_AFTER_STMNT RETURN CLOB AS 
+BEGIN
+  RETURN '
+  IF v_listMatricToUpdate IS NOT NULL THEN
+    -- Insère dans la table temporaire les NUMPAC/PACMAT/MATRIC à mettre à jour
+    --DBMS_OUTPUT.PUT_LINE(''CONTRAT_HISTO UPDATING ''||v_listMatricToUpdate);
+    --FIXME utiliser la procédure trace_dbms_output()
+    EXECUTE_IMMEDIATE_STRING (''INSERT INTO SECUPACMAT_TMP_CONTRAT (NUMPAC, PACMAT, MATRIC) SELECT DISTINCT NUMPAC, PACMAT, MATRIC FROM SECUPACMAT WHERE MATRIC IN (''||v_listMatricToUpdate||'')'',0);
+    SECNAV_MAJ_CURRENT_CONTRAT(''DO_MAJ'', 0, 1, 0);
+    DELETE FROM SECUPACMAT_TMP_CONTRAT;
+    IF INSERTING THEN
+      v_actionIdx := ''I'';
+    ELSIF UPDATING THEN
+      v_actionIdx := ''U'';
+    ELSIF DELETING THEN
+      v_actionIdx := ''D'';
+    END IF;
+    DBMS_JOB.SUBMIT(v_jobIdx , ''BEGIN NULL; END;'' , sysdate+1);
+ 	DBMS_JOB.WHAT(v_jobIdx , ''ALIM_IDX.COMPARE_CONTRAT_HISTO_JOB(''||v_jobIdx||'', ''''''||v_actionIdx||'''''');'');
+ 	DBMS_JOB.NEXT_DATE(v_jobIdx ,  sysdate-1);
+    INSERT INTO DIC_IDX_JOB_KEYS SELECT v_jobIdx, T.* FROM TABLE(v_cles_idx_contrat) T;
+    IF INSERTING OR UPDATING THEN
+      INSERT INTO DIC_IDX_JOB_OLD_DATAS VALUES (v_jobIdx, ANYDATA.CONVERTCOLLECTION(GET_DACH_MULTI_HORS_TRANSAC(v_cles_idx_contrat)));
+    END IF;
+  END IF;
+   --CRF RSI 
+  select count(*) into v1_bypass_DACH from bypass_trg_DACH_on_session;
+  IF v1_bypass_DACH =0 THEN
+  FOR i IN 1..paiezadTab.count
+  LOOP
+    IF v_type_writer = ''M'' THEN
+      listJobMasseAsyncTab.extend();
+      listJobMasseAsyncTab(listJobMasseAsyncTab.last):='' TGE_ALIM_PERIODE_INDIV(0, '''''' || numpacTab(i) || '''''', '''''' || periodeTab(i) || '''''', '''''' || paiezadTab(i) || '''''');'';
+    ELSE
+      TGE_ALIM_PERIODE_INDIV(0, numpacTab(i), periodeTab(i), paiezadTab(i));
+    END IF;
+  END LOOP ;
+  
+  FOR i IN 1..calcHpTab.count
+  LOOP
+  	in_calc_hp := calcHpTab(i);
+	IF in_calc_hp.exists(''P_NUMPAC'') THEN
+	  	IF v_type_writer = ''M'' THEN
+	      	listJobMasseAsyncTab.extend();
+	      	listJobMasseAsyncTab(listJobMasseAsyncTab.last):='' CALC_HP.PRINCIPAL(
+			    '''''' || in_calc_hp(''P_NUMPAC'') || '''''',
+			    '''''' || in_calc_hp(''P_PACMAT'') || '''''',
+			    '''''' || in_calc_hp(''P_PAIEZAD'') || '''''',
+			     	'' || in_calc_hp(''P_NUMCNT'') || '',
+			    '''''' || in_calc_hp(''P_DATE_EFF'') || '''''',
+			    '''''' || in_calc_hp(''P_DATE_SORTIE_SIT_BO'') || '''''',
+			    '''''' || in_calc_hp(''P_LOGIN'') || '''''', 
+			    '''''' || in_calc_hp(''p_isDeleting'')  || ''''''
+			  	);'';
+	    ELSE
+	        CALC_HP.PRINCIPAL(
+			    in_calc_hp(''P_NUMPAC''),
+			    in_calc_hp(''P_PACMAT''),
+			    in_calc_hp(''P_PAIEZAD''),
+			    TO_NUMBER(in_calc_hp(''P_NUMCNT'')),
+			    in_calc_hp(''P_DATE_EFF''),
+			    in_calc_hp(''P_DATE_SORTIE_SIT_BO''),
+			    in_calc_hp(''P_LOGIN'') , 
+			    in_calc_hp(''p_isDeleting'') 
+			  );
+	    END IF;
+	 END IF;
+ END LOOP ;
+ END IF; 
+ --FIN CRF RSI
+  -- maj secupacmat.PRESENCE_FICHIER
+  indexTabPresFicPacmat := tabPresenceFichierPacmat.FIRST;
+  WHILE indexTabPresFicPacmat IS NOT NULL LOOP
+    IF v_type_writer = ''M'' THEN
+      listJobMasseAsyncTab.extend();
+      listJobMasseAsyncTab(listJobMasseAsyncTab.last):='' R_PRESENT_FICHIER_PAIE('''''' || tabPresenceFichierPacmat(indexTabPresFicPacmat).NUMPAC || '''''','''''' || tabPresenceFichierPacmat(indexTabPresFicPacmat).PACMAT || '''''');'';
+    ELSE
+      R_PRESENT_FICHIER_PAIE(tabPresenceFichierPacmat(indexTabPresFicPacmat).NUMPAC,tabPresenceFichierPacmat(indexTabPresFicPacmat).PACMAT);
+    END IF;
+    indexTabPresFicPacmat := tabPresenceFichierPacmat.NEXT(indexTabPresFicPacmat);
+  end loop;
+  --Lancement du job async lors d''une mise à jour Manuelle, en Masse (type_writer = ''M'')
+  IF v_type_writer = ''M'' THEN
+    DBMS_JOB_SUBMIT_MASSE(listJobMasseAsyncTab, ''TRG_DACH'');
+  END IF;
+';
+END TRG_CONTRAT_HISTO_AFTER_STMNT;

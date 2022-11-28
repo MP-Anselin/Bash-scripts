@@ -1,0 +1,110 @@
+##
+TAG_CHARSET=@€ιθη
+##
+SYS_TRT_TOMAKE 
+==
+delete from SYS_TRT_TOMAKE where ID_TRT='Traitement_InterrogationDocument'
+'Traitement_InterrogationDocument','H01'
+##
+SYS_TRT_TOMAKE
+==
+DELETE FROM SYS_TRT_TOMAKE WHERE ID_TRT like 'Traitement_ESignature' 
+'Traitement_ESignature','01'
+##
+SYS_TRT_TOMAKE
+==
+DELETE FROM SYS_TRT_TOMAKE WHERE ID_TRT = 'Traitement_EnvoieWorkerDex' 
+'Traitement_EnvoieWorkerDex','00'
+##
+SYS_TRT_TOMAKE
+=SQL IFEXIST=SYS_TRT_TOMAKE=
+DELETE FROM SYS_TRT_TOMAKE WHERE ID_TRT = 'Traitement_Purge_SYS_DEF_PURGE_TBL'
+##
+SYS_TRT_TOMAKE
+=SQL IFEXIST=SYS_TRT_TOMAKE=
+INSERT INTO SYS_TRT_TOMAKE (ID_TRT,REQUESTEDGO_OR_FREQUENCY) VALUES ('Traitement_Purge_SYS_DEF_PURGE_TBL','01')
+##
+SYS_TRT_TOMAKE
+==
+DELETE FROM SYS_TRT_TOMAKE WHERE ID_TRT = 'Traitement_ExtractionDemat' 
+'Traitement_ExtractionDemat','00'
+##
+SYS_TRT_TOMAKE
+==
+DELETE FROM SYS_TRT_TOMAKE WHERE ID_TRT = 'Traitement_EnvoieJobStatusChange' 
+'Traitement_EnvoieJobStatusChange','00'
+##
+SYS_TRT_TOMAKE
+==
+DELETE FROM SYS_TRT_TOMAKE WHERE ID_TRT = 'Traitement_MoveReportDumaFile' 
+'Traitement_MoveReportDumaFile','00'
+##
+SYS_TRT_TOMAKE
+==
+DELETE FROM SYS_TRT_TOMAKE WHERE ID_TRT = 'Traitement_PurgeTableGapTrtDoc' 
+'Traitement_PurgeTableGapTrtDoc','01-06:30'
+##
+SYS_TRT_TOMAKE
+==
+insert into sys_trt_tomake (ID_TRT,REQUESTEDGO_OR_FREQUENCY)  select 'Traitement_InitEncryption','01' from dual where not exists ( select 1 from sys_trt_tomake where id_trt like 'Traitement_InitEncryption%')
+##
+SYS_TRT_TOMAKE
+==
+DELETE FROM SYS_TRT_TOMAKE WHERE ID_TRT = 'Traitement_AlimDocContainerMetadata' 
+'Traitement_AlimDocContainerMetadata','01'
+##
+SYS_TRT_TOMAKE
+=SQL IFEXIST=SYS_TRT_TOMAKE=
+DELETE FROM SYS_TRT_TOMAKE WHERE ID_TRT = 'Traitement_PropagerCAD'
+##
+SYS_TRT_TOMAKE
+=SQL IFEXIST=SYS_TRT_TOMAKE=
+INSERT INTO SYS_TRT_TOMAKE (ID_TRT, REQUESTEDGO_OR_FREQUENCY) VALUES ('Traitement_PropagerCAD','00')
+##
+SYS_TRT_TOMAKE
+==
+DELETE FROM SYS_TRT_TOMAKE WHERE ID_TRT = 'Traitement_ControleMail' 
+'Traitement_ControleMail','00'
+##
+SYS_TRT_TOMAKE
+==
+DELETE FROM SYS_TRT_TOMAKE WHERE ID_TRT = 'Traitement_ExportDocumentsSignes' 
+'Traitement_ExportDocumentsSignes','00'
+##
+SYS_TRT_TOMAKE
+==
+insert into sys_trt_tomake (ID_TRT,REQUESTEDGO_OR_FREQUENCY)  select 'Traitement_CompleteRetroTardive?NUMPAC=XXXXX&PERIODE=YYYYMM','00' from dual where not exists ( select 1 from sys_trt_tomake where id_trt like 'Traitement_CompleteRetroTardive%')
+##
+SYS_TRT_TOMAKE 
+==
+delete from SYS_TRT_TOMAKE where ID_TRT='Traitement_EnvoieJobStatusChange'
+'Traitement_EnvoieJobStatusChange','H01'
+##
+SYS_TRT_TOMAKE 
+==
+delete from SYS_TRT_TOMAKE where ID_TRT='Traitement_Dpae_Renvoi_MSA'
+'Traitement_Dpae_Renvoi_MSA','00'
+##
+SYS_TRT_TOMAKE 
+==
+delete from SYS_TRT_TOMAKE where ID_TRT='Traitement_DpaeMsa'
+'Traitement_DpaeMsa','00'
+##
+SYS_TRT_TOMAKE
+==
+DELETE FROM SYS_TRT_TOMAKE WHERE ID_TRT = 'Traitement_ExportDroitACE'
+'Traitement_ExportDroitACE','00'
+##
+SYS_TRT_TOMAKE
+==
+DELETE FROM SYS_TRT_TOMAKE WHERE ID_TRT like 'Traitement_Purge_TablesDePaie%'
+'Traitement_Purge_TablesDePaie?WithOrphanPartitions=true','00'
+##
+SYS_TRT_TOMAKE
+=IF_ROW_NOTEXIST=
+'Traitement_LancementBatchCFT?nomInterface=Hexaposte','00'
+##
+SYS_TRT_TOMAKE
+==
+DELETE FROM SYS_TRT_TOMAKE WHERE ID_TRT = 'Traitement_PurgeTableGapTrtDoc' 
+'Traitement_PurgeTableGapTrtDoc','01-07:30'

@@ -1,0 +1,38 @@
+##
+META_MAX_ORDRE_GROUPE_DONNEES
+=SQL=
+create or replace
+FUNCTION META_MAX_ORDRE_GROUPE_DONNEES(
+      p_company_id VARCHAR2,
+      p_id_groupe  VARCHAR2)
+    RETURN NUMBER
+  IS
+    v_nbSousGroupes NUMBER;
+    v_retour        NUMBER;
+  BEGIN
+    SELECT MAX(ORDRE)
+    INTO v_retour
+    FROM META_GROUPE_DONNEES
+    WHERE COMPANY_ID=p_company_id
+    AND ID_GROUPE   =p_id_groupe;
+    DECLARE
+      CURSOR v_tabSousGroupes
+      IS
+        SELECT *
+        FROM META_GROUPE_DONNEES
+        WHERE COMPANY_ID=p_company_id
+        AND ID_GROUPE   =p_id_groupe
+        AND NOM_DONNEE LIKE '#GROUPE%';
+      v_ligneSousGroupe META_GROUPE_DONNEES%ROWTYPE;
+    BEGIN
+      OPEN v_tabSousGroupes;
+      LOOP
+        FETCH v_tabSousGroupes INTO v_ligneSousGroupe;
+        EXIT
+      WHEN v_tabSousGroupes%NOTFOUND OR v_retour>1000;
+        v_retour                               := v_retour+META_MAX_ORDRE_GROUPE_DONNEES(p_company_id, v_ligneSousGroupe.SUFFIXE_OU_LIBELLE);
+      END LOOP;
+      CLOSE v_tabSousGroupes;
+    END;
+    RETURN v_retour;
+  END META_MAX_ORDRE_GROUPE_DONNEES;

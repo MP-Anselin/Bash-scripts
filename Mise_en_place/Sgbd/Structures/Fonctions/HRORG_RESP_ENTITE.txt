@@ -1,0 +1,170 @@
+##
+TAG_CHARSET=@€éèç
+##
+HRORG_RESP_ENTITE
+=SQL=
+create or replace FUNCTION HRORG_RESP_ENTITE(
+    p_codts          IN std_struc_arbre.codts%TYPE,
+    p_codeEntite     IN std_struc_arbre.code_entite%TYPE,
+    p_date           IN std_struc_entite.date_eff%TYPE,
+    p_avecUsrExterne IN INT,                    -- 0 : on ne retourne que les salariés, 1 : on retourne les responsables user externe
+    p_matric         IN VARCHAR2, -- peut être null
+    p_cid   IN std_struc_arbre.cid%TYPE default null)
+  RETURN std_struc_entite.matric_resp%TYPE
+IS
+  v_matricPrincipal secumatric.matric%TYPE;
+  v_retour std_struc_arbre.login_resp%TYPE;
+  v_matricResp std_struc_arbre.matric_resp%TYPE;
+  v_reqSelectMatricResp VARCHAR2(4000);
+  v_matricRespSuppOuRemp VARCHAR2(4000);
+  v_matricRespRemp VARCHAR2(4000);
+  v_listMatricRespSuppOuRemp VARCHAR2(4000);
+  v_loginResp std_struc_arbre.login_resp%TYPE;
+  v_req VARCHAR2(4000);
+  v_withMatric BOOLEAN;
+  v_cid std_struc_arbre.cid%TYPE;
+BEGIN
+  
+  v_cid := p_cid;
+  IF (v_cid IS NULL) THEN
+  	BEGIN
+  		SELECT VALVAR INTO v_cid FROM SYS_VARSYS where CODVAR = 'NS_CLIENT_ID';
+  	EXCEPTION
+  	WHEN NO_DATA_FOUND THEN
+  		v_cid := null;
+  	END;
+  END IF;
+  IF (v_cid IS NULL) THEN
+  	-- En mode multiclient, la varsys peut être null et le passage du paramètre pCid est obligatoire
+  	RETURN null;
+  END IF;
+	
+  -- p_matric peut être de la forme :
+  -- - 'XXXXXXX'
+  -- - 'XXXXXXX,YYYYYYY,ZZZZZZZ'
+  -- - 'XXXXXXX,YYYYYYY-->ZZZZZZZ,AAAAAAA-->BBBBBBB'
+  -- Le premier matricule (XXXXXXX) est le matricule principal (à ne pas retourner)
+  -- Les matricules suivants doivent être considérés comme supprimés (si seul) / remplacés (si '-->')
+  v_matricPrincipal             := p_matric;
+  IF INSTR(v_matricPrincipal,',')>0 THEN
+    v_matricPrincipal           := SUBSTR(v_matricPrincipal,1,INSTR(v_matricPrincipal,',')-1);
+  END IF;
+  v_withMatric := false;
+  v_reqSelectMatricResp := 'matric_resp';
+  IF p_matric IS NOT NULL AND NOT v_matricPrincipal = p_matric THEN
+    v_listMatricRespSuppOuRemp := SUBSTR(p_matric,INSTR(p_matric,',')+1);
+    LOOP
+      IF INSTR(v_listMatricRespSuppOuRemp,',')>0 THEN
+        v_matricRespSuppOuRemp := SUBSTR(v_listMatricRespSuppOuRemp,1,INSTR(v_listMatricRespSuppOuRemp,',')-1);
+        v_listMatricRespSuppOuRemp := SUBSTR(v_listMatricRespSuppOuRemp,INSTR(v_listMatricRespSuppOuRemp,',')+1);
+      ELSE
+        v_matricRespSuppOuRemp := v_listMatricRespSuppOuRemp;
+        v_listMatricRespSuppOuRemp := NULL;
+      END IF;
+      IF INSTR(v_matricRespSuppOuRemp,'-->')>0 THEN
+        v_matricRespRemp := ''''||SUBSTR(v_matricRespSuppOuRemp,INSTR(v_matricRespSuppOuRemp,'-->')+3)||'''';
+        v_matricRespSuppOuRemp := SUBSTR(v_matricRespSuppOuRemp,1,INSTR(v_matricRespSuppOuRemp,'-->')-1);
+      ELSE
+        v_matricRespRemp := 'NULL';
+      END IF;
+      v_reqSelectMatricResp := 'REPLACE('||v_reqSelectMatricResp||','''||v_matricRespSuppOuRemp||''','||v_matricRespRemp||')';
+      EXIT WHEN v_listMatricRespSuppOuRemp IS NULL;
+    END LOOP;
+  END IF;
+  -- Recherche du responsable sur la branche de l'arbre  
+  v_req := 'SELECT matric_resp, login_resp';
+  v_req := v_req||' FROM (';
+  v_req := v_req||'   SELECT code_entite, code_ent_mere, codTs, '||v_reqSelectMatricResp||' as matric_resp, login_resp';  
+  v_req := v_req||'   FROM std_struc_arbre';
+  v_req := v_req||'   START WITH'; 
+  v_req := v_req||'     code_entite = :1'; 
+  v_req := v_req||'     AND codTs = :2';
+  v_req := v_req||'     AND :3 BETWEEN date_eff AND date_fin';
+  v_req := v_req||'     AND cid = :4';
+  v_req := v_req||'     AND statut = ''1'''; 
+  v_req := v_req||'   CONNECT BY'; 
+  v_req := v_req||'   PRIOR code_ent_mere = code_entite';
+  v_req := v_req||'   AND PRIOR codTs = codTs';
+  v_req := v_req||'   AND PRIOR cid = cid';
+  v_req := v_req||'   AND :5 BETWEEN date_eff AND date_fin';
+  v_req := v_req||')'; 
+  v_req := v_req||' WHERE';
+  v_req := v_req||'   1=1';
+  IF p_avecUsrExterne = 0 THEN
+    v_req := v_req||'    AND matric_resp IS NOT NULL';
+  ELSE
+    v_req := v_req||'   AND (matric_resp IS NOT NULL';
+    v_req := v_req||'   OR';
+    v_req := v_req||'   login_resp IS NOT NULL)';
+  END IF;
+  IF(p_matric IS NOT NULL) THEN
+    v_withMatric := true;
+    v_req := v_req||' AND NVL(matric_resp,''*'') != :6 ';
+  END IF;
+  v_req := v_req||'   AND ROWNUM = 1';
+  
+  BEGIN
+    IF v_withMatric THEN
+      EXECUTE IMMEDIATE v_req INTO v_matricResp, v_loginResp USING p_codeEntite, p_codts, p_date, v_cid, p_date,  v_matricPrincipal;
+    ELSE
+      EXECUTE IMMEDIATE v_req INTO v_matricResp, v_loginResp USING p_codeEntite, p_codts, p_date, v_cid, p_date;
+    END IF;
+    
+    IF v_loginResp IS NOT NULL AND p_avecUsrExterne = 1 THEN
+      v_retour := v_loginResp;
+    ELSE
+      v_retour := v_matricResp;
+    END IF;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      v_retour := NULL;
+  END;
+  
+-- Recherche du responsable sur l'entité
+IF( v_retour  IS NULL ) THEN
+  v_req       := 'SELECT matric_resp, login_resp';
+  v_req       := v_req||' FROM std_struc_entite';
+  v_req       := v_req||' WHERE';
+  v_req       := v_req||'   code_entite = '''||p_codeEntite||'''';
+  v_req       := v_req||'   and cid = '''||v_cid||'''';
+  v_req       := v_req||'   AND '''||p_date||''' BETWEEN date_eff AND date_fin';
+  IF(p_matric IS NOT NULL) THEN
+    v_req     := v_req||'   AND matric_resp <> '''||v_matricPrincipal||'''';
+  END IF;
+
+  BEGIN
+    EXECUTE IMMEDIATE v_req INTO v_matricResp, v_loginResp;
+    IF v_loginResp IS NOT NULL AND p_avecUsrExterne = 1 THEN
+      v_retour     := v_loginResp;
+    ELSE
+      v_retour := v_matricResp;
+    END IF;
+  EXCEPTION
+  WHEN NO_DATA_FOUND THEN
+    v_retour := NULL;
+  END;
+END IF ;
+
+-- Rechercher du responsable sur la structure
+IF( v_retour IS NULL) THEN
+  SELECT matric_resp,
+    login_resp
+  INTO v_matricResp,
+    v_loginResp
+  FROM std_struc_type
+  WHERE codts     = p_codts ;
+  IF v_loginResp IS NOT NULL AND p_avecUsrExterne = 1 THEN
+    v_retour     := v_loginResp;
+  ELSE
+    v_retour := v_matricResp;
+  END IF;
+  IF(p_matric IS NOT NULL AND v_matricPrincipal = v_retour ) THEN
+    v_retour  := NULL;
+  END IF;
+END IF;
+RETURN v_retour ;
+EXCEPTION
+WHEN OTHERS THEN
+  DBMS_OUTPUT.put_line('Exception ' || SQLCODE || ' - ' || SQLERRM);
+  RETURN NULL;
+END HRORG_RESP_ENTITE ;

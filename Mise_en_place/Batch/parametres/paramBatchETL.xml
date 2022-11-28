@@ -1,0 +1,35 @@
+<interface idInterface="TRTETL">
+	<nomInterface>TRAITEMENT ETL</nomInterface>
+	<descriptionInterface>Import des donnees GAP vers une base HRT secable</descriptionInterface>
+	<racineInterface>.../BatchCFT/DEV/</racineInterface>
+	<traitements>
+		<traitement>
+			<descriptionTraitement>Chargement du premier script SQL </descriptionTraitement>
+			<desactive>NON</desactive>
+			<ceif></ceif>
+			<typeTraitement>SCRIPT</typeTraitement>
+			<nomFichier>XXX.sql</nomFichier>
+			<typeFichier>SQL</typeFichier>
+			<commitGeneral>OUI</commitGeneral>
+			<continueSiErreur>OUI</continueSiErreur>
+		</traitement>
+		<traitement>
+			<descriptionTraitement>Import des donnees GAP vers une base HRT secable</descriptionTraitement>
+			<desactive>NON</desactive>
+			<typeTraitement>ETLHRT</typeTraitement>
+			<type_import>N</type_import>
+			<versionGAP_client>4090XX</versionGAP_client>
+			<dbLinkName>XXX</dbLinkName>
+		</traitement>
+		<traitement>
+			<descriptionTraitement>Chargement du deuxieme script SQL </descriptionTraitement>
+			<desactive>NON</desactive>
+			<ceif></ceif>
+			<typeTraitement>SCRIPT</typeTraitement>
+			<nomFichier>XXX.sql</nomFichier>
+			<typeFichier>SQL</typeFichier>
+			<commitGeneral>OUI</commitGeneral>
+			<continueSiErreur>OUI</continueSiErreur>
+		</traitement>
+	</traitements>
+</interface>

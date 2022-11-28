@@ -1,0 +1,19 @@
+<interface idInterface="TABNATIO">
+	<nomInterface>Chargement des tables nationales de GA</nomInterface>
+	<descriptionInterface></descriptionInterface>
+	<alerteSiFichierNonDisponible>OUI</alerteSiFichierNonDisponible>
+	<listeDependancesFichiers>
+		<nomFichierDep>TABNATIO.TXT</nomFichierDep>
+	</listeDependancesFichiers>
+	<traitements>
+		<traitement>
+			<descriptionTraitement>Chargement des donnees</descriptionTraitement>
+			<typeTraitement>CHARGEMENT</typeTraitement>
+			<nbcommit>1000</nbcommit>
+			<nomFichier>TABNATIO.TXT</nomFichier>
+			<typeFichier>MAJBASE</typeFichier>
+			<modeChargement>AER</modeChargement>
+			<continueSiErreur>OUI</continueSiErreur>
+		</traitement>
+	</traitements>
+</interface>

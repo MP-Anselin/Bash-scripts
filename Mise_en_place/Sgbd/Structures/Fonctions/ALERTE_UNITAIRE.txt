@@ -1,0 +1,26 @@
+##
+ALERTE_UNITAIRE
+=SQL=
+CREATE OR REPLACE
+  FUNCTION ALERTE_UNITAIRE(
+      Req IN VARCHAR2)
+    RETURN NUMBER
+  IS
+  TYPE TCur
+IS
+  REF
+  CURSOR ;
+    cur TCur ;
+    RetourSelect VARCHAR2(80);
+    Retour       NUMBER := 0;
+  BEGIN
+    OPEN cur FOR Req ;
+    LOOP
+      FETCH cur INTO Retour ;
+    EXIT
+  WHEN cur%NOTFOUND ;
+    RETURN Retour ;
+  END LOOP ;
+  CLOSE cur ;
+  RETURN Retour;
+END ; 

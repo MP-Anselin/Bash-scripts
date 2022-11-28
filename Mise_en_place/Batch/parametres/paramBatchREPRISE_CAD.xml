@@ -1,0 +1,19 @@
+<interface idInterface="RCD">
+	<nomInterface>Reprise des CAD </nomInterface>
+	<descriptionInterface>Reprise des CAD Client : Le fichier a importer doit etre nomme REPRISE_CAD.txt</descriptionInterface>
+	<alerteSiFichierNonDisponible>OUI</alerteSiFichierNonDisponible>
+	<listeDependancesFichiers>
+		<nomFichierDep>REPRISE_CAD.TXT</nomFichierDep>
+	</listeDependancesFichiers>
+	<SupprimerFichier>NON</SupprimerFichier>
+	<traitements>
+		<traitement>
+			<descriptionTraitement>Reprise des CAD</descriptionTraitement>
+			<typeTraitement>REPRISE_CAD</typeTraitement>
+			<modeTrt>I</modeTrt>
+			<fichierSource>REPRISE_CAD.txt</fichierSource>
+			<fichierLignesEnErreur>lignesEnErreur.txt</fichierLignesEnErreur>
+			<fichierRapport>rapport.txt</fichierRapport>
+		</traitement>
+	</traitements>
+</interface>

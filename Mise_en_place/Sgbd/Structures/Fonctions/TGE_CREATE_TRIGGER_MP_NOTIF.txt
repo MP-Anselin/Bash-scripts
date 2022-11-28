@@ -1,0 +1,627 @@
+##
+TAG_CHARSET=@€éèç
+##
+TGE_CREATE_TRIGGER_MP_NOTIF
+=SQL=
+CREATE OR REPLACE FUNCTION TGE_CREATE_TRIGGER_MP_NOTIF(NOM_TABLE IN VARCHAR2)
+RETURN CLOB
+AS
+  v_retour CLOB;
+
+  v_typeTable VARCHAR(1);
+  date_eff_exists NUMBER;
+  PROC_DEX_UPDATING CLOB;
+  PROC_DEX_UPDATING_TMP CLOB;
+  PROC_DEX_CONDITION CLOB;
+  v_existeDonneeDex boolean;
+  v_eventDexPrec VARCHAR(100);
+  v_cleSecondaireDex VARCHAR(300);
+  v_cle1SecondaireMP VARCHAR(100);
+  v_cle2SecondaireMP VARCHAR(100);
+  v_cle3SecondaireMP VARCHAR(100);
+  v_action_acr varchar2(3);
+  v_event_sans_acr MP_MAPPING_EVENT_DATA.EVENT%TYPE; 
+  v_condition_acr_old_vide CLOB;
+  v_condition_acr_new_vide CLOB;
+  v_condition_donnee CLOB;
+  v_condition_donnee_sql CLOB;
+  -- Ce tableau indexé contient l'association entre un couple NOM_DONNEE/EVENT et le SOUS_EVENT à générer
+  TYPE T_MAPPING_SPECIF_SOUS_EVENT IS TABLE OF VARCHAR2(100) INDEX BY VARCHAR2(150);
+  mappingSubEventByEventAndData T_MAPPING_SPECIF_SOUS_EVENT;
+  -- Ce tableau indexé contient l'association entre un SOUS_EVENT et le IF qui conditionne sa génération
+  TYPE T_SUB_EVENT_CONDITION IS TABLE OF CLOB INDEX BY VARCHAR2(100);
+  subEventToGenWithCond T_SUB_EVENT_CONDITION;
+  subEventToGen VARCHAR2(100);
+  -- Ce tableau indexé contient l'association entre un EVENT et la liste des SOUS_EVENT de cet EVENT, et le IF qui conditionne sa génération
+  TYPE T_SUB_EVENT_CONDITION_BY_EVENT IS TABLE OF T_SUB_EVENT_CONDITION INDEX BY VARCHAR2(100);
+  subEventToGenWithCondByEvent T_SUB_EVENT_CONDITION_BY_EVENT;
+  -- Ce tableau indexé contient l'association entre un couple EVENT(de type ACR)/CONDITION et la clause SQL de cette condition
+  TYPE T_CONDITION_EVENT_ACR IS TABLE OF CLOB INDEX BY VARCHAR2(4000);
+  conditionForEventAcr T_CONDITION_EVENT_ACR;
+
+  CURSOR cur_donneesDex IS
+    SELECT DISTINCT DMED.EVENT, RDMU.NOM_DONNEE, RDMU.CONDITION, DMED.NOM_DONNEE_DEX_OU_EVENT, LTRIM(REGEXP_SUBSTR(DMED.EVENT, '\.[acr]{1,3}$'),'.') ACTION_ACR, REGEXP_REPLACE(DMED.EVENT, '\.[acr]{1,3}$','') EVENT_SANS_ACR, UTC.DATA_TYPE 
+    FROM MP_MAPPING_EVENT_DATA DMED, REF_DONNEE_MAPPING_UX RDMU, REF_DONNEE_GENERALE RDG, USER_TAB_COLS UTC 
+    WHERE 
+      UTC.COLUMN_NAME=RDMU.NOM_DONNEE AND UTC.TABLE_NAME=NOM_TABLE 
+      AND DMED.NOM_DONNEE_DEX_OU_EVENT=RDMU.NOM_DONNEE_UX 
+      AND RDMU.NOM_DONNEE=RDG.NOM_DONNEE 
+      AND DMED.UTILISE_TRIGGER='O' 
+      AND DMED.TYPE='D' 
+      AND RDG.NOM_DICTIONNAIRE=NOM_TABLE 
+    ORDER BY DMED.EVENT, RDMU.NOM_DONNEE;
+  lig_donneeDex cur_donneesDex%rowtype;
+  vFunctionCompare VARCHAR2(10);
+  vFunctionCompareParam3 VARCHAR2(50);
+
+  CURSOR cur_eventsDex IS
+    SELECT DISTINCT DMED.EVENT, RDMU.CONDITION, LTRIM(REGEXP_SUBSTR(DMED.EVENT, '\.[acr]{1,3}$'),'.') ACTION_ACR, REGEXP_REPLACE(DMED.EVENT, '\.[acr]{1,3}$','') EVENT_SANS_ACR 
+    FROM MP_MAPPING_EVENT_DATA DMED, REF_DONNEE_MAPPING_UX RDMU, REF_DONNEE_GENERALE RDG 
+    WHERE 
+      DMED.NOM_DONNEE_DEX_OU_EVENT=RDMU.NOM_DONNEE_UX 
+      AND RDMU.NOM_DONNEE=RDG.NOM_DONNEE 
+      AND DMED.UTILISE_TRIGGER='O' 
+      AND DMED.TYPE='D' 
+      AND RDG.NOM_DICTIONNAIRE=NOM_TABLE;
+  lig_eventDex cur_eventsDex%rowtype;
+
+  CURSOR cur_subEventsDex IS
+    SELECT NOM_DONNEE, EVENT, SOUS_EVENT
+    FROM MP_SPECIF_MAP_SOUS_EVENT_DATA
+    WHERE 
+      NOM_DONNEE IN (
+        SELECT COLUMN_NAME 
+        FROM USER_TAB_COLS 
+        WHERE TABLE_NAME=NOM_TABLE
+      );
+  lig_subEventDex cur_subEventsDex%rowtype;
+
+BEGIN
+
+  BEGIN EXECUTE_IMMEDIATE_STRING( 'DROP PROCEDURE CHECK_MP_NOTIF_'||NOM_TABLE,0); EXCEPTION WHEN OTHERS THEN NULL; END;
+
+  -- On vérifie si la table va générer des évènements pour DEX (au moins une donnée mappée, ou dictionnaire DIC_ADM_CONTRAT qui gère l'embauche et le départ)
+  v_existeDonneeDex := false;
+  IF nom_table='DIC_ADM_CONTRAT' THEN
+    v_existeDonneeDex := TRUE;
+  ELSE
+    OPEN cur_donneesDex;
+    LOOP FETCH cur_donneesDex INTO lig_donneeDex ;
+      EXIT WHEN cur_donneesDex%NOTFOUND OR v_existeDonneeDex;
+      v_existeDonneeDex := true;
+    END LOOP;
+    CLOSE cur_donneesDex;
+  END IF;
+
+  IF NOT v_existeDonneeDex THEN
+    RETURN NULL;
+  END IF;
+
+  v_retour := 'CREATE OR REPLACE PROCEDURE CHECK_MP_NOTIF_'||NOM_TABLE||'(v_ligOld '||NOM_TABLE||'%ROWTYPE, v_ligNew '||NOM_TABLE||'%ROWTYPE) IS 
+ v_matric VARCHAR2(32);
+ v_paiezad VARCHAR2(8);
+ v_dexaction varchar2(1);
+ v_dexCleSecondaire VARCHAR2(100);
+ exist_contrat_for_matric NUMBER ;
+ TYPE eventsTabType is  table of MP_EVENTS%ROWTYPE ;
+ eventsTab eventsTabType := eventsTabType();
+ TYPE subEventsTabType is  table of MP_SPECIF_SOUS_EVENT%ROWTYPE ;
+ subEventsTab subEventsTabType := subEventsTabType();
+ v_processEventDex boolean;
+ v_processEventDexTypeAcr varchar2(3);
+ v_toutesLesNouvelleValVides boolean;
+ v_toutesLesAnciennesValVides boolean;
+BEGIN
+';
+
+  v_typeTable := fsed.getTypeTable(NOM_TABLE);
+
+  date_eff_exists := 0;
+  IF nom_table = 'DIC_ADM_PERSO_HISTO' OR nom_table = 'DIC_ADM_CONTRAT_HISTO' THEN
+    date_eff_exists := 1;
+  ELSIF nom_table <> 'DIC_ADM_PERSO' AND nom_table <> 'DIC_ADM_CONTRAT' THEN
+    SELECT COUNT(*)
+    INTO date_eff_exists
+    FROM user_tab_cols
+    WHERE column_name     = 'DATE_EFF'
+    AND table_name        = NOM_TABLE;
+  END IF;
+
+  -- Au moins une donnée DEX = on va vérifier si le traitement pour DEX doit être effectué
+  IF nom_table = 'DIC_ADM_CONTRAT_HISTO' THEN
+    -- Date d'effet = traitement DEX seulement si modification à date du jour ou dans le futur (à revoir pour DACH ?)
+    v_retour := v_retour||' 
+IF (DELETING AND TRUNC(SYSDATE,''dd'') > v_ligOld.DATE_FIN) OR (NOT DELETING AND TRUNC(SYSDATE,''dd'') > v_ligNew.DATE_FIN) THEN
+ RETURN;
+END IF;
+';
+  ELSIF date_eff_exists>0 THEN
+    -- Date d'effet = traitement DEX seulement si modification à date du jour ou dans le futur
+    v_retour := v_retour||' 
+IF TRUNC(SYSDATE,''dd'') > nvl(v_ligNew.DATE_FIN,v_ligOld.DATE_FIN) THEN
+ RETURN;
+END IF;
+';
+  END IF;
+
+    v_retour := v_retour||' 
+v_matric := NVL(v_ligNew.MATRIC,v_ligOld.MATRIC); ';
+
+  -- Si traitement DEX sur une table de type PAIEZAD ou PACMAT, si on n'a pas de MATRIC, on le récupère
+  IF v_typeTable ='z' THEN
+    v_retour := v_retour||' 
+IF v_matric IS NULL THEN
+ IF DELETING THEN
+  v_paiezad := v_ligOld.PAIEZAD;
+ ELSE
+  v_paiezad := v_ligNew.PAIEZAD;
+ END IF;
+ SELECT MAX(MATRIC) INTO v_matric FROM DIC_ADM_CONTRAT_SITU WHERE NUMPAC=nvl(v_ligNew.NUMPAC,v_ligOld.NUMPAC) AND PAIEZAD=v_paiezad; 
+END IF;
+';
+  ELSIF v_typeTable ='p' THEN
+    v_retour := v_retour||' 
+IF v_matric IS NULL THEN
+ BEGIN
+  SELECT MATRIC INTO v_matric FROM SECUPACMAT WHERE NUMPAC=nvl(v_ligNew.NUMPAC,v_ligOld.NUMPAC) AND PACMAT=nvl(v_ligNew.PACMAT,v_ligOld.PACMAT);
+ EXCEPTION 
+  WHEN NO_DATA_FOUND THEN NULL; 
+ END;
+END IF;
+';
+  END IF;
+
+  -- Le traitement en lui-même : certains évènements nécessitent d'avoir une clé secondaire spécifique, sinon on positionne '*'
+  v_cleSecondaireDex := '''*''';
+
+  -- On boucle sur les données générant un sous-événement (paramétrage spécifique)
+  OPEN cur_subEventsDex;
+  LOOP FETCH cur_subEventsDex INTO lig_subEventDex ;
+    EXIT WHEN cur_subEventsDex%NOTFOUND;
+    mappingSubEventByEventAndData(lig_subEventDex.NOM_DONNEE||'#'||lig_subEventDex.EVENT) := lig_subEventDex.SOUS_EVENT;
+  END LOOP;
+  CLOSE cur_subEventsDex;
+
+  -- On boucle sur les données de l'évènement afin de calculer la CLE_SECONDAIRE si besoin 
+  -- On en profite pour construire une partir du code de la partie UPDATING
+  OPEN cur_donneesDex;
+  LOOP FETCH cur_donneesDex INTO lig_donneeDex ;
+    IF v_eventDexPrec IS NULL AND cur_donneesDex%NOTFOUND THEN
+      PROC_DEX_UPDATING := PROC_DEX_UPDATING||' 
+NULL;
+';
+    ELSIF v_eventDexPrec IS NOT NULL AND (cur_donneesDex%NOTFOUND OR NOT v_eventDexPrec=lig_donneeDex.EVENT) THEN
+      -- Dernière donnée pour l'event
+      PROC_DEX_UPDATING := PROC_DEX_UPDATING||' 
+-- gestion evenement dex ' || v_eventDexPrec || '
+v_processEventDex := FALSE; 
+';
+
+      PROC_DEX_UPDATING := PROC_DEX_UPDATING||'
+IF FALSE THEN -- DEBUT v_ligNew<>v_ligOld
+ NULL; '||PROC_DEX_UPDATING_TMP||' 
+END IF; -- FIN v_ligNew<>v_ligOld
+';
+
+      conditionForEventAcr(v_eventDexPrec||'#'||v_condition_donnee||'#OLD') := v_condition_acr_old_vide;
+      conditionForEventAcr(v_eventDexPrec||'#'||v_condition_donnee||'#NEW') := v_condition_acr_new_vide;
+
+      PROC_DEX_UPDATING := PROC_DEX_UPDATING||'
+IF v_processEventDex THEN
+';
+
+      IF v_action_acr IS NULL THEN
+        PROC_DEX_UPDATING := PROC_DEX_UPDATING||'
+eventsTab.EXTEND ;
+eventsTab(eventsTab.LAST).EVENT :='''||v_eventDexPrec||''';
+eventsTab(eventsTab.LAST).ACTION :=''M'';
+';
+      ELSE
+        PROC_DEX_UPDATING := PROC_DEX_UPDATING||'
+v_toutesLesAnciennesValVides := '||v_condition_acr_old_vide||v_condition_donnee_sql||';
+v_toutesLesNouvelleValVides := '||v_condition_acr_new_vide||v_condition_donnee_sql||';
+IF FALSE THEN
+ v_processEventDex := FALSE; 
+';
+        IF INSTR(v_action_acr,'a') > 0 THEN
+          PROC_DEX_UPDATING := PROC_DEX_UPDATING||'
+ELSIF v_toutesLesAnciennesValVides AND NOT v_toutesLesNouvelleValVides THEN
+ eventsTab.EXTEND ;
+ eventsTab(eventsTab.LAST).EVENT := ''' || v_event_sans_acr || '.add''; -- gestion add
+ eventsTab(eventsTab.LAST).ACTION :=''M'';
+';
+        END IF; -- FIN v_action_acr = 'a'
+
+        IF INSTR(v_action_acr,'c') > 0 THEN
+          PROC_DEX_UPDATING := PROC_DEX_UPDATING||'
+ELSIF NOT v_toutesLesAnciennesValVides AND NOT v_toutesLesNouvelleValVides THEN
+ eventsTab.EXTEND ;
+ eventsTab(eventsTab.LAST).EVENT := ''' || v_event_sans_acr || '.change''; -- gestion change
+ eventsTab(eventsTab.LAST).ACTION :=''M'';
+';
+        END IF; -- FIN v_action_acr = 'c'
+
+        IF INSTR(v_action_acr,'r') > 0 THEN
+          PROC_DEX_UPDATING := PROC_DEX_UPDATING||'
+ELSIF NOT v_toutesLesAnciennesValVides AND v_toutesLesNouvelleValVides THEN
+ eventsTab.EXTEND ;
+ eventsTab(eventsTab.LAST).EVENT := ''' || v_event_sans_acr || '.remove'';  -- gestion remove
+ eventsTab(eventsTab.LAST).ACTION :=''M'';
+';
+        END IF; -- FIN v_action_acr = 'r'
+
+        PROC_DEX_UPDATING := PROC_DEX_UPDATING||' 
+ELSE
+ v_processEventDex := FALSE;
+END IF;
+';
+      END IF; -- FIN v_action_acr IS NULL
+
+      -- On boucle sur les sous-événements à générer (paramétrage spécifique)
+      subEventToGen := subEventToGenWithCond.first;
+      LOOP
+        EXIT WHEN subEventToGen IS NULL;
+        -- On concatène la condition, puis le sous-événements (si la condition est vérifiée)
+        PROC_DEX_UPDATING := PROC_DEX_UPDATING||'
+IF v_processEventDex AND '; 
+
+        PROC_DEX_UPDATING := PROC_DEX_UPDATING||' ('||subEventToGenWithCond(subEventToGen)||') ';
+
+        PROC_DEX_UPDATING := PROC_DEX_UPDATING||' THEN 
+ subEventsTab.EXTEND;
+ subEventsTab(subEventsTab.LAST).EVENT := eventsTab(eventsTab.LAST).EVENT; 
+ subEventsTab(subEventsTab.LAST).SOUS_EVENT :='''||subEventToGen||''';
+END IF; -- FIN test génération sous-événement
+';
+        subEventToGen := subEventToGenWithCond.next(subEventToGen);
+      END LOOP;
+
+      PROC_DEX_UPDATING := PROC_DEX_UPDATING||'
+END IF; -- FIN v_processEventDex
+';
+
+      -- On vide le tableau pour recommencer un nouvel événément (on le sauvegarde avant, en l'associant à l'event)
+      subEventToGenWithCondByEvent(v_eventDexPrec) := subEventToGenWithCond;
+      subEventToGenWithCond.delete;
+    END IF;
+
+    -- Traitement spécifique à certains évènements qui stocke une CLE_SECONDAIRE
+    IF nom_table ='DIC_ADM_CONTRAT' THEN
+      -- Si le nom de table est DIC_ADM_CONTRAT on stocke la date de début de contrat (DSDCN) dans la colonne CLE_SECONDAIRE 
+      v_cleSecondaireDex := '''DSDCN;'' || TO_CHAR(nvl(v_ligNew.DSDCN, v_ligOld.DSDCN), ''YYYY-MM-DD'')';
+
+    ELSIF nom_table ='DIC_ADM_CONTRAT_HISTO' THEN
+      -- Si le nom de table est DIC_ADM_CONTRAT_HISTO on stocke la date d'effet (DATE_EFF) dans la colonne CLE_SECONDAIRE 
+      v_cleSecondaireDex := '''DATE_EFF;''|| TO_CHAR(nvl(v_ligNew.DATE_EFF, v_ligOld.DATE_EFF), ''YYYY-MM-DD'')';
+
+    END IF;
+
+    EXIT WHEN cur_donneesDex%NOTFOUND;
+
+    IF v_eventDexPrec IS NULL OR NOT v_eventDexPrec=lig_donneeDex.EVENT THEN
+      -- Première donnée pour l'event
+      v_action_acr := lig_donneeDex.ACTION_ACR;
+      v_event_sans_acr := lig_donneeDex.EVENT_SANS_ACR;
+      PROC_DEX_UPDATING_TMP := NULL;
+      v_condition_acr_old_vide := null;
+      v_condition_acr_new_vide := null;
+    END IF;
+
+    -- Traitement spécifique à certains évènements qui stocke une CLE_SECONDAIRE
+    IF lig_donneeDex.NOM_DONNEE_DEX_OU_EVENT = 'precedenceOrdCompteBancaire' THEN
+      -- BANQUE : On parcourt les données de l'event et trouver celle qui correspond à la cle dont on a besoin
+      v_cleSecondaireDex := 'nvl(v_ligNew.'||lig_donneeDex.NOM_DONNEE||', v_ligOld.'||lig_donneeDex.NOM_DONNEE||')';
+      
+     -- PERSONAL CONTACT : La clé secondaire pour les contacts d'urgence est composée de 3 éléments à mettre dans un certain ordre : rankEmergency;familyName1Emergency;givenNameEmergency   
+    ELSIF lig_donneeDex.NOM_DONNEE_DEX_OU_EVENT = 'rankEmergency' THEN
+      v_cle1SecondaireMP := 'nvl(v_ligNew.'||lig_donneeDex.NOM_DONNEE||', v_ligOld.'||lig_donneeDex.NOM_DONNEE||')';
+    
+    ELSIF  lig_donneeDex.NOM_DONNEE_DEX_OU_EVENT = 'familyName1Emergency'  THEN
+      v_cle2SecondaireMP := 'nvl(v_ligNew.'||lig_donneeDex.NOM_DONNEE||', v_ligOld.'||lig_donneeDex.NOM_DONNEE||')';
+    
+    ELSIF  lig_donneeDex.NOM_DONNEE_DEX_OU_EVENT = 'givenNameEmergency'  THEN
+       v_cle3SecondaireMP := 'nvl(v_ligNew.'||lig_donneeDex.NOM_DONNEE||', v_ligOld.'||lig_donneeDex.NOM_DONNEE||')';
+       
+    ELSIF lig_donneeDex.NOM_DONNEE_DEX_OU_EVENT = 'dependentConjointBirthOrder' THEN
+      -- CONJOINT : Dans le cas où une donnée 'dependentConjointBirthOrder' a été paramétrée, 
+      -- c'est cette valeur qui va être prise
+      v_cleSecondaireDex := '''C;''||nvl(v_ligNew.'||lig_donneeDex.NOM_DONNEE||', v_ligOld.'||lig_donneeDex.NOM_DONNEE||')';
+
+    ELSIF INSTR(lig_donneeDex.NOM_DONNEE_DEX_OU_EVENT, 'dependentConjoint') = 1 AND INSTR(v_cleSecondaireDex, 'C;') = 0 THEN
+      -- CONJOINT : La première fois que l'on trouve une donnée commençant par 'dependentConjoint', on positionne la clé secondaire
+      -- avec comme valeur "01" pour le "BirthOrder"
+      v_cleSecondaireDex := '''C;01''';
+
+    ELSIF lig_donneeDex.NOM_DONNEE_DEX_OU_EVENT = 'dependentEnfantBirthOrder' OR lig_donneeDex.NOM_DONNEE_DEX_OU_EVENT = 'dependentEnfantBirthDate' THEN
+      -- ENFANT : La clé secondaire pour les enfants est composée de 2 éléments à mettre dans un certain ordre : E;BirthOrder;BirthDate
+      IF v_cleSecondaireDex = '''*''' THEN
+        IF lig_donneeDex.NOM_DONNEE_DEX_OU_EVENT = 'dependentEnfantBirthOrder' THEN
+          v_cleSecondaireDex := '''E;''||nvl(v_ligNew.'||lig_donneeDex.NOM_DONNEE||', v_ligOld.'||lig_donneeDex.NOM_DONNEE||')';
+        ELSE
+          v_cleSecondaireDex := '||TO_CHAR(nvl(v_ligNew.'||lig_donneeDex.NOM_DONNEE||', v_ligOld.'||lig_donneeDex.NOM_DONNEE||'), ''YYYY-MM-DD'')';
+        END IF;
+      ELSE
+        IF lig_donneeDex.NOM_DONNEE_DEX_OU_EVENT = 'dependentEnfantBirthOrder' THEN
+          v_cleSecondaireDex := '''E;''||nvl(v_ligNew.'||lig_donneeDex.NOM_DONNEE||', v_ligOld.'||lig_donneeDex.NOM_DONNEE||')||'';''' || v_cleSecondaireDex;
+        ELSE
+          v_cleSecondaireDex := v_cleSecondaireDex || '||'';''||TO_CHAR(nvl(v_ligNew.'||lig_donneeDex.NOM_DONNEE||', v_ligOld.'||lig_donneeDex.NOM_DONNEE||'), ''YYYY-MM-DD'')';
+        END IF;
+      END IF;
+    END IF;
+
+    vFunctionCompare := 'IS_EQ';
+    vFunctionCompareParam3 := NULL;
+    IF lig_donneeDex.data_type = 'DATE' THEN
+      vFunctionCompare := 'IS_EQ_DATE';
+      vFunctionCompareParam3 := ',''yyyymmddhh24miss''';
+    END IF;
+    PROC_DEX_CONDITION := ' NOT '||vFunctionCompare||'(v_ligNew.'||lig_donneeDex.NOM_DONNEE||',v_ligOld.'||lig_donneeDex.NOM_DONNEE||vFunctionCompareParam3||') ';
+    v_condition_donnee_sql := '1=1';
+    v_condition_donnee := lig_donneeDex.CONDITION;
+    IF v_condition_donnee IS NOT NULL THEN
+      v_condition_donnee_sql := regexp_replace(regexp_replace(v_condition_donnee, '([^ ]+)[ ]*=[ ]*(''[^ ]+'')', 'nvl(v_ligNew.\1,v_ligOld.\1)=\2'), '(''[^ ]+'')[ ]*=[ ]*([^ ]+)', 'nvl(v_ligNew.\2,v_ligOld.\2)=\1');
+      PROC_DEX_CONDITION := PROC_DEX_CONDITION||' AND '||v_condition_donnee_sql;
+    END IF;
+
+    PROC_DEX_UPDATING_TMP :=PROC_DEX_UPDATING_TMP||'
+ELSIF '||PROC_DEX_CONDITION||' THEN
+v_processEventDex := TRUE;';
+
+    v_condition_acr_old_vide := v_condition_acr_old_vide||'v_ligOld.'||lig_donneeDex.NOM_DONNEE||' IS NULL AND ';
+    v_condition_acr_new_vide := v_condition_acr_new_vide||'v_ligNew.'||lig_donneeDex.NOM_DONNEE||' IS NULL AND ';
+
+    IF mappingSubEventByEventAndData.exists(lig_donneeDex.NOM_DONNEE||'#'||lig_donneeDex.EVENT) THEN
+      IF NOT subEventToGenWithCond.exists(mappingSubEventByEventAndData(lig_donneeDex.NOM_DONNEE||'#'||lig_donneeDex.EVENT)) THEN
+        subEventToGenWithCond(mappingSubEventByEventAndData(lig_donneeDex.NOM_DONNEE||'#'||lig_donneeDex.EVENT)) := '1=2';
+      END IF;
+      subEventToGenWithCond(mappingSubEventByEventAndData(lig_donneeDex.NOM_DONNEE||'#'||lig_donneeDex.EVENT)) := subEventToGenWithCond(mappingSubEventByEventAndData(lig_donneeDex.NOM_DONNEE||'#'||lig_donneeDex.EVENT))||' OR ('||PROC_DEX_CONDITION||') ';
+    END IF;
+
+    v_eventDexPrec:=lig_donneeDex.EVENT;
+  END LOOP;
+  CLOSE cur_donneesDex;
+
+  IF v_cle1SecondaireMP IS NOT NULL AND v_cle2SecondaireMP IS NOT NULL AND v_cle3SecondaireMP IS NOT NULL THEN
+    v_cleSecondaireDex := v_cle1SecondaireMP||'||'';''||'||v_cle2SecondaireMP||'||'';''||'||v_cle3SecondaireMP ;   
+  END IF ;
+
+  v_retour := v_retour||' 
+v_dexCleSecondaire := '||v_cleSecondaireDex||';
+eventsTab.delete;
+subEventsTab.delete;
+';
+
+  IF nom_table ='DIC_ADM_CONTRAT_HISTO' THEN
+    -- Pour DIC_ADM_CONTRAT_HISTO, pas de particularité
+    NULL;
+  ELSIF nom_table   ='DIC_ADM_CONTRAT' THEN
+    -- Pour DIC_ADM_CONTRAT, on gère en spécifique 
+    -- - La création --> Evènement worker.hire ou worker.rehire
+    -- - La suppression --> Evènement worker.workAssignment.terminate
+    -- - La mise à jour de DSFCN --> Evènement worker.workAssignment.terminate (ou autre pour la modification ou l'annulation de départ ???)
+    v_retour := v_retour||' 
+IF INSERTING THEN
+ -- On vérifie si c''est une embauche ou bien réembauche : s''il existe déja  un contrat pour le MATRIC c''est un réembauche. 
+ exist_contrat_for_matric := COUNT_CONTRAT_HORS_TRANSAC ( v_matric ) ;
+ IF exist_contrat_for_matric>0 THEN
+  -- Réembauche  --> Evénement worker.rehire
+  eventsTab.EXTEND ;
+  eventsTab(eventsTab.LAST).EVENT :=''worker.rehire'';
+  eventsTab(eventsTab.LAST).ACTION :=''Z''; 
+  eventsTab(eventsTab.LAST).DATE_ENVOI_MIN :=v_ligNew.DSDCN;
+ ELSE
+  --  Embauche -->  Evénement worker.hire
+  eventsTab.EXTEND ;
+  eventsTab(eventsTab.LAST).EVENT :=''worker.hire'';
+  eventsTab(eventsTab.LAST).ACTION :=''Z''; 
+  eventsTab(eventsTab.LAST).DATE_ENVOI_MIN :=v_ligNew.DSDCN;
+ END IF ;
+ELSIF DELETING THEN
+ exist_contrat_for_matric := COUNT_CONTRAT_HORS_TRANSAC ( v_matric ) ;
+ IF exist_contrat_for_matric>1 THEN
+  -- Annulation Réembauche  --> Evénement workerRehire.cancel 
+  eventsTab.EXTEND ;
+  eventsTab(eventsTab.LAST).EVENT :=''workerRehire.cancel'';
+  eventsTab(eventsTab.LAST).ACTION :=''S''; 
+  eventsTab(eventsTab.LAST).DATE_ENVOI_MIN :=v_ligOld.DSDCN;
+ ELSE
+  -- Annulation Embauche -->  Evénement workerHire.cancel
+  eventsTab.EXTEND ;
+  eventsTab(eventsTab.LAST).EVENT :=''workerHire.cancel'';
+  eventsTab(eventsTab.LAST).ACTION :=''S''; 
+  eventsTab(eventsTab.LAST).DATE_ENVOI_MIN :=v_ligOld.DSDCN;
+ END IF ;
+ELSIF NOT IS_EQ_DATE(v_ligNew.DSFCN,v_ligOld.DSFCN) THEN
+ IF v_ligNew.DSFCN IS NOT NULL AND v_ligOld.DSFCN IS NULL THEN
+  eventsTab.EXTEND ;
+  eventsTab(eventsTab.LAST).EVENT :=''worker.workAssignment.terminate'';
+  eventsTab(eventsTab.LAST).ACTION :=''M''; 
+  -- On n''envoie le départ que le jour où il devient effectif
+  eventsTab(eventsTab.LAST).DATE_ENVOI_MIN :=v_ligNew.DSFCN;
+ ELSIF v_ligNew.DSFCN<>v_ligOld.DSFCN THEN 
+  -- mise à jour de DSFCN --> EVENEMENT worker.workerTerminationDate.change
+  eventsTab.EXTEND ;
+  eventsTab(eventsTab.LAST).EVENT :=''worker.workerTerminationDate.change'';
+  eventsTab(eventsTab.LAST).ACTION :=''M'';
+  -- On garde la date de départ initiale comme date d''envoi de la notif, comme ça le partenaire aura le départ et la modif de départ en même temps
+  eventsTab(eventsTab.LAST).DATE_ENVOI_MIN :=v_ligOld.DSFCN;
+ ELSIF v_ligNew.DSFCN IS NULL AND v_ligOld.DSFCN IS NOT NULL THEN
+ -- Annulation Départ --> EVENEMENT workerTermination.cancel 
+  eventsTab.EXTEND ;
+  eventsTab(eventsTab.LAST).EVENT :=''workerTermination.cancel'';
+  eventsTab(eventsTab.LAST).ACTION :=''S''; 
+  -- On garde la date de départ initiale comme date d''envoi de la notif, comme ça le partenaire aura le départ et l''annulation de départ en même temps
+  eventsTab(eventsTab.LAST).DATE_ENVOI_MIN :=v_ligOld.DSFCN;
+ ELSE
+  NULL;
+ END IF;
+ELSE
+';
+  ELSE
+    -- Partie insert pour les autres tables
+    -- Pour les autres tables, en création et suppression, on insère une ligne par évènement potentiellement généré par la table, avec le bon code action
+    v_retour := v_retour||' 
+-- DEBUT INSERTING / DELETING
+IF INSERTING OR DELETING THEN
+ IF INSERTING THEN
+  v_dexaction := ''C'';
+ ELSE
+  v_dexaction := ''S'';
+ END IF;
+';
+
+    OPEN cur_eventsDex;
+    LOOP FETCH cur_eventsDex INTO lig_eventDex ;
+      EXIT WHEN cur_eventsDex%NOTFOUND;
+      v_retour := v_retour||'-- gestion evenement dex ' || lig_eventDex.EVENT || '
+';
+      v_action_acr := lig_eventDex.ACTION_ACR;
+      v_condition_donnee_sql := '1=1';
+      IF lig_eventDex.CONDITION IS NOT NULL THEN
+        v_condition_donnee_sql := regexp_replace(regexp_replace(lig_eventDex.CONDITION, '([^ ]+)[ ]*=[ ]*(''[^ ]+'')', 'nvl(v_ligNew.\1,v_ligOld.\1)=\2'), '(''[^ ]+'')[ ]*=[ ]*([^ ]+)', 'nvl(v_ligNew.\2,v_ligOld.\2)=\1');
+        v_retour := v_retour||'
+IF '||v_condition_donnee_sql||' THEN
+';
+      END IF;
+
+      v_retour := v_retour||'
+v_processEventDex := FALSE;
+v_toutesLesAnciennesValVides := '||conditionForEventAcr(lig_eventDex.EVENT||'#'||lig_eventDex.CONDITION||'#OLD')||'1=1;
+v_toutesLesNouvelleValVides := '||conditionForEventAcr(lig_eventDex.EVENT||'#'||lig_eventDex.CONDITION||'#NEW')||'1=1;
+';
+      IF v_action_acr IS NULL THEN
+        v_retour := v_retour||'
+IF (INSERTING AND NOT v_toutesLesNouvelleValVides) OR (DELETING AND NOT v_toutesLesAnciennesValVides) THEN
+ v_processEventDex := TRUE;
+ eventsTab.EXTEND ;
+ eventsTab(eventsTab.LAST).EVENT :='''||lig_eventDex.EVENT||''';
+ eventsTab(eventsTab.LAST).ACTION :=v_dexaction;
+END IF; 
+';
+      ELSIF conditionForEventAcr.exists(lig_eventDex.EVENT||'#'||lig_eventDex.CONDITION||'#OLD') THEN
+        v_retour := v_retour||'
+IF FALSE THEN NULL; 
+';
+
+        IF INSTR(v_action_acr,'a') > 0 THEN
+          v_retour := v_retour||'
+ELSIF INSERTING AND NOT v_toutesLesNouvelleValVides THEN
+ v_processEventDex := TRUE;
+ eventsTab.EXTEND ;
+ eventsTab(eventsTab.LAST).EVENT := '''||lig_eventDex.EVENT_SANS_ACR||'.add'';
+ eventsTab(eventsTab.LAST).ACTION :=v_dexaction; 
+';
+        END IF; -- FIN v_action_acr = 'a'
+
+        IF INSTR(v_action_acr,'r') > 0 THEN
+          v_retour := v_retour||'
+ELSIF DELETING AND NOT v_toutesLesAnciennesValVides THEN
+ v_processEventDex := TRUE;
+ eventsTab.EXTEND ;
+ eventsTab(eventsTab.LAST).EVENT := '''||lig_eventDex.EVENT_SANS_ACR||'.remove'';
+ eventsTab(eventsTab.LAST).ACTION :=v_dexaction; 
+';
+        END IF; -- FIN v_action_acr = 'r'
+
+        v_retour := v_retour||'
+END IF;
+';
+      END IF;
+
+      IF lig_eventDex.CONDITION IS NOT NULL THEN
+        v_retour := v_retour||'
+END IF; -- FIN '||v_condition_donnee_sql||'
+';
+      END IF;
+
+      IF subEventToGenWithCondByEvent.exists(lig_eventDex.EVENT) THEN
+        subEventToGenWithCond := subEventToGenWithCondByEvent(lig_eventDex.EVENT);
+        -- On boucle sur les sous-événements à générer (paramétrage spécifique) pour l'événement courant
+        subEventToGen := subEventToGenWithCond.first;
+        LOOP
+          EXIT WHEN subEventToGen IS NULL;
+          -- On concatène la condition, puis le sous-événements (si la condition est vérifiée)
+          v_retour := v_retour||'
+IF v_processEventDex AND ('||subEventToGenWithCond(subEventToGen)||') THEN
+ subEventsTab.EXTEND;
+ subEventsTab(subEventsTab.LAST).EVENT := eventsTab(eventsTab.LAST).EVENT; 
+ subEventsTab(subEventsTab.LAST).SOUS_EVENT :='''||subEventToGen||''';
+END IF;
+';
+          subEventToGen := subEventToGenWithCond.next(subEventToGen);
+        END LOOP;
+      END IF;
+    END LOOP;
+    CLOSE cur_eventsDex;
+    v_retour := v_retour||'
+-- FIN INSERTING / DELETING
+ELSE -- DEBUT UPDATING
+ v_dexaction := ''M'';
+';
+  END IF;
+  -- Début de l'updating commun à toutes les tables
+
+  v_eventDexPrec := NULL;
+  -- On rajoute ce qui a été calculé plus haut
+  v_retour := v_retour||PROC_DEX_UPDATING;
+
+  IF NOT nom_table ='DIC_ADM_CONTRAT_HISTO' THEN
+    -- Pour DIC_ADM_CONTRAT_HISTO, il n'y a pas de gros IF qui encadre les tests de génération de notif
+    v_retour := v_retour||'
+END IF; -- FIN UPDATING
+';
+  END IF;
+
+  v_retour := v_retour||' 
+ IF eventsTab.count>0 THEN
+  for i in 1..eventsTab.count loop
+';
+
+  IF nom_table = 'DIC_ADM_CONTRAT_HISTO' THEN
+    v_retour := v_retour||' 
+IF DELETING THEN
+ eventsTab(i).DATE_ENVOI_MIN :=v_ligOld.DATE_EFF;
+ELSE
+ eventsTab(i).DATE_ENVOI_MIN :=v_ligNew.DATE_EFF;
+END IF;
+';
+  ELSIF date_eff_exists>0 THEN
+    v_retour := v_retour||' 
+eventsTab(i).DATE_ENVOI_MIN :=NVL(v_ligNew.DATE_EFF,v_ligOld.DATE_EFF);
+';
+  END IF;
+
+  v_retour := v_retour||' 
+   MERGE INTO MP_EVENTS DE 
+    USING (SELECT v_matric AS MATRIC,eventsTab(i).EVENT AS EVENT, v_dexCleSecondaire AS CLE_SECONDAIRE FROM DUAL) Z 
+    ON (Z.MATRIC=DE.MATRIC AND Z.EVENT=DE.EVENT AND Z.CLE_SECONDAIRE=DE.CLE_SECONDAIRE)
+    WHEN MATCHED THEN UPDATE SET ACTION=eventsTab(i).ACTION,DATE_MODIF=CURRENT_TIMESTAMP,DATE_ENVOI_MIN=eventsTab(i).DATE_ENVOI_MIN
+    WHEN NOT MATCHED THEN INSERT (MATRIC,EVENT,CLE_SECONDAIRE,ACTION,DATE_MODIF,DATE_ENVOI_MIN) VALUES (v_matric,eventsTab(i).EVENT,v_dexCleSecondaire,eventsTab(i).ACTION,CURRENT_TIMESTAMP,eventsTab(i).DATE_ENVOI_MIN);
+  end loop;
+ END IF; -- FIN eventsTab.count>0
+
+ IF subEventsTab.count>0 THEN
+  for i in 1..subEventsTab.count loop
+   MERGE INTO MP_SPECIF_SOUS_EVENT DE 
+    USING (SELECT v_matric AS MATRIC, subEventsTab(i).EVENT AS EVENT, v_dexCleSecondaire AS CLE_SECONDAIRE, subEventsTab(i).SOUS_EVENT AS SOUS_EVENT FROM DUAL) Z 
+    ON (Z.MATRIC=DE.MATRIC AND Z.EVENT=DE.EVENT AND Z.CLE_SECONDAIRE=DE.CLE_SECONDAIRE AND Z.SOUS_EVENT=DE.SOUS_EVENT)
+    WHEN MATCHED THEN UPDATE SET DATE_MODIF=CURRENT_TIMESTAMP, STATUT_TRT=NULL, DATE_TRT=NULL
+    WHEN NOT MATCHED THEN INSERT (MATRIC,EVENT,CLE_SECONDAIRE,SOUS_EVENT,DATE_MODIF) VALUES (v_matric,subEventsTab(i).EVENT,v_dexCleSecondaire,subEventsTab(i).SOUS_EVENT,CURRENT_TIMESTAMP);
+  end loop;
+ END IF; -- FIN subEventsTab.count>0
+';
+
+  v_retour := v_retour||'
+END CHECK_MP_NOTIF_'||NOM_TABLE||';';
+
+EXECUTE_IMMEDIATE_STRING( v_retour,0);
+
+  v_retour :=  '
+-- DEBUT TRAITEMENT DEX
+IF v_type_writer<>''M'' THEN
+ CHECK_MP_NOTIF_'||NOM_TABLE||'(v_ligOld, v_ligNew);
+END IF;
+-- FIN TRAITEMENT DEX';
+ 
+  return v_retour;
+END TGE_CREATE_TRIGGER_MP_NOTIF;

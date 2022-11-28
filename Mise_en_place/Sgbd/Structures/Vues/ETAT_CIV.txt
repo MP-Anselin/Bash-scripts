@@ -1,0 +1,164 @@
+##
+ETAT_CIV
+=SQL=
+CREATE OR REPLACE VIEW ETAT_CIV
+AS
+  (SELECT DAP.matric,
+    DAP.TITRE                     AS TCIVI,
+    DAP.NOM                       AS NOMFAM,
+    DAP.NOMJF                     AS NOMJF,
+    DAP.PRENOM                    AS PRENOM,
+    DAP.SEXE                      AS SEXE,
+    TO_CHAR(DAP.DSNAI,'yyyymmdd') AS DTNAI,
+    DAP.MELPRO                    AS EMAIL,
+    ''                            AS FLAG,
+    '2'                           AS TYPE_MATRIC,
+    ''                            AS ET_HORAIREHEBDO,
+    ''                            AS ET_COEFMAJ,
+    (SELECT DACH.ZA523
+    FROM DIC_ADM_CONTRAT_HISTO DACH
+    WHERE DACH.NUMPAC = DAP.CURRENT_NUMPAC
+    AND DACH.PACMAT   = DAP.CURRENT_PACMAT
+    AND DACH.NUMCNT   = DAP.CURRENT_NUMCNT
+    AND DACH.DATE_EFF = DAP.DATE_EFF_CONTRAT
+    AND SYSDATE BETWEEN DACH.DATE_EFF AND DACH.DATE_FIN
+    )  AS ET_CATPRO,
+    '' AS ET_CATREM,
+    '' AS ET_TYPEPAIE,
+    (SELECT DACH.ZA557
+    FROM DIC_ADM_CONTRAT_HISTO DACH
+    WHERE DACH.NUMPAC = DAP.CURRENT_NUMPAC
+    AND DACH.PACMAT   = DAP.CURRENT_PACMAT
+    AND DACH.NUMCNT   = DAP.CURRENT_NUMCNT
+    AND DACH.DATE_EFF = DAP.DATE_EFF_CONTRAT
+    AND SYSDATE BETWEEN DACH.DATE_EFF AND DACH.DATE_FIN
+    )  AS ET_CLASSIF,
+    '' AS ET_CODECOTOR,
+    (SELECT code_entite
+    FROM std_struc_affectation
+    WHERE codts=
+      (SELECT valvar
+      FROM sys_varsys
+      WHERE module ='GPC'
+      AND codvar   ='STRUCTURE_JUR'
+      )
+    AND matric                       = DAP.matric
+    AND TO_CHAR(SYSDATE,'yyyymmdd') >= DATE_EFF
+    AND TO_CHAR(SYSDATE,'yyyymmdd') <= NVL( DATE_FIN, '20991231')
+    AND EST_AFFEC_PRINCIPAL          = 1
+    ) AS ET_CODE_ENTITE_JUR,
+    (SELECT code_entite
+    FROM std_struc_affectation
+    WHERE codts=
+      (SELECT valvar
+      FROM sys_varsys
+      WHERE module ='GPC'
+      AND codvar   ='STRUCTURE_ADM'
+      )
+    AND matric                       = DAP.matric
+    AND TO_CHAR(SYSDATE,'yyyymmdd') >= DATE_EFF
+    AND TO_CHAR(SYSDATE,'yyyymmdd') <= NVL( DATE_FIN, '20991231')
+    AND EST_AFFEC_PRINCIPAL          = 1
+    ) AS ET_CODE_ENTITE_ADM,
+    (SELECT code_entite
+    FROM std_struc_affectation
+    WHERE codts=
+      (SELECT valvar
+      FROM sys_varsys
+      WHERE module ='GPC'
+      AND codvar   ='STRUCTURE_GEO'
+      )
+    AND matric                       = DAP.matric
+    AND TO_CHAR(SYSDATE,'yyyymmdd') >= DATE_EFF
+    AND TO_CHAR(SYSDATE,'yyyymmdd') <= NVL( DATE_FIN, '20991231')
+    AND EST_AFFEC_PRINCIPAL          = 1
+    )  AS ET_CODE_ENTITE_GEO,
+    '' AS ET_CODEAFFNIV,
+    '' AS ET_LIBAFFNIV,
+    '' AS ET_RAISONSOC,
+    '' AS ET_DTDEBGROUPE,
+    '' AS ET_DTFINGROUPE,
+    SAN.DTDEBSOCIETE AS DTDEBSOCIETE,
+    SAN.DTFINSOCIETE AS ET_DTFINSOCIETE,
+    '' AS ET_CODEMOTIFENTREE,
+    '' AS ET_CODEMOTIFSORTIE,
+    '' AS ET_CODERECOURS,
+    '' AS ET_DTANCIENNETE,
+    '' AS ET_DTDEBMATERNITE,
+    '' AS ET_DTFINMATERNITE,
+    '' AS ET_TYPECNT,
+    (SELECT DACH.ZT061
+    FROM DIC_ADM_CONTRAT_HISTO DACH
+    WHERE DACH.NUMPAC = DAP.CURRENT_NUMPAC
+    AND DACH.PACMAT   = DAP.CURRENT_PACMAT
+    AND DACH.NUMCNT   = DAP.CURRENT_NUMCNT
+    AND DACH.DATE_EFF = DAP.DATE_EFF_CONTRAT
+    AND SYSDATE BETWEEN DACH.DATE_EFF AND DACH.DATE_FIN
+    )  AS ET_NATCNT,
+    '' AS ET_DTDEBCNT,
+    '' AS ET_DTFINCNT,
+    '' AS ET_CODESUSCNT,
+    '' AS ET_DTDEBSUSCNT,
+    '' AS ET_DTFINSUSCNT,
+    '' AS ET_DTDEBEMP,
+    (SELECT
+      CASE upper(valvar)
+        WHEN 'TRUE'
+        THEN
+          (SELECT NVL(SEC.EMPLOI,'*')
+          FROM secumatric SEC
+          WHERE SEC.NUMPAC = DAP.CURRENT_NUMPAC
+          AND SEC.PACMAT   = DAP.CURRENT_PACMAT
+          )
+        ELSE '*'
+      END
+    FROM sys_varsys
+    WHERE codvar LIKE 'AVECEMPLOILOC'
+    ) AS ET_CODEEMPL,
+    (SELECT SEC.METIER
+    FROM SECUMATRIC SEC
+    WHERE SEC.NUMPAC = DAP.CURRENT_NUMPAC
+    AND SEC.PACMAT   = DAP.CURRENT_PACMAT
+    ) AS ET_CODEEMPT,
+    (SELECT SEC.FILIR
+    FROM SECUMATRIC SEC
+    WHERE SEC.NUMPAC = DAP.CURRENT_NUMPAC
+    AND SEC.PACMAT   = DAP.CURRENT_PACMAT
+    ) AS ET_CODEFAM,
+    (SELECT SEC.SSFIL
+    FROM SECUMATRIC SEC
+    WHERE SEC.NUMPAC = DAP.CURRENT_NUMPAC
+    AND SEC.PACMAT   = DAP.CURRENT_PACMAT
+    )  AS ET_CODEMET,
+    '' AS ET_CODEROLE,
+    '' AS ET_CODEINSEE,
+    '' AS ET_DTDEBPROF,
+    '' AS ET_LOCALITE,
+    '' AS ET_CODEPOSTAL,
+    '' AS ET_BURDIST,
+    '' AS ET_TELEPHONE,
+    '' AS ET_LIEUDIT,
+    '' AS ET_NUMV,
+    '' AS ET_BTQ,
+    '' AS ET_TYPVOIE,
+    '' AS ET_NOMVOIE,
+    '' AS ET_CODPAYS,
+    '' AS ET_CODTYPCOL,
+    '' AS ET_CODADM1,
+    '' AS ET_CODADM2,
+    '' AS ET_CODADM3,
+    '' AS ET_CODADM4,
+    '' AS ET_CODADM5,
+    '' AS ET_CODADM6,
+    '' AS ET_BULLETIN,
+    '' AS ET_USERMODELE,
+    '' AS ET_CODE_UID,
+    '' AS ET_HR_ENTITE,
+    '' AS ET_TEL_PRO_FIXE,
+    '' AS ET_TEL_PRO_PORT,
+    '' AS ET_FAX_PRO,
+    '' AS ET_EMAIL_PERSO
+  FROM DIC_ADM_PERSO DAP
+  LEFT JOIN STD_STRUCT_DATEAFFJURIDIQUE SAN
+  ON SAN.matric = DAP.matric
+  )

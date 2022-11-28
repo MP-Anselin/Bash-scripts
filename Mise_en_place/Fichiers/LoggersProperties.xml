@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<!DOCTYPE LoggersProperties [ 
+<!ELEMENT LoggersProperties (LoggerProperty+)>
+<!ELEMENT LoggerProperty (Logger, Level?, File?) >
+<!ELEMENT Logger (#PCDATA)>
+<!ELEMENT Level (#PCDATA)>
+<!ELEMENT File (#PCDATA)>
+]>
+
+<LoggersProperties>
+	<LoggerProperty>
+		<Logger>fr.adp.com.gxp.std.moteur.comm_base.gxp_db</Logger>
+		<Level>INFO</Level>
+	</LoggerProperty>
+	<LoggerProperty>
+		<Logger>fr.adp.com.gxp.std.moteur.filter.SecurityFilter</Logger>
+		<Level>INFO</Level>
+	</LoggerProperty>
+	<LoggerProperty>
+		<Logger>fr.adp.com.gxp.std.mot_tech.lib.ConstServAppli</Logger>
+		<Level>FINE</Level>
+	</LoggerProperty>
+</LoggersProperties>

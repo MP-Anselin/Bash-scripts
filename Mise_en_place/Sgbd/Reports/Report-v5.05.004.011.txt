@@ -1,0 +1,29 @@
+##
+TAG_IMPORT=5.05.004.R011
+##
+GESTIL_MCT
+=SQL IFEXIST=GESTIL_MCT=DONNEE_GXP=
+ALTER TABLE GESTIL_MCT MODIFY (DONNEE_GXP VARCHAR2(50))
+##
+SYS_DEF_ERREURS
+==
+DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'GAP00224'
+'GAP00224','GAP','fr_fr','0','Le type de contrat du salarié n''est pas CDD.','1'
+##
+TAG_CHARSET=@€éèç
+##
+WKF_OPERATIONS
+=SQL IFEXIST=WKF_OPERATIONS=
+UPDATE WKF_OPERATIONS SET COMP_CLASS = 'fr.adp.com.gxp.std.modules.lib.objects.gap.administratif.workflow.GA_WKF_ESS_ATTESTATION' WHERE OP_NUM = '50704'  
+##
+WKF_OPERATIONS
+=SQL IFEXIST=WKF_OPERATIONS=
+UPDATE WKF_OPERATIONS SET COMP_WEB = 'Ext.adp.Gap.Administratif.workflow.Attestation.WkfAttestationsExpert' WHERE OP_NUM = '50702'  
+##
+WKF_OPERATIONS
+=SQL IFEXIST=WKF_OPERATIONS=
+UPDATE WKF_OPERATIONS SET COMP_WEB = 'Ext.adp.Gap.Administratif.workflow.Attestation.WkfAttestationsCollab' WHERE OP_NUM = '50700'  
+##
+WKF_OPERATIONS
+=SQL IFEXIST=WKF_OPERATIONS=
+UPDATE WKF_OPERATIONS SET COMP_WEB = 'Ext.adp.Gap.Administratif.workflow.Attestation.WkfAttestationsManager' WHERE OP_NUM = '50701'  

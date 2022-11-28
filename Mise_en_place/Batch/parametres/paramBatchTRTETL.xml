@@ -1,0 +1,52 @@
+<interface idInterface="TRTETL">
+	<nomInterface>TRAITEMENT ETL</nomInterface>
+	<descriptionInterface>Import des donnees GAP vers une base HRT secable</descriptionInterface>
+	<traitements>
+		<traitement>
+			<descriptionTraitement>Chargement du premier script SQL</descriptionTraitement>
+			<desactive>OUI</desactive>
+			<ceif/>
+			<typeTraitement>SCRIPT</typeTraitement>
+			<nomFichier>sql_avant.sql</nomFichier>
+			<typeFichier>SQL</typeFichier>
+			<commitGeneral>OUI</commitGeneral>
+			<continueSiErreur>OUI</continueSiErreur>
+		</traitement>
+		<traitement>
+			<descriptionTraitement>Import des donnees GAP vers une base HRT secable</descriptionTraitement>
+			<desactive>NON</desactive>
+			<typeTraitement>ETLHRT</typeTraitement>
+			<type_import>N</type_import>
+			<versionGAP_client>505003</versionGAP_client>
+			<dbLinkName>ETL_SECABILITE</dbLinkName>
+		</traitement>
+		<traitement>
+			<descriptionTraitement>Chargement du deuxieme script SQL</descriptionTraitement>
+			<desactive>NON</desactive>
+			<ceif/>
+			<typeTraitement>SCRIPT</typeTraitement>
+			<nomFichier>sql_apres_USER.sql</nomFichier>
+			<typeFichier>SQL</typeFichier>
+			<commitGeneral>OUI</commitGeneral>
+			<continueSiErreur>OUI</continueSiErreur>
+		</traitement>
+		<traitement>
+			<descriptionTraitement>Extraction pour injecter les users a creer</descriptionTraitement>
+			<actifSiEnv>P</actifSiEnv>
+			<typeTraitement>RAPPORT</typeTraitement>
+			<nomreq>USER_NS</nomreq>
+			<fichierOUT>USERS_NS.dat</fichierOUT>
+			<encapsuleurChamp/>
+		</traitement>
+		<traitement>
+			<descriptionTraitement>Creation User NS</descriptionTraitement>
+			<actifSiEnv>P</actifSiEnv>
+			<typeTraitement>InterfaceUserNS</typeTraitement>
+			<modeDebug>true</modeDebug>
+			<versionTraitement>V2</versionTraitement>
+			<fichierUsers>USERS_NS.dat</fichierUsers>
+			<continueSiErreur>OUI</continueSiErreur>
+			<activerMail>OUI</activerMail>
+		</traitement>
+	</traitements>
+</interface>

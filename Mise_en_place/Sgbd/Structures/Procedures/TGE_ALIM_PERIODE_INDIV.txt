@@ -1,0 +1,290 @@
+##
+TAG_CHARSET=@€éèç
+##
+TGE_ALIM_PERIODE_INDIV
+=SQL=
+CREATE OR REPLACE PROCEDURE TGE_ALIM_PERIODE_INDIV(
+    p_id            IN NUMBER,
+    p_numpac        IN VARCHAR2,
+    p_periode_paie  IN VARCHAR2,
+    p_paiezad       IN VARCHAR2,
+    p_dosNumForSimu IN NUMBER DEFAULT NULL,
+ 	p_recueil_photo IN VARCHAR2 DEFAULT 'N'  )
+IS
+  id_trt                NUMBER;
+  periode_deb_retro     VARCHAR2(6);
+  periode_deb_histo_retro     VARCHAR2(6);
+  periode_recalcul      VARCHAR2(6);
+  periode_paie_en_cours VARCHAR2(6);
+  periode_recalcul_deb  VARCHAR2(6);
+  nb_mois_retro         NUMBER(2);
+  recueil_photo         BOOLEAN;
+  w_pacmat 				VARCHAR2(20);
+  v_jobIdx 			   NUMBER;
+  V_PERIODE_EN_COURS	   VARCHAR(6);
+  V_DEB_RETRO           VARCHAR(6);
+  req                   CLOB;
+  
+  --SELECT les changement pour la rétro
+  type PERIODE IS RECORD
+  ( 
+  NUMPAC DIC_ADM_CONTRAT_SITU.NUMPAC%TYPE,
+  PACMAT DIC_ADM_CONTRAT_SITU.PACMAT%TYPE,
+  PERIODE TGE_PERIODE_RECUEIL_PAIEZAD.MOIS_PAIE%TYPE,
+  CODE_CHRONO DIC_ADM_CONTRAT_SITU.CODE_CHRONO%TYPE,
+  PAIEZAD DIC_ADM_CONTRAT_SITU.PAIEZAD%TYPE);
+  type PERIODE_TAB IS TABLE OF PERIODE INDEX BY BINARY_INTEGER;
+  tab_retro PERIODE_TAB;
+  type PERIODE2 IS RECORD
+ (
+  NUMPAC DIC_ADM_CONTRAT_SITU.NUMPAC%TYPE,
+  PACMAT DIC_ADM_CONTRAT_SITU.PACMAT%TYPE,
+  PERIODE TGE_PERIODE_RECUEIL_PAIEZAD.MOIS_PAIE%TYPE,
+  CODE_CHRONO DIC_ADM_CONTRAT_SITU.CODE_CHRONO%TYPE,
+  PAIEZAD DIC_ADM_CONTRAT_SITU.PAIEZAD%TYPE,
+  NUMCNT DIC_ADM_CONTRAT_SITU.NUMCNT%TYPE,
+  DATE_SORTIE_SIT_BO DIC_ADM_CONTRAT_HISTO.DATE_SORTIE_SIT_BO%TYPE,
+  DATE_EFF VARCHAR2(10) );
+ type PERIODE_TAB2 IS TABLE OF PERIODE2 INDEX BY BINARY_INTEGER;
+ tab_retro2 PERIODE_TAB2;
+BEGIN
+  TGE_IMPORT_AVANCEMENT_proc('TGE_ALIM_PER','TGE_ALIM_PERIODE_INDIV début (' || p_numpac || ',' || p_periode_paie || ',' || p_paiezad || ',' || p_recueil_photo || ')');
+  --Alimentation id procédure
+  IF p_id   = 0 OR p_id IS NULL THEN
+    id_trt := IMP_TRT_SEQ_ID.nextval;
+  ELSE
+    id_trt := p_id;
+  END IF;
+  --Alimentation recueil_photo
+  IF p_recueil_photo = 'O' THEN
+    recueil_photo:=TRUE;
+  ELSE
+    recueil_photo:=FALSE;
+  END IF;
+  --Alimentation des informations sur le pac
+  SELECT DEB_RETRO,
+  	DEB_HISTO_RETRO,
+    NB_MOIS_RETRO,
+    PERIODEENCOURS
+  INTO periode_deb_retro,
+    periode_deb_histo_retro,
+    nb_mois_retro,
+    periode_paie_en_cours
+  FROM TGE_REF_PAC
+  WHERE NUMPAC = p_numpac;
+  --Alimentation de la période de début de calcul
+  -- Pour les simulations de départ, on autorise le calcul des périodes de recueil pour un mois dans le futur
+  IF( p_periode_paie     <= periode_paie_en_cours OR p_dosNumForSimu IS NOT NULL) THEN
+    IF p_dosNumForSimu IS NOT NULL THEN
+      periode_recalcul   := p_periode_paie;
+    ELSIF periode_deb_retro IS NOT NULL AND periode_deb_retro <= periode_paie_en_cours THEN
+      periode_recalcul   := GREATEST(p_periode_paie, TO_CHAR(ADD_MONTHS(TO_DATE(periode_paie_en_cours, 'YYYYMM'), -nb_mois_retro), 'YYYYMM'));
+      IF periode_recalcul < periode_deb_histo_retro THEN
+        periode_recalcul := periode_deb_histo_retro;
+      END IF;
+      TGE_IMPORT_AVANCEMENT_proc('TGE_ALIM_PER','TGE_ALIM_PERIODE_INDIV calcul des périodes de recueil du ' || periode_recalcul || ' au ' || periode_paie_en_cours);
+    ELSE
+      periode_recalcul   := periode_paie_en_cours;
+    END IF;
+    periode_recalcul_deb := periode_recalcul;
+       --Récupération du pacmat
+	 IF p_paiezad IS NOT NULL THEN
+		 BEGIN
+			 SELECT PACMAT
+			 INTO w_pacmat
+			 FROM DIC_ADM_CONTRAT_SITU
+			 WHERE NUMPAC = p_numpac
+			 AND PAIEZAD  = p_paiezad
+			 AND rownum   =1;
+		 EXCEPTION
+			 WHEN NO_DATA_FOUND THEN
+				 req := 'DELETE FROM ';
+				 IF p_dosNumForSimu IS NOT NULL THEN
+					 -- Si un dos_num est passé en paramètre, on alimente la table SIMU
+					 req := req||'SIMU_TGE_PERIODE_RECUEIL_PZAD';
+				 ELSE
+				 	req := req||'TGE_PERIODE_RECUEIL_PAIEZAD';
+				 END IF;
+				 req := req||' WHERE NUMPAC = '''||p_numpac||'''';
+				 req := req||' AND MOIS_PAIE >= '''||periode_recalcul_deb||'''';
+				 req := req||' AND PAIEZAD = '''||p_paiezad||'''';
+				 IF p_dosNumForSimu IS NOT NULL THEN
+				 	req := req||' AND DOS_NUM = '||p_dosNumForSimu;
+				 END IF;
+				 EXECUTE_IMMEDIATE_STRING (req,0);
+				 TGE_IMPORT_AVANCEMENT_proc('TGE_ALIM_PER','TGE_ALIM_PERIODE_INDIV_MAIN ERR : Erreurs dans DIC_ADM_CONTRAT_SITU AUCUN PACMAT trouvé pour le PAIEZAD = ''' || p_paiezad || '''');
+			 raise;
+		 END;
+	 END IF;
+    --Sauvegarde des période de recueil dans TGE_PERIODE_RECUEIL_PAIEZAD_R
+	IF p_dosNumForSimu IS NULL THEN
+		EXECUTE_IMMEDIATE_STRING  ('DELETE TGE_PERIODE_RECUEIL_PAIEZAD_R WHERE ID_TRT = ''' || id_trt || ''' OR ID_TRT + 1000 < ''' || id_trt || ''' ',0);
+		req         := 'INSERT  INTO TGE_PERIODE_RECUEIL_PAIEZAD_R ';
+		req         := req||'SELECT  '''||id_trt||'''  ,TGE_PERIODE_RECUEIL_PAIEZAD.* FROM TGE_PERIODE_RECUEIL_PAIEZAD ';
+		req         := req||' WHERE NUMPAC = '''||p_numpac||'''';
+		req         := req||' AND MOIS_PAIE >= '''||periode_recalcul||'''';
+		IF w_pacmat IS NOT NULL THEN
+		 	req       := req||' AND PACMAT = '''||w_pacmat||'''';
+		END IF;
+		EXECUTE_IMMEDIATE_STRING ( req,0);
+	END IF;
+    LOOP
+      TGE_ALIM_PERIODE_INDIV_MAIN(id_trt, p_numpac, periode_recalcul, w_pacmat, p_dosNumForSimu, recueil_photo);
+      --On passe au mois suivant
+      periode_recalcul := TO_CHAR(ADD_MONTHS(TO_DATE(periode_recalcul, 'YYYYMM'), 1), 'YYYYMM');
+      EXIT
+    WHEN periode_deb_retro IS NULL OR periode_deb_retro > periode_paie_en_cours OR periode_recalcul > periode_paie_en_cours;
+    END LOOP;
+    --Mise à jour des incidents qui on changé période de paie plus inscription en rétro
+	IF p_dosNumForSimu IS NULL THEN
+	 	 -- Initialisations des variables pour tester la rétroactivité depuis la table TGE_REF_PAC. 
+		 SELECT 
+			 PERIODEENCOURS,
+			 DEB_RETRO
+		 INTO
+			 V_PERIODE_EN_COURS,
+			 V_DEB_RETRO
+		 FROM TGE_REF_PAC
+		 WHERE NUMPAC = p_numpac; 
+	 	 -- Le recalcul de la période n'est fait que si le pac est rétro et que la rétro a démarré 
+		 IF V_DEB_RETRO IS NOT NULL AND V_DEB_RETRO <= V_PERIODE_EN_COURS THEN
+		 -- CALL TGE_RETRO_INSCRIPT_WITH_CHECK
+		 TGE_IMPORT_AVANCEMENT_proc('TGE_ALIM_PER','TGE_ALIM_PERIODE_INDIV -> Début CALL TGE_RETRO_INSCRIPT_WITH_CHECK');
+		 
+			req              := 'select S.NUMPAC, S.PACMAT, NVL(R.MOIS_PAIE, P.MOIS_PAIE) AS PERIODE, S.CODE_CHRONO, S.PAIEZAD from TGE_PERIODE_RECUEIL_PAIEZAD_R R  ';
+			req              := req||'FULL JOIN TGE_PERIODE_RECUEIL_PAIEZAD P  ';
+			req              := req||'ON R.NUMPAC = P.NUMPAC ';
+			req              := req||'AND R.MOIS_PAIE = P.MOIS_PAIE ';
+			req              := req||'AND R.PAIEZAD = P.PAIEZAD ';
+			req              := req||'AND R.PACMAT = P.PACMAT ';
+			req              := req||'INNER JOIN dic_adm_contrat_SITU S ';
+			req              := req||'ON S.NUMPAC = NVL(R.NUMPAC, P.NUMPAC) ';
+			req              := req||'AND S.PAIEZAD = NVL(R.PAIEZAD, P.PAIEZAD) ';
+			req              := req||'WHERE  ';
+			req              := req||'NVL(R.MOIS_PAIE, P.MOIS_PAIE) >= ''' || periode_recalcul_deb || ''' ';
+ 			req              := req||'AND NVL(R.NUMPAC, P.NUMPAC) = ''' || p_numpac || ''' ';
+ 		IF w_pacmat IS NOT NULL THEN
+ 			req              := req||'AND NVL(R.PACMAT, P.PACMAT) = '''||w_pacmat||'''';
+ 		END IF;
+			req              := req||'AND (P.MOIS_PAIE IS NULL  ';
+			req              := req||'OR R.MOIS_PAIE IS NULL ';
+			req              := req||'OR P.DEBUT_PERIODE_RECUEIL != R.DEBUT_PERIODE_RECUEIL ';
+			req              := req||'OR P.FIN_PERIODE_RECUEIL != R.FIN_PERIODE_RECUEIL) ';
+			
+			EXECUTE IMMEDIATE req BULK COLLECT INTO tab_retro;
+			IF tab_retro.exists(1) THEN
+			  FOR i IN tab_retro.first..tab_retro.last
+			  LOOP
+			  	BEGIN
+			    	TGE_RETRO_INSCRIPT_WITH_CHECK(tab_retro(i).NUMPAC, tab_retro(i).PACMAT, tab_retro(i).PERIODE,  tab_retro(i).CODE_CHRONO,  tab_retro(i).PAIEZAD, 'TGE_PERIODE_RECUEIL_PAIEZAD');
+			    EXCEPTION
+			    WHEN OTHERS THEN
+ 					TGE_IMPORT_AVANCEMENT_proc('TGE_ALIM_PER','TGE_ALIM_PERIODE_INDIV KO : TGE_RETRO_INSCRIPT_WITH_CHECK('''||tab_retro(i).NUMPAC||''', '''||tab_retro(i).PACMAT||''', '''||tab_retro(i).PERIODE||''',  '''||tab_retro(i).CODE_CHRONO||''',  '''||tab_retro(i).PAIEZAD||''', ''TGE_PERIODE_RECUEIL_PAIEZAD'') '||SQLCODE||' '||SQLERRM);
+			    END;
+			  END LOOP;
+			END IF;
+			
+		-- Le calcul des périodes de recueil doit lancer le calcul des HP, CALC_HP.principal, lorsqu'une modification est détectée sur la date de début ou de fin de génération HP. 
+         TGE_IMPORT_AVANCEMENT_proc('TGE_ALIM_PER','TGE_ALIM_PERIODE_INDIV -> Début CALL CALC_HP.principal');
+         req              := 'WITH TPRP2  AS ( select NVL(R.MOIS_PAIE, P.MOIS_PAIE) AS MOIS_PAIE , NVL(R.NUMPAC, P.NUMPAC) AS NUMPAC ,NVL(R.PACMAT, P.PACMAT) AS PACMAT,NVL(R.PAIEZAD, P.PAIEZAD) AS PAIEZAD ';
+         req              := req||'from TGE_PERIODE_RECUEIL_PAIEZAD_R R  ';
+         req              := req||'FULL JOIN TGE_PERIODE_RECUEIL_PAIEZAD P '; 
+         req              := req||'ON R.NUMPAC = P.NUMPAC '; 
+         req              := req||'AND R.MOIS_PAIE = P.MOIS_PAIE ';
+         req              := req||'AND R.PAIEZAD = P.PAIEZAD '; 
+         req              := req||'AND R.PACMAT = P.PACMAT ';
+         req              := req||'WHERE (P.MOIS_PAIE IS NULL ';
+         req              := req||'OR R.MOIS_PAIE IS NULL ';
+         req              := req||'OR P.DEBUT_PER_GENERATION_HP != R.DEBUT_PER_GENERATION_HP '; 
+         req              := req||'OR P.FIN_PER_GENERATION_HP  != R.FIN_PER_GENERATION_HP)) ';
+         req              := req||'select S.NUMPAC, S.PACMAT, TPRP2.MOIS_PAIE AS PERIODE, S.CODE_CHRONO , S.PAIEZAD , S.NUMCNT , H.DATE_SORTIE_SIT_BO , TO_CHAR( TO_DATE(TPRP2.MOIS_PAIE,''YYYYMM''),''DD/MM/YYYY'') AS DATE_EFF FROM TPRP2 ';
+         req              := req||'INNER JOIN dic_adm_contrat_SITU S ';
+         req              := req||'ON S.NUMPAC = TPRP2.NUMPAC ';
+         req              := req||'AND S.PAIEZAD = TPRP2.PAIEZAD ';
+         req              := req||'AND S.PACMAT = TPRP2.PACMAT ';
+         req              := req||'INNER JOIN ( SELECT DISTINCT ';
+         req              := req||'TPRP2.MOIS_PAIE, ';
+         req              := req||'dach_max_date_eff.numpac, ';
+         req              := req||'dach_max_date_eff.paiezad, ';
+         req              := req||'dach_max_date_eff.pacmat, ';
+         req              := req||'MAX(dach_max_date_eff.date_eff) ';
+         req              := req||'OVER(PARTITION BY dach_max_date_eff.numpac, dach_max_date_eff.paiezad, dach_max_date_eff.pacmat) AS date_eff ';
+         req              := req||'FROM dic_adm_contrat_histo dach_max_date_eff ';
+         req              := req||'INNER JOIN TPRP2  ON ';
+         req              := req||'dach_max_date_eff.numpac = TPRP2.numpac ';
+         req              := req||'AND dach_max_date_eff.paiezad = TPRP2.paiezad ';
+         req              := req||'AND dach_max_date_eff.pacmat = TPRP2.pacmat ';
+         req              := req||'WHERE dach_max_date_eff.date_eff <= last_day(to_date(TPRP2.MOIS_PAIE, ''YYYYMM'')) ';
+         req              := req||') C on  ';
+         req              := req||'C.NUMPAC = S.NUMPAC ';
+         req              := req||'AND C.paiezad = S.paiezad ';
+         req              := req||'AND C.PACMAT = S.PACMAT ';
+         req              := req||'AND C.MOIS_PAIE = TPRP2.MOIS_PAIE ';
+         req              := req||'INNER join DIC_ADM_CONTRAT_HISTO H  ';
+         req              := req||'ON H.NUMPAC = S.NUMPAC ';
+         req              := req||'AND H.PAIEZAD = S.PAIEZAD ';        
+         req              := req||'AND H.PACMAT = S.PACMAT ';
+         req              := req||'AND H.NUMCNT = S.NUMCNT ';
+         req              := req||'AND H.DATE_EFF = C.date_eff ';
+         req              := req||'AND H.ZA996 = ''Z'' ';
+         req              := req||'WHERE  ';
+         req              := req||'TPRP2.MOIS_PAIE >= ''' || periode_recalcul_deb || '''  ';
+         req              := req||'AND TPRP2.NUMPAC = ''' || p_numpac || '''  ';
+         IF w_pacmat IS NOT NULL THEN
+           req              := req||'AND TPRP2.PACMAT = '''||w_pacmat||'''  ';
+         END IF ;
+         EXECUTE IMMEDIATE req BULK COLLECT INTO tab_retro2;
+         IF tab_retro2.exists(1) THEN
+           FOR i IN tab_retro2.first..tab_retro2.last  
+           LOOP
+             BEGIN
+               TGE_RETRO_INSCRIPT_WITH_CHECK(tab_retro2(i).NUMPAC, tab_retro2(i).PACMAT, tab_retro2(i).PERIODE,  tab_retro2(i).CODE_CHRONO,  tab_retro2(i).PAIEZAD, 'TGE_PERIODE_RECUEIL_PAIEZAD');
+             EXCEPTION
+             WHEN OTHERS THEN
+               TGE_IMPORT_AVANCEMENT_proc('TGE_ALIM_PER','TGE_ALIM_PERIODE_INDIV KO : TGE_RETRO_INSCRIPT_WITH_CHECK('''||tab_retro2(i).NUMPAC||''', '''||tab_retro2(i).PACMAT||''', '''||tab_retro2(i).PERIODE||''',  '''||tab_retro2(i).CODE_CHRONO||''',  '''||tab_retro2(i).PAIEZAD||''', ''TGE_PERIODE_RECUEIL_PAIEZAD'') '||SQLCODE||' '||SQLERRM);
+             END;
+             BEGIN
+	           -- TGE_IMPORT_AVANCEMENT_proc('TGE_ALIM_PER','CALC_HP.principal('''||tab_retro2(i).NUMPAC||''', '''||tab_retro2(i).PACMAT||''', '''||tab_retro2(i).PERIODE||''',  '''||tab_retro2(i).CODE_CHRONO||''',  '''||tab_retro2(i).PAIEZAD||''','''||tab_retro2(i).DATE_SORTIE_SIT_BO||''','''||tab_retro2(i).DATE_EFF||''','''||tab_retro2(i).NUMCNT||''', ''TGE_PERIODE_RECUEIL_PAIEZAD'') '||SQLCODE||' '||SQLERRM);
+               CALC_HP.principal(tab_retro2(i).NUMPAC, tab_retro2(i).PACMAT, tab_retro2(i).PAIEZAD,  tab_retro2(i).NUMCNT,  tab_retro2(i).DATE_EFF,  tab_retro2(i).DATE_SORTIE_SIT_BO, 'proc_TGE_ALIM_PERIODE_INDIV',1);
+             EXCEPTION
+             WHEN OTHERS THEN
+               TGE_IMPORT_AVANCEMENT_proc('TGE_ALIM_PER','TGE_ALIM_PERIODE_INDIV KO : CALC_HP.principal('''||tab_retro2(i).NUMPAC||''', '''||tab_retro2(i).PACMAT||''', '''||tab_retro2(i).PAIEZAD||''',  '''||tab_retro2(i).NUMCNT||''',  '''||tab_retro2(i).DATE_EFF||''', '''||tab_retro2(i).DATE_SORTIE_SIT_BO||''', ''proc_TGE_ALIM_PERIODE_INDIV'',1) '||SQLCODE||' '||SQLERRM);
+             END;
+           END LOOP;
+         END IF;	
+		 EXECUTE_IMMEDIATE_STRING  ('DELETE TGE_PERIODE_RECUEIL_PAIEZAD_R WHERE ID_TRT = ''' || id_trt || ''' ',0);		 
+		 TGE_IMPORT_AVANCEMENT_proc('TGE_ALIM_PER','TGE_ALIM_PERIODE_INDIV -> Début JOB.SUBMIT UPDATE TGE_INCIDENTS_PAIE');
+		 -- UPDATE TGE_INCIDENTS_PAIE pour forcer le passage dans le trigger et le recalcul de la colonne PERIODE avec la bonne valeur
+		 -- On cible les incidents dont la colonne PERIODE ne correspond pas à la valeur qu'elle devrait avoir (MOIS_PAIE de TGE_PERIODE_RECUEIL_PAIEZAD pour la période de recueil incluant la DATE_EFFET de l'incident)
+			req              := 'UPDATE TGE_INCIDENTS_PAIE SET PERIODE = PERIODE, TYPE_WRITER=''''R'''' ';
+			req              := req|| ' WHERE ID IN ( ';
+			req            	 := req|| '   select I.ID from TGE_INCIDENTS_PAIE I  '; 
+			req            	 := req|| '   INNER JOIN TGE_PERIODE_RECUEIL_PAIEZAD P  '; 
+			req            	 := req|| '   ON I.NUMPAC = P.NUMPAC '; 
+			req            	 := req|| '   AND I.PAIEZAD = P.PAIEZAD '; 
+			req            	 := req|| '   AND I.DATE_EFFET BETWEEN P.DEBUT_PERIODE_RECUEIL AND P.FIN_PERIODE_RECUEIL '; 
+			req            	 := req|| '   WHERE I.NUMPAC = ''''' || p_numpac || ''''' '; 
+			req            	 := req|| '   AND TO_CHAR(I.PERIODE, ''''YYYYMM'''') != P.MOIS_PAIE '; 
+			IF w_pacmat IS NOT NULL THEN
+				req          := req|| '   AND P.PACMAT = '''''||w_pacmat||'''''  ';
+			END IF;
+			req            	 := req|| ' )  '; 
+				 
+		  DBMS_JOB.SUBMIT(v_jobIdx , 'BEGIN
+			 TGE_IMPORT_AVANCEMENT_proc(''TGE_ALIM_PER'',''début CALCUL PERIODE INCIDENT '||id_trt||''');
+			 EXECUTE_IMMEDIATE_STRING('''||req||''', 0);
+			 TGE_IMPORT_AVANCEMENT_proc(''TGE_ALIM_PER'',''fin CALCUL PERIODE INCIDENT '||id_trt||' OK : ''||SQL%ROWCOUNT||'' ligne(s) mise(s) à jour'');
+			 EXCEPTION
+			 WHEN OTHERS THEN
+			 TGE_IMPORT_AVANCEMENT_proc(''TGE_ALIM_PER'',''fin CALCUL PERIODE INCIDENT KO : ''|| SQLCODE||'' ''||SQLERRM);
+		  END;', sysdate, null);
+	 	END IF;
+	 END IF;
+  ELSE
+    TGE_IMPORT_AVANCEMENT_proc('TGE_ALIM_PER','TGE_ALIM_PERIODE_INDIV -> Date de periode_recalcul ('||p_periode_paie||') > à la période du pac en cours ('||periode_paie_en_cours||')');
+  END IF;
+  TGE_IMPORT_AVANCEMENT_proc('TGE_ALIM_PER','fin TGE_ALIM_PERIODE_INDIV OK');
+EXCEPTION
+WHEN OTHERS THEN
+  TGE_IMPORT_AVANCEMENT_proc('TGE_ALIM_PER','fin TGE_ALIM_PERIODE_INDIV KO : TGE_ALIM_PERIODE_INDIV '||SQLCODE||' '||SQLERRM);
+END TGE_ALIM_PERIODE_INDIV;

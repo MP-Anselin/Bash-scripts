@@ -1,0 +1,83 @@
+##
+TAG_CHARSET=@€éèç
+##
+DIC_AJOUT_CHAMP_REQUETE
+=SQL=
+create or replace PROCEDURE DIC_AJOUT_CHAMP_REQUETE(p_nomTable IN user_tables.table_name%TYPE,p_nomCol IN user_tab_cols.column_name%TYPE) AS
+TYPE TypeTrancoTypeChamp IS TABLE OF VARCHAR2(1) INDEX BY VARCHAR2(1);
+tableTranscotypeChamp TypeTrancoTypeChamp;
+nomRequete EDI_REQ_SQL.NOMREQ%type;
+listeRequete TAB_VARCHAR;
+typeDon REF_DONNEE_GENERALE.TYPE_DONNEE%type;
+masqueDon REF_DONNEE_GENERALE.LONGUEUR_MASQUE_NB_ENTIERS%type;
+decimaux REF_DONNEE_GENERALE.NB_DECIMAUX%type;
+typeChampQuery EDI_REQ_SQL_CF.TYPEDATA%type;
+champSelect EDI_REQ_SQL_CF.VALEURSELECT%type;
+libel REF_DONNEE_GENERALE.LIBELLE_DONNEE%type;
+compteur integer;
+compId META_DICTIONNAIRE_IHM.COMPANY_ID%type := '*';
+BEGIN
+	champSelect := p_nomTable || '.' || p_nomCol;
+	
+	tableTranscotypeChamp('X') := 'T';
+	tableTranscotypeChamp('9') := 'N';
+	tableTranscotypeChamp('D') := 'T';
+	tableTranscotypeChamp('N') := 'T';
+	
+	-- formatage du champ
+	begin
+		select DG.TYPE_DONNEE,DG.LONGUEUR_MASQUE_NB_ENTIERS, DG.NB_DECIMAUX, DG.LIBELLE_DONNEE into typeDon, masqueDon,decimaux, libel from REF_DONNEE_GENERALE DG where DG.NOM_DICTIONNAIRE = p_nomTable and NOM_DONNEE = p_nomCol and DG.COMPANY_ID = compId;
+		EXCEPTION
+			WHEN others THEN
+			typeDon := 'X';
+			masqueDon := null;
+			decimaux := null;
+	end;
+
+	begin
+		typeChampQuery := tableTranscotypeChamp(typeDon);
+		EXCEPTION
+		WHEN others THEN
+			typeChampQuery := 'T';
+	end;
+			
+	if typeDon = 'D' then
+		champSelect := 'TO_CHAR(' || champSelect || ',''' || masqueDon || ''')';
+	end if;
+	-- fin formatage du champ
+	
+		
+	-- établie la liste des requètes impactée par le nouveau champ
+	if p_nomTable = 'DIC_ADM_PERSO' then
+		listeRequete := TAB_VARCHAR('STD_REQ_DIC_ADM_PERSO','STD_REQ_DIC_PERSO_H','STD_REQ_DIC_PERSO_CONTRAT_H');
+	elsif p_nomTable = 'DIC_ADM_PERSO_HISTO' then
+		listeRequete := TAB_VARCHAR('STD_REQ_DIC_ADM_PERSO_HISTO','STD_REQ_DIC_PERSO_H');		
+	elsif p_nomTable = 'DIC_ADM_CONTRAT' then
+		listeRequete := TAB_VARCHAR('STD_REQ_DIC_ADM_CONTRAT','STD_REQ_DIC_CONTRAT_H','STD_REQ_DIC_PERSO_CONTRAT_H');	
+	elsif p_nomTable = 'DIC_ADM_CONTRAT_HISTO' then
+		listeRequete := TAB_VARCHAR('STD_REQ_DIC_ADM_CONTRAT_HISTO','STD_REQ_DIC_PERSO_CONTRAT_H','STD_REQ_DIC_CONTRAT_H');
+	else
+		listeRequete := TAB_VARCHAR();
+		listeRequete.extend;
+		listeRequete(listeRequete.last) := 'STD_REQ_' || p_nomTable;
+		
+	end if;
+
+	--ajout du champ
+	
+	for elem in 1 .. listeRequete.last loop
+		select nvl(max(ORDRE),0) +1 into compteur from EDI_REQ_SQL_CF where NOMREQ = listeRequete(elem);
+		-- insertion des champs de la requète
+		begin
+			Insert into EDI_REQ_SQL_CF (NOMREQ,NOMCHAMPFUSION,VALEURSELECT,SEPAR_CHAMP,ORDRE,TYPEDATA,LIBCHAMPFUSION,TAILLE)
+			values (listeRequete(elem),p_nomCol,champSelect,null,compteur,typeChampQuery,substr(libel,1,50),0);
+		EXCEPTION
+			WHEN others THEN
+				null;
+		end;
+
+
+	end loop;
+	
+	--commit;
+END DIC_AJOUT_CHAMP_REQUETE;

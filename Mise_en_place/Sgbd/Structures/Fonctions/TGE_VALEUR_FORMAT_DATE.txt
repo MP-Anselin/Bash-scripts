@@ -1,0 +1,48 @@
+##
+TAG_CHARSET=@€éèç
+##
+TGE_VALEUR_FORMAT_DATE
+=SQL=
+create or replace FUNCTION TGE_VALEUR_FORMAT_DATE 
+(
+  pMasqueElement in VARCHAR2
+) RETURN VARCHAR2 AS 
+
+BEGIN
+  /**
+   Fonction permettant de retourner le masque de date attendu pour un élément TGE en fonction du masque de la colonne TGE_REF_DICOZ.MASQUE
+ **/
+	IF (pMasqueElement = '1') THEN
+  		return 'JJMMSSAA';
+  	ELSIF (pMasqueElement = '2') THEN
+  		return 'MMSSAA';
+  	ELSIF (pMasqueElement = '3') THEN
+	  	return 'SSAAMM';
+	ELSIF (pMasqueElement = '4') THEN
+  		return 'JJ';  	
+  	ELSIF (pMasqueElement = '5') THEN
+  		return 'MM';
+  	ELSIF (pMasqueElement = '6') THEN
+  		return 'SSAA';
+  	ELSIF (pMasqueElement = '7') THEN
+  		return 'SSAAMMJJ';
+  	ELSIF (pMasqueElement = '8') THEN
+  		return 'JJMMAA';
+  	ELSIF (pMasqueElement = '9') THEN
+  		return 'MMAA';
+  	ELSIF (pMasqueElement = '10') THEN
+  		return 'AAMM';
+  	ELSIF (pMasqueElement = '11') THEN
+  		return 'AA';
+  	ELSIF (pMasqueElement = '12') THEN
+  		return 'AAMMJJ';
+  	ELSIF (pMasqueElement = '13') THEN
+  		return 'JJAA';
+  	ELSIF (pMasqueElement = '14') THEN
+  		return 'JJMM';
+  	ELSIF (pMasqueElement = '15') THEN
+  		return 'MMJJ';
+  	ELSIF (pMasqueElement = '16') THEN
+  		return 'MMJJSSAA';
+  	END IF;
+END TGE_VALEUR_FORMAT_DATE;

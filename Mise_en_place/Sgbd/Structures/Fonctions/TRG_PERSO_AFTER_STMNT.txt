@@ -1,0 +1,22 @@
+##
+TRG_PERSO_AFTER_STMNT
+=SQL=
+CREATE OR REPLACE FUNCTION TRG_PERSO_AFTER_STMNT RETURN CLOB AS 
+BEGIN
+  RETURN '
+  IF v_listMatricToDelete IS NOT NULL THEN
+    -- On supprime de SECUPACMAT les MATRIC supprimés
+    --DBMS_OUTPUT.PUT_LINE(''PERSO DELETING ''||v_listMatricToDelete);
+    --FIXME utiliser la procédure trace_dbms_output()
+    EXECUTE_IMMEDIATE_STRING( ''DELETE FROM SECUPACMAT WHERE MATRIC IN (''||v_listMatricToDelete||'')'',0);
+  END IF;
+  IF v_listMatricToUpdate IS NOT NULL THEN
+    -- On insère dans la table temporaire les MATRIC à mettre à jour
+    --DBMS_OUTPUT.PUT_LINE(''PERSO UPDATING ''||v_listMatricToUpdate);
+    --FIXME utiliser la procédure trace_dbms_output()
+    EXECUTE_IMMEDIATE_STRING (''INSERT INTO SECUPACMAT_TMP_PERSO (MATRIC) SELECT DISTINCT MATRIC FROM SECUPACMAT WHERE MATRIC IN (''||v_listMatricToUpdate||'') AND MATRIC NOT IN (SELECT MATRIC FROM SECUPACMAT_TMP_PERSO)'',0);
+    SECNAV_MAJ_DATA_PERSO(0);
+    EXECUTE_IMMEDIATE_STRING (''DELETE FROM SECUPACMAT_TMP_PERSO'',0);
+  END IF;
+';
+END TRG_PERSO_AFTER_STMNT;

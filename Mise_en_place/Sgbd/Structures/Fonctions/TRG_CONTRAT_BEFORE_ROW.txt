@@ -1,0 +1,158 @@
+##
+TAG_CHARSET=@€éèç
+##
+TRG_CONTRAT_BEFORE_ROW
+=SQL=
+CREATE OR REPLACE FUNCTION TRG_CONTRAT_BEFORE_ROW RETURN CLOB AS 
+BEGIN
+  RETURN '
+  -- On vérifie qu''on ne modifie ni le NUMPAC, ni le PACMAT, ni le NUMCNT
+  IF UPDATING AND (NOT v_ligOld.NUMPAC=v_ligNew.NUMPAC OR NOT v_ligOld.PACMAT=v_ligNew.PACMAT OR NOT v_ligOld.NUMCNT=v_ligNew.NUMCNT) THEN
+    -- Message d''erreur --> On interdit la mise à jour du NUMPAC, du PACMAT et du NUMCNT : il faut faire un delete puis un insert
+    RAISE_APPLICATION_ERROR(-20000,''La mise à jour des colonnes NUMPAC, PACMAT et NUMCNT n''''est pas autorisée : vous devez supprimer puis recréer le contrat'');
+  END IF;
+  -- On vérifie qu''on ne modifie pas le RHID et qu''il n''est pas vide
+  IF (INSERTING OR UPDATING) AND v_ligNew.MATRIC IS NULL THEN
+    RAISE_APPLICATION_ERROR(-20000,''La colonne MATRIC doit être renseignée dans DIC_ADM_CONTRAT'');
+  END IF;
+  IF UPDATING AND NOT v_ligOld.MATRIC=v_ligNew.MATRIC THEN
+    RAISE_APPLICATION_ERROR(-20000,''La mise à jour de la colonne MATRIC n''''est pas autorisée'');
+  END IF;
+  -- On vérifie qu''on ne modifie pas la date de début de contrat et qu''elle n''est pas vide
+  IF (INSERTING OR UPDATING) AND v_ligNew.DSDCN IS NULL THEN
+    RAISE_APPLICATION_ERROR(-20000,''La colonne DSDCN doit être renseignée dans DIC_ADM_CONTRAT'');
+  END IF;
+  IF UPDATING AND NOT v_ligOld.DSDCN=v_ligNew.DSDCN THEN
+    RAISE_APPLICATION_ERROR(-20000,''La mise à jour de la colonne DSDCN n''''est pas autorisée'');
+  END IF;
+  
+  IF INSERTING THEN
+    -- On regarde si le couple NUMPAC/PACMAT existe dans SECUPACMAT (premier contrat du couple ?), et si un NUMPAC temporaire est positionné pour le MATRIC (premier contrat du MATRIC ?)
+    BEGIN
+      SELECT NVL(MATRIC,''NO_MATRIC'') INTO v_matricForPacmat FROM SECUPACMAT WHERE NUMPAC=v_ligNew.NUMPAC AND PACMAT=v_ligNew.PACMAT;
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN v_matricForPacmat:=NULL;
+      WHEN OTHERS THEN RAISE;
+    END;
+    IF v_matricForPacmat IS NULL THEN
+      v_nbLig:=0;
+    ELSE
+      IF NOT v_matricForPacmat=v_ligNew.MATRIC THEN
+        -- Le couple NUMPAC/PACMAT existe pour un autre MATRIC
+        RAISE_APPLICATION_ERROR(-20000,''Erreur lors de l''''attribution du PACMAT pour le matricule ''||v_ligNew.MATRIC||'' sur le PAC ''||v_ligNew.NUMPAC||'' : le PACMAT ''||v_ligNew.PACMAT||'' est déjà associé au matricule ''||v_matricForPacmat);
+      END IF;
+      v_nbLig:=1;
+    END IF;
+    IF v_nbLig=0 THEN
+      -- Premier contrat pour le couple NUMPAC/PACMAT : on insère dans SECUPACMAT (ou on met à jour la ligne ayant un NUMPAC temporaire, si elle existe)
+      SELECT COUNT(*) INTO v_nbLig FROM SECUPACMAT WHERE NUMPAC=''TMPPAC'' AND MATRIC=v_ligNew.MATRIC;
+      IF v_nbLig=1 THEN
+        -- Il y a un couple NUMPAC/PACMAT temporaire dans SECUPACMAT pour ce MATRIC : on le met à jour
+        UPDATE SECUPACMAT SET NUMPAC=v_ligNew.NUMPAC, PACMAT=v_ligNew.PACMAT WHERE NUMPAC=''TMPPAC'' AND MATRIC=v_ligNew.MATRIC;
+      ELSE
+        -- On insère le couple NUMPAC/PACMAT dans SECUPACMAT
+        INSERT INTO SECUPACMAT (NUMPAC, PACMAT, MATRIC) VALUES (v_ligNew.NUMPAC, v_ligNew.PACMAT, v_ligNew.MATRIC);
+        v_doMajPerso := 1;
+      END IF;
+    ELSE
+        IF v_nbLig = 1 THEN
+            update SECUPACMAT set FLAG_MASQUAGE_RGPD = 0 where NUMPAC = v_ligNew.NUMPAC and PACMAT = v_ligNew.PACMAT;
+        END IF;
+    END IF;
+    -- Si la colonne NUMCNT_ORIGINE est vide, on la valorise avec NUMCNT
+    IF v_ligNew.NUMCNT_ORIGINE IS NULL THEN
+      :NEW.NUMCNT_ORIGINE := v_ligNew.NUMCNT;
+      v_ligNew.NUMCNT_ORIGINE := :NEW.NUMCNT_ORIGINE;
+    END IF;
+    -- On stocke la liste des NUMPAC/PACMAT modifiés
+    IF v_type_writer<>''N'' AND v_type_writer<>''M'' THEN
+      IF v_listMatricToUpdate IS NULL OR INSTR(v_listMatricToUpdate,v_ligNew.MATRIC)<=0 THEN
+        IF v_nbMatricToUpdate=1000 THEN
+          v_nbMatricToUpdate := 0;
+          v_listMatricToUpdate := v_listMatricToUpdate||'') OR MATRIC IN ('';
+        ELSIF v_nbMatricToUpdate>0 THEN
+          v_listMatricToUpdate := v_listMatricToUpdate||'','';
+        END IF;
+        v_listMatricToUpdate := v_listMatricToUpdate||''''''''||v_ligNew.MATRIC||'''''''';
+        v_nbMatricToUpdate := v_nbMatricToUpdate+1;
+      END IF;
+      -- On stocke la liste des NUMPAC/PACMAT/NUMCNT/DATE_EFF insérés
+      v_cle_idx_contrat := T_CLE_IDX_CONTRAT_HISTO(v_ligNew.MATRIC, v_ligNew.NUMPAC, v_ligNew.PACMAT, v_ligNew.NUMCNT, v_ligNew.DSDCN);
+      v_cles_idx_contrat.extend;
+      v_cles_idx_contrat(v_cles_idx_contrat.last) := v_cle_idx_contrat;
+    END IF;
+    
+   IF NOT tabRefPacByNumpac.exists(v_ligNew.NUMPAC) THEN
+       SELECT * INTO tabRefPacByNumpac(v_ligNew.NUMPAC) FROM TGE_REF_PAC WHERE NUMPAC = v_ligNew.NUMPAC;
+   END IF;
+   
+   	v_date_debut_periode_paie := to_date(tabRefPacByNumpac(v_ligNew.NUMPAC).PERIODEENCOURS || ''01'',''YYYYMMDD''); 
+
+   	IF v_ligNew.DSDCN < v_date_debut_periode_paie THEN
+    	:NEW.ENTREE_RETRO := ''O'';
+   	ELSE
+	   	:NEW.ENTREE_RETRO := ''N'';
+    END IF;
+    v_ligNew.ENTREE_RETRO := :NEW.ENTREE_RETRO;
+
+    IF v_ligNew.DSFCN < v_date_debut_periode_paie THEN
+    	:NEW.SORTIE_RETRO := ''O'';
+   	ELSE
+	   	:NEW.SORTIE_RETRO := ''N'';
+    END IF;
+    v_ligNew.SORTIE_RETRO := :NEW.SORTIE_RETRO;
+
+    
+  ELSIF UPDATING AND (NOT UPDATING(''DATE_EFF_CONTRAT'') AND NOT UPDATING(''CURRENT_PAIEZAD'')) THEN
+    -- On considère que c''est une "vraie" mise à jour si ce n''est pas de la mise à jour de DATE_EFF_CONTRAT ou CURRENT_PAIEZAD
+    -- On stocke la liste des NUMPAC/PACMAT modifiés
+    IF v_type_writer<>''N'' AND v_type_writer<>''M'' THEN
+      IF v_listMatricToUpdate IS NULL OR INSTR(v_listMatricToUpdate,v_ligNew.MATRIC)<=0 THEN
+        IF v_nbMatricToUpdate=1000 THEN
+          v_nbMatricToUpdate := 0;
+          v_listMatricToUpdate := v_listMatricToUpdate||'') OR MATRIC IN ('';
+        ELSIF v_nbMatricToUpdate>0 THEN
+          v_listMatricToUpdate := v_listMatricToUpdate||'','';
+        END IF;
+        v_listMatricToUpdate := v_listMatricToUpdate||''''''''||v_ligNew.MATRIC||'''''''';
+        v_nbMatricToUpdate := v_nbMatricToUpdate+1;
+      END IF;
+      -- On stocke la liste des NUMPAC/PACMAT/NUMCNT/DATE_EFF modifiés
+      v_cle_idx_contrat := T_CLE_IDX_CONTRAT_HISTO(v_ligNew.MATRIC, v_ligNew.NUMPAC, v_ligNew.PACMAT, v_ligNew.NUMCNT, v_ligNew.DSDCN);
+      v_cles_idx_contrat.extend;
+      v_cles_idx_contrat(v_cles_idx_contrat.last) := v_cle_idx_contrat;
+    END IF;
+
+    IF UPDATING(''DSFCN'') THEN
+       IF NOT tabRefPacByNumpac.exists(v_ligOld.NUMPAC) THEN
+         SELECT * INTO tabRefPacByNumpac(v_ligOld.NUMPAC) FROM TGE_REF_PAC WHERE NUMPAC = v_ligOld.NUMPAC;
+       END IF;
+    	v_date_debut_periode_paie := to_date(tabRefPacByNumpac(v_ligNew.NUMPAC).PERIODEENCOURS || ''01'',''YYYYMMDD''); 
+    	IF v_ligNew.DSFCN < v_date_debut_periode_paie THEN
+    		:NEW.SORTIE_RETRO := ''O'';
+    	ELSE
+	    	:NEW.SORTIE_RETRO := ''N'';
+    	END IF;
+    	v_ligNew.SORTIE_RETRO := :NEW.SORTIE_RETRO;
+    END IF;
+  ELSIF DELETING THEN
+    IF (v_listNumpacPacmatToDelete IS NULL OR INSTR(v_listNumpacPacmatToDelete, '',''||v_ligOld.NUMPAC||v_ligOld.PACMAT||'','')<=0) THEN
+      -- On liste les couples NUMPAC/PACMAT supprimés pour les traiter par la suite
+      v_NUMPAC_PACMAT.MATRIC:=v_ligOld.MATRIC;
+      v_NUMPAC_PACMAT.NUMPAC:=v_ligOld.NUMPAC;
+      v_NUMPAC_PACMAT.PACMAT:=v_ligOld.PACMAT;
+      IF v_TAB_NUMPAC_PACMAT IS NULL THEN
+        v_TAB_NUMPAC_PACMAT:=TAB_NUMPAC_PACMAT_TO_DELETE(v_NUMPAC_PACMAT);
+      ELSE
+        v_TAB_NUMPAC_PACMAT.EXTEND();
+        v_TAB_NUMPAC_PACMAT(v_TAB_NUMPAC_PACMAT.last):=v_NUMPAC_PACMAT;
+      END IF;
+      v_listNumpacPacmatToDelete := v_listNumpacPacmatToDelete||v_ligOld.NUMPAC||v_ligOld.PACMAT||'','';
+    END IF;
+    -- On stocke la liste des NUMPAC/PACMAT/NUMCNT/DATE_EFF supprimés
+    v_cle_idx_contrat := T_CLE_IDX_CONTRAT_HISTO(v_ligOld.MATRIC, v_ligOld.NUMPAC, v_ligOld.PACMAT, v_ligOld.NUMCNT, v_ligOld.DSDCN);
+    v_cles_idx_contrat.extend;
+    v_cles_idx_contrat(v_cles_idx_contrat.last) := v_cle_idx_contrat;
+  END IF;
+';
+END TRG_CONTRAT_BEFORE_ROW;

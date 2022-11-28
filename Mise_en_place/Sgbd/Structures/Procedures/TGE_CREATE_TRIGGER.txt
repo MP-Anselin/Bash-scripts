@@ -1,0 +1,380 @@
+##
+TAG_CHARSET=@€éèç
+##
+TGE_CREATE_TRIGGER
+=SQL=
+create or replace PROCEDURE TGE_CREATE_TRIGGER(NOM_TABLE IN VARCHAR2) AS
+ PROC CLOB;
+ PROC_MP_NOTIF CLOB;
+ populateLigOld CLOB;
+ populateLigNew CLOB;
+ v_typeTable VARCHAR(1);
+ is_aller_ou_allerretour_mapta NUMBER;
+ table_exist                   NUMBER;
+ type_writer_exists            NUMBER;
+ extensionDACH NUMBER;
+ BEGIN
+ -- Exclusion de DACS, le trigger est en dur.
+  IF upper(NOM_TABLE) = 'DIC_ADM_CONTRAT_SITU' THEN
+    RETURN;
+  END IF;
+ 
+ -- On teste si la table existe bien
+ SELECT COUNT(*)
+ INTO table_exist
+ FROM user_tables
+ WHERE table_name = nom_table;
+ IF table_exist = 0 THEN
+ RETURN;
+ END IF;
+ 
+ SELECT COUNT(*)
+ INTO is_aller_ou_allerretour_mapta
+ FROM tge_ref_mapta
+ WHERE
+ tablephy = nom_table
+ --RSI DIT 39298 MPE : Fonction d'envoi inconditionnel pour la table TGE_REF_MAPDO
+ --Ajout du type 'I'
+ AND allerretour                                   IN ('A', '2','I');
+ 
+ PROC_MP_NOTIF := TGE_CREATE_TRIGGER_MP_NOTIF(NOM_TABLE);
+ 
+ -- Si on n'est ni sur une table qui part en paie, ni sur une table qui génère des notifications Marketplace, ni sur DIC_ADM_PERSO, DIC_ADM_PERSO_HISTO, DIC_ADM_CONTRAT ou DIC_ADM_CONTRAT_HISTO, on ne génère pas de trigger
+ IF is_aller_ou_allerretour_mapta = 0 AND nom_table NOT IN ('DIC_ADM_PERSO','DIC_ADM_PERSO_HISTO','DIC_ADM_CONTRAT') AND nom_table not like 'DIC_ADM_CONTRAT_HISTO%' AND PROC_MP_NOTIF IS NULL THEN
+ RETURN;
+ END IF;
+ 
+ -- Si la colonne TYPE_WRITER n'existe pas, on la crée
+ SELECT COUNT(*)
+ INTO type_writer_exists
+ FROM user_tab_cols
+ WHERE column_name     = 'TYPE_WRITER'
+ AND table_name        = NOM_TABLE;
+ IF type_writer_exists = 0 THEN
+ EXECUTE_IMMEDIATE_STRING(  'ALTER TABLE ' || NOM_TABLE || ' ADD (TYPE_WRITER VARCHAR2(1 BYTE))',0);
+ END IF;
+ 
+ v_typeTable := fsed.getTypeTable(NOM_TABLE);
+ 
+ PROC        := 'CREATE OR REPLACE TRIGGER TRG_' || NOM_TABLE || ' FOR INSERT OR UPDATE OR DELETE ON '||NOM_TABLE||' COMPOUND TRIGGER
+ v_matric varchar2(32);
+ v_numpac varchar2(6);
+ v_pacmat varchar2(8);
+ v_numcnt number;
+ v_paiezad varchar2(8);
+ v_type_writer varchar2(1);
+ v_bypass_trigger number;
+ v_bypass_DACH number;
+ v1_bypass_DACH number;
+ TYPE periodeTabType is  table of TGE_REF_PAC.PERIODEENCOURS%TYPE ;
+ periodeTab periodeTabType := periodeTabType();
+ idxPeriodesIndiv NUMBER;
+ v_ligOld '||nom_table||'%ROWTYPE;
+ v_ligNew '||nom_table||'%ROWTYPE;
+ v_periode varchar2(6);
+ tabRefPacByNumpac ALIM_IDX.T_REF_PAC_BY_NUMPAC;
+ ';
+ IF nom_table='DIC_PERIODES_RECUEIL_HIS' OR nom_table='DIC_ADM_CONTRAT_HISTO' THEN
+ PROC :=PROC||'
+ listJobMasseAsync varchar2(4000);
+ listJobMasseAsyncTab TAB_VARCHAR:=TAB_VARCHAR();
+ v_jobAsyncMasseIdx NUMBER;
+ ';
+ END IF;
+ 
+ IF nom_table='DIC_PERIODES_RECUEIL_HIS' THEN
+ PROC :=PROC||'
+ TYPE paiezadPacPeriodModifedType IS  TABLE OF TGE_PAC_PAIEZAD_PERIOD_RETRO  INDEX BY VARCHAR2(15);
+ paiezadPacPeriodModifed paiezadPacPeriodModifedType ;
+ idx  VARCHAR2(15);
+ ';
+ ELSE
+ PROC :=PROC||'
+ idx NUMBER;
+ ';
+ END IF;
+ 
+ IF nom_table IN ('DIC_ADM_PERSO','DIC_ADM_PERSO_HISTO','DIC_ADM_CONTRAT') OR nom_table like 'DIC_ADM_CONTRAT_HISTO%' THEN
+ PROC          :=PROC||'
+ v_listMatricToUpdate CLOB := NULL;
+ v_nbMatricToUpdate NUMBER := 0;
+ v_countSecNav NUMBER := -1;
+ ';
+ IF nom_table   ='DIC_ADM_PERSO' THEN
+ PROC        :=PROC||'
+ v_listMatricToDelete CLOB := NULL;
+ v_nbMatricToDelete NUMBER := 0;
+ ';
+ ELSIF nom_table='DIC_ADM_CONTRAT' THEN
+ PROC        :=PROC||'
+ v_date_debut_periode_paie DATE :=NULL;
+ v_nbLig NUMBER;
+ v_doMajPerso NUMBER := 0;
+ TYPE NUMPAC_PACMAT_TO_DELETE IS RECORD (MATRIC DIC_ADM_CONTRAT.MATRIC%TYPE, NUMPAC DIC_ADM_CONTRAT.NUMPAC%TYPE, PACMAT DIC_ADM_CONTRAT.PACMAT%TYPE);
+ TYPE TAB_NUMPAC_PACMAT_TO_DELETE IS TABLE OF NUMPAC_PACMAT_TO_DELETE;
+ v_NUMPAC_PACMAT NUMPAC_PACMAT_TO_DELETE;
+ v_TAB_NUMPAC_PACMAT TAB_NUMPAC_PACMAT_TO_DELETE;
+ v_listNumpacPacmatToDelete CLOB := '','';
+ ';
+ ELSIF nom_table like 'DIC_ADM_CONTRAT_HISTO%' THEN
+ PROC        :=PROC||'
+ v_dsdcn DIC_ADM_CONTRAT.DSDCN%TYPE;
+ v_date_eff '|| nom_table || '.DATE_EFF%TYPE;
+ v_natcol DIC_ADM_CONTRAT.NATCOL%TYPE;
+ 
+ TYPE paiezadTabType is table of '|| nom_table || '.PAIEZAD%TYPE ;
+ TYPE numpacTabType is  table of '|| nom_table || '.NUMPAC%TYPE ;
+ paiezadTab paiezadTabType := paiezadTabType();
+ numpacTab numpacTabType := numpacTabType();
+ 
+ TYPE T_TRAITEMENT_PERIODES_INDIV IS TABLE OF VARCHAR2(100) INDEX BY VARCHAR2(100);
+ -- Ce tableau indexé contient plusieurs chose :
+ -- + Une entrée avec un code PAC + un PAIEZAD --> Un flag permettant de savoir si le couple NUMPAC/PAIEZAD a déjà été traité
+ -- + Une entrée avec un code PAC --> La période en cours du PAC
+ tabTrtPeriodesIndividuelles T_TRAITEMENT_PERIODES_INDIV;
+ in_calc_hp T_TRAITEMENT_PERIODES_INDIV;
+ TYPE calcHpTabType is  table of T_TRAITEMENT_PERIODES_INDIV ;
+ calcHpTab calcHpTabType := calcHpTabType();
+ 
+ TYPE T_COMPARAISON_VAL_OLD_NEW IS TABLE OF VARCHAR2(100) INDEX BY VARCHAR2(20);
+ tabValToCompare T_COMPARAISON_VAL_OLD_NEW;
+ TYPE PRESENTDIC_PACMAT IS RECORD
+ (NUMPAC  varchar2(6),PACMAT '|| nom_table || '.PACMAT%TYPE);
+ TYPE TAB_PRESENTDIC_PACMAT IS TABLE OF PRESENTDIC_PACMAT INDEX BY VARCHAR2(14);
+ indexTabPresFicPacmat varchar2(14);
+ tabPresenceFichierPacmat TAB_PRESENTDIC_PACMAT;
+ alimPeriodesIndiv boolean;
+ ';
+ END IF;
+ 
+ IF nom_table='DIC_ADM_CONTRAT' OR nom_table like 'DIC_ADM_CONTRAT_HISTO%' THEN
+ PROC     :=PROC||'
+ v_actionIdx VARCHAR2(1);
+ v_lanceRecalculHp boolean;
+ v_isDeleting  NUMBER ;
+ v_jobIdx NUMBER;
+ v_cle_idx_contrat T_CLE_IDX_CONTRAT_HISTO;
+ v_cles_idx_contrat T_CLES_IDX_CONTRAT_HISTO := T_CLES_IDX_CONTRAT_HISTO();
+ ';
+ END IF;
+ 
+ IF nom_table='DIC_ADM_PERSO' OR nom_table='DIC_ADM_CONTRAT' THEN
+ PROC     :=PROC||'
+ v_matricForPacmat VARCHAR2(32);
+ TYPE T_LOCKED_MATRIC IS TABLE OF VARCHAR2(1) INDEX BY VARCHAR2(32);
+ tabLockedMatric T_LOCKED_MATRIC;
+ ';
+ END IF;
+ END IF;
+ 
+ IF nom_table like 'DIC_ADM_CONTRAT_HISTO%' THEN
+ PROC      :=PROC||'
+ BEFORE STATEMENT IS BEGIN
+ select count(*) into v_bypass_DACH from bypass_trg_DACH_on_session;
+ END BEFORE STATEMENT;
+ ';
+ END IF;
+ 
+ PROC        := PROC || '
+ BEFORE EACH ROW IS BEGIN
+ ' ;
+ 
+ populateLigOld := NULL;
+ populateLigNew := NULL;
+ FOR liste_cols_table IN (SELECT COLUMN_NAME FROM USER_TAB_COLS WHERE TABLE_NAME=NOM_TABLE AND COLUMN_ID IS NOT NULL ORDER BY COLUMN_NAME)
+ LOOP
+ populateLigOld := populateLigOld||'
+ v_ligOld.'||liste_cols_table.COLUMN_NAME||' := :OLD.'||liste_cols_table.COLUMN_NAME||';';
+ 
+ populateLigNew := populateLigNew||'
+ v_ligNew.'||liste_cols_table.COLUMN_NAME||' := :NEW.'||liste_cols_table.COLUMN_NAME||';';
+ END LOOP;
+ -- si table extension contrat histo, on génère la procédure GET_CONTRAT_HISTO_HORS_TRANSAC qui correspond
+ 
+ PROC      := PROC || '
+ IF INSERTING THEN
+ -- On initialise le ''OLD'' (car :OLD n''existe pas, en insertion)
+ v_ligOld := ';
+ IF nom_table like 'DIC_ADM_CONTRAT_HISTO%' THEN
+ CREATE_PROC_DACHX_HORS_TRANSAC(nom_table);
+ -- En insertion dans DIC_ADM_CONTRAT_HISTO, on considère que le 'OLD' c'est l'histo précédent (celui qui est en train d'être splitté)
+ PROC      := PROC || 'GET_CONTRAT_HISTO'|| replace(nom_table,'DIC_ADM_CONTRAT_HISTO','') ||'_HORS_TRANSAC(:NEW.NUMPAC, :NEW.PACMAT, :NEW.NUMCNT, :NEW.DATE_EFF-1, TRUE); ';
+ ELSE
+ PROC      := PROC || 'NULL; ';
+ END IF;
+ PROC      := PROC || '
+ ELSE' || populateLigOld || '
+ END IF;
+ IF DELETING THEN
+ -- On initialise le ''NEW'' (car :NEW n''existe pas, en suppression)
+ v_ligNew := ';
+ IF nom_table like 'DIC_ADM_CONTRAT_HISTO%' THEN
+ -- En suppression dans DIC_ADM_CONTRAT_HISTO, on considère que le 'NEW' c'est l'histo précédent (dont les données vont remplacer celles de l'histo qui est supprimée)
+ PROC      := PROC || 'GET_CONTRAT_HISTO'|| replace(nom_table,'DIC_ADM_CONTRAT_HISTO','') ||'_HORS_TRANSAC(:OLD.NUMPAC, :OLD.PACMAT, :OLD.NUMCNT, :OLD.DATE_EFF-1, TRUE); ';
+ ELSE
+ PROC      := PROC || 'NULL; ';
+ END IF;
+ PROC      := PROC || '
+ ELSE' || populateLigNew || '
+ END IF;
+ ';
+ 
+ IF nom_table like 'DIC_ADM_CONTRAT_HISTO%' THEN
+ PROC      := PROC || ' IF (v_bypass_DACH > 0) THEN null; else ';
+ END IF;
+ 
+ PROC          := PROC || '
+ if (v_bypass_trigger > 0) then
+ v_type_writer := ''N'';
+ else
+ IF DELETING THEN
+ v_type_writer :=NVL(v_ligOld.type_writer,''O'');
+ ELSE
+ v_type_writer :=NVL(v_ligNew.type_writer,''O'');
+ -- On remet TYPE_WRITER à NULL pour qu''il ne soit pas considéré comme ''N'' lors des futurs update n''incluant pas cette colonne
+ :NEW.type_writer := NULL;
+ v_ligNew.type_writer := :NEW.type_writer;
+ END IF;
+ END IF;
+ v_matric := NVL(v_ligNew.MATRIC,v_ligOld.MATRIC);
+ ';
+ 
+ IF v_typeTable = 'z' THEN
+ PROC := PROC||'
+ v_numpac := nvl(v_ligNew.numpac,v_ligOld.numpac);
+ IF DELETING THEN
+ v_paiezad := v_ligOld.paiezad;
+ ELSE
+ v_paiezad := v_ligNew.paiezad;
+ END IF; ';
+ ELSIF v_typeTable='p' THEN
+ PROC := PROC||'
+ v_numpac := nvl(v_ligNew.numpac,v_ligOld.numpac);
+ v_pacmat := nvl(v_ligNew.pacmat,v_ligOld.pacmat); ';
+ END IF;
+ IF nom_table like 'DIC_ADM_CONTRAT_HISTO%' THEN
+ PROC := PROC||'
+ v_pacmat := nvl(v_ligNew.pacmat,v_ligOld.pacmat); 
+ v_numcnt := nvl(v_ligNew.numcnt,v_ligOld.numcnt);';
+ END IF;
+ 
+ IF nom_table IN ('DIC_ADM_PERSO','DIC_ADM_PERSO_HISTO','DIC_ADM_CONTRAT') or nom_table like 'DIC_ADM_CONTRAT_HISTO%' THEN
+ PROC      := PROC || '
+ IF v_type_writer<>''N'' AND v_type_writer<>''M'' AND v_countSecNav=-1 THEN
+ SELECT COUNT(*) INTO v_countSecNav FROM SECUPACMAT_TMP WHERE MATRIC=''SECNAV'';
+ IF v_countSecNav>0 THEN
+ RAISE_APPLICATION_ERROR(-20000,''CODERR=GENREC03'');
+ END IF;
+ END IF;
+ ';
+ END IF;
+  
+ IF nom_table ='DIC_ADM_PERSO' OR nom_table ='DIC_ADM_CONTRAT' THEN
+ -- On récupère le MATRIC et on teste si on l'a déjà traité
+ PROC      := PROC || '
+ IF v_type_writer<>''N'' AND v_type_writer<>''M'' AND NOT tabLockedMatric.exists(v_matric) THEN';
+ 
+ -- En cas de modification de DAP, on lock les tables qui la mette à jour par trigger (DAPH, DAC, DACS et DACH)
+ -- En cas de modification de DAC, on lock les tables qui la mette à jour par trigger (DACS et DACH)
+ IF nom_table ='DIC_ADM_PERSO' THEN
+ -- DAPH et DAC uniquement pour DAP
+ PROC      := PROC || '
+ BEGIN
+ UPDATE DIC_ADM_PERSO_HISTO SET MATRIC=MATRIC, DATE_DERNIERE_MODIF=TO_DATE(''19010101'',''yyyymmdd''), TYPE_WRITER=''N'' WHERE MATRIC=v_matric;
+ EXCEPTION WHEN OTHERS THEN NULL; END;
+ BEGIN
+ UPDATE DIC_ADM_CONTRAT SET NUMPAC=NUMPAC, DATE_DERNIERE_MODIF=TO_DATE(''19010101'',''yyyymmdd''), TYPE_WRITER=''N'' WHERE MATRIC=v_matric;
+ EXCEPTION WHEN OTHERS THEN NULL; END;';
+ END IF;
+ 
+ -- DACs et DACH uniquement pour les 2 (DAP et DAC)
+ PROC      := PROC || '
+ BEGIN
+ UPDATE DIC_ADM_CONTRAT_SITU SET NUMPAC=NUMPAC, DATE_DERNIERE_MODIF=TO_DATE(''19010101'',''yyyymmdd'') WHERE MATRIC=v_matric;
+ EXCEPTION WHEN OTHERS THEN NULL; END;
+ BEGIN
+ UPDATE DIC_ADM_CONTRAT_HISTO SET NUMPAC=NUMPAC, DATE_DERNIERE_MODIF=TO_DATE(''19010101'',''yyyymmdd''), TYPE_WRITER=''N'' WHERE MATRIC=v_matric;
+ EXCEPTION WHEN OTHERS THEN NULL; END;';
+ 
+ 
+ -- On stocke le MATRIC pour indiquer qu'on l'a déjà traité
+ PROC      := PROC || '
+ tabLockedMatric(v_matric) := ''O'';
+ END IF;';
+ 
+ END IF;
+ 
+ IF nom_table   ='DIC_ADM_PERSO' THEN
+ PROC        :=PROC||TRG_PERSO_BEFORE_ROW();
+ ELSIF nom_table='DIC_ADM_PERSO_HISTO' THEN
+ PROC        :=PROC||TRG_PERSO_HISTO_BEFORE_ROW();
+ ELSIF nom_table='DIC_ADM_CONTRAT' THEN
+ PROC        :=PROC||TRG_CONTRAT_BEFORE_ROW();
+ ELSIF nom_table = 'DIC_ADM_CONTRAT_HISTO' THEN
+ PROC        :=PROC||TRG_CONTRAT_HISTO_BEFORE_ROW();
+ ELSIF nom_table like 'DIC_ADM_CONTRAT_HISTO%' THEN
+ PROC        :=PROC||TRG_CONTRAT_HISTOX_BEFORE_ROW();
+ END IF;
+ 
+ IF is_aller_ou_allerretour_mapta > 0 THEN
+ PROC := PROC||TGE_CREATE_TRIGGER_RECYCLAGE(NOM_TABLE);
+ END IF;
+ 
+ IF nom_table like 'DIC_ADM_CONTRAT_HISTO%' THEN
+ PROC      := PROC || '
+ END IF ;
+ ';
+ END IF;
+ 
+ PROC := PROC||PROC_MP_NOTIF;
+ 
+ PROC :=PROC||'
+ END BEFORE EACH ROW;';
+ 
+ IF nom_table IN ('DIC_ADM_CONTRAT_HISTO','DIC_PERIODES_RECUEIL_HIS') THEN
+ PROC      :=PROC||' AFTER EACH ROW IS BEGIN ';
+ IF nom_table = 'DIC_ADM_CONTRAT_HISTO' THEN
+ PROC      := PROC|| TRG_CONTRAT_HISTO_AFTER_ROW();
+ ELSIF nom_table='DIC_PERIODES_RECUEIL_HIS' THEN
+ PROC      := PROC|| DIC_PERIOD_REC_HISTO_AFTER_ROW();
+ END IF;
+ PROC      :=PROC||' END AFTER EACH ROW;';
+ END IF;
+ 
+ IF nom_table IN ('DIC_ADM_PERSO','DIC_ADM_PERSO_HISTO','DIC_ADM_CONTRAT','DIC_PERIODES_RECUEIL_HIS') or nom_table like 'DIC_ADM_CONTRAT_HISTO%' THEN
+ 
+ -- si les extension DACH sont bien activées c'est que la table pivot est en place
+  SELECT NVL(VALVAR,0)
+ INTO extensionDACH
+ FROM SYS_VARSYS
+ WHERE CODVAR = 'NB_EXTENSION_DACH';
+ 
+ PROC          :=PROC||' AFTER STATEMENT IS BEGIN';
+ IF nom_table   ='DIC_ADM_PERSO' THEN
+ PROC        :=PROC||TRG_PERSO_AFTER_STMNT();
+ ELSIF nom_table='DIC_ADM_PERSO_HISTO' THEN
+ PROC        :=PROC||TRG_PERSO_HISTO_AFTER_STMNT();
+ ELSIF nom_table='DIC_ADM_CONTRAT' THEN
+ PROC        :=PROC||TRG_CONTRAT_AFTER_STMNT();
+ ELSIF nom_table = 'DIC_ADM_CONTRAT_HISTO' THEN
+ PROC        :=PROC||TRG_CONTRAT_HISTO_AFTER_STMNT();
+  ELSIF nom_table like  'DIC_ADM_CONTRAT_HISTO%' THEN
+ PROC        :=PROC||TRG_CONTRAT_HISTOX_AFTER_STMNT(SUBSTR(nom_table,22 , 1));
+ ELSIF nom_table='DIC_PERIODES_RECUEIL_HIS' THEN
+ PROC        :=PROC||DIC_PERIODES_REC_H_AFTER_STMNT();
+ END IF;
+ 
+ IF nom_table like 'DIC_ADM_CONTRAT_HISTO%' AND extensionDACH > 0 THEN
+ PROC      := PROC || '
+ -- Calcul de la table pivot pour le numpac,pacmat 
+ MAJ_DIC_ADM_CONTRAT_PIVOT(v_numpac,v_pacmat,v_numcnt);
+ ';
+ END IF;
+ 
+ PROC:=PROC||'END AFTER STATEMENT;';
+ END IF;
+ 
+ PROC :=PROC||' END TRG_'||NOM_TABLE||';';
+ 
+ EXECUTE_IMMEDIATE_STRING( PROC,0);
+ END TGE_CREATE_TRIGGER;

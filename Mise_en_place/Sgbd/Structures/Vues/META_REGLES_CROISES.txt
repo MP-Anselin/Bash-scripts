@@ -1,0 +1,268 @@
+##
+META_REGLES_CROISES
+=SQL=
+CREATE OR REPLACE VIEW META_REGLES_CROISES AS
+  SELECT
+    a.id_reglegestion,
+    a.libelle,
+    CASE
+      WHEN a.flag_specif_type_regle = 'M'
+      THEN 'Masque les données et les vide'
+      WHEN a.flag_specif_type_regle = 'C'
+      THEN 'Masque les données sans les vider'
+      WHEN a.flag_specif_type_regle = 'V'
+      THEN 'Rend les données non saisissables'
+      WHEN a.flag_specif_type_regle = 'O'
+      THEN 'Activée en temps réel'
+      WHEN a.flag_specif_type_regle = 'N'
+      THEN 'Non activée en temps réel'
+      ELSE ''
+    END TYPE_REGLE2 ,
+    z.type_regle,
+    NVL(z.TYPE_OBJET,'NON UTILISE') AS TYPE_OBJET,
+    z.info1,
+    z.type_objet2,
+    z.info2 ,
+    a.description,
+    a.regle_synthetique,
+    a.est_supprime
+  FROM
+    (
+      SELECT
+        'DONNEE'               AS TYPE_OBJET,
+        'AUTOMATISME RD '      AS TYPE_REGLE,
+        NOM_DONNEE             AS INFO1,
+        'NOM_PAGE'             AS TYPE_OBJET2,
+        NOM_PAGE               AS INFO2 ,
+        ID_REGLEGESTION_AUT_RD AS ID_REGLE
+      FROM
+        META_DONNEE_ECRAN
+      UNION ALL
+      SELECT
+        'DONNEE'                AS TYPE_OBJET,
+        'AUTOMATISME CLI '      AS TYPE_REGLE,
+        NOM_DONNEE              AS INFO1,
+        'NOM_PAGE'              AS TYPE_OBJET2,
+        NOM_PAGE                AS INFO2 ,
+        ID_REGLEGESTION_AUT_CLI AS ID_REGLE
+      FROM
+        META_DONNEE_ECRAN
+      UNION ALL
+      SELECT
+        'DONNEE'               AS TYPE_OBJET,
+        'AFFICHAGE RD '        AS TYPE_REGLE,
+        NOM_DONNEE             AS INFO1,
+        'NOM_PAGE'             AS TYPE_OBJET2,
+        NOM_PAGE               AS INFO2 ,
+        ID_REGLEGESTION_AFF_RD AS ID_REGLE
+      FROM
+        META_DONNEE_ECRAN
+      UNION ALL
+      SELECT
+        'DONNEE'                AS TYPE_OBJET,
+        'AFFICHAGE CLI '        AS TYPE_REGLE,
+        NOM_DONNEE              AS INFO1,
+        'NOM_PAGE'              AS TYPE_OBJET2,
+        NOM_PAGE                AS INFO2 ,
+        ID_REGLEGESTION_AFF_CLI AS ID_REGLE
+      FROM
+        META_DONNEE_ECRAN
+      UNION ALL
+      SELECT
+        'DONNEE'               AS TYPE_OBJET,
+        'CONTROLE RD  '        AS TYPE_REGLE,
+        NOM_DONNEE             AS INFO1,
+        'NOM_PAGE'             AS TYPE_OBJET2,
+        NOM_PAGE               AS INFO2 ,
+        ID_REGLEGESTION_CTL_RD AS ID_REGLE
+      FROM
+        META_DONNEE_ECRAN
+      UNION ALL
+      SELECT
+        'DONNEE'                AS TYPE_OBJET,
+        'CONTROLE CLI '         AS TYPE_REGLE,
+        NOM_DONNEE              AS INFO1,
+        'NOM_PAGE'              AS TYPE_OBJET2,
+        NOM_PAGE                AS INFO2 ,
+        ID_REGLEGESTION_CTL_CLI AS ID_REGLE
+      FROM
+        META_DONNEE_ECRAN
+      UNION ALL
+      SELECT
+        'DONNEE'               AS TYPE_OBJET,
+        'OBLIGATOIRE '        AS TYPE_REGLE,
+        NOM_DONNEE             AS INFO1,
+        'NOM_PAGE'             AS TYPE_OBJET2,
+        NOM_PAGE               AS INFO2 ,
+        SUBSTR(EST_OBLIGATOIRE,3) AS ID_REGLE
+      FROM
+        META_DONNEE_ECRAN
+      WHERE
+        EST_OBLIGATOIRE LIKE 'R_%'
+      UNION ALL
+      SELECT
+        'DONNEE'               AS TYPE_OBJET,
+        'VALEUR PAR DEFAUT '   AS TYPE_REGLE,
+        NOM_DONNEE             AS INFO1,
+        'NOM_PAGE'             AS TYPE_OBJET2,
+        NOM_PAGE               AS INFO2 ,
+        SUBSTR(VALEUR_DEFAUT,10) AS ID_REGLE
+      FROM
+        META_DONNEE_ECRAN
+      WHERE
+        VALEUR_DEFAUT LIKE 'ID_REGLE=%'
+      UNION ALL
+      SELECT
+        'TABLEAU SUPP'              AS TYPE_OBJET,
+        'CONTROLE RD  '             AS TYPE_REGLE,
+        ID_GROUPE                   AS INFO1,
+        ''                          AS TYPE_OBJET2,
+        ''                          AS INFO2 ,
+        ID_REGLEGESTION_CTL_RD_SUPP AS ID_REGLE
+      FROM
+        META_GROUPE_DONNEES
+      WHERE
+        NOM_DONNEE LIKE '#TABLEAU%'
+      UNION ALL
+      SELECT
+        'TABLEAU SUPP'               AS TYPE_OBJET,
+        'CONTROLE CLI '              AS TYPE_REGLE,
+        ID_GROUPE                    AS INFO1,
+        ''                           AS TYPE_OBJET2,
+        ''                           AS INFO2 ,
+        ID_REGLEGESTION_CTL_CLI_SUPP AS ID_REGLE
+      FROM
+        META_GROUPE_DONNEES
+      WHERE
+        NOM_DONNEE LIKE '#TABLEAU%'
+      UNION ALL
+      SELECT
+        'AFF RECONDUCTION DONNEES'  AS TYPE_OBJET,
+        'AFFICHAGE RD  '            AS TYPE_REGLE,
+        ID_GROUPE                   AS INFO1,
+        ''                          AS TYPE_OBJET2,
+        ''                          AS INFO2 ,
+        ID_REGLEGESTION_CTL_RD_SUPP AS ID_REGLE
+      FROM
+        META_GROUPE_DONNEES
+      WHERE
+        NOM_DONNEE LIKE '#RECONDUCTION_DONNEES%'
+      UNION ALL
+      SELECT
+        'AFF RECONDUCTION DONNEES'   AS TYPE_OBJET,
+        'AFFICHAGE CLI '             AS TYPE_REGLE,
+        ID_GROUPE                    AS INFO1,
+        ''                           AS TYPE_OBJET2,
+        ''                           AS INFO2 ,
+        ID_REGLEGESTION_CTL_CLI_SUPP AS ID_REGLE
+      FROM
+        META_GROUPE_DONNEES
+      WHERE
+        NOM_DONNEE LIKE '#RECONDUCTION_DONNEES%'
+      UNION ALL
+      SELECT
+        'GROUPE'               AS TYPE_OBJET,
+        'AFFICHAGE RD '        AS TYPE_REGLE,
+        ID_GROUPE              AS INFO1,
+        ''                     AS TYPE_OBJET2,
+        ''                     AS INFO2 ,
+        ID_REGLEGESTION_AFF_RD AS ID_REGLE
+      FROM
+        META_GROUPE_DONNEES_INFO
+      UNION ALL
+      SELECT
+        'GROUPE'                AS TYPE_OBJET,
+        'AFFICHAGE CLI '        AS TYPE_REGLE,
+        ID_GROUPE               AS INFO1,
+        ''                      AS TYPE_OBJET2,
+        ''                      AS INFO2 ,
+        ID_REGLEGESTION_AFF_CLI AS ID_REGLE
+      FROM
+        META_GROUPE_DONNEES_INFO
+      UNION ALL
+      SELECT
+        'ECRAN'                    AS TYPE_OBJET,
+        'CONDITION ECRAN WORKFLOW' AS TYPE_REGLE,
+        ECRAN_NOM_PAGE             AS INFO1,
+        'OP_NUM'                   AS TYPE_OBJET2,
+        TO_CHAR(OP_NUM)
+        ||' '
+        ||
+        (
+          SELECT
+            w.op_libelle
+          FROM
+            wkf_operations w
+          WHERE
+            w.op_num=META_WKF_OPERATION_ECRANS.op_num
+          AND rownum=1
+        )                          AS INFO2 ,
+        ECRAN_ID_REGLEGESTION_COND AS ID_REGLE
+      FROM
+        META_WKF_OPERATION_ECRANS
+      UNION ALL
+      SELECT
+        'ECRAN'             AS TYPE_OBJET,
+        'CONTROLE WORKFLOW' AS TYPE_REGLE,
+        ECRAN_NOM_PAGE      AS INFO1,
+        'OP_NUM'            AS TYPE_OBJET2,
+        TO_CHAR(OP_NUM)
+        ||' '
+        ||
+        (
+          SELECT
+            w.op_libelle
+          FROM
+            wkf_operations w
+          WHERE
+            w.op_num=META_WKF_OPERATION_ECRANS.op_num
+          AND rownum=1
+        )                             AS INFO2 ,
+        RECHERCHE_ID_REGLEGESTION_CTL AS ID_REGLE
+      FROM
+        META_WKF_OPERATION_ECRANS
+      UNION ALL
+      SELECT
+        'ECRAN'                AS TYPE_OBJET,
+        'AUTOMATISME RD '      AS TYPE_REGLE,
+        NOM_PAGE               AS INFO1,
+        ''                     AS TYPE_OBJET2,
+        ''                     AS INFO2 ,
+        ID_REGLEGESTION_AUT_RD AS ID_REGLE
+      FROM
+        META_ECRAN
+      UNION ALL
+      SELECT
+        'ECRAN'                 AS TYPE_OBJET,
+        'AUTOMATISME CLI '      AS TYPE_REGLE,
+        NOM_PAGE                AS INFO1,
+        ''                      AS TYPE_OBJET2,
+        ''                      AS INFO2 ,
+        ID_REGLEGESTION_AUT_CLI AS ID_REGLE
+      FROM
+        META_ECRAN
+      UNION ALL
+      SELECT
+        'ECRAN'                AS TYPE_OBJET,
+        'CONTROLE RD  '        AS TYPE_REGLE,
+        NOM_PAGE               AS INFO1,
+        ''                     AS TYPE_OBJET2,
+        ''                     AS INFO2 ,
+        ID_REGLEGESTION_CTL_RD AS ID_REGLE
+      FROM
+        META_ECRAN
+      UNION ALL
+      SELECT
+        'ECRAN'                 AS TYPE_OBJET,
+        'CONTROLE CLI '         AS TYPE_REGLE,
+        NOM_PAGE                AS INFO1,
+        ''                      AS TYPE_OBJET2,
+        ''                      AS INFO2 ,
+        ID_REGLEGESTION_CTL_CLI AS ID_REGLE
+      FROM
+        META_ECRAN
+    )
+    Z,
+    meta_reglegestion_desc A
+  WHERE
+    Z.id_regle(+) = a.id_reglegestion

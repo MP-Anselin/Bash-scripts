@@ -1,0 +1,54 @@
+##
+HRORG_INIT_AFFECTATION
+=SQL=
+create or replace PROCEDURE HRORG_INIT_AFFECTATION AS
+  matric DIC_ADM_CONTRAT_HISTO.MATRIC%type;
+  dateEff DIC_ADM_CONTRAT_HISTO.DATE_EFF%type;
+  dateFin DIC_ADM_CONTRAT_HISTO.DATE_FIN%type;
+  dateFinBo DIC_ADM_CONTRAT_HISTO.DATE_SORTIE_SIT_BO%type;
+  entite varchar2(100);
+  TYPE EmpCurTyp IS REF CURSOR;  -- define weak REF CURSOR type
+  CUR EmpCurTyp;
+  dateDebIns varchar2(8);
+  dateFinIns varchar2(8);
+BEGIN
+  --maj du champs DATE_FIN
+  MAJ_DATE_FIN_CONTRAT_HISTO();
+
+  --maj du champs DATE_SORTIE_SIT_BO
+  R_DATE_SORTIE_SIT_BO_CNT_HISTO();
+
+  FOR codts_actif in (select codts,nomcol_secumatric from std_struc_type where nomcol_secumatric IS NOT NULL) LOOP
+    -- purge des types de structures gérée par un champs de contrat
+    delete from STD_STRUC_AFFECTATION where codts = codts_actif.codts;
+      
+    -- insertion dans la table des affectations
+    OPEN CUR FOR 'SELECT MATRIC,DATE_EFF,DATE_FIN,DATE_SORTIE_SIT_BO,NVL(' || codts_actif.nomcol_secumatric || ',''@NON_AFFECTE@'') from DIC_ADM_CONTRAT_HISTO';
+    LOOP
+      FETCH CUR INTO matric, dateEff, dateFin, dateFinBo, entite;
+      EXIT WHEN CUR%NOTFOUND;
+      IF (matric is null or dateEff is null or dateFin is null ) THEN
+        CONTINUE;
+      END IF;
+      begin
+        dateDebIns := to_char(dateEff,'yyyymmdd');
+        dateFinIns := to_char(dateFin,'yyyymmdd');
+        insert into STD_STRUC_AFFECTATION (MATRIC,CODTS,DATE_EFF,CODE_ENTITE,DATE_FIN,EST_AFFEC_PRINCIPAL) values(matric, codts_actif.codts, dateDebIns, entite,dateFinIns, 1);
+      IF (dateFinBo > dateFin) THEN
+        dateDebIns := to_char(dateFin+1,'yyyymmdd');
+        dateFinIns := to_char(dateFinBo,'yyyymmdd');
+        insert into STD_STRUC_AFFECTATION (MATRIC,CODTS,DATE_EFF,CODE_ENTITE,DATE_FIN,EST_AFFEC_PRINCIPAL) values(matric, codts_actif.codts, dateDebIns, '@NON_AFFECTE@',dateFinIns, 1);
+      END IF;
+      EXCEPTION
+      WHEN DUP_VAL_ON_INDEX THEN
+        NULL;
+      END;
+    END LOOP;
+    CLOSE CUR;
+    COMMIT;-- commit par code types
+  END LOOP;
+
+  --consolidation
+  HRORG_CONSOLIDE_AFFECTATION();
+  COMMIT;
+END HRORG_INIT_AFFECTATION;

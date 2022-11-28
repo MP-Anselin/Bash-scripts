@@ -1,0 +1,107 @@
+##
+TAG_CHARSET=@€éèç
+##
+HRORG_MAJ_AFFEC_HERITE_ENT
+=SQL=
+create or replace
+PROCEDURE HRORG_MAJ_AFFEC_HERITE_ENT(
+ p_codts               NUMBER,
+ p_matric              VARCHAR2,
+ p_code_entite         VARCHAR2,
+ p_date_eff            VARCHAR2,
+ p_date_fin            VARCHAR2,
+ p_est_affec_principal VARCHAR2,
+ p_cid   IN std_struc_entite.cid%TYPE default null)
+ AS
+ TYPE tcur
+ IS
+ REF
+ CURSOR;
+ c_struc_heritees tcur;
+ c_entites_mere tcur;
+ v_codts               NUMBER;
+ v_niv_heritage        NUMBER;
+ v_niv_entite          NUMBER;
+ v_code_ent_mere       VARCHAR2(25);
+ v_date_eff_mere       VARCHAR2(8);
+ v_date_fin_mere       VARCHAR2(8);
+ v_entite_mere_checked NUMBER;
+ v_cid std_struc_entite.cid%TYPE;
+ BEGIN
+ 	v_cid := p_cid;
+   	IF (v_cid IS NULL) THEN
+  		BEGIN
+  			SELECT VALVAR INTO v_cid FROM SYS_VARSYS where CODVAR = 'NS_CLIENT_ID';
+  		EXCEPTION
+  		WHEN NO_DATA_FOUND THEN
+  			v_cid := null;
+  		END;
+	END IF;
+  	IF (v_cid IS NULL) THEN
+  		-- En mode multiclient, la varsys peut être null et le passage du paramètre pCid est obligatoire
+  		RETURN;
+  	END IF;
+	 
+	 
+ v_entite_mere_checked:=0;
+ IF (NOT p_code_entite ='@NON_AFFECTE@') THEN
+ SELECT n.niveau
+ INTO v_niv_entite
+ FROM std_struc_entite e,
+ std_struc_niv n
+ WHERE
+ e.cid = v_cid
+ AND e.type_entite=n.type_entite
+ AND e.code_entite  =p_code_entite
+ AND n.codts        =p_codts
+ AND p_date_eff BETWEEN e.date_eff AND e.date_fin
+ AND p_date_eff BETWEEN n.date_eff AND n.date_fin;
+ ELSE
+ v_niv_entite:=NULL;
+ END IF;
+ OPEN c_struc_heritees FOR SELECT codts,
+ hrorg_niv_mere_affec_heritage(codts, p_date_eff)
+ AS
+ niv_heritage FROM std_struc_type WHERE lien_codts=p_codts ORDER BY codts;
+ LOOP
+ FETCH c_struc_heritees INTO v_codts, v_niv_heritage;
+ EXIT
+ WHEN c_struc_heritees % NOTFOUND;
+ IF (v_niv_heritage IS NOT NULL AND v_niv_heritage>0) THEN
+ IF (p_code_entite ='@NON_AFFECTE@' OR (v_niv_entite IS NOT NULL AND v_niv_entite=v_niv_heritage)) THEN
+ INSERT
+ INTO STD_STRUC_AFFECTATION VALUES
+ (
+ p_matric,
+ v_codts,
+ p_date_eff,
+ p_code_entite,
+ p_date_fin,
+ p_est_affec_principal
+ );
+ ELSE
+ IF (v_entite_mere_checked=0 AND v_niv_entite IS NOT NULL AND v_niv_entite>v_niv_heritage) THEN
+ OPEN c_entites_mere FOR SELECT code_ent_mere,
+ date_eff,
+ date_fin FROM std_struc_arbre WHERE cid = v_cid and codts=p_codts AND code_entite=p_code_entite AND date_eff<=p_date_fin AND date_fin>=p_date_eff AND code_ent_mere IS NOT NULL ORDER BY date_eff;
+ LOOP
+ FETCH c_entites_mere INTO v_code_ent_mere, v_date_eff_mere, v_date_fin_mere;
+ EXIT
+ WHEN c_entites_mere % NOTFOUND;
+ IF (v_date_eff_mere<p_date_eff) THEN
+ v_date_eff_mere :=p_date_eff;
+ END IF;
+ IF (v_date_fin_mere>p_date_fin) THEN
+ v_date_fin_mere :=p_date_fin;
+ END IF;
+ HRORG_MAJ_AFFEC_HERITE_ENT(p_codts, p_matric, v_code_ent_mere, v_date_eff_mere, v_date_fin_mere, p_est_affec_principal, v_cid);
+ v_entite_mere_checked:=1;
+ END LOOP;
+ CLOSE c_entites_mere;
+ END IF;
+ END IF;
+ END IF;
+ END LOOP;
+ CLOSE c_struc_heritees;
+ END HRORG_MAJ_AFFEC_HERITE_ENT;
+ 

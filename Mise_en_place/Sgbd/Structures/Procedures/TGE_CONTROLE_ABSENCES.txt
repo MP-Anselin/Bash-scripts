@@ -1,0 +1,106 @@
+##
+TAG_CHARSET=@€éèç
+##
+TGE_CONTROLE_ABSENCES
+=SQL=
+create or replace PROCEDURE TGE_CONTROLE_ABSENCES ( P_LOGIN IN VARCHAR2
+ , P_DATE_IMPORT IN VARCHAR2
+ , P_NUMLIGNE IN VARCHAR2
+ , P_CODLANG in VARCHAR2
+ ) AS
+ /********************************************************************************
+Version     : V5.05.000
+*********************************************************************************/
+ cNumeric_Characters varchar2(40);
+ cNLS_NUMERIC_CHARACTERS varchar2(40);
+ clWhereLoginDate varchar2(1000);
+ clWhere varchar2(1000);
+ req varchar2(2000);
+ w_err VARCHAR2(2000);
+ BEGIN
+ SELECT TRIM(VALUE) INTO cNLS_NUMERIC_CHARACTERS FROM nls_session_parameters where PARAMETER = 'NLS_NUMERIC_CHARACTERS';
+ 
+ clwhereLoginDate:='login='''||p_login||''' and date_import='''||P_DATE_IMPORT||'''';
+ --Ajout clause incident
+ clwhere:=clWhereLoginDate||' and ( exists ( (SELECT ri.CODE_INCIDENT FROM TGE_REF_PRE ri WHERE ri.numpac = ii.numpac AND  ri.OPTION_CONSERV_HISTO = ''A'' and CODE_IP=ri.CODE_INCIDENT) )OR ';
+ clwhere:=clwhere||' exists (SELECT ri.CODE_INCIDENT FROM TGE_REF_PRE ri WHERE ri.numpac=''*''  and CODE_IP=ri.CODE_INCIDENT AND ri.OPTION_CONSERV_HISTO = ''A'' ';
+ clwhere:=clwhere||' AND NOT EXISTS (SELECT 1 FROM TGE_REF_PRE rt2 WHERE rt2.numpac=ii.numpac and  CODE_IP=rt2.CODE_INCIDENT ))) ';
+ if p_numligne is not null then
+ clwhere:=clwhere||' AND NUMLIGNE='||p_numligne;
+ end if;
+ /*Champs obligatoires*/
+ --contenuMotif(p_absence.motif, arrErreurs);ToolsTge_controles.contenu(p_motif, "TGE00142", p_arrErreurs);CODE_IP
+ req:='update TGE_IMPORT_INCIDENTS ii SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00142',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''') where '||clwhere||' AND CODE_IP is null';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ --contenuDate_debut(p_absence.date_debut, arrErreurs);p_arrErreurs.add(new GxpErreurWithParams("TGE00108", new String[] {}));
+ req:='update TGE_IMPORT_INCIDENTS ii SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00108',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''') where '||clwhere||' AND DATE_DEBUT is null';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ --contenuDate_fin(p_absence.date_fin, arrErreurs);p_arrErreurs.add(new GxpErreurWithParams("TGE00109", new String[] {}));
+ req:='update TGE_IMPORT_INCIDENTS ii SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00109',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''') where  '||clwhere||' AND DATE_FIN is null';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ --contenu numpac  ToolsTge_controles.contenuNumPac(p_absence.numPac, arrErreurs); TGE00077
+ req:='update TGE_IMPORT_INCIDENTS ii SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00077',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''') where '||clwhere||' AND NUMPAC is null';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ /* Contrôles format */
+ --controleFormatMatricule(p_absence.matric, arrErreurs);p_arrErreurs.add(new GxpErreurWithParams("TGE00089", new String[] {}));--MATRIC
+ req:='update TGE_IMPORT_INCIDENTS ii SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00089',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''') where '||clwhere||' AND MATRICULE is NOT NULL AND LENGTH(MATRICULE)>32';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ --controleFormatMotif(p_absence.motif, arrErreurs);p_arrErreurs.add(new GxpErreurWithParams("TGE00143", new String[] {}));MOTIF
+ req:='update TGE_IMPORT_INCIDENTS ii SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00143',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''') where '||clwhere||' AND (CODE_IP IS NOT NULL AND LENGTH(CODE_IP) > 2)';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ --ToolsTge_controles.controleFormatNumPac(p_absence.numPac, arrErreurs);TGE00072
+ req:='update TGE_IMPORT_INCIDENTS ii SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00072',p_codlang),'''','''''')||''',NUMPAC,'''||p_codlang||''') where '||clwhere||' AND NUMPAC IS NOT NULL AND LENGTH(NUMPAC)>6';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ /* Contrôles métier */
+ --Format date fin et date
+ req:='update TGE_IMPORT_INCIDENTS ii SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00118',p_codlang),'''','''''')||''',date_debut||''|''||date_fin,'''||p_codlang||''') where '||clwhere||' AND DATE_DEBUT IS NOT NULL AND DATE_FIN IS NOT NULL '||
+ ' AND  (IS_DATE(date_debut, ''YYYYMMdd'')=0 OR IS_DATE(date_fin, ''YYYYMMdd'')=0)';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ --date_debut> date_fin
+ req:='update TGE_IMPORT_INCIDENTS ii SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00118',p_codlang),'''','''''')||''',date_debut||''|''||date_fin,'''||p_codlang||''') where '||clwhere||' AND DATE_DEBUT IS NOT NULL AND DATE_FIN IS NOT NULL '||
+ ' AND  DATE_DEBUT>DATE_FIN  AND IS_DATE(date_debut, ''YYYYMMdd'')=1 AND  IS_DATE(date_fin, ''YYYYMMdd'')=1 AND  '||clwhere;
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- controlePlageSiDuree: n'est pas valable puisque debut_ma ='D' et fin_ma tjrs
+
+ --controleAbsenceInPeriodeActivite(p_absence, arrErreurs); verification de la négation "TGE00148"
+ req:='update TGE_IMPORT_INCIDENTS  ii SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00148',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''')where '||clwhere;
+ req:= req || ' AND EXISTS ( SELECT 1
+ FROM DIC_ADM_CONTRAT dac, dic_adm_contrat_histo dach
+ WHERE dac.numpac=dach.numpac and dac.numpac=ii.numpac
+ AND dac.pacmat=dach.pacmat and dac.pacmat=ii.pacmat
+ AND dac.numcnt=dach.numcnt 
+ AND ii.date_debut <=TO_CHAR(dach.date_sortie_sit_bo,''yyyymmdd'')
+ AND ii.date_fin  > TO_CHAR(dac.dsfcn,''yyyymmdd'')
+ AND dac.DSFCN<dach.DATE_SORTIE_SIT_BO)';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+
+ ---controleExistenceMotif TGE00161
+ req:='update TGE_IMPORT_INCIDENTS  ii  SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00161',p_codlang),'''','''''')||''',CODE_IP||''|''||numpac,'''||p_codlang||''') ';
+ req:= req || ' WHERE '||clWhereLoginDate||' AND II.CODE_IP IS NOT NULL ';
+ req:= req || ' AND NOT (';
+ req:= req ||   '(exists(SELECT p.CODE_INCIDENT FROM TGE_REF_PRE P WHERE p.numpac=II.numpac AND p.CODE_INCIDENT=II.CODE_IP  and II.CODE_IP= p.CODE_INCIDENT))';
+ req:= req || ' OR ';
+ req:= req ||   '(exists (SELECT p.CODE_INCIDENT FROM TGE_REF_PRE P WHERE p.numpac=''*'' and II.CODE_IP= p.CODE_INCIDENT AND p.CODE_INCIDENT=II.CODE_IP AND NOT EXISTS (SELECT 1 FROM TGE_REF_PRE rt2 WHERE rt2.numpac=II.numpac)))';
+ req:= req || ')  ' ;
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ --ToolsTge_controles.controleAutorisationMatric(p_loginOrLoginDelegator, p_absence.matric, arrErreurs);STD00014
+ req:='update TGE_IMPORT_INCIDENTS  ii SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('STD','STD00014',p_codlang),'''','''''')||''',MATRICULE,'''||p_codlang||''') where '||clwhere||
+ 'AND MATRICULE IS NOT NULL and NOT exists (select S.MATRIC  from SECUPACMAT S, DIC_ADM_CONTRAT C where  C.NUMPAC = S.NUMPAC and C.PACMAT = S.PACMAT and C.NUMCNT = S.CURRENT_NUMCNT and S.MATRIC =ii.MATRICULE)';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ --controlerMotifInAllNumPac TGE00161
+ req:='update TGE_IMPORT_INCIDENTS  ii SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00161',p_codlang),'''','''''')||''',CODE_IP||''|''||NUMPAC,'''||p_codlang||''')';
+ req:= req || ' where '||clwhereLoginDate|| ' AND MATRICULE IS NOT NULL AND NUMPAC IS NOT NULL AND (DATE_DEBUT IS NOT NULL OR DATE_FIN IS NOT NULL)';
+ req:= req || ' and II.CODE_IP IS NOT NULL and exists ';
+ -- Récupération de la liste des numPac pour lesquels le code incident n'existe pas
+ req:= req || ' (select NUMPAC from TGE_REF_PAC where ( NUMPAC not in (select NUMPAC from TGE_REF_PRE where code_incident = ii.code_IP) and not exists (select * from TGE_REF_PRE where code_incident = ii.code_IP  and NUMPAC = ''*''))';
+ req:= req || ' and NUMPAC in (select distinct C.NUMPAC from   DIC_ADM_CONTRAT C where  C.MATRIC = ii.matricule and  C.DSDCN  <= to_DATE(ii.date_debut,''YYYYMMDD'') and (C.DSFCN >= TO_DATE(ii.date_fin,''YYYYMMDD'')  or C.DSFCN is null ))'||
+ ')';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- controle Période de recueil
+ END TGE_CONTROLE_ABSENCES;

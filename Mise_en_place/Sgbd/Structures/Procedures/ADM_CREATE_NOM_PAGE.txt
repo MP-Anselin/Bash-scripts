@@ -1,0 +1,93 @@
+##
+ADM_CREATE_NOM_PAGE
+=SQL=
+create or replace PROCEDURE ADM_CREATE_NOM_PAGE( p_NIVEAU    IN NUMBER,
+ p_LIBELLE   IN VARCHAR2,
+ p_NOM_PAGE  IN VARCHAR2,
+ p_CODE_ROLE IN NUMBER,
+ isRD        IN VARCHAR2)
+ IS
+ p_code_element NUMBER;
+ countnompage   NUMBER:=0;
+ countlibelle   NUMBER:=0;
+  libelle50   varchar2(50):='';
+ BEGIN
+ IF LENGTH(p_LIBELLE) > 50 THEN
+ libelle50 := SUBSTR(p_LIBELLE,0,47)||'...';
+ ELSE 
+ libelle50 := p_LIBELLE;
+ END IF ;
+ IF p_niveau=99 THEN
+ SELECT COUNT(*)
+ INTO countnompage
+ FROM SYS_SCH_ELEMENT
+ WHERE niveau=p_niveau
+ AND nom_page=p_nom_page;
+ ELSE
+ SELECT COUNT(*)
+ INTO countlibelle
+ FROM SYS_SCH_ELEMENT
+ WHERE niveau=p_niveau
+ AND libelle =libelle50;
+ END IF;
+ IF (p_niveau=99 AND countnompage>0) THEN
+ UPDATE SYS_SCH_ELEMENT
+ SET libelle   =libelle50,
+ code_role   =p_code_role
+ WHERE niveau  =p_niveau
+ AND nom_page  =p_nom_page;
+ elsif (p_niveau<>99 AND countlibelle>0) THEN
+ UPDATE SYS_SCH_ELEMENT
+ SET nom_page=p_nom_page,
+ code_role =p_code_role
+ WHERE niveau=p_niveau
+ AND libelle =libelle50;
+ ELSE
+ IF isRD='true' THEN
+ SELECT MIN(code_element)-1
+ INTO p_code_element
+ FROM SYS_SCH_ELEMENT
+ WHERE niveau=p_niveau;
+ INSERT
+ INTO SYS_SCH_ELEMENT
+ (
+ NIVEAU,
+ CODE_ELEMENT,
+ LIBELLE,
+ NOM_PAGE,
+ CODE_ROLE
+ )
+ VALUES
+ (
+ p_NIVEAU,
+ p_CODE_ELEMENT,
+ libelle50,
+ p_NOM_PAGE,
+ p_CODE_ROLE
+ );
+ ELSE
+ SELECT MAX(code_element)+1
+ INTO p_code_element
+ FROM SYS_SCH_ELEMENT
+ WHERE niveau=p_niveau;
+ INSERT
+ INTO SYS_SCH_ELEMENT
+ (
+ NIVEAU,
+ CODE_ELEMENT,
+ LIBELLE,
+ NOM_PAGE,
+ CODE_ROLE
+ )
+ VALUES
+ (
+ p_NIVEAU,
+ p_CODE_ELEMENT,
+ libelle50,
+ p_NOM_PAGE,
+ p_CODE_ROLE
+ );
+ END IF;
+ END IF;
+ END ADM_CREATE_NOM_PAGE;
+ 

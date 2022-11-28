@@ -1,0 +1,40 @@
+##
+TAG_CHARSET=@€éèç
+##
+TRG_CONTRAT_HISTOX_BEFORE_ROW
+=SQL=
+CREATE OR REPLACE FUNCTION TRG_CONTRAT_HISTOX_BEFORE_ROW RETURN CLOB AS 
+BEGIN
+  RETURN '
+  -- On vérifie qu''on ne modifie ni le NUMPAC, ni le PACMAT, ni le NUMCNT, ni la date d''effet
+  IF UPDATING AND (NOT v_ligOld.NUMPAC=v_ligNew.NUMPAC OR NOT v_ligOld.PACMAT=v_ligNew.PACMAT OR NOT v_ligOld.NUMCNT=v_ligNew.NUMCNT OR NOT v_ligOld.DATE_EFF=v_ligNew.DATE_EFF) THEN
+    -- Message d''erreur --> On interdit la mise à jour du NUMPAC, du PACMAT et de la date d''effet : il faut faire un delete puis un insert
+    RAISE_APPLICATION_ERROR(-20000,''La mise à jour des colonnes NUMPAC, PACMAT, NUMCNT et DATE_EFF n''''est pas autorisée : vous devez supprimer puis recréer l''''occurrence'');
+  END IF;
+  IF INSERTING OR UPDATING THEN
+    IF v_ligNew.DATE_FIN IS NULL THEN
+      :NEW.DATE_FIN := TO_DATE(''20991231'',''yyyymmdd'');
+      v_ligNew.DATE_FIN := :NEW.DATE_FIN;
+    END IF;
+  END IF;
+  IF v_type_writer<>''N'' AND v_type_writer<>''M'' THEN
+    IF v_listMatricToUpdate IS NULL OR INSTR(v_listMatricToUpdate,NVL(v_ligNew.MATRIC,v_ligOld.MATRIC))<=0 THEN
+      -- On stocke la liste des NUMPAC/PACMAT modifiés
+      IF v_nbMatricToUpdate=1000 THEN
+        v_nbMatricToUpdate := 0;
+        v_listMatricToUpdate := v_listMatricToUpdate||'') OR MATRIC IN ('';
+      ELSIF v_nbMatricToUpdate>0 THEN
+        v_listMatricToUpdate := v_listMatricToUpdate||'','';
+      END IF;
+      v_listMatricToUpdate := v_listMatricToUpdate||''''''''||NVL(v_ligNew.MATRIC,v_ligOld.MATRIC)||'''''''';
+      v_nbMatricToUpdate := v_nbMatricToUpdate+1;
+    END IF;
+    -- On stocke la liste des NUMPAC/PACMAT/NUMCNT/DATE_EFF insérés/modifiés/supprimés
+    IF DELETING THEN
+     v_date_eff := v_ligOld.DATE_EFF;
+    ELSE
+     v_date_eff := v_ligNew.DATE_EFF;
+    END IF;    
+  END IF;   
+';
+END TRG_CONTRAT_HISTOX_BEFORE_ROW;

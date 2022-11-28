@@ -1,0 +1,12 @@
+##
+IS_NUMBER
+=SQL=
+create or replace FUNCTION "IS_NUMBER" (xvar_num IN varchar2) RETURN number AS wnumber number; begin wnumber := to_number(replace(xvar_num,'.',',')); RETURN wnumber ;
+ exception 
+ when others then
+ begin 
+  wnumber := to_number(replace(xvar_num,',','.')); RETURN wnumber ;
+  exception 
+  when others then RETURN null;
+ end;
+end;

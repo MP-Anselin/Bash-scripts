@@ -1,0 +1,268 @@
+##
+CREATE_PROC_SECNAV_MAJ_DATA
+=SQL=
+create or replace PROCEDURE CREATE_PROC_SECNAV_MAJ_DATA AUTHID CURRENT_USER
+AS
+TYPE TYP_COL_ROW
+IS
+     TABLE OF USER_TAB_COLUMNS%Rowtype ;
+     Tabcol TYP_COL_ROW ;
+     v_nbColPerso NUMBER;
+     v_reqCreateProcPerso CLOB;
+     v_nbColPersoHisto NUMBER;
+     v_reqCreateProcPersoHisto CLOB;
+     v_nbColContrat NUMBER;
+     v_reqCreateProcContrat CLOB;
+     v_nbColContratHisto NUMBER;
+     v_reqCreateProcContratHisto CLOB;
+     v_reqTmp CLOB;
+     v_colsDACH CLOB;
+     v_nbcolcontrathisto1         NUMBER;
+	 v_nbcolcontrathisto2         NUMBER;
+	 v_nbcolcontrathisto3         NUMBER;
+	 v_nbcolcontrathisto4         NUMBER;
+	 v_nbcolcontrathisto5         NUMBER;
+	 v_reqcreateproccontrathisto1 CLOB;
+	 v_reqcreateproccontrathisto2 CLOB;
+	 v_reqcreateproccontrathisto3 CLOB;
+	 v_reqcreateproccontrathisto4 CLOB;
+	 v_reqcreateproccontrathisto5 CLOB;
+	 v_colsdach1                  CLOB;
+	 v_colsdach2                  CLOB;
+	 v_colsdach3                  CLOB;
+	 v_colsdach4                  CLOB;
+	 v_colsdach5                  CLOB;
+	 insertclauseTable           CLOB;
+	 v_count        NUMBER;
+	 nbtabledach    NUMBER;
+BEGIN
+     v_nbColPerso       :=0;
+     v_nbColPersoHisto  :=0;
+     v_nbColContrat     :=0;
+     v_nbColContratHisto:=0;
+     v_nbcolcontrathisto1 := 0;
+	 v_nbcolcontrathisto2 := 0;
+	 v_nbcolcontrathisto3 := 0;
+	 v_nbcolcontrathisto4 := 0;
+	 v_nbcolcontrathisto5 := 0;
+     v_colsDACH := 'NUMPAC,PACMAT,NUMCNT,DATE_EFF';
+     v_colsDACH1 := 'NUMPAC,PACMAT,NUMCNT,DATE_EFF,DATE_FIN';
+     v_colsDACH2 := 'NUMPAC,PACMAT,NUMCNT,DATE_EFF,DATE_FIN';
+     v_colsDACH3 := 'NUMPAC,PACMAT,NUMCNT,DATE_EFF,DATE_FIN';
+     v_colsDACH4 := 'NUMPAC,PACMAT,NUMCNT,DATE_EFF,DATE_FIN';
+     v_colsDACH5 := 'NUMPAC,PACMAT,NUMCNT,DATE_EFF,DATE_FIN';
+     /*récupération de la varsys NB_EXTENSION_DACH*/
+	 SELECT
+	 to_number(valvar)
+	 INTO nbtabledach
+	 FROM
+	 sys_varsys
+	 WHERE
+	 codvar = 'NB_EXTENSION_DACH'
+	 AND module = 'SYS';	 
+	 IF ( nbtabledach > 0 AND nbtabledach < 6 ) THEN
+	 v_count := 1;
+	 insertclauseTable :='SELECT
+	 d.*
+	 FROM
+	 user_tab_columns s,
+	 user_tab_columns d
+	 WHERE
+	 s.column_name = d.column_name
+	 AND s.column_name NOT IN ( ''MATRIC'', ''DATE_EFF_PERSO'', ''NUMPAC'', ''PACMAT'', ''IDPACMAT'', ''CURRENT_NUMCNT'', ''DATE_EFF_CONTRAT'' )
+	 AND s.table_name = ''SECUPACMAT''
+	 AND d.table_name IN ( ''DIC_ADM_PERSO'', ''DIC_ADM_PERSO_HISTO'', ''DIC_ADM_CONTRAT'', ''DIC_ADM_CONTRAT_HISTO''  ';	 
+	 WHILE ( v_count <= nbtabledach ) LOOP
+	 insertclauseTable :=insertclauseTable|| ', ''DIC_ADM_CONTRAT_HISTO'||v_count||'''';
+	 v_count := v_count + 1;
+	 END LOOP;
+	 insertclauseTable :=insertclauseTable||  ')  ORDER BY s.column_id';
+	 ELSE
+	 insertclauseTable :='SELECT
+	 d.*
+	 FROM
+	 user_tab_columns s,
+	 user_tab_columns d
+	 WHERE
+	 s.column_name = d.column_name
+	 AND s.column_name NOT IN ( ''MATRIC'', ''DATE_EFF_PERSO'', ''NUMPAC'', ''PACMAT'', ''IDPACMAT'', ''CURRENT_NUMCNT'', ''DATE_EFF_CONTRAT'' )
+	 AND s.table_name = ''SECUPACMAT''
+	 AND d.table_name IN ( ''DIC_ADM_PERSO'', ''DIC_ADM_PERSO_HISTO'', ''DIC_ADM_CONTRAT'', ''DIC_ADM_CONTRAT_HISTO''  )
+	 ORDER BY
+	 s.column_id';	 
+	 END IF;	 
+	 EXECUTE IMMEDIATE insertclauseTable bulk collect into  tabcol;
+     IF Tabcol.count>0 THEN
+          FOR i IN Tabcol.first..Tabcol.last
+          LOOP
+               v_reqTmp             := Tabcol(i).COLUMN_NAME||'=';
+               IF Tabcol(i).DATA_TYPE='DATE' THEN
+                    v_reqTmp        := v_reqTmp||'TO_CHAR(';
+               END IF;
+               v_reqTmp             := v_reqTmp||Tabcol(i).TABLE_NAME||'.'||Tabcol(i).COLUMN_NAME;
+               IF Tabcol(i).DATA_TYPE='DATE' THEN
+                    v_reqTmp        := v_reqTmp||',''yyyymmdd'')';
+               END IF;
+               IF Tabcol(i).TABLE_NAME         ='DIC_ADM_PERSO' THEN
+                    v_nbColPerso              := v_nbColPerso+1;
+                    IF v_reqCreateProcPerso   IS NOT NULL THEN
+                         v_reqCreateProcPerso := v_reqCreateProcPerso||',';
+                    END IF;
+                    v_reqCreateProcPerso           := v_reqCreateProcPerso||v_reqTmp;
+               ELSIF Tabcol(i).TABLE_NAME           ='DIC_ADM_PERSO_HISTO' THEN
+                    v_nbColPersoHisto              := v_nbColPersoHisto+1;
+                    IF v_reqCreateProcPersoHisto   IS NOT NULL THEN
+                         v_reqCreateProcPersoHisto := v_reqCreateProcPersoHisto||',';
+                    END IF;
+                    v_reqCreateProcPersoHisto   := v_reqCreateProcPersoHisto||v_reqTmp;
+               ELSIF Tabcol(i).TABLE_NAME        ='DIC_ADM_CONTRAT' THEN
+                    v_nbColContrat              := v_nbColContrat+1;
+                    IF v_reqCreateProcContrat   IS NOT NULL THEN
+                         v_reqCreateProcContrat := v_reqCreateProcContrat||',';
+                    END IF;
+                    v_reqCreateProcContrat           := v_reqCreateProcContrat||v_reqTmp;
+               ELSIF Tabcol(i).TABLE_NAME             ='DIC_ADM_CONTRAT_HISTO' THEN
+                    v_nbColContratHisto              := v_nbColContratHisto+1;
+                    IF v_reqCreateProcContratHisto   IS NOT NULL THEN
+                         v_reqCreateProcContratHisto := v_reqCreateProcContratHisto||',';
+                    END IF;
+                    v_colsDACH := v_colsDACH||','||Tabcol(i).COLUMN_NAME;
+                    v_reqCreateProcContratHisto := v_reqCreateProcContratHisto||v_reqTmp;
+               ELSIF ( nbtabledach > 0 AND nbtabledach < 6 AND tabcol(i).table_name = 'DIC_ADM_CONTRAT_HISTO1' ) THEN 
+ 					v_nbcolcontrathisto1 := v_nbcolcontrathisto1 + 1;
+ 					IF v_reqcreateproccontrathisto1 IS NOT NULL THEN
+						v_reqcreateproccontrathisto1 := v_reqcreateproccontrathisto1 || ',';
+					END IF;
+ 					v_colsdach1 := v_colsdach1 || ',' || tabcol(i).column_name;
+ 					v_reqcreateproccontrathisto1 := v_reqcreateproccontrathisto1 || v_reqtmp;
+ 			   ELSIF ( nbtabledach > 1 AND nbtabledach < 6 AND tabcol(i).table_name = 'DIC_ADM_CONTRAT_HISTO2' ) THEN
+ 					v_nbcolcontrathisto2 := v_nbcolcontrathisto2 + 1;
+					IF v_reqcreateproccontrathisto2 IS NOT NULL THEN
+ 						v_reqcreateproccontrathisto2 := v_reqcreateproccontrathisto2 || ',';
+ 					END IF;
+ 			   		v_colsdach2 := v_colsdach2 || ',' || tabcol(i).column_name;
+ 					v_reqcreateproccontrathisto2 := v_reqcreateproccontrathisto2 || v_reqtmp;
+ 			   ELSIF ( nbtabledach > 2 AND nbtabledach < 6 AND tabcol(i).table_name = 'DIC_ADM_CONTRAT_HISTO3' ) THEN
+ 					v_nbcolcontrathisto3 := v_nbcolcontrathisto3 + 1;
+ 					IF v_reqcreateproccontrathisto3 IS NOT NULL THEN
+ 						v_reqcreateproccontrathisto3 := v_reqcreateproccontrathisto3 || ',';
+ 					END IF;
+ 					v_colsdach3 := v_colsdach3 || ',' || tabcol(i).column_name;
+ 					v_reqcreateproccontrathisto3 := v_reqcreateproccontrathisto3 || v_reqtmp;
+ 				ELSIF ( nbtabledach > 3 AND nbtabledach < 6 AND tabcol(i).table_name = 'DIC_ADM_CONTRAT_HISTO4' ) THEN
+					v_nbcolcontrathisto4 := v_nbcolcontrathisto4 + 1;
+ 					IF v_reqcreateproccontrathisto4 IS NOT NULL THEN
+ 						v_reqcreateproccontrathisto4 := v_reqcreateproccontrathisto4 || ',';
+ 					END IF;
+ 					v_colsdach4 := v_colsdach4 || ',' || tabcol(i).column_name;
+ 					v_reqcreateproccontrathisto4 := v_reqcreateproccontrathisto4 || v_reqtmp;
+ 				ELSIF ( nbtabledach = 5  AND tabcol(i).table_name = 'DIC_ADM_CONTRAT_HISTO5' ) THEN
+ 					v_nbcolcontrathisto5 := v_nbcolcontrathisto5 + 1;
+					IF v_reqcreateproccontrathisto5 IS NOT NULL THEN
+ 						v_reqcreateproccontrathisto5 := v_reqcreateproccontrathisto5 || ',';
+ 					END IF;
+ 					v_colsdach5 := v_colsdach5|| ','|| tabcol(i).column_name;
+ 					v_reqcreateproccontrathisto5 := v_reqcreateproccontrathisto5 || v_reqtmp;                    
+               END IF;
+          END LOOP;
+          IF v_nbColPerso            =0 THEN
+               v_reqCreateProcPerso := 'NULL;';
+          ELSE
+               v_reqTmp             := 'MERGE INTO ## USING DIC_ADM_PERSO ON (DIC_ADM_PERSO.MATRIC=##.MATRIC AND ##.MATRIC IN (SELECT MATRIC FROM SECUPACMAT_TMP_PERSO)) WHEN MATCHED THEN UPDATE SET '||v_reqCreateProcPerso||';';
+               v_reqCreateProcPerso := 'IF p_alimTmp=0 THEN '||REPLACE(v_reqTmp, '##', 'SECUPACMAT')||' ELSE '||REPLACE(v_reqTmp, '##', 'SECUPACMAT_TMP')||' END IF;';
+          END IF;
+          v_reqCreateProcPerso := 'CREATE OR REPLACE PROCEDURE SECNAV_MAJ_DATA_PERSO(p_alimTmp NUMBER) IS BEGIN '||v_reqCreateProcPerso||' END SECNAV_MAJ_DATA_PERSO;';
+          EXECUTE_IMMEDIATE_STRING(v_reqCreateProcPerso,0);
+          IF v_nbColPersoHisto            =0 THEN
+               v_reqCreateProcPersoHisto := 'NULL;';
+          ELSE
+               v_reqTmp                  := 'MERGE INTO ## USING DIC_ADM_PERSO_HISTO ON (DIC_ADM_PERSO_HISTO.MATRIC=##.MATRIC AND DIC_ADM_PERSO_HISTO.DATE_EFF=##.DATE_EFF_PERSO AND ##.MATRIC IN (SELECT MATRIC FROM SECUPACMAT_TMP_PERSO)) WHEN MATCHED THEN UPDATE SET '||v_reqCreateProcPersoHisto||';';
+               v_reqCreateProcPersoHisto := 'IF p_alimTmp=0 THEN '||REPLACE(v_reqTmp, '##', 'SECUPACMAT')||' ELSE '||REPLACE(v_reqTmp, '##', 'SECUPACMAT_TMP')||' END IF;';
+          END IF;
+          v_reqCreateProcPersoHisto := 'CREATE OR REPLACE PROCEDURE SECNAV_MAJ_DATA_PERSO_HISTO(p_alimTmp NUMBER) IS BEGIN '||v_reqCreateProcPersoHisto||' END SECNAV_MAJ_DATA_PERSO_HISTO;';
+          EXECUTE_IMMEDIATE_STRING( v_reqCreateProcPersoHisto,0);
+          IF v_nbColContrat            =0 THEN
+               v_reqCreateProcContrat := 'NULL;';
+          ELSE
+               v_reqTmp               := 'MERGE INTO ## USING DIC_ADM_CONTRAT ON (DIC_ADM_CONTRAT.NUMPAC=##.NUMPAC AND DIC_ADM_CONTRAT.PACMAT=##.PACMAT AND DIC_ADM_CONTRAT.NUMCNT=##.CURRENT_NUMCNT AND (##.NUMPAC,##.PACMAT) IN (SELECT NUMPAC, PACMAT FROM SECUPACMAT_TMP_CONTRAT)) WHEN MATCHED THEN UPDATE SET '||v_reqCreateProcContrat||';';
+               v_reqCreateProcContrat := 'IF p_alimTmp=0 THEN '||REPLACE(v_reqTmp, '##', 'SECUPACMAT')||' ELSE '||REPLACE(v_reqTmp, '##', 'SECUPACMAT_TMP')||' END IF;';
+          END IF;
+          v_reqCreateProcContrat := 'CREATE OR REPLACE PROCEDURE SECNAV_MAJ_DATA_CONTRAT(p_alimTmp NUMBER) IS BEGIN '||v_reqCreateProcContrat||' END SECNAV_MAJ_DATA_CONTRAT;';
+          EXECUTE_IMMEDIATE_STRING (v_reqCreateProcContrat,0);
+          IF v_nbColContratHisto            =0 THEN
+               v_reqCreateProcContratHisto := 'NULL;';
+          ELSE
+               v_reqTmp                    := 'MERGE INTO ## USING (SELECT '||v_colsDACH||' FROM DIC_ADM_CONTRAT_HISTO) DIC_ADM_CONTRAT_HISTO ON (DIC_ADM_CONTRAT_HISTO.NUMPAC=##.NUMPAC AND DIC_ADM_CONTRAT_HISTO.PACMAT=##.PACMAT AND DIC_ADM_CONTRAT_HISTO.NUMCNT=##.CURRENT_NUMCNT AND DIC_ADM_CONTRAT_HISTO.DATE_EFF=##.DATE_EFF_CONTRAT AND (##.NUMPAC,##.PACMAT) IN (SELECT NUMPAC, PACMAT FROM SECUPACMAT_TMP_CONTRAT)) WHEN MATCHED THEN UPDATE SET '||v_reqCreateProcContratHisto||';';
+               v_reqCreateProcContratHisto := 'IF p_alimTmp=0 THEN '||REPLACE(v_reqTmp, '##', 'SECUPACMAT')||' ELSE '||REPLACE(v_reqTmp, '##', 'SECUPACMAT_TMP')||' END IF;';
+          END IF;
+          v_reqCreateProcContratHisto := 'CREATE OR REPLACE PROCEDURE SECNAV_MAJ_DATA_CONTRAT_HISTO(p_alimTmp NUMBER) IS BEGIN '||v_reqCreateProcContratHisto||' END SECNAV_MAJ_DATA_CONTRAT_HISTO;';
+          EXECUTE_IMMEDIATE_STRING( v_reqCreateProcContratHisto,0);
+          IF (nbtabledach =5) THEN
+ 		  	IF (v_nbcolcontrathisto5 = 0  )  THEN
+	 			v_reqcreateproccontrathisto5 := 'NULL;';
+	 		ELSE
+	 			v_reqtmp := 'MERGE INTO ## USING (SELECT '|| v_colsdach5|| ' FROM DIC_ADM_CONTRAT_HISTO5) DIC_ADM_CONTRAT_HISTO5 ON (DIC_ADM_CONTRAT_HISTO5.NUMPAC=##.NUMPAC AND DIC_ADM_CONTRAT_HISTO5.PACMAT=##.PACMAT AND DIC_ADM_CONTRAT_HISTO5.NUMCNT=##.CURRENT_NUMCNT AND DIC_ADM_CONTRAT_HISTO5.DATE_EFF= (SELECT MAX (DIC_ADM_CONTRAT_HISTO5.DATE_EFF) FROM DIC_ADM_CONTRAT_HISTO5 WHERE DIC_ADM_CONTRAT_HISTO5.NUMPAC=##.NUMPAC AND DIC_ADM_CONTRAT_HISTO5.PACMAT=##.PACMAT AND DIC_ADM_CONTRAT_HISTO5.NUMCNT=##.CURRENT_NUMCNT AND ##.DATE_EFF_CONTRAT BETWEEN DIC_ADM_CONTRAT_HISTO5.DATE_EFF AND DIC_ADM_CONTRAT_HISTO5.DATE_FIN) AND (##.NUMPAC,##.PACMAT) IN (SELECT NUMPAC, PACMAT FROM SECUPACMAT_TMP_CONTRAT)) WHEN MATCHED THEN UPDATE SET '
+	 				|| v_reqcreateproccontrathisto5 || ';';
+	 			v_reqcreateproccontrathisto5 := 'IF p_alimTmp=0 THEN ' || replace( v_reqtmp,'##','SECUPACMAT' ) || ' ELSE ' || replace(v_reqtmp,'##','SECUPACMAT_TMP')|| ' END IF;';
+	 		END IF ;
+	 		v_reqcreateproccontrathisto5 := 'CREATE OR REPLACE PROCEDURE SECNAV_MAJ_DATA_CONTRAT_HISTO5(p_alimTmp NUMBER) IS BEGIN '
+	 			|| v_reqcreateproccontrathisto5 || ' END SECNAV_MAJ_DATA_CONTRAT_HISTO5;';
+	 		execute_immediate_string( v_reqcreateproccontrathisto5,0);
+	 	  END IF ;
+	      IF (nbtabledach >=4) THEN
+	 		IF (v_nbcolcontrathisto4 = 0 )  THEN
+	 			v_reqcreateproccontrathisto4 := 'NULL;';
+	 		ELSE
+				v_reqtmp := 'MERGE INTO ## USING (SELECT ' || v_colsdach4 || ' FROM DIC_ADM_CONTRAT_HISTO4) DIC_ADM_CONTRAT_HISTO4 ON (DIC_ADM_CONTRAT_HISTO4.NUMPAC=##.NUMPAC AND DIC_ADM_CONTRAT_HISTO4.PACMAT=##.PACMAT AND DIC_ADM_CONTRAT_HISTO4.NUMCNT=##.CURRENT_NUMCNT AND DIC_ADM_CONTRAT_HISTO4.DATE_EFF= (SELECT MAX (DIC_ADM_CONTRAT_HISTO4.DATE_EFF) FROM DIC_ADM_CONTRAT_HISTO4 WHERE DIC_ADM_CONTRAT_HISTO4.NUMPAC=##.NUMPAC AND DIC_ADM_CONTRAT_HISTO4.PACMAT=##.PACMAT AND DIC_ADM_CONTRAT_HISTO4.NUMCNT=##.CURRENT_NUMCNT AND ##.DATE_EFF_CONTRAT BETWEEN DIC_ADM_CONTRAT_HISTO4.DATE_EFF AND DIC_ADM_CONTRAT_HISTO4.DATE_FIN) AND (##.NUMPAC,##.PACMAT) IN (SELECT NUMPAC, PACMAT FROM SECUPACMAT_TMP_CONTRAT)) WHEN MATCHED THEN UPDATE SET '
+					 || v_reqcreateproccontrathisto4 || ';';
+	 			v_reqcreateproccontrathisto4 := 'IF p_alimTmp=0 THEN ' || replace(v_reqtmp, '##','SECUPACMAT' ) || ' ELSE ' || replace(v_reqtmp,'##', 'SECUPACMAT_TMP' )|| ' END IF;';
+	 		END IF ;
+	 		v_reqcreateproccontrathisto4 := 'CREATE OR REPLACE PROCEDURE SECNAV_MAJ_DATA_CONTRAT_HISTO4(p_alimTmp NUMBER) IS BEGIN '
+				|| v_reqcreateproccontrathisto4 || ' END SECNAV_MAJ_DATA_CONTRAT_HISTO4;';
+	 		execute_immediate_string( v_reqcreateproccontrathisto4, 0);
+	 	  END IF;
+		  IF (nbtabledach >=3) THEN
+	 	  	IF (v_nbcolcontrathisto3 = 0 )  THEN
+	 			v_reqcreateproccontrathisto3 := 'NULL;';
+	 		ELSE
+				v_reqtmp := 'MERGE INTO ## USING (SELECT ' || v_colsdach3 || ' FROM DIC_ADM_CONTRAT_HISTO3) DIC_ADM_CONTRAT_HISTO3 ON (DIC_ADM_CONTRAT_HISTO3.NUMPAC=##.NUMPAC AND DIC_ADM_CONTRAT_HISTO3.PACMAT=##.PACMAT AND DIC_ADM_CONTRAT_HISTO3.NUMCNT=##.CURRENT_NUMCNT AND DIC_ADM_CONTRAT_HISTO3.DATE_EFF= (SELECT MAX (DIC_ADM_CONTRAT_HISTO3.DATE_EFF) FROM DIC_ADM_CONTRAT_HISTO3 WHERE DIC_ADM_CONTRAT_HISTO3.NUMPAC=##.NUMPAC AND DIC_ADM_CONTRAT_HISTO3.PACMAT=##.PACMAT AND DIC_ADM_CONTRAT_HISTO3.NUMCNT=##.CURRENT_NUMCNT AND ##.DATE_EFF_CONTRAT BETWEEN DIC_ADM_CONTRAT_HISTO3.DATE_EFF AND DIC_ADM_CONTRAT_HISTO3.DATE_FIN) AND (##.NUMPAC,##.PACMAT) IN (SELECT NUMPAC, PACMAT FROM SECUPACMAT_TMP_CONTRAT)) WHEN MATCHED THEN UPDATE SET '
+					 || v_reqcreateproccontrathisto3 || ';';
+	 			v_reqcreateproccontrathisto3 := 'IF p_alimTmp=0 THEN ' || replace(v_reqtmp, '##','SECUPACMAT' ) || ' ELSE ' || replace(v_reqtmp,'##', 'SECUPACMAT_TMP' )|| ' END IF;';
+	 		END IF ;
+	 		v_reqcreateproccontrathisto3 := 'CREATE OR REPLACE PROCEDURE SECNAV_MAJ_DATA_CONTRAT_HISTO3(p_alimTmp NUMBER) IS BEGIN '
+				|| v_reqcreateproccontrathisto3 || ' END SECNAV_MAJ_DATA_CONTRAT_HISTO3;';
+	 		execute_immediate_string( v_reqcreateproccontrathisto3, 0);
+	 	 END IF;
+	 	 IF (nbtabledach >=2) THEN
+	 		IF (v_nbcolcontrathisto2 = 0 )  THEN
+	 			v_reqcreateproccontrathisto2 := 'NULL;';
+	 		ELSE
+	 			v_reqtmp := 'MERGE INTO ## USING (SELECT ' || v_colsdach2 || ' FROM DIC_ADM_CONTRAT_HISTO2) DIC_ADM_CONTRAT_HISTO2 ON (DIC_ADM_CONTRAT_HISTO2.NUMPAC=##.NUMPAC AND DIC_ADM_CONTRAT_HISTO2.PACMAT=##.PACMAT AND DIC_ADM_CONTRAT_HISTO2.NUMCNT=##.CURRENT_NUMCNT AND DIC_ADM_CONTRAT_HISTO2.DATE_EFF= (SELECT MAX (DIC_ADM_CONTRAT_HISTO2.DATE_EFF) FROM DIC_ADM_CONTRAT_HISTO2 WHERE DIC_ADM_CONTRAT_HISTO2.NUMPAC=##.NUMPAC AND DIC_ADM_CONTRAT_HISTO2.PACMAT=##.PACMAT AND DIC_ADM_CONTRAT_HISTO2.NUMCNT=##.CURRENT_NUMCNT AND ##.DATE_EFF_CONTRAT BETWEEN DIC_ADM_CONTRAT_HISTO2.DATE_EFF AND DIC_ADM_CONTRAT_HISTO2.DATE_FIN) AND (##.NUMPAC,##.PACMAT) IN (SELECT NUMPAC, PACMAT FROM SECUPACMAT_TMP_CONTRAT)) WHEN MATCHED THEN UPDATE SET '
+	 				|| v_reqcreateproccontrathisto2|| ';';	 v_reqcreateproccontrathisto2 := 'IF p_alimTmp=0 THEN '|| replace( v_reqtmp, '##','SECUPACMAT' )
+	 				|| ' ELSE ' || replace(v_reqtmp,'##','SECUPACMAT_TMP' )
+	 				|| ' END IF;';
+			END IF ;
+			v_reqcreateproccontrathisto2 := 'CREATE OR REPLACE PROCEDURE SECNAV_MAJ_DATA_CONTRAT_HISTO2(p_alimTmp NUMBER) IS BEGIN '
+	 		|| v_reqcreateproccontrathisto2
+	 		|| ' END SECNAV_MAJ_DATA_CONTRAT_HISTO2;';
+	 		execute_immediate_string( v_reqcreateproccontrathisto2, 0);
+	 	END IF;
+	 IF (nbtabledach >=1) THEN
+	 	IF (v_nbcolcontrathisto1 = 0 )  THEN
+		v_reqcreateproccontrathisto1 := 'NULL;';
+	 ELSE
+	 	v_reqtmp := 'MERGE INTO ## USING (SELECT ' || v_colsdach1 || ' FROM DIC_ADM_CONTRAT_HISTO1) DIC_ADM_CONTRAT_HISTO1 ON (DIC_ADM_CONTRAT_HISTO1.NUMPAC=##.NUMPAC AND DIC_ADM_CONTRAT_HISTO1.PACMAT=##.PACMAT AND DIC_ADM_CONTRAT_HISTO1.NUMCNT=##.CURRENT_NUMCNT AND DIC_ADM_CONTRAT_HISTO1.DATE_EFF= (SELECT MAX (DIC_ADM_CONTRAT_HISTO1.DATE_EFF) FROM DIC_ADM_CONTRAT_HISTO1 WHERE DIC_ADM_CONTRAT_HISTO1.NUMPAC=##.NUMPAC AND DIC_ADM_CONTRAT_HISTO1.PACMAT=##.PACMAT AND DIC_ADM_CONTRAT_HISTO1.NUMCNT=##.CURRENT_NUMCNT AND ##.DATE_EFF_CONTRAT BETWEEN DIC_ADM_CONTRAT_HISTO1.DATE_EFF AND DIC_ADM_CONTRAT_HISTO1.DATE_FIN) AND (##.NUMPAC,##.PACMAT) IN (SELECT NUMPAC, PACMAT FROM SECUPACMAT_TMP_CONTRAT)) WHEN MATCHED THEN UPDATE SET '
+					|| v_reqcreateproccontrathisto1|| ';';	 v_reqcreateproccontrathisto1 := 'IF p_alimTmp=0 THEN '|| replace( v_reqtmp, '##','SECUPACMAT' )
+	 				|| ' ELSE ' || replace(v_reqtmp,'##','SECUPACMAT_TMP' )
+	 				|| ' END IF;';
+			END IF ;
+	 v_reqcreateproccontrathisto1 := 'CREATE OR REPLACE PROCEDURE SECNAV_MAJ_DATA_CONTRAT_HISTO1(p_alimTmp NUMBER) IS BEGIN '
+	 || v_reqcreateproccontrathisto1 || ' END SECNAV_MAJ_DATA_CONTRAT_HISTO1;';
+	 execute_immediate_string( v_reqcreateproccontrathisto1, 0);
+	 END IF;
+     END IF;
+END CREATE_PROC_SECNAV_MAJ_DATA;
+##
+CREATE_PROC_SECNAV_MAJ_DATA
+==
+CALL CREATE_PROC_SECNAV_MAJ_DATA()

@@ -1,0 +1,16 @@
+##
+TAG_CHARSET=@€éèç
+##
+GA_ZWSANCTIONS
+=SQL IFNOTEXIST=GA_ZWSANCTIONS=
+CREATE TABLE GA_ZWSANCTIONS (CODE VARCHAR2(2) PRIMARY KEY, LIBELLE VARCHAR2(50), UTILISE VARCHAR2(1))
+##
+GA_ZWSANCTIONS
+==
+DELETE FROM GA_ZWSANCTIONS WHERE CODE IN ('01','02','03','04','05','06')
+'01','Blâme','O'
+'02','Mise à pied disciplinaire','O'
+'03','Rétrogradation','O'
+'04','Mutation','O'
+'05','Licenciement faute réelle et sérieuse','O'
+'06','Licenciement faute grave ou lourde','O'

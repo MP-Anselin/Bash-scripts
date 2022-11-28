@@ -1,0 +1,13 @@
+##
+TAG_CHARSET=@€ιθη
+##
+TGE_REF_STATUT_IMPORT
+==
+DELETE TGE_REF_STATUT_IMPORT WHERE  CODESTATUT='ANNULEC'
+'ANNULEC', 'Annulation en cours...'
+##
+TGE_REF_STATUT_IMPORT
+==
+DELETE TGE_REF_STATUT_IMPORT WHERE  CODESTATUT in ('ERRGRAVE', 'ERRFORM')
+'ERRGRAVE', 'Il est impossible d''importer cette feuille car une erreur est survenue. Veuillez consulter les logs.'
+'ERRFORM', 'Il est impossible d''importer cette feuille car celle-ci ne respecte pas le format. Veuillez consulter l''aide en ligne.'

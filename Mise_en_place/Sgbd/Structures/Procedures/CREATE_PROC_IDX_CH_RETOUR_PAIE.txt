@@ -1,0 +1,244 @@
+##
+CREATE_PROC_IDX_CH_RETOUR_PAIE
+=SQL=
+CREATE OR REPLACE PROCEDURE CREATE_PROC_IDX_CH_RETOUR_PAIE AUTHID CURRENT_USER
+AS
+  TYPE TypeColNameCountTable IS RECORD (COLUMN_NAME USER_TAB_COLUMNS.COLUMN_NAME%TYPE, COUNT_TABLE NUMBER,COLUMN_TYPE USER_TAB_COLUMNS.DATA_TYPE%TYPE);
+  TYPE TYP_COL_NAME IS TABLE OF TypeColNameCountTable;
+  TabcolContrat TYP_COL_NAME ;
+  TabcolContratHisto TYP_COL_NAME ;
+  v_reqCreate CLOB;
+  v_reqCreateHistoRuptureContrat CLOB;
+  v_reqCreateHistoModifOnly CLOB;
+  emptyVal VARCHAR2(7);
+BEGIN
+  SELECT COLUMN_NAME, 0, DATA_TYPE BULK COLLECT
+  INTO TabcolContrat
+  FROM USER_TAB_COLUMNS
+  WHERE TABLE_NAME='DIC_ADM_CONTRAT'
+  AND COLUMN_NAME IN (SELECT NOM_DONNEE FROM DIC_IDX_DONNEE_RETOUR_PAIE)
+  ORDER BY COLUMN_NAME;
+
+  SELECT COLUMN_NAME, (SELECT COUNT(*) FROM DIC_IDX_DONNEE_RUPTURE_CONTRAT WHERE NOM_DONNEE=COLUMN_NAME),DATA_TYPE BULK COLLECT
+  INTO TabcolContratHisto
+  FROM USER_TAB_COLUMNS
+  WHERE TABLE_NAME='DIC_ADM_CONTRAT_HISTO'
+  AND COLUMN_NAME IN (SELECT NOM_DONNEE FROM DIC_IDX_DONNEE_RETOUR_PAIE)
+  ORDER BY COLUMN_NAME;
+
+  v_reqCreate := 'CREATE OR REPLACE PROCEDURE ALIM_IDX_CH_RETOUR_PAIE AS ';
+  IF TabcolContrat.count>0 THEN
+    v_reqCreate := v_reqCreate||'cursor curContrat is SELECT MATRIC, NUMPAC, PACMAT, NUMCNT, DSDCN, DSFCN';
+    FOR i IN TabcolContrat.first..TabcolContrat.last
+    LOOP
+      v_reqCreate := v_reqCreate||', '||TabcolContrat(i).COLUMN_NAME;
+    END LOOP;
+    v_reqCreate := v_reqCreate||' FROM DIC_ADM_CONTRAT WHERE (NUMPAC,PACMAT) IN (SELECT NUMPAC,PACMAT FROM SECUPACMAT_TMP_CONTRAT) ORDER BY Matric, Dsdcn;';
+    v_reqCreate := v_reqCreate||'TYPE TypeColContrat IS RECORD (MATRIC DIC_ADM_CONTRAT.MATRIC%TYPE, NUMPAC DIC_ADM_CONTRAT.NUMPAC%TYPE, PACMAT DIC_ADM_CONTRAT.PACMAT%TYPE, NUMCNT DIC_ADM_CONTRAT.NUMCNT%TYPE, DSDCN DIC_ADM_CONTRAT.DSDCN%TYPE, DSFCN DIC_ADM_CONTRAT.DSFCN%TYPE';
+    FOR i IN TabcolContrat.first..TabcolContrat.last
+    LOOP
+      v_reqCreate := v_reqCreate||', '||TabcolContrat(i).COLUMN_NAME||' DIC_ADM_CONTRAT.'||TabcolContrat(i).COLUMN_NAME||'%TYPE';
+    END LOOP;
+    v_reqCreate := v_reqCreate||');';
+    v_reqCreate := v_reqCreate||'ligContrat TypeColContrat;';
+    v_reqCreate := v_reqCreate||'previous_ligContrat TypeColContrat;   ';
+  END IF;
+
+  IF TabcolContratHisto.count>0 THEN
+    v_reqCreate := v_reqCreate||'cursor curHisto is  SELECT MATRIC, NUMPAC, PACMAT, NUMCNT, DATE_EFF, DATE_FIN';
+    FOR i IN TabcolContratHisto.first..TabcolContratHisto.last
+    LOOP
+      v_reqCreate := v_reqCreate||', '||TabcolContratHisto(i).COLUMN_NAME;
+    END LOOP;
+    v_reqCreate := v_reqCreate||' FROM DIC_ADM_CONTRAT_HISTO WHERE (NUMPAC,PACMAT) IN (SELECT NUMPAC,PACMAT FROM SECUPACMAT_TMP_CONTRAT) ORDER BY Matric, Date_eff;';
+    v_reqCreate := v_reqCreate||'TYPE TypeColHisto IS RECORD (MATRIC DIC_ADM_CONTRAT_HISTO.MATRIC%TYPE, NUMPAC DIC_ADM_CONTRAT_HISTO.NUMPAC%TYPE, PACMAT DIC_ADM_CONTRAT_HISTO.PACMAT%TYPE, NUMCNT DIC_ADM_CONTRAT_HISTO.NUMCNT%TYPE, DATE_EFF DIC_ADM_CONTRAT_HISTO.DATE_EFF%TYPE, DATE_FIN DIC_ADM_CONTRAT_HISTO.DATE_FIN%TYPE';
+    FOR i IN TabcolContratHisto.first..TabcolContratHisto.last
+    LOOP
+      v_reqCreate := v_reqCreate||', '||TabcolContratHisto(i).COLUMN_NAME||' DIC_ADM_CONTRAT_HISTO.'||TabcolContratHisto(i).COLUMN_NAME||'%TYPE';
+    END LOOP;
+    v_reqCreate := v_reqCreate||');';
+    v_reqCreate := v_reqCreate||'ligHisto TypeColHisto;';
+    v_reqCreate := v_reqCreate||'previous_ligHisto TypeColHisto;   ';
+  END IF;
+
+  IF TabcolContrat.count>0 OR TabcolContratHisto.count>0 THEN
+    v_reqCreate := v_reqCreate||'TYPE TYP_LIG_IDX IS RECORD ( ';
+    v_reqCreate := v_reqCreate||'  NUMPAC DIC_IDX_CONTRAT_HISTO_TMP.NUMPAC%TYPE, ';
+    v_reqCreate := v_reqCreate||'  PACMAT DIC_IDX_CONTRAT_HISTO_TMP.PACMAT%TYPE, ';
+    v_reqCreate := v_reqCreate||'  NUMCNT DIC_IDX_CONTRAT_HISTO_TMP.NUMCNT%TYPE, ';
+    v_reqCreate := v_reqCreate||'  DATE_EFF DIC_IDX_CONTRAT_HISTO_TMP.DATE_EFF%TYPE, ';
+    v_reqCreate := v_reqCreate||'  NOM_DONNEE DIC_IDX_CONTRAT_HISTO_TMP.NOM_DONNEE%TYPE, ';
+    v_reqCreate := v_reqCreate||'  IDPACMAT DIC_IDX_CONTRAT_HISTO_TMP.IDPACMAT%TYPE, ';
+    v_reqCreate := v_reqCreate||'  DATE_FIN DIC_IDX_CONTRAT_HISTO_TMP.DATE_FIN%TYPE, ';
+    v_reqCreate := v_reqCreate||'  RUPTURE_CONTRAT DIC_IDX_CONTRAT_HISTO_TMP.RUPTURE_CONTRAT%TYPE, ';
+    v_reqCreate := v_reqCreate||'  DATE_DERNIERE_MODIF DIC_IDX_CONTRAT_HISTO_TMP.DATE_DERNIERE_MODIF%TYPE); ';
+
+    v_reqCreate := v_reqCreate||'TYPE TYP_TAB_IDX IS TABLE OF TYP_LIG_IDX ; ';
+    v_reqCreate := v_reqCreate||'Tabidx TYP_TAB_IDX ; ';
+    v_reqCreate := v_reqCreate||'Ligidx TYP_LIG_IDX ; ';
+  END IF;
+
+  IF TabcolContratHisto.count>0 THEN
+    v_reqCreate := v_reqCreate||'TYPE TAB_INDICE_IDX_BY_DONNEE IS TABLE OF NUMBER INDEX BY VARCHAR2(20) ; ';
+    v_reqCreate := v_reqCreate||'tabIndice TAB_INDICE_IDX_BY_DONNEE ; ';
+    v_reqCreate := v_reqCreate||'bMATRIC NUMBER ; ';
+    v_reqCreate := v_reqCreate||'bCNT NUMBER ; ';
+    FOR i IN TabcolContratHisto.first..TabcolContratHisto.last
+    LOOP
+      v_reqCreate := v_reqCreate||'b'||TabcolContratHisto(i).COLUMN_NAME||' NUMBER ; ';
+    END LOOP;
+  END IF;
+
+  v_reqCreate := v_reqCreate||'BEGIN ';
+  IF TabcolContrat.count=0 AND TabcolContratHisto.count=0 THEN
+    v_reqCreate := v_reqCreate||'NULL; ';
+  ELSE
+    v_reqCreate := v_reqCreate||'Tabidx := TYP_TAB_IDX(); ';
+    IF TabcolContrat.count>0 THEN
+      v_reqCreate := v_reqCreate||'OPEN curContrat; ';
+      v_reqCreate := v_reqCreate||'  LOOP ';
+      v_reqCreate := v_reqCreate||' FETCH curContrat INTO ligContrat; ';
+      v_reqCreate := v_reqCreate||'   EXIT ';
+      v_reqCreate := v_reqCreate||' WHEN curContrat % NOTFOUND; ';
+      v_reqCreate := v_reqCreate||' IF previous_ligContrat.PACMAT is null OR NOT previous_ligContrat.MATRIC=ligContrat.MATRIC THEN ';
+      v_reqCreate := v_reqCreate||' IF previous_ligContrat.PACMAT is not null THEN ';
+      v_reqCreate := v_reqCreate||'BEGIN ';
+      v_reqCreate := v_reqCreate||'FORALL i IN 1..Tabidx.COUNT SAVE EXCEPTIONS ';
+      v_reqCreate := v_reqCreate||'INSERT INTO DIC_IDX_CONTRAT_HISTO_TMP (NUMPAC, PACMAT, NUMCNT, DATE_EFF, NOM_DONNEE, DATE_FIN, RUPTURE_CONTRAT, DATE_DERNIERE_MODIF) VALUES (Tabidx(i).NUMPAC, Tabidx(i).PACMAT, Tabidx(i).NUMCNT, Tabidx(i).DATE_EFF, Tabidx(i).NOM_DONNEE, Tabidx(i).DATE_FIN, Tabidx(i).RUPTURE_CONTRAT, SYSDATE); ';
+      v_reqCreate := v_reqCreate||'EXCEPTION WHEN OTHERS THEN NULL; END; ';
+      v_reqCreate := v_reqCreate||'Tabidx.delete(); ';
+      v_reqCreate := v_reqCreate||' END IF; ';
+      v_reqCreate := v_reqCreate||'ELSE ';
+      FOR i IN TabcolContrat.first..TabcolContrat.last
+      LOOP
+        emptyVal := '_EMPTY_';
+        IF (TabcolContrat(i).COLUMN_TYPE = 'NUMBER') THEN
+          emptyVal := '0';
+        END IF;
+        v_reqCreate := v_reqCreate||'
+          IF NOT NVL(TO_CHAR(previous_ligContrat.'||TabcolContrat(i).COLUMN_NAME||'),'''||emptyVal||''') = NVL(TO_CHAR(ligContrat.'||TabcolContrat(i).COLUMN_NAME||'),'''||emptyVal||''') THEN ';
+        v_reqCreate := v_reqCreate||'Ligidx.NUMPAC := ligContrat.NUMPAC; ';
+        v_reqCreate := v_reqCreate||'Ligidx.PACMAT := ligContrat.PACMAT; ';
+        v_reqCreate := v_reqCreate||'Ligidx.NUMCNT := ligContrat.NUMCNT; ';
+        v_reqCreate := v_reqCreate||'Ligidx.DATE_EFF := ligContrat.DSDCN; ';
+        v_reqCreate := v_reqCreate||'Ligidx.DATE_FIN := NVL(ligContrat.DSFCN,TO_DATE(''20991231'',''yyyymmdd'')); ';
+        v_reqCreate := v_reqCreate||'Ligidx.NOM_DONNEE := '''||TabcolContrat(i).COLUMN_NAME||'''; ';
+        v_reqCreate := v_reqCreate||'Ligidx.RUPTURE_CONTRAT := NULL; ';
+        v_reqCreate := v_reqCreate||'Tabidx.extend; ';
+        v_reqCreate := v_reqCreate||'Tabidx(Tabidx.last) := Ligidx; ';
+        v_reqCreate := v_reqCreate||'END IF; ';
+      END LOOP;
+      v_reqCreate := v_reqCreate||'END IF; ';
+      v_reqCreate := v_reqCreate||'  previous_ligContrat:=ligContrat;';
+      v_reqCreate := v_reqCreate||' end loop;';
+      v_reqCreate := v_reqCreate||'close curContrat;';
+      v_reqCreate := v_reqCreate||'BEGIN ';
+      v_reqCreate := v_reqCreate||'FORALL i IN 1..Tabidx.COUNT SAVE EXCEPTIONS ';
+      v_reqCreate := v_reqCreate||'INSERT INTO DIC_IDX_CONTRAT_HISTO_TMP (NUMPAC, PACMAT, NUMCNT, DATE_EFF, NOM_DONNEE, DATE_FIN, RUPTURE_CONTRAT, DATE_DERNIERE_MODIF) VALUES (Tabidx(i).NUMPAC, Tabidx(i).PACMAT, Tabidx(i).NUMCNT, Tabidx(i).DATE_EFF, Tabidx(i).NOM_DONNEE, Tabidx(i).DATE_FIN, Tabidx(i).RUPTURE_CONTRAT, SYSDATE); ';
+      v_reqCreate := v_reqCreate||'EXCEPTION WHEN OTHERS THEN NULL; END; ';
+      v_reqCreate := v_reqCreate||'Tabidx.delete(); ';
+    END IF;
+    IF TabcolContratHisto.count>0 THEN
+      v_reqCreate := v_reqCreate||'OPEN curHisto; ';
+      v_reqCreateHistoRuptureContrat := 'tabIndice.delete(); ';
+      v_reqCreateHistoModifOnly := NULL;
+      FOR i IN TabcolContratHisto.first..TabcolContratHisto.last
+      LOOP
+        IF TabcolContratHisto(i).COUNT_TABLE>0 THEN
+          v_reqCreateHistoRuptureContrat := v_reqCreateHistoRuptureContrat||'Ligidx.NUMPAC := ligHisto.NUMPAC; ';
+          v_reqCreateHistoRuptureContrat := v_reqCreateHistoRuptureContrat||'Ligidx.PACMAT := ligHisto.PACMAT; ';
+          v_reqCreateHistoRuptureContrat := v_reqCreateHistoRuptureContrat||'Ligidx.NUMCNT := ligHisto.NUMCNT; ';
+          v_reqCreateHistoRuptureContrat := v_reqCreateHistoRuptureContrat||'Ligidx.DATE_EFF := ligHisto.DATE_EFF; ';
+          v_reqCreateHistoRuptureContrat := v_reqCreateHistoRuptureContrat||'Ligidx.DATE_FIN := ligHisto.DATE_FIN; ';
+          v_reqCreateHistoRuptureContrat := v_reqCreateHistoRuptureContrat||'Ligidx.NOM_DONNEE := '''||TabcolContratHisto(i).COLUMN_NAME||'''; ';
+          v_reqCreateHistoRuptureContrat := v_reqCreateHistoRuptureContrat||'Ligidx.RUPTURE_CONTRAT := ''O''; ';
+          v_reqCreateHistoRuptureContrat := v_reqCreateHistoRuptureContrat||'Tabidx.extend; ';
+          v_reqCreateHistoRuptureContrat := v_reqCreateHistoRuptureContrat||'Tabidx(Tabidx.last) := Ligidx; ';
+          v_reqCreateHistoRuptureContrat := v_reqCreateHistoRuptureContrat||'tabIndice('''||TabcolContratHisto(i).COLUMN_NAME||''') := Tabidx.last; ';
+        END IF;
+        v_reqCreateHistoModifOnly := v_reqCreateHistoModifOnly||'IF b'||TabcolContratHisto(i).COLUMN_NAME||'=1 THEN ';
+        v_reqCreateHistoModifOnly := v_reqCreateHistoModifOnly||'IF tabIndice.exists('''||TabcolContratHisto(i).COLUMN_NAME||''') AND Tabidx(tabIndice('''||TabcolContratHisto(i).COLUMN_NAME||''')).DATE_EFF = ligHisto.DATE_EFF THEN ';
+        v_reqCreateHistoModifOnly := v_reqCreateHistoModifOnly||'Tabidx(tabIndice('''||TabcolContratHisto(i).COLUMN_NAME||''')).RUPTURE_CONTRAT := NULL; ';
+        v_reqCreateHistoModifOnly := v_reqCreateHistoModifOnly||'ELSE ';
+        v_reqCreateHistoModifOnly := v_reqCreateHistoModifOnly||'Ligidx.NUMPAC := ligHisto.NUMPAC; ';
+        v_reqCreateHistoModifOnly := v_reqCreateHistoModifOnly||'Ligidx.PACMAT := ligHisto.PACMAT; ';
+        v_reqCreateHistoModifOnly := v_reqCreateHistoModifOnly||'Ligidx.NUMCNT := ligHisto.NUMCNT; ';
+        v_reqCreateHistoModifOnly := v_reqCreateHistoModifOnly||'Ligidx.DATE_EFF := ligHisto.DATE_EFF; ';
+        v_reqCreateHistoModifOnly := v_reqCreateHistoModifOnly||'Ligidx.DATE_FIN := ligHisto.DATE_FIN; ';
+        v_reqCreateHistoModifOnly := v_reqCreateHistoModifOnly||'Ligidx.NOM_DONNEE := '''||TabcolContratHisto(i).COLUMN_NAME||'''; ';
+        v_reqCreateHistoModifOnly := v_reqCreateHistoModifOnly||'Ligidx.RUPTURE_CONTRAT := NULL; ';
+        v_reqCreateHistoModifOnly := v_reqCreateHistoModifOnly||'Tabidx.extend; ';
+        v_reqCreateHistoModifOnly := v_reqCreateHistoModifOnly||'Tabidx(Tabidx.last) := Ligidx; ';
+        v_reqCreateHistoModifOnly := v_reqCreateHistoModifOnly||'tabIndice('''||TabcolContratHisto(i).COLUMN_NAME||''') := Tabidx.last; ';
+        v_reqCreateHistoModifOnly := v_reqCreateHistoModifOnly||'END IF; ';
+        v_reqCreateHistoModifOnly := v_reqCreateHistoModifOnly||'ELSIF tabIndice.exists('''||TabcolContratHisto(i).COLUMN_NAME||''') THEN ';
+        v_reqCreateHistoModifOnly := v_reqCreateHistoModifOnly||'Tabidx(tabIndice('''||TabcolContratHisto(i).COLUMN_NAME||''')).DATE_FIN := ligHisto.DATE_FIN; ';
+        v_reqCreateHistoModifOnly := v_reqCreateHistoModifOnly||'END IF; ';
+      END LOOP;
+      v_reqCreate := v_reqCreate||'  LOOP ';
+      v_reqCreate := v_reqCreate||' FETCH curHisto INTO ligHisto; ';
+      v_reqCreate := v_reqCreate||'   EXIT ';
+      v_reqCreate := v_reqCreate||' WHEN curHisto % NOTFOUND; ';
+      v_reqCreate := v_reqCreate||' IF previous_ligHisto.PACMAT is null OR NOT previous_ligHisto.MATRIC=ligHisto.MATRIC THEN ';
+      v_reqCreate := v_reqCreate||'bMATRIC := 1; ';
+      v_reqCreate := v_reqCreate||'bCNT := 1; ';
+      FOR i IN TabcolContratHisto.first..TabcolContratHisto.last
+      LOOP
+        v_reqCreate := v_reqCreate||'b'||TabcolContratHisto(i).COLUMN_NAME||' := 0; ';
+      END LOOP;
+      v_reqCreate := v_reqCreate||'BEGIN ';
+      v_reqCreate := v_reqCreate||'FORALL i IN 1..Tabidx.COUNT SAVE EXCEPTIONS ';
+      v_reqCreate := v_reqCreate||'INSERT INTO DIC_IDX_CONTRAT_HISTO_TMP (NUMPAC, PACMAT, NUMCNT, DATE_EFF, NOM_DONNEE, DATE_FIN, RUPTURE_CONTRAT, DATE_DERNIERE_MODIF) VALUES (Tabidx(i).NUMPAC, Tabidx(i).PACMAT, Tabidx(i).NUMCNT, Tabidx(i).DATE_EFF, Tabidx(i).NOM_DONNEE, Tabidx(i).DATE_FIN, Tabidx(i).RUPTURE_CONTRAT, SYSDATE); ';
+      v_reqCreate := v_reqCreate||'EXCEPTION WHEN OTHERS THEN NULL; END; ';
+      v_reqCreate := v_reqCreate||'Tabidx.delete(); ';
+      v_reqCreate := v_reqCreate||'ELSE ';
+      v_reqCreate := v_reqCreate||'bMATRIC := 0; ';
+      v_reqCreate := v_reqCreate||'IF NOT (previous_ligHisto.NUMPAC=ligHisto.NUMPAC AND previous_ligHisto.PACMAT=ligHisto.PACMAT AND previous_ligHisto.NUMCNT=ligHisto.NUMCNT) THEN ';
+      v_reqCreate := v_reqCreate||'bCNT := 1; ';
+      v_reqCreate := v_reqCreate||'ELSE ';
+      v_reqCreate := v_reqCreate||'bCNT := 0; ';
+      v_reqCreate := v_reqCreate||'END IF; ';
+      FOR i IN TabcolContratHisto.first..TabcolContratHisto.last
+      LOOP
+        emptyVal := '_EMPTY_';
+        IF (TabcolContratHisto(i).COLUMN_TYPE = 'NUMBER') THEN
+          emptyVal := '0';
+        END IF;
+        v_reqCreate := v_reqCreate||'
+          IF NOT NVL(TO_CHAR(previous_ligHisto.'||TabcolContratHisto(i).COLUMN_NAME||'),'''||emptyVal||''') = NVL(TO_CHAR(ligHisto.'||TabcolContratHisto(i).COLUMN_NAME||'),'''||emptyVal||''') THEN ';
+        v_reqCreate := v_reqCreate||'b'||TabcolContratHisto(i).COLUMN_NAME||' := 1; ';
+        v_reqCreate := v_reqCreate||'ELSE ';
+        v_reqCreate := v_reqCreate||'b'||TabcolContratHisto(i).COLUMN_NAME||' := 0; ';
+        v_reqCreate := v_reqCreate||'END IF; ';
+      END LOOP;
+      v_reqCreate := v_reqCreate||'END IF; ';
+      v_reqCreate := v_reqCreate||'IF bCNT=1 THEN ';
+      v_reqCreate := v_reqCreate||v_reqCreateHistoRuptureContrat;
+      v_reqCreate := v_reqCreate||'END IF; ';
+      v_reqCreate := v_reqCreate||'IF bMATRIC=0 THEN ';
+      v_reqCreate := v_reqCreate||v_reqCreateHistoModifOnly;
+      v_reqCreate := v_reqCreate||'END IF; ';
+      v_reqCreate := v_reqCreate||'  previous_ligHisto:=ligHisto;';
+      v_reqCreate := v_reqCreate||' end loop;';
+      v_reqCreate := v_reqCreate||'close curHisto;';
+      v_reqCreate := v_reqCreate||'BEGIN ';
+      v_reqCreate := v_reqCreate||'FORALL i IN 1..Tabidx.COUNT SAVE EXCEPTIONS ';
+      v_reqCreate := v_reqCreate||'INSERT INTO DIC_IDX_CONTRAT_HISTO_TMP (NUMPAC, PACMAT, NUMCNT, DATE_EFF, NOM_DONNEE, DATE_FIN, RUPTURE_CONTRAT, DATE_DERNIERE_MODIF) VALUES (Tabidx(i).NUMPAC, Tabidx(i).PACMAT, Tabidx(i).NUMCNT, Tabidx(i).DATE_EFF, Tabidx(i).NOM_DONNEE, Tabidx(i).DATE_FIN, Tabidx(i).RUPTURE_CONTRAT, SYSDATE); ';
+      v_reqCreate := v_reqCreate||'EXCEPTION WHEN OTHERS THEN NULL; END; ';
+      v_reqCreate := v_reqCreate||'Tabidx.delete(); ';
+    END IF;
+    IF TabcolContrat.count>0 OR TabcolContratHisto.count>0 THEN
+      v_reqCreate := v_reqCreate||'MERGE INTO DIC_IDX_CONTRAT_HISTO IDX USING (SELECT * FROM DIC_IDX_CONTRAT_HISTO_TMP) IDX_TMP ON (IDX.NUMPAC=IDX_TMP.NUMPAC AND IDX.PACMAT=IDX_TMP.PACMAT AND IDX.NUMCNT=IDX_TMP.NUMCNT AND IDX.DATE_EFF=IDX_TMP.DATE_EFF AND IDX.NOM_DONNEE=IDX_TMP.NOM_DONNEE) WHEN MATCHED THEN UPDATE SET DATE_FIN=IDX_TMP.DATE_FIN, RUPTURE_CONTRAT=IDX_TMP.RUPTURE_CONTRAT, DATE_DERNIERE_MODIF=IDX_TMP.DATE_DERNIERE_MODIF WHEN NOT MATCHED THEN INSERT (NUMPAC, PACMAT, NUMCNT, DATE_EFF, NOM_DONNEE, DATE_FIN, RUPTURE_CONTRAT, DATE_DERNIERE_MODIF) VALUES (IDX_TMP.NUMPAC, IDX_TMP.PACMAT, IDX_TMP.NUMCNT, IDX_TMP.DATE_EFF, IDX_TMP.NOM_DONNEE, IDX_TMP.DATE_FIN, IDX_TMP.RUPTURE_CONTRAT, IDX_TMP.DATE_DERNIERE_MODIF); ';
+    END IF;
+    v_reqCreate := v_reqCreate||'DELETE FROM DIC_IDX_CONTRAT_HISTO ';
+    v_reqCreate := v_reqCreate||' WHERE NOT EXISTS (SELECT 1 FROM DIC_IDX_CONTRAT_HISTO_TMP WHERE NUMPAC=DIC_IDX_CONTRAT_HISTO.NUMPAC AND PACMAT=DIC_IDX_CONTRAT_HISTO.PACMAT AND NUMCNT=DIC_IDX_CONTRAT_HISTO.NUMCNT AND DATE_EFF=DIC_IDX_CONTRAT_HISTO.DATE_EFF AND NOM_DONNEE=DIC_IDX_CONTRAT_HISTO.NOM_DONNEE) ';
+    v_reqCreate := v_reqCreate||' AND EXISTS (SELECT 1 FROM SECUPACMAT_TMP_CONTRAT WHERE NUMPAC=DIC_IDX_CONTRAT_HISTO.NUMPAC AND PACMAT=DIC_IDX_CONTRAT_HISTO.PACMAT) ';
+    v_reqCreate := v_reqCreate||' AND EXISTS (SELECT 1 FROM DIC_IDX_DONNEE_RETOUR_PAIE WHERE NOM_DONNEE=DIC_IDX_CONTRAT_HISTO.NOM_DONNEE); ';
+  END IF;
+  v_reqCreate := v_reqCreate||'END ALIM_IDX_CH_RETOUR_PAIE;';
+  EXECUTE_IMMEDIATE_STRING(v_reqCreate,0);
+END CREATE_PROC_IDX_CH_RETOUR_PAIE;
+##
+CREATE_PROC_IDX_CH_RETOUR_PAIE
+==
+CALL CREATE_PROC_IDX_CH_RETOUR_PAIE()

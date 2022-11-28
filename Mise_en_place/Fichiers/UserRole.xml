@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<message>
+<metadatas>
+	<metadata name="uidadm" value="admin-123" />
+	<metadata name="debug" value="false" />
+	<metadata name="email" value="toto.aspweb@fr.adp.com" />
+</metadatas>
+<service name="hrtrainingfr" version="1.0">
+</service>
+</message>

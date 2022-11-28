@@ -1,0 +1,19 @@
+##
+DIC_GESTION_PURGEC99
+=SQL=
+CREATE OR REPLACE PROCEDURE DIC_GESTION_PURGEC99
+AS
+BEGIN
+  DECLARE
+    CURSOR c_tabs
+    IS
+      SELECT table_name FROM user_tables WHERE table_name LIKE 'C99%';
+    nom_obj VARCHAR(500) ;
+  BEGIN
+    FOR curs_tab IN c_tabs
+    LOOP
+      nom_obj:=curs_tab.table_name;
+      EXECUTE_IMMEDIATE_STRING( 'drop table ' || nom_obj ,0);
+    END LOOP;
+  END;
+END DIC_GESTION_PURGEC99;

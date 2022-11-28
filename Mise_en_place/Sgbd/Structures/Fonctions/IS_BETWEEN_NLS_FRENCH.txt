@@ -1,0 +1,36 @@
+##
+IS_BETWEEN_NLS_FRENCH
+=SQL=
+CREATE OR REPLACE FUNCTION IS_BETWEEN_NLS_FRENCH(
+    VALCOMP  IN VARCHAR2 ,
+    BORNEINF IN VARCHAR2 ,
+    BORNESUP IN VARCHAR2 )
+  RETURN VARCHAR2
+AS
+  nbr INT;
+BEGIN
+  SELECT COUNT(*)
+  INTO nbr
+  FROM
+    (SELECT rownum AS pos,
+      name
+    FROM
+      (SELECT *
+      FROM
+        (SELECT VALCOMP AS name FROM dual
+        UNION ALL
+        SELECT BORNEINF AS name FROM dual
+        UNION ALL
+        SELECT BORNESUP AS name FROM dual
+        )
+      ORDER BY NLSSORT(name, 'NLS_SORT = FRENCH')
+      )
+    )
+  WHERE name=VALCOMP
+  AND pos   =2;
+  IF (nbr   =1) THEN
+    RETURN 'TRUE';
+  ELSE
+    RETURN 'FALSE';
+  END IF;
+END IS_BETWEEN_NLS_FRENCH;

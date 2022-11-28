@@ -1,0 +1,4 @@
+##
+TGE_REF_CARTE_29_IJEDI
+==
+create or replace view TGE_REF_CARTE_29_IJEDI as select * from (select 'A001' CODE_ELEMENT,'**' INDICATIF from dual union all select 'A275' CODE_ELEMENT,'**' INDICATIF from dual )

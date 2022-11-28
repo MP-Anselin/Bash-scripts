@@ -1,0 +1,11 @@
+<interface idInterface="CAD">
+	<nomInterface>Chargement des des Compteurs a Date</nomInterface>
+	<descriptionInterface>Chargement des Compteurs a Date</descriptionInterface>
+	<traitements>
+		<traitement>
+			<descriptionTraitement>Appel a l'interface</descriptionTraitement>
+			<typeTraitement>CAD</typeTraitement>
+			<typeEnvoi>zip</typeEnvoi>
+		</traitement>
+	</traitements>
+</interface>

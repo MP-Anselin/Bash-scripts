@@ -1,0 +1,237 @@
+##
+TAG_CHARSET=@€éèç
+##
+TGE_CONTROLE_40_CHEVAUCHEMENT
+=SQL=
+create or replace PROCEDURE TGE_CONTROLE_40_CHEVAUCHEMENT (P_LOGIN IN VARCHAR2, P_DATE_IMPORT IN VARCHAR2, P_NUMLIGNE IN VARCHAR2, P_CODLANG IN VARCHAR2) AS 
+ /********************************************************************************
+ Version     : V5.05.003
+ *********************************************************************************/
+ 
+ dateDebutSQL  VARCHAR2(20);                      --date fin import_absence
+ dateFinSQL    VARCHAR2(20);                      --date fin import_absence
+ cod_erreur    VARCHAR2(10);                      --code anomalie
+ msg           VARCHAR(1000);                     --Message d'ano namlie
+ typ_msg       VARCHAR2(10);                      --type de message ERROR ou WARNING
+ varsys        VARCHAR2(100);                     --boolean varsys CTRL_ABS_CHEVAUCH
+ ctrlWhere     VARCHAR2(2000) ;                   --requet SELECT pour controler le chevauchement
+ updatesql     VARCHAR2(2000);                    --requete d'insertion de ERROR/WARNING
+ C_FORMAT_DATE CONSTANT VARCHAR(10) :='YYYYMMDD'; --format date
+ iterChev      NUMBER               :=0;          --compteur iteration absence chevauchante
+ haveJ         NUMBER               :=0;          --boolean verifier si une absence type J a été traité
+ firstMsg      NUMBER               :=0;
+ haveMsg2demiJr NUMBER              :=0;
+ accepte_2_demi_journee boolean:=false;
+ type_demi_journee_meme_motif boolean:=false;
+ 
+ ------- variable temporaire info abs. chevauché -------
+ v_DATE_DEBUT TGE_ABSENCES.DATE_DEBUT%TYPE ;
+ v_DATE_FIN TGE_ABSENCES.DATE_FIN%TYPE;
+ v_FIN_MA TGE_ABSENCES.FIN_MA%TYPE;
+ v_DEBUT_MA TGE_ABSENCES.DEBUT_MA%TYPE;
+ v_MOTIF TGE_ABSENCES.MOTIF%TYPE;
+ v_DEMI_JOURNEE TGE_REF_PRE.DEMI_JOURNEE%TYPE;
+ v_duree VARCHAR2(100);
+ --------------------------------------
+ TYPE TGE_CTRL40_type_map_msg_error
+ IS
+ TABLE OF VARCHAR2(200) INDEX BY VARCHAR2(10);-- typer table temporère pour optimiser la recupération des erreurs */
+ abs_chevauch SYS_REFCURSOR;                  -- cursor + variable absence chevauché
+ prop_abs_encour TGE_CTRL40_prop_absence;     -- contient statut absence
+ map_msg TGE_CTRL40_type_map_msg_error;       -- for optimization error
+ inf_abs TGE_CTRL40_info_absence;             -- Objet de sauvegarde des propriété absence calculable
+ tmp_record_cursor TGE_CTRL40_abs_row_cursor  :=TGE_CTRL40_abs_row_cursor(NULL,NULL,NULL,NULL,NULL,NULL);
+ C_SQL_NON_DEMI_JOURNEE CONSTANT VARCHAR(200) :='and not exists (select 1 from tge_ref_pre pre  where absence.numpac=pre.numpac and absence.motif=pre.code_incident and pre.demi_journee =1 )';
+ /************ CURSORS ************/
+ -- Curseur des absence à contrôler
+ CURSOR ABS_IMPORT
+ IS
+ SELECT absence.LOGIN,
+ absence.DATE_IMPORT,
+ absence.NUMLIGNE,
+ absence.MATRICULE,
+ absence.NUMPAC,
+ absence.PACMAT,
+ absence.PAIEZAD,
+ absence.PERIODE,
+ absence.TYPE_TRAITEMENT,
+ absence.DATE_DEBUT,
+ absence.DATE_FIN,
+ absence.HEURES_TRAV,
+ absence.TYPE_HEURE,
+ absence.HEURES_IP,
+ absence.CODE_IP,
+ absence.CODE_IMPUTATION,
+ absence.DOMAINE_IMP,
+ absence.ORIGINE,
+ absence.ERREURS,
+ absence.STATUT,
+ absence.WARNINGS,
+ absence.DATE_EFFET,
+ absence.FSED_PAIEZAD,
+ MOT.DEMI_JOURNEE,
+ mot.RUB_ECHANGE,
+ mot.UNITE
+ FROM TGE_IMPORT_INCIDENTS absence LEFT JOIN TGE_REF_PRE mot
+ ON absence.CODE_IP=mot.CODE_INCIDENT AND mot.NUMPAC    =absence.NUMPAC WHERE LOGIN =P_LOGIN  AND DATE_IMPORT   =P_DATE_IMPORT AND mot.OPTION_CONSERV_HISTO='A';
+ 
+ --Curseur des messages d'erreurs
+ CURSOR error_msg_cursor
+ IS SELECT coderr, liberr FROM sys_def_erreurs WHERE codlang=P_CODLANG AND CODMOD   ='TGE'
+ AND coderr  IN ('TGE00172','TGE00184','TGE00187','TGE00188','TGE00198','TGE00185','TGE00186','TGE00197','TGE00295','TGE00296','TGE00297','TGE00298','TGE00344','TGE00345');
+ 
+ BEGIN
+ /**********DEBUT TRAITEMENT ***********/
+ TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'CTRL_CHEVAUCHEMENT_40 DEBUT '||TO_CHAR(SYSTIMESTAMP, 'DD.MM.YYYY HH24:MI:SSxFF'));
+ 
+ /** Alimentation des erreur en memoir **/
+ FOR row_err IN error_msg_cursor LOOP
+ map_msg(row_err.coderr):=row_err.liberr;
+ END LOOP;
+ 
+ --get varsys CTRL_ABS_CHEVAUCH
+ --IF true inserer dans Erreur ELSE inserer dans Warning
+ SELECT valvar INTO varsys FROM sys_varsys WHERE module ='TGE' AND CODVAR      ='CTRL_ABS_CHEVAUCH';
+ IF upper(varsys)='TRUE' THEN  typ_msg :='erreurs'; ELSE typ_msg:='warnings'; END IF;
+ 
+ /**************************************/
+ /****  LOOP sur TGE_IMPORT_ABSENCES****/
+ /**************************************/
+ FOR absence IN ABS_IMPORT
+ LOOP
+ 
+ dateDebutSQL                  :='';
+ dateFinSQL                    :='';
+ iterChev                      :=0;
+ tmp_record_cursor.DATE_DEBUT  :=absence.DATE_DEBUT;
+ tmp_record_cursor.DATE_FIN    :=absence.DATE_FIN;
+ tmp_record_cursor.UNITE       :=absence.UNITE;
+ tmp_record_cursor.HEURES_IP   :=absence.HEURES_IP;
+ tmp_record_cursor.DEMI_JOURNEE:=absence.DEMI_JOURNEE;
+ tmp_record_cursor.RUB_ECHANGE :=absence.RUB_ECHANGE;
+ 
+ -- get info absence
+ inf_abs  := TGE_CTRL40_GET_INFO_ABSENCE(tmp_record_cursor,dateDebutSQL , dateFinSQL);
+ 
+ -- calculer les états de l'absence
+ prop_abs_encour :=TGE_CTRL40_GET_ETATS_ABSENCE(absence.HEURES_IP, absence.DEMI_JOURNEE, inf_abs, dateDebutSQL, dateFinSQL);
+ 
+ /* verification date absence */
+ IF dateDebutSQL IS NULL THEN dateDebutSQL := '19000102'; END IF;
+ IF dateFinSQL   IS NULL THEN dateFinSQL   := '20990101'; END IF;
+ 
+ /********************************************************/
+ /* Construction de la requete controle chevauchement !! */
+ /********************************************************/
+ ctrlWhere :='SELECT DATE_DEBUT, DATE_FIN, FIN_MA, DEBUT_MA,MOTIF , TO_CHAR(NVL(DUREE,0)) as DUREE, DEMI_JOURNEE FROM TGE_ABSENCES absence LEFT JOIN TGE_REF_PRE mot ON absence.MOTIF=mot.CODE_INCIDENT AND mot.NUMPAC=absence.NUMPAC  WHERE MATRIC='''||absence.MATRICULE||''' AND STATUT IN (select CODE from TGE_GTA_ABS_STATUTS  where EST_ABS_ACTIVE = 1) ' ;
+ ctrlWhere := ctrlWhere|| 'AND ( ( TO_DATE( ' || dateDebutSQL ||','''|| C_FORMAT_DATE ||''') between DATE_DEBUT AND DATE_FIN OR TO_DATE('||dateFinSQL||','''|| C_FORMAT_DATE ||''') between DATE_DEBUT AND DATE_FIN OR DATE_DEBUT between TO_DATE('||dateDebutSql||','''|| C_FORMAT_DATE ||''') AND TO_DATE('||dateFinSql||','''|| C_FORMAT_DATE ||''') OR  DATE_FIN  between TO_DATE('||dateDebutSql ||','''|| C_FORMAT_DATE ||''') AND TO_DATE('||dateDebutSql||','''|| C_FORMAT_DATE ||''') ) AND ';
+ IF prop_abs_encour.isJourneeCompleteSurUnSeulJour   =1 OR prop_abs_encour.isEnDureeSurUnSeulJour=1 OR prop_abs_encour.isJourneCompletSurPlusieurJour=1 OR prop_abs_encour.isEnDureeSurPlusieursJour=1 THEN
+ ctrlWhere :=ctrlWhere||' 1=1 ';
+ ELSIF prop_abs_encour.isDemiJourneeSurUnSeulJour=1  OR prop_abs_encour.estDemiJournee=1 THEN
+ ctrlWhere :=ctrlWhere||' ((DEBUT_MA=''J'' AND ( ('''|| NVL(absence.heures_ip,'0') ||'''=''0.50'' AND TO_CHAR(NVL(DUREE,0))=''14400'') OR  ''0'' = NVL(DUREE,''0'')) ) OR (DEBUT_MA in (''M'',''D'',''A'')) OR (FIN_MA in (''M'',''D'',''A'')) OR DEMI_JOURNEE = ''1'')';
+ ELSIF prop_abs_encour.isMatinSurUnSeulJour =1 OR prop_abs_encour.isMatinSurPlusieursJour=1 THEN --
+ ctrlWhere :=ctrlWhere||' ( (DEBUT_MA IN (''D'',''J'',''M'') AND DEBUT_MA =FIN_MA '||C_SQL_NON_DEMI_JOURNEE||' ) OR (DEBUT_MA=''A'' AND FIN_MA in (''M'',''J'') AND TO_DATE('||dateFinSql||','''|| C_FORMAT_DATE ||''') <> DATE_DEBUT ) OR (DEBUT_MA=''J'' AND FIN_MA=''M'') )';
+ ELSIF prop_abs_encour.isApresMidiSurUnSeulJour      =1 OR prop_abs_encour.isApresMidiSurPlusieursJour=1 THEN--
+ ctrlWhere :=ctrlWhere||' (  (DEBUT_MA in (''D'',''J'',''A'') AND DEBUT_MA= FIN_MA '||C_SQL_NON_DEMI_JOURNEE||' ) OR (DEBUT_MA=''A'' AND FIN_MA=''J'') OR ( DEBUT_MA IN (''A'',''J'') and FIN_MA=''M'' and TO_DATE('||dateDebutSql||','''|| C_FORMAT_DATE ||''') <> DATE_FIN ) ) ';
+ ELSIF prop_abs_encour.isStatApremdAndFinitToutJourne=1 THEN
+ ctrlWhere :=ctrlWhere||' ( (DEBUT_MA in(''J'',''D'',''A'') AND DEBUT_MA= FIN_MA '||C_SQL_NON_DEMI_JOURNEE||' ) OR (DEBUT_MA=''A'' and FIN_MA=''J'') OR ( DEBUT_MA in (''A'',''J'') AND FIN_MA=''M'' AND TO_DATE('||dateDebutSql ||','''|| C_FORMAT_DATE ||''') <> DATE_FIN ) OR ( DEBUT_MA=''M'' and FIN_MA=''M'' AND DATE_FIN >  TO_DATE( '|| dateDebutSQL||' ,'''|| C_FORMAT_DATE ||''') ) )';
+ ELSIF prop_abs_encour.isStartApremidiAndFinitMatin  =1 THEN
+ ctrlWhere :=ctrlWhere||' ( (DEBUT_MA IN (''J'',''D'') AND DEBUT_MA=FIN_MA '||C_SQL_NON_DEMI_JOURNEE||' ) OR ( DEBUT_MA=''M'' AND FIN_MA=''M'' AND DATE_FIN> TO_DATE('||dateDebutSql ||','''|| C_FORMAT_DATE ||''') ) OR ( DEBUT_MA=''A'' AND FIN_MA=''A'' AND DATE_DEBUT > TO_DATE( '||dateFinSql||','''|| C_FORMAT_DATE ||''') ) OR ( DEBUT_MA=''A'' AND FIN_MA=''M'' AND DATE_DEBUT <> TO_DATE('||dateFinSql||','''|| C_FORMAT_DATE ||''') and DATE_FIN <> TO_DATE('||dateDebutSql ||','''|| C_FORMAT_DATE ||''') ) OR ( DEBUT_MA=''J'' AND FIN_MA=''M'' AND DATE_FIN <> TO_DATE('||dateDebutSql||','''|| C_FORMAT_DATE ||''') ) )';
+ ELSIF prop_abs_encour.isStartToutJourneAndFinitMatin=1 THEN
+ ctrlWhere :=ctrlWhere||' ( ( DEBUT_MA IN (''J'',''D'',''M'') AND DEBUT_MA=FIN_MA '||C_SQL_NON_DEMI_JOURNEE||' ) OR ( DEBUT_MA =''A'' AND FIN_MA =''A''  AND DATE_DEBUT < TO_DATE('||dateFinSql||','''|| C_FORMAT_DATE ||''') ) OR ( DEBUT_MA =''A'' AND FIN_MA IN (''J'',''M'') AND DATE_DEBUT <> TO_DATE('||dateFinSQL||','''|| C_FORMAT_DATE ||''') ) OR ( DEBUT_MA=''J'' AND FIN_MA=''M'' ) )';
+ END IF;
+ ctrlWhere :=ctrlWhere||')  ORDER BY DEBUT_MA desc';
+ 
+ 
+ IF NOT prop_abs_encour.erreur=1 THEN
+ --parcourir les absences en cheuvauchement pour inserer les erreurs/warnings
+ OPEN abs_chevauch FOR ctrlWhere;
+ LOOP
+ FETCH abs_chevauch INTO v_DATE_DEBUT, v_DATE_FIN, v_FIN_MA, v_DEBUT_MA, v_MOTIF, v_duree, v_DEMI_JOURNEE;
+ EXIT WHEN abs_chevauch%NOTFOUND;
+ 
+
+ 
+ IF v_DEBUT_MA='J' OR v_FIN_MA='J' THEN haveJ:=1; END IF;
+ 
+ iterChev :=iterChev+1;
+ 
+ -- condition qui accepte 2 demi journée
+ accepte_2_demi_journee:= iterchev<2 AND (prop_abs_encour.isDemiJourneeSurUnSeulJour=1 OR prop_abs_encour.estDemiJournee=1) AND ( ((v_duree ='14400') AND v_DEBUT_MA = 'J' AND v_DEMI_JOURNEE <> 1) OR  v_DEBUT_MA IN ('M','A') OR v_FIN_MA IN ('M','A') OR (v_DEMI_JOURNEE=1 AND v_MOTIF != absence.CODE_IP));
+ -- condition qui bloque la 2éme absence typé demi_journée si même motif d'absence
+ type_demi_journee_meme_motif:=prop_abs_encour.estDemiJournee=1 AND v_DEMI_JOURNEE=1 AND v_MOTIF=absence.CODE_IP;
+ 
+ -- contrôle pour ne pas dépasser 2 demi journée dans la même journée (sauf pour la durée) et qui bloque l'import d'une 2eme absnece typée demi-journée avec le même motif.
+ IF firstMsg = 0 AND (not(accepte_2_demi_journee) OR type_demi_journee_meme_motif ) THEN
+ msg:=map_msg('TGE00172');
+ updatesql:=' update TGE_IMPORT_INCIDENTS set '|| ( CASE WHEN v_DEBUT_MA='D' AND haveJ=0 THEN 'warnings' ELSE typ_msg END) ||' = '|| ( CASE WHEN v_DEBUT_MA='D' AND haveJ=0 THEN 'warnings' ELSE typ_msg END) ||' || '''||REPLACE(msg,'''','''''')||'''  WHERE login='''||absence.login||''' and date_import='''||absence.date_import||''' and numligne='|| absence.numligne||'';
+ EXECUTE_IMMEDIATE_STRING(updatesql,0);
+ firstMsg:=1;
+ END IF;
+ IF accepte_2_demi_journee THEN
+ CONTINUE;
+ ELSIF haveMsg2demiJr=0 AND prop_abs_encour.isDemiJourneeSurUnSeulJour=1 AND (v_DEBUT_MA  <> 'D' OR haveJ = 1)  AND iterchev>=2 THEN
+ msg:=map_msg('TGE00344');
+ msg:=regexp_replace(msg,'#',v_DATE_DEBUT,1,1);
+ haveMsg2demiJr:=1;
+ GOTO MAJ_TBL_IMPORT;
+ ELSIF haveMsg2demiJr=1 AND prop_abs_encour.isDemiJourneeSurUnSeulJour=1 AND iterchev>=2 THEN
+ CONTINUE;
+ END IF;
+ IF type_demi_journee_meme_motif THEN
+ msg:=map_msg('TGE00345');
+ msg:=regexp_replace(msg,'#',v_MOTIF,1,1);
+ msg:=regexp_replace(msg,'#',v_DATE_DEBUT,1,1);
+ GOTO MAJ_TBL_IMPORT;
+ END IF;
+ 
+ --get code erreur adéquat
+ IF v_DATE_DEBUT   =v_DATE_FIN THEN
+ IF    v_DEBUT_MA='D' THEN cod_erreur   :='TGE00184';
+ ELSIF v_DEBUT_MA='M' THEN cod_erreur   :='TGE00187';
+ ELSIF v_DEBUT_MA='A' THEN cod_erreur   :='TGE00188';
+ ELSIF v_DEBUT_MA='J' THEN cod_erreur   :='TGE00198';
+ END IF;
+ ELSE
+ IF v_DEBUT_MA   ='M' THEN
+ cod_erreur   :='TGE00185';
+ ELSIF v_DEBUT_MA='A' AND v_FIN_MA!='M' AND v_FIN_MA!='J' THEN cod_erreur   :='TGE00186';
+ ELSIF v_DEBUT_MA='J' AND v_FIN_MA!='M' THEN cod_erreur   :='TGE00197';
+ ELSIF v_DEBUT_MA='A' AND v_FIN_MA='J' THEN cod_erreur   :='TGE00295';
+ ELSIF v_DEBUT_MA='A' AND v_FIN_MA='M' THEN cod_erreur   :='TGE00296';
+ ELSIF v_DEBUT_MA='J' AND v_FIN_MA='M' THEN cod_erreur   :='TGE00297';
+ ELSIF v_DEBUT_MA='D' THEN cod_erreur   :='TGE00298';
+ END IF;
+ END IF;
+ 
+ --récupèrer message d'erreur et remplacer les paramétres
+ msg:=map_msg(cod_erreur);
+ msg:=regexp_replace(msg,'#',v_MOTIF,1,1);
+ msg:=regexp_replace(msg,'#',v_DATE_DEBUT,1,1);
+ msg:=regexp_replace(msg,'#',v_DATE_FIN,1,1);
+ 
+ <<MAJ_TBL_IMPORT>>
+ --MAJ de l'anomalie import_absence / WARNINGS si MA=Durée
+ updatesql:=' UPDATE TGE_IMPORT_INCIDENTS SET '|| ( CASE WHEN v_DEBUT_MA='D' AND haveJ=0 THEN 'warnings' ELSE typ_msg END) ||' = '|| ( CASE WHEN v_DEBUT_MA='D' AND haveJ=0 THEN 'warnings' ELSE typ_msg END) ||' || '''||REPLACE(msg,'''','''''')||'''  WHERE login='''||absence.login||''' AND date_import='''||absence.date_import||''' AND numligne='|| absence.numligne||'';
+ EXECUTE_IMMEDIATE_STRING(updatesql,0);
+ 
+ END LOOP; --FIN LOOP absence chevauché
+ iterChev:=0; firstMsg:=0;haveJ:=0;haveMsg2demiJr:=0;
+ CLOSE abs_chevauch;
+ 
+ ELSE
+ msg :='Problem de controle de chevauchement. ';
+ updatesql:=' UPDATE TGE_IMPORT_ABSENCES SET '||( CASE WHEN v_DEBUT_MA='D' AND haveJ=0 THEN 'warnings' ELSE typ_msg END) ||' = '|| ( CASE WHEN v_DEBUT_MA='D' AND haveJ=0 THEN 'warnings' ELSE typ_msg END) ||' || '''||REPLACE(msg,'''','''''')||'''  WHERE login='''||absence.login||''' AND date_import='''||absence.date_import||''' AND numligne='|| absence.numligne||'';
+ EXECUTE_IMMEDIATE_STRING(updatesql,0);
+ END IF;
+ END LOOP;--FIN LOOP import_absence
+ 
+ TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'CTRL_CHEVAUCHEMENT_40 FIN '||TO_CHAR(SYSTIMESTAMP, 'DD.MM.YYYY HH24:MI:SSxFF'));
+ 
+ EXCEPTION
+ WHEN OTHERS THEN
+ IF (P_LOGIN != 'BATCH') THEN
+ -- On remonte l'erreur à l'application
+ raise;
+ END IF;
+ END TGE_CONTROLE_40_CHEVAUCHEMENT;

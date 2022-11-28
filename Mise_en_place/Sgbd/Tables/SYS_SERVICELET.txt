@@ -1,0 +1,180 @@
+##
+TAG_CHARSET=@€ιθη
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE TYP='T' and SYNONYME='Traitement_CompleteRetroTardive' 
+'T','Traitement_CompleteRetroTardive','fr.adp.com.gxp.std.modules.lib.objects.zpaie.mgr.Traitement_CompleteRetroTardive','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE TYP='T' and SYNONYME='Traitement_ExportDocumentsSignes' 
+'T','Traitement_ExportDocumentsSignes','fr.adp.com.gxp.std.modules.lib.signature.traitement.Traitement_ExportDocumentsSignes','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE TYP='J' and SYNONYME='TestBandeauProjetJsonServlet' 
+'J','TestBandeauProjetJsonServlet','fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.TestBandeauProjetJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE TYP='J' and SYNONYME='AppelTableAdminJsonServlet' 
+'J','AppelTableAdminJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.paramecrandyn.AppelTableAdminJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE TYP='J' and SYNONYME='TraceAppelsAPIJsonServlet' 
+'J','TraceAppelsAPIJsonServlet','fr.adp.com.gxp.std.modules.lib.traceapi.jsonservlet.TraceAppelsAPIJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM sys_servicelet WHERE SYNONYME = 'BenchmarkJsonServlet'
+'J','BenchmarkJsonServlet','fr.adp.com.gxp.std.modules.lib.benchmark.BenchmarkJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME = 'BqeOcrInterpreteur'
+'I','BqeOcrInterpreteur','fr.adp.com.gxp.std.modules.lib.servicelet.gap.interpreteur.BqeOcrInterpreteur','O'
+##
+SYS_SERVICELET
+==
+delete from SYS_SERVICELET where TYP='J' and SYNONYME='PersonnalisationUsesCaseJsonServlet' 
+'J','PersonnalisationUsesCaseJsonServlet','fr.adp.com.gxp.std.mot_met.lib.dex.jsonservlet.PersonnalisationUsesCaseJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE TYP='J' and SYNONYME='DateEffetDetailsJsonServlet' 
+'J','DateEffetDetailsJsonServlet','fr.adp.com.gxp.std.modules.lib.servicelet.gap.DateEffetDetailsJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE TYP='J' and SYNONYME='ParamSignatureJsonServlet' 
+'J','ParamSignatureJsonServlet','fr.adp.com.gxp.std.modules.lib.signature.jsonservlet.ParamSignatureJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE TYP='S' and SYNONYME='ConsultationFeuilleChargeeImpuServiceLet' 
+'S','ConsultationFeuilleChargeeImpuServiceLet','fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.ConsultationFeuilleChargeeImpuServiceLet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE TYP='J' and SYNONYME='ZTGEExportImputationsJsonServlet' 
+'J','ZTGEExportImputationsJsonServlet','fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.ZTGEExportImputationsJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE synonyme = 'MajOccuModeSuppInterpreteur'
+'I','MajOccuModeSuppInterpreteur','fr.adp.com.gxp.std.modules.lib.servicelet.gap.interpreteur.MajOccuModeSuppInterpreteur','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE TYP='J' and SYNONYME='SlideUploadDocumentExterneJsonServlet' 
+'J','SlideUploadDocumentExterneJsonServlet','fr.adp.com.gxp.std.modules.lib.signature.jsonservlet.SlideUploadDocumentExterneJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE TYP='J' and SYNONYME='BridgingJsonServlet' 
+'J','BridgingJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.paramecrandyn.BridgingJsonServlet','O'
+##
+SYS_SERVICELET (TYP,SYNONYME,CLASS_NAME,ACTIF)
+=IF_ROW_NOTEXIST=
+'I','ETBCodeInseeAlphaInterpreteur','fr.adp.com.gxp.std.modules.lib.servicelet.gap.structures.interpreteur.ETBCodeInseeAlphaInterpreteur','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE TYP='T' and SYNONYME='Traitement_Dpae_Renvoi_MSA' 
+'T','Traitement_Dpae_Renvoi_MSA','fr.adp.com.gxp.std.modules.dpae.batch.Traitement_Dpae_Renvoi_MSA','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE TYP='T' and SYNONYME='Traitement_DpaeMsa' 
+'T','Traitement_DpaeMsa','fr.adp.com.gxp.std.modules.dpae.batch.Traitement_DpaeMsa','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE synonyme = 'HelpDeskConfirmGapCMSServiceLet'
+'S','HelpDeskConfirmGapCMSServiceLet','fr.adp.com.gxp.std.modules.lib.servicelet.HelpDesk.HelpDeskConfirmGapCMSServiceLet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME IN ('ConditionsDocserverJsonServlet','ConditionDocserverCMJsonServlet')
+'J','ConditionsDocserverJsonServlet','fr.adp.com.gxp.std.mot_met.lib.objects.docserver.moduleeditique.ConditionsDocserverJsonServlet','O'
+'J','ConditionDocserverCMJsonServlet','fr.adp.com.gxp.std.mot_met.lib.objects.docserver.moduleeditique.ConditionDocserverCMJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME IN ('ExportChampsFusionDocserverServlet')
+'J','ExportChampsFusionDocserverServlet','fr.adp.com.gxp.std.mot_met.lib.objects.docserver.moduleeditique.ExportChampsFusionDocserverServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE synonyme = 'HelpDeskConfirmGapCMSServiceLet'
+'S','HelpDeskConfirmGapCMSServiceLet','fr.adp.com.gxp.std.modules.lib.servicelet.helpdeskservicelet.HelpDeskConfirmGapCMSServiceLet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE TYP = 'J' AND SYNONYME = 'SlidePreferenceJsonServlet'
+'J','SlidePreferenceJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.SlidePreferenceJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE TYP = 'J' AND SYNONYME = 'ThemeJsonServlet'
+'J','ThemeJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.theme.ThemeJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE TYP = 'J' AND SYNONYME = 'LogoJsonServlet'
+'J','LogoJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.theme.LogoJsonServlet','O'
+##
+SYS_SERVICELET
+==
+delete from SYS_SERVICELET where TYP='J' and SYNONYME='AccessibiliteExempleJsonServlet' 
+'J','AccessibiliteExempleJsonServlet','fr.adp.com.gxp.std.mot_met.lib.accessibilite.AccessibiliteExempleJsonServlet','O'
+##
+SYS_SERVICELET
+==
+delete from SYS_SERVICELET where TYP='J' and SYNONYME='AccessibiliteExempleCJsonServlet' 
+'J','AccessibiliteExempleCJsonServlet','fr.adp.com.gxp.std.mot_met.lib.accessibilite.AccessibiliteExempleCJsonServlet','O'
+##
+SYS_SERVICELET
+==
+delete from SYS_SERVICELET where TYP='J' and SYNONYME='AccessibiliteExempleMJsonServlet' 
+'J','AccessibiliteExempleMJsonServlet','fr.adp.com.gxp.std.mot_met.lib.accessibilite.AccessibiliteExempleMJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE TYP='J' and SYNONYME='MultiGestListePacmatJsonServlet' 
+'J','MultiGestListePacmatJsonServlet','fr.adp.com.gxp.std.modules.lib.servicelet.gap.traitement.MultiGestListePacmatJsonServlet','O'
+##
+SYS_SERVICELET
+==
+delete from SYS_SERVICELET where TYP = 'S' AND SYNONYME = 'GestionNivStructServiceLet'
+##
+SYS_SERVICELET
+==
+delete from SYS_SERVICELET where TYP = 'S' AND SYNONYME = 'SearchPackServiceLet'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME= 'Traitement_ExportDroitACE'
+'T','Traitement_ExportDroitACE','fr.adp.com.gxp.std.mot_tech.lib.ace.Traitement_ExportDroitACE','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME = 'Traitement_Purge_TablesDePaie' AND TYP = 'T'
+'T','Traitement_Purge_TablesDePaie','fr.adp.com.gxp.std.mot_met.lib.objects.purge.Traitement_Purge_TablesDePaie','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE TYP='J' and SYNONYME='ExportDonneesEcranJsonServlet' 
+'J','ExportDonneesEcranJsonServlet','fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.ExportDonneesEcranJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE TYP='J' and SYNONYME='MenuRechercheJsonServlet' 
+'J','MenuRechercheJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.common.bandeau.MenuRechercheJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE TYP='J' and SYNONYME='RechercheClientJsonServlet' 
+'J','RechercheClientJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.common.bandeau.RechercheClientJsonServlet','O'

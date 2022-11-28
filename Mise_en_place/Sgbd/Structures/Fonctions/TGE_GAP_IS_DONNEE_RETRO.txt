@@ -1,0 +1,110 @@
+##
+TGE_GAP_IS_DONNEE_RETRO
+=SQL=
+CREATE OR REPLACE FUNCTION tge_gap_is_donnee_retro (
+    pnumpac      IN   VARCHAR2,
+    pdonneegxp   IN   VARCHAR2
+) RETURN VARCHAR2 AS
+    v_element   VARCHAR2(5);
+    v_count     NUMBER;
+BEGIN
+    BEGIN
+        SELECT
+            element
+        INTO v_element
+        FROM
+            (
+                SELECT
+                    m.element
+                FROM
+                    tge_ref_mapdo   m,
+                    tge_ref_def     d
+                WHERE
+                    d.numpac = m.numpac
+                    AND m.element = d.element
+                    AND m.numpac = pnumpac
+                    AND donneegxp = pdonneegxp
+                ORDER BY
+                    m.occurence,
+                    m.element
+            )
+        WHERE
+            ROWNUM <= 1;
+
+    EXCEPTION
+        WHEN OTHERS THEN
+            v_element := '';
+    END;
+
+    IF v_element IS NULL THEN
+        BEGIN
+            SELECT
+                element
+            INTO v_element
+            FROM
+                (
+                    SELECT
+                        m.element
+                    FROM
+                        tge_ref_mapdo   m,
+                        tge_ref_def     d
+                    WHERE
+                        m.numpac = '*'
+                        AND d.numpac = pnumpac
+                        AND m.element = d.element
+                        AND donneegxp = pdonneegxp
+                    ORDER BY
+                        m.occurence,
+                        m.element
+                )
+            WHERE
+                ROWNUM <= 1;
+
+        EXCEPTION
+            WHEN OTHERS THEN
+                RETURN 'Non';
+        END;
+
+    END IF;
+
+    IF v_element IS NOT NULL THEN
+        BEGIN
+            SELECT
+                COUNT(*)
+            INTO v_count
+            FROM
+                tge_ref_def d
+            WHERE
+                d.numpac = pnumpac
+                AND element = v_element;
+
+        EXCEPTION
+            WHEN OTHERS THEN
+                v_count := 0;
+        END;
+
+        IF v_count = 0 THEN
+            BEGIN
+                SELECT
+                    COUNT(*)
+                INTO v_count
+                FROM
+                    tge_ref_def d
+                WHERE
+                    d.numpac = '*'
+                    AND element = v_element;
+
+            EXCEPTION
+                WHEN OTHERS THEN
+                    RETURN 'Non';
+            END;
+
+        END IF;
+
+    END IF;
+
+    IF v_count > 0 THEN
+        RETURN 'Oui';
+    END IF;
+    RETURN 'Non';
+END tge_gap_is_donnee_retro;

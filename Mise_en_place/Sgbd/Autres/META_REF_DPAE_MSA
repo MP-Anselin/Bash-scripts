@@ -1,0 +1,674 @@
+##
+TAG_CHARSET=@€éèç
+##
+META_DICTIONNAIRE (COMPANY_ID,NOM_DICTIONNAIRE,LIBELLE_DICTIONNAIRE,CHAMPS_CLE,HISTORISE,TYPE_CLE_SALARIE,ID_PROJET,NUM_VERSION_RD,EST_SUPPRIME,PERSONNALISE)
+=IF_ROW_NOTEXIST=
+'*','DIC_SST_MSA_HISTO','Suivi Santé au Travail MSA',NULL,'O','M',NULL,'1163',NULL,NULL
+##
+REF_DICTIONNAIRE (COMPANY_ID,NOM_DICTIONNAIRE,LIBELLE_DICTIONNAIRE,CHAMPS_CLE,HISTORISE,TYPE_CLE_SALARIE,ID_PROJET,NUM_VERSION_RD,EST_SUPPRIME,PERSONNALISE)
+=IF_ROW_NOTEXIST=
+'*','DIC_SST_MSA_HISTO','Suivi Santé au Travail MSA',NULL,'O','M',NULL,'1163',NULL,NULL
+##
+META_DONNEE_GENERALE (COMPANY_ID,NOM_DONNEE,LIBELLE_DONNEE,NOM_DICTIONNAIRE,TYPE_DONNEE,LONGUEUR_MASQUE_NB_ENTIERS,NB_DECIMAUX,CHECKBOX_VALEUR_ON,CHECKBOX_VALEUR_OFF,MODELE,UTILISATION,ACTIF,ID_PROJET,NUM_VERSION_RD,EST_SUPPRIME,PERSONNALISE,MINUSCULES_AUTORISEES,NOM_DONNEE_CLE_DIC_REFERENCE,PROPAGER_TOUTES_OCCURRENCES,DEGRE_LIBERTE)
+=IF_ROW_NOTEXIST=
+'*','RD_CDD_RENOUV','CDD renouvelable','DIC_ADM_CONTRAT_HISTO','X','1',NULL,NULL,NULL,NULL,'GZ','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_DSVMED_MSA','Rappel de la date de la visite médicale','DIC_DONNEES_VIRTUELLES','D','dd.MM.yyyy',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_18ANS_AFF','Travailleur de moins de 18 ans affecté à des travaux réglementés','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_18ANS_NONAFF','Travailleur de moins de 18 ans non affecté à des travaux réglementés','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_ACT','Code activité professionnelle','DIC_ADM_CONTRAT_HISTO','X','4',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_APTE_EQ24','Salarié déclaré apte à un emploi équivalent au cours des 24 derniers mois','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_APTE_SIM12','Salarié déclaré apte chez un autre employeur dans un emploi similaire au cours des 12 derniers mois','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_APTE_SIM24','Salarié déclaré apte dans un emploi similaire chez le même employeur au cours des 24 derniers mois','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_AUT_COND','Equip. de travail mobiles automoteurs (servant au levage) nécessitant une autorisation de conduite','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_BEBE','Femme enceinte, allaitante ou venant d''accoucher','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_CAD','Salarié cadre ou assimilé','DIC_ADM_CONTRAT_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_CHARG_LOURDES','Manipulation de charges lourdes','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_DATE_SIA','Date du suivi adapté','DIC_SST_MSA_HISTO','D','dd.MM.yyyy',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_DATE_SIR','Date du suivi renforcé','DIC_SST_MSA_HISTO','D','dd.MM.yyyy',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_ENGINS_LOURDS','Conduite engins lourds','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_EXOPAT','Demande d''exonération patronales','DIC_ADM_CONTRAT_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_EXPO_AGTS_BIO','Aux agents biologiques des groupes 3 et 4 mentionnés à l''article  R.4421-3 CT','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_EXPO_AGTS_TOX','Aux agents cancérogènes, mutagènes ou toxiques pour la reproduction selon l''article R. 4412-60 CT','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_EXPO_AG_BIO2','Le travailleur de nuit est exposé aux agents biologiques du groupe 2','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_EXPO_AMIA','A l''amiante','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_EXPO_CHUTE','Au risque de chute de hauteur lors des opérations de montage et de  démontage d''échafaudages','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_EXPO_HYPER','Au risque hyperbare','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_EXPO_PLOMB','Au plomb dans les conditions prévues à l''article R. 4412-160 CT','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_EXPO_RAYONS','Aux rayonnements ionisants','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_HAB_ELEC','Travaux nécessitant une habilitation électrique','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_HAND_RECO','Salarié ayant un handicap reconnu','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_HOR_EQUIV','Salarié soumis à des horaires d''équivalence','DIC_ADM_CONTRAT_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_MANUT','Manutention inévitable > 55 kgs (homme)','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_MOIS_EXAM','Le salarié a bénéficié d''un examen de santé dans les :','DIC_SST_MSA_HISTO','N','2',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_NON_MENS','Salarié exclu de la mensualisation de la paie','DIC_ADM_CONTRAT_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_NUIT_EXPO','Le travailleur de nuit est exposé à des champs électromagnétiques','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_PENS_INV','Travailleur titulaire d''une pension d''invalidité','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_PERS_TECH','Personnel technique','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_QUALITE','Qualité du salarié','DIC_ADM_CONTRAT_HISTO','N','3',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_RET','Salarié déclaré à AGRICA (retraite AGIRC)','DIC_ADM_CONTRAT_HISTO','N','2','0',NULL,NULL,NULL,'GZ','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_RISQUES_CHIM','Travail soumis à des risques chimiques','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_RISQUES_PART','Poste à risques particuliers déclaré par l''employeur au titre de l''article R.717-16-IV du code rural','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_SAISON_45J','Saisonnier recruté pour au moins 45 jours','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_SIR_RESULT','Avec inaptitude ou aménagement du poste ou des horaires :','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_TACHE','Salarié rémunéré à la tâche','DIC_ADM_CONTRAT_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_TRAV_BRUIT','Travail dans le bruit','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_TRAV_NUIT','Travail de nuit','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_ZERO_RISQ','Aucun des risques mentionnés dans le SIR ou le SIA','DIC_SST_MSA_HISTO','X','1',NULL,'O','N',NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_TOP_MSA','Top salarié MSA','DIC_DONNEES_VIRTUELLES','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_TRAV_ETB_MSA','Zone trav pour ETB MSA','DIC_DONNEES_VIRTUELLES','X','5',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+##
+REF_DONNEE_GENERALE (COMPANY_ID,NOM_DONNEE,LIBELLE_DONNEE,NOM_DICTIONNAIRE,TYPE_DONNEE,LONGUEUR_MASQUE_NB_ENTIERS,NB_DECIMAUX,CHECKBOX_VALEUR_ON,CHECKBOX_VALEUR_OFF,MODELE,UTILISATION,ACTIF,ID_PROJET,NUM_VERSION_RD,EST_SUPPRIME,PERSONNALISE,MINUSCULES_AUTORISEES,NOM_DONNEE_CLE_DIC_REFERENCE,PROPAGER_TOUTES_OCCURRENCES,DEGRE_LIBERTE)
+=IF_ROW_NOTEXIST=
+'*','RD_CDD_RENOUV','CDD renouvelable','DIC_ADM_CONTRAT_HISTO','X','1',NULL,NULL,NULL,NULL,'GZ','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_DSVMED_MSA','Rappel de la date de la visite médicale','DIC_DONNEES_VIRTUELLES','D','dd.MM.yyyy',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_18ANS_AFF','Travailleur de moins de 18 ans affecté à des travaux réglementés','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_18ANS_NONAFF','Travailleur de moins de 18 ans non affecté à des travaux réglementés','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_ACT','Code activité professionnelle','DIC_ADM_CONTRAT_HISTO','X','4',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_APTE_EQ24','Salarié déclaré apte à un emploi équivalent au cours des 24 derniers mois','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_APTE_SIM12','Salarié déclaré apte chez un autre employeur dans un emploi similaire au cours des 12 derniers mois','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_APTE_SIM24','Salarié déclaré apte dans un emploi similaire chez le même employeur au cours des 24 derniers mois','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_AUT_COND','Equip. de travail mobiles automoteurs (servant au levage) nécessitant une autorisation de conduite','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_BEBE','Femme enceinte, allaitante ou venant d''accoucher','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_CAD','Salarié cadre ou assimilé','DIC_ADM_CONTRAT_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_CHARG_LOURDES','Manipulation de charges lourdes','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_DATE_SIA','Date du suivi adapté','DIC_SST_MSA_HISTO','D','dd.MM.yyyy',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_DATE_SIR','Date du suivi renforcé','DIC_SST_MSA_HISTO','D','dd.MM.yyyy',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_ENGINS_LOURDS','Conduite engins lourds','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_EXOPAT','Demande d''exonération patronales','DIC_ADM_CONTRAT_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_EXPO_AGTS_BIO','Aux agents biologiques des groupes 3 et 4 mentionnés à l''article  R.4421-3 CT','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_EXPO_AGTS_TOX','Aux agents cancérogènes, mutagènes ou toxiques pour la reproduction selon l''article R. 4412-60 CT','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_EXPO_AG_BIO2','Le travailleur de nuit est exposé aux agents biologiques du groupe 2','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_EXPO_AMIA','A l''amiante','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_EXPO_CHUTE','Au risque de chute de hauteur lors des opérations de montage et de  démontage d''échafaudages','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_EXPO_HYPER','Au risque hyperbare','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_EXPO_PLOMB','Au plomb dans les conditions prévues à l''article R. 4412-160 CT','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_EXPO_RAYONS','Aux rayonnements ionisants','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_HAB_ELEC','Travaux nécessitant une habilitation électrique','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_HAND_RECO','Salarié ayant un handicap reconnu','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_HOR_EQUIV','Salarié soumis à des horaires d''équivalence','DIC_ADM_CONTRAT_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_MANUT','Manutention inévitable > 55 kgs (homme)','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_MOIS_EXAM','Le salarié a bénéficié d''un examen de santé dans les :','DIC_SST_MSA_HISTO','N','2',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_NON_MENS','Salarié exclu de la mensualisation de la paie','DIC_ADM_CONTRAT_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_NUIT_EXPO','Le travailleur de nuit est exposé à des champs électromagnétiques','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_PENS_INV','Travailleur titulaire d''une pension d''invalidité','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_PERS_TECH','Personnel technique','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_QUALITE','Qualité du salarié','DIC_ADM_CONTRAT_HISTO','N','3',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_RET','Salarié déclaré à AGRICA (retraite AGIRC)','DIC_ADM_CONTRAT_HISTO','N','2','0',NULL,NULL,NULL,'GZ','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_RISQUES_CHIM','Travail soumis à des risques chimiques','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_RISQUES_PART','Poste à risques particuliers déclaré par l''employeur au titre de l''article R.717-16-IV du code rural','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_SAISON_45J','Saisonnier recruté pour au moins 45 jours','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_SIR_RESULT','Avec inaptitude ou aménagement du poste ou des horaires :','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_TACHE','Salarié rémunéré à la tâche','DIC_ADM_CONTRAT_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_TRAV_BRUIT','Travail dans le bruit','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_TRAV_NUIT','Travail de nuit','DIC_SST_MSA_HISTO','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_MSA_ZERO_RISQ','Aucun des risques mentionnés dans le SIR ou le SIA','DIC_SST_MSA_HISTO','X','1',NULL,'O','N',NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_TOP_MSA','Top salarié MSA','DIC_DONNEES_VIRTUELLES','X','1',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+'*','RD_TRAV_ETB_MSA','Zone trav pour ETB MSA','DIC_DONNEES_VIRTUELLES','X','5',NULL,NULL,NULL,NULL,'Z','O',NULL,'1163',NULL,NULL,NULL,NULL,'N',NULL
+##
+META_DONNEE_ECRAN (COMPANY_ID,NOM_DONNEE,NOM_PAGE,LIBELLE_DONNEE,EST_OBLIGATOIRE,MODE_SAISIE,APPELTABLE_NOMPAGE,APPELTABLE_IDREQUETE,APPELTABLE_LISTELIBELLE,APPELTABLE_LISTECHAMPS,APPELTABLE_PARAMETRES,AFFICHE_CHOIX_VIDE_SELECT,VALEUR_DEFAUT,ID_REGLEGESTION_AUT_RD,ID_REGLEGESTION_AUT_CLI,TYPE_REGLEGESTION_AUT_CLI,ID_REGLEGESTION_AFF_RD,ID_REGLEGESTION_AFF_CLI,TYPE_REGLEGESTION_AFF_CLI,ID_REGLEGESTION_CTL_RD,ID_REGLEGESTION_CTL_CLI,TYPE_REGLEGESTION_CTL_CLI,SEARCH_STRUCTURE_PARAM,REFRESH_AFTER_CHANGE,SPAN_CHECK_VALUE,LIB_ALIGN_TOP,NB_LIGNE_TEXTEAREA,NB_COLONNE_TEXTEAREA)
+=IF_ROW_NOTEXIST=
+'*','RD_CDD_RENOUV','*','CDD renouvelable','N','select-readonly',NULL,NULL,'Oui,Non','O,N',NULL,'N','ID_REGLE=RD_VALO_CDD_RENOUVELABLE','RD_VALO_CDD_RENOUVELABLE',NULL,'C','NPA_AFFICHAGE',NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_DSVMED_MSA','*','Rappel de la date de la visite médicale','O','span',NULL,NULL,NULL,NULL,NULL,'N',NULL,'RD_VALO_DSVMED_MSA',NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_DSVMED_MSA','RD_WKF_SST_MSA','Rappel de la date de la visite médicale','O','span',NULL,NULL,NULL,NULL,NULL,'N',NULL,'RD_VALO_DSVMED_MSA',NULL,'C','RD_AFFICHAGE_DATE_VISITE_MED',NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_18ANS_AFF','*','Travailleur de moins de 18 ans affecté à des travaux réglementés','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_18ANS_NONAFF','*','Travailleur de moins de 18 ans non affecté à des travaux réglementés','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_ACT','*','Code activité professionnelle','R_RD_AFF_DONNEES_MSA','text','TAB_RD_AFM_MSA','1','Code,Libellé','RD_MSA_ACT,#OUI',NULL,'N',NULL,NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','1','0'
+'*','RD_MSA_APTE_EQ24','*','Salarié déclaré apte à un emploi équivalent au cours des 24 derniers mois','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_APTE_SIM12','*','Salarié déclaré apte chez un autre employeur dans un emploi similaire au cours des 12 derniers mois','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_APTE_SIM24','*','Salarié déclaré apte dans un emploi similaire chez le même employeur au cours des 24 derniers mois','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_AUT_COND','*','Equip. de travail mobiles automoteurs (servant au levage) nécessitant une autorisation de conduite','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_BEBE','*','Femme enceinte, allaitante ou venant d''accoucher','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_CAD','*','Salarié cadre ou assimilé','R_RD_AFF_DONNEES_MSA','radio-readonly',NULL,NULL,'Oui,Non','O,N',NULL,'N','ID_REGLE=RD_VALO_STATUT_CAD_MSA','RD_VALO_STATUT_CAD_MSA',NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_CHARG_LOURDES','*','Manipulation de charges lourdes','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_DATE_SIA','*','Date du suivi adapté','N','text',NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_DATE_SIR','*','Date du suivi renforcé','N','text',NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_ENGINS_LOURDS','*','Conduite engins lourds','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_EXOPAT','*','Demande d''exonération patronales','R_RD_AFFICHAGE_EXOPAT_MSA','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','ID_REGLE=RD_VALO_EXOPAT_MSA','RD_VALO_EXOPAT_MSA',NULL,'C','RD_AFFICHAGE_EXOPAT_MSA',NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_EXPO_AGTS_BIO','*','Aux agents biologiques des groupes 3 et 4 mentionnés à l''article  R.4421-3 CT','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_EXPO_AGTS_TOX','*','Aux agents cancérogènes, mutagènes ou toxiques pour la reproduction (l''article R. 4412-60 CT)','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_EXPO_AG_BIO2','*','Le travailleur de nuit est exposé aux agents biologiques du groupe 2','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_EXPO_AMIA','*','A l''amiante','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_EXPO_CHUTE','*','Au risque de chute de hauteur lors des opérations de montage et de  démontage d''échafaudages','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_EXPO_HYPER','*','Au risque hyperbare','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_EXPO_PLOMB','*','Au plomb dans les conditions prévues à l''article R. 4412-160 CT','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_EXPO_RAYONS','*','Aux rayonnements ionisants','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_HAB_ELEC','*','Travaux nécessitant une habilitation électrique','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_HAND_RECO','*','Salarié ayant un handicap reconnu','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_HOR_EQUIV','*','Salarié soumis à des horaires d''équivalence','R_RD_AFF_DONNEES_MSA','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_MANUT','*','Manutention inévitable > 55 kgs (homme)','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_MOIS_EXAM','*','Le salarié a bénéficié d''un examen de santé dans les :','N','select',NULL,NULL,'24 mois,36 mois, 60 mois','24,36,60',NULL,'N',NULL,NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_NON_MENS','*','Salarié exclu de la mensualisation de la paie','R_RD_AFF_DONNEES_MSA','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','ID_REGLE=RD_VALO_NON_MENS_MSA','RD_VALO_NON_MENS_MSA',NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_NUIT_EXPO','*','Le travailleur de nuit est exposé à des champs électromagnétiques','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_PENS_INV','*','Travailleur titulaire d''une pension d''invalidité','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_PERS_TECH','*','Personnel technique','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_QUALITE','*','Qualité du salarié','N','text','TAB_RD_QUALITE','1','Code,Libellé','RD_MSA_QUALITE,#OUI',NULL,'N',NULL,NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','1','0'
+'*','RD_MSA_RET','*','Salarié déclaré à AGRICA (retraite AGIRC)','R_RD_AFF_DONNEES_MSA','select',NULL,NULL,'Non,Oui','02,01',NULL,'N','02',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_RISQUES_CHIM','*','Travail soumis à des risques chimiques','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_RISQUES_PART','*','Poste à risques particuliers déclaré par l''employeur au titre de l''article R.717-16-IV du code rural','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_SAISON_45J','*','Saisonnier recruté pour au moins 45 jours','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_SIR_RESULT','*','Avec inaptitude ou aménagement du poste ou des horaires :','N','select',NULL,NULL,'Inaptitude,Aménagement','I,A',NULL,'N',NULL,NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_TACHE','*','Salarié rémunéré à la tâche','R_RD_AFF_DONNEES_MSA','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_TRAV_BRUIT','*','Travail dans le bruit','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_TRAV_NUIT','*','Travail de nuit','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_ZERO_RISQ','*','Aucun des risques mentionnés dans le SIR ou le SIA','N','checkbox',NULL,NULL,'Oui,Non','O,N',NULL,'N','O',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_TOP_MSA','*','Top salarié MSA','N','hidden',NULL,NULL,NULL,NULL,NULL,'N','ID_REGLE=RD_RECUP_MSA',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_TOP_MSA','RD_CHS_H','Top salarié MSA','N','span',NULL,NULL,NULL,NULL,NULL,'N',NULL,'RD_RECUP_MSA',NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_TRAV_ETB_MSA','*','Zone trav pour ETB MSA','N','span','REG_RD_SALARIE_MSA','10','URSSAF,MSA','RD_TRAV_ETB_MSA,RD_TOP_MSA','RD_TRAV_ETB_MSA','N',NULL,NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+##
+REF_DONNEE_ECRAN (COMPANY_ID,NOM_DONNEE,NOM_PAGE,LIBELLE_DONNEE,EST_OBLIGATOIRE,MODE_SAISIE,APPELTABLE_NOMPAGE,APPELTABLE_IDREQUETE,APPELTABLE_LISTELIBELLE,APPELTABLE_LISTECHAMPS,APPELTABLE_PARAMETRES,AFFICHE_CHOIX_VIDE_SELECT,VALEUR_DEFAUT,ID_REGLEGESTION_AUT_RD,ID_REGLEGESTION_AUT_CLI,TYPE_REGLEGESTION_AUT_CLI,ID_REGLEGESTION_AFF_RD,ID_REGLEGESTION_AFF_CLI,TYPE_REGLEGESTION_AFF_CLI,ID_REGLEGESTION_CTL_RD,ID_REGLEGESTION_CTL_CLI,TYPE_REGLEGESTION_CTL_CLI,SEARCH_STRUCTURE_PARAM,REFRESH_AFTER_CHANGE,SPAN_CHECK_VALUE,LIB_ALIGN_TOP,NB_LIGNE_TEXTEAREA,NB_COLONNE_TEXTEAREA)
+=IF_ROW_NOTEXIST=
+'*','RD_CDD_RENOUV','*','CDD renouvelable','N','select-readonly',NULL,NULL,'Oui,Non','O,N',NULL,'N','ID_REGLE=RD_VALO_CDD_RENOUVELABLE','RD_VALO_CDD_RENOUVELABLE',NULL,'C','NPA_AFFICHAGE',NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_DSVMED_MSA','*','Rappel de la date de la visite médicale','O','span',NULL,NULL,NULL,NULL,NULL,'N',NULL,'RD_VALO_DSVMED_MSA',NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_DSVMED_MSA','RD_WKF_SST_MSA','Rappel de la date de la visite médicale','O','span',NULL,NULL,NULL,NULL,NULL,'N',NULL,'RD_VALO_DSVMED_MSA',NULL,'C','RD_AFFICHAGE_DATE_VISITE_MED',NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_18ANS_AFF','*','Travailleur de moins de 18 ans affecté à des travaux réglementés','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_18ANS_NONAFF','*','Travailleur de moins de 18 ans non affecté à des travaux réglementés','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_ACT','*','Code activité professionnelle','R_RD_AFF_DONNEES_MSA','text','TAB_RD_AFM_MSA','1','Code,Libellé','RD_MSA_ACT,#OUI',NULL,'N',NULL,NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','1','0'
+'*','RD_MSA_APTE_EQ24','*','Salarié déclaré apte à un emploi équivalent au cours des 24 derniers mois','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_APTE_SIM12','*','Salarié déclaré apte chez un autre employeur dans un emploi similaire au cours des 12 derniers mois','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_APTE_SIM24','*','Salarié déclaré apte dans un emploi similaire chez le même employeur au cours des 24 derniers mois','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_AUT_COND','*','Equip. de travail mobiles automoteurs (servant au levage) nécessitant une autorisation de conduite','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_BEBE','*','Femme enceinte, allaitante ou venant d''accoucher','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_CAD','*','Salarié cadre ou assimilé','R_RD_AFF_DONNEES_MSA','radio-readonly',NULL,NULL,'Oui,Non','O,N',NULL,'N','ID_REGLE=RD_VALO_STATUT_CAD_MSA','RD_VALO_STATUT_CAD_MSA',NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_CHARG_LOURDES','*','Manipulation de charges lourdes','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_DATE_SIA','*','Date du suivi adapté','N','text',NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_DATE_SIR','*','Date du suivi renforcé','N','text',NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_ENGINS_LOURDS','*','Conduite engins lourds','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_EXOPAT','*','Demande d''exonération patronales','R_RD_AFFICHAGE_EXOPAT_MSA','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','ID_REGLE=RD_VALO_EXOPAT_MSA','RD_VALO_EXOPAT_MSA',NULL,'C','RD_AFFICHAGE_EXOPAT_MSA',NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_EXPO_AGTS_BIO','*','Aux agents biologiques des groupes 3 et 4 mentionnés à l''article  R.4421-3 CT','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_EXPO_AGTS_TOX','*','Aux agents cancérogènes, mutagènes ou toxiques pour la reproduction (l''article R. 4412-60 CT)','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_EXPO_AG_BIO2','*','Le travailleur de nuit est exposé aux agents biologiques du groupe 2','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_EXPO_AMIA','*','A l''amiante','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_EXPO_CHUTE','*','Au risque de chute de hauteur lors des opérations de montage et de  démontage d''échafaudages','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_EXPO_HYPER','*','Au risque hyperbare','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_EXPO_PLOMB','*','Au plomb dans les conditions prévues à l''article R. 4412-160 CT','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_EXPO_RAYONS','*','Aux rayonnements ionisants','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_HAB_ELEC','*','Travaux nécessitant une habilitation électrique','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_HAND_RECO','*','Salarié ayant un handicap reconnu','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_HOR_EQUIV','*','Salarié soumis à des horaires d''équivalence','R_RD_AFF_DONNEES_MSA','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_MANUT','*','Manutention inévitable > 55 kgs (homme)','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_MOIS_EXAM','*','Le salarié a bénéficié d''un examen de santé dans les :','N','select',NULL,NULL,'24 mois,36 mois, 60 mois','24,36,60',NULL,'N',NULL,NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_NON_MENS','*','Salarié exclu de la mensualisation de la paie','R_RD_AFF_DONNEES_MSA','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','ID_REGLE=RD_VALO_NON_MENS_MSA','RD_VALO_NON_MENS_MSA',NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_NUIT_EXPO','*','Le travailleur de nuit est exposé à des champs électromagnétiques','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_PENS_INV','*','Travailleur titulaire d''une pension d''invalidité','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_PERS_TECH','*','Personnel technique','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_QUALITE','*','Qualité du salarié','N','text','TAB_RD_QUALITE','1','Code,Libellé','RD_MSA_QUALITE,#OUI',NULL,'N',NULL,NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','1','0'
+'*','RD_MSA_RET','*','Salarié déclaré à AGRICA (retraite AGIRC)','R_RD_AFF_DONNEES_MSA','select',NULL,NULL,'Non,Oui','02,01',NULL,'N','02',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_RISQUES_CHIM','*','Travail soumis à des risques chimiques','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_RISQUES_PART','*','Poste à risques particuliers déclaré par l''employeur au titre de l''article R.717-16-IV du code rural','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_SAISON_45J','*','Saisonnier recruté pour au moins 45 jours','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_SIR_RESULT','*','Avec inaptitude ou aménagement du poste ou des horaires :','N','select',NULL,NULL,'Inaptitude,Aménagement','I,A',NULL,'N',NULL,NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_TACHE','*','Salarié rémunéré à la tâche','R_RD_AFF_DONNEES_MSA','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_TRAV_BRUIT','*','Travail dans le bruit','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_TRAV_NUIT','*','Travail de nuit','N','radio',NULL,NULL,'Oui,Non','O,N',NULL,'N','N',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_MSA_ZERO_RISQ','*','Aucun des risques mentionnés dans le SIR ou le SIA','N','checkbox',NULL,NULL,'Oui,Non','O,N',NULL,'N','O',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_TOP_MSA','*','Top salarié MSA','N','hidden',NULL,NULL,NULL,NULL,NULL,'N','ID_REGLE=RD_RECUP_MSA',NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_TOP_MSA','RD_CHS_H','Top salarié MSA','N','span',NULL,NULL,NULL,NULL,NULL,'N',NULL,'RD_RECUP_MSA',NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+'*','RD_TRAV_ETB_MSA','*','Zone trav pour ETB MSA','N','span','REG_RD_SALARIE_MSA','10','URSSAF,MSA','RD_TRAV_ETB_MSA,RD_TOP_MSA','RD_TRAV_ETB_MSA','N',NULL,NULL,NULL,'C',NULL,NULL,'C',NULL,NULL,'C',NULL,'N','N','N','0','0'
+##
+META_ECRAN (COMPANY_ID,NOM_PAGE,LIBELLE_PAGE,CODE_DESTINATION,ROLE_ECRAN,NOM_DICTIONNAIRE,MODULE_ECRAN,BOUTONS_ECRAN,ID_GROUPE_DONNEES,TYPE_ECRAN,NOM_SERVICELET,ID_PROJET,NUM_VERSION_RD,EST_SUPPRIME,PERSONNALISE,ID_REGLEGESTION_AUT_RD,ID_REGLEGESTION_AUT_CLI,TYPE_REGLEGESTION_AUT_CLI,ID_REGLEGESTION_CTL_RD,ID_REGLEGESTION_CTL_CLI,TYPE_REGLEGESTION_CTL_CLI,CODEDI,TOUTES_PERIODES_EMPLOI,SURCHARGE_EDITION,PERSO_PJ_UX,DESCRIPTION_DA,ONGLET_VERTICAL)
+=IF_ROW_NOTEXIST=
+'*','RD_SST_MSA','Suivi Santé au Travail MSA','RD','EXP','DIC_SST_MSA_HISTO','STD','INT,VAL','RD_SST_MSA','U',NULL,NULL,'1169','N',NULL,'RD_SST_HISTO_VALO_DATE_EFFET',NULL,NULL,'RD_SST_HISTO_CRTL_DATE_EFFET',NULL,NULL,NULL,NULL,'N',NULL,NULL,'N'
+'*','RD_WKF_SST_MSA','Suivi Santé au Travail MSA','RD','EXP',NULL,'STD',NULL,'RD_SST_MSA','W',NULL,NULL,'1163','N',NULL,'RD_SST_HISTO_VALO_DATE_EFFET',NULL,NULL,'RD_SST_HISTO_CRTL_DATE_EFFET',NULL,NULL,NULL,NULL,'N',NULL,NULL,'N'
+##
+REF_ECRAN (COMPANY_ID,NOM_PAGE,LIBELLE_PAGE,CODE_DESTINATION,ROLE_ECRAN,NOM_DICTIONNAIRE,MODULE_ECRAN,BOUTONS_ECRAN,ID_GROUPE_DONNEES,TYPE_ECRAN,NOM_SERVICELET,ID_PROJET,NUM_VERSION_RD,EST_SUPPRIME,PERSONNALISE,ID_REGLEGESTION_AUT_RD,ID_REGLEGESTION_AUT_CLI,TYPE_REGLEGESTION_AUT_CLI,ID_REGLEGESTION_CTL_RD,ID_REGLEGESTION_CTL_CLI,TYPE_REGLEGESTION_CTL_CLI,CODEDI,TOUTES_PERIODES_EMPLOI,SURCHARGE_EDITION,PERSO_PJ_UX,DESCRIPTION_DA,ONGLET_VERTICAL)
+=IF_ROW_NOTEXIST=
+'*','RD_SST_MSA','Suivi Santé au Travail MSA','RD','EXP','DIC_SST_MSA_HISTO','STD','INT,VAL','RD_SST_MSA','U',NULL,NULL,'1169','N',NULL,'RD_SST_HISTO_VALO_DATE_EFFET',NULL,NULL,'RD_SST_HISTO_CRTL_DATE_EFFET',NULL,NULL,NULL,NULL,'N',NULL,NULL,'N'
+'*','RD_WKF_SST_MSA','Suivi Santé au Travail MSA','RD','EXP',NULL,'STD',NULL,'RD_SST_MSA','W',NULL,NULL,'1163','N',NULL,'RD_SST_HISTO_VALO_DATE_EFFET',NULL,NULL,'RD_SST_HISTO_CRTL_DATE_EFFET',NULL,NULL,NULL,NULL,'N',NULL,NULL,'N'
+##
+META_GROUPE_DONNEES_INFO (COMPANY_ID,ID_GROUPE,ID_REGLEGESTION_AFF_RD,ID_REGLEGESTION_AFF_CLI,TYPE_REGLEGESTION_AFF_CLI,EST_ONGLET,ID_PROJET,NUM_VERSION_RD,EST_SUPPRIME,LIBELLE_GROUPE,DESCRIPTION_GROUPE,PERSONNALISE,IS_VISIBLE,DEGRE_LIBERTE)
+=IF_ROW_NOTEXIST=
+'*','RD_APP_MSA','RD_AFF_DONNEES_MSA',NULL,NULL,'N',NULL,'1163',NULL,'Groupe de l''écran Appointements pour la MSA','4 données spécifiques à la MSA',NULL,'1','1'
+'*','RD_CLA_MSA','RD_AFF_DONNEES_MSA',NULL,NULL,'N',NULL,'1163',NULL,'Groupe de l''écran classification pour la MSA','4 données spécifiques à la MSA',NULL,'1','1'
+'*','RD_SST_MSA',NULL,NULL,NULL,'N',NULL,'1163',NULL,'Sous-groupe SST dédié MSA  ','Sous-groupe SST dédié MSA ',NULL,'1','1'
+'*','RD_SST_MSA_SIA',NULL,NULL,NULL,'O',NULL,'1178',NULL,'Suivi individuel adapté','Sous-groupe SST dédié MSA  Suivi Indiv Adapté',NULL,'1','1'
+'*','RD_SST_MSA_SIR',NULL,NULL,NULL,'O',NULL,'1169',NULL,'Suivi individuel renforcé','Sous-groupe SST dédié MSA  Suivi Indiv Renforcé',NULL,'1','1'
+'*','RD_SST_MSA_SIS',NULL,NULL,NULL,'O',NULL,'1178',NULL,'Suivi individuel simple','Sous-groupe SST dédié MSA  Suivi Indiv Simple',NULL,'1','1'
+'*','RD_TRAV_AF2_STR','RD_MODE_MASQUE_DONNEE_TRAV',NULL,NULL,'N',NULL,'1163',NULL,'AF2 structures données de travail MSA','Données structures affectation : données de travail MSA',NULL,'1','1'
+##
+REF_GROUPE_DONNEES_INFO (COMPANY_ID,ID_GROUPE,ID_REGLEGESTION_AFF_RD,ID_REGLEGESTION_AFF_CLI,TYPE_REGLEGESTION_AFF_CLI,EST_ONGLET,ID_PROJET,NUM_VERSION_RD,EST_SUPPRIME,LIBELLE_GROUPE,DESCRIPTION_GROUPE,PERSONNALISE,IS_VISIBLE,DEGRE_LIBERTE)
+=IF_ROW_NOTEXIST=
+'*','RD_APP_MSA','RD_AFF_DONNEES_MSA',NULL,NULL,'N',NULL,'1163',NULL,'Groupe de l''écran Appointements pour la MSA','4 données spécifiques à la MSA',NULL,'1','1'
+'*','RD_CLA_MSA','RD_AFF_DONNEES_MSA',NULL,NULL,'N',NULL,'1163',NULL,'Groupe de l''écran classification pour la MSA','4 données spécifiques à la MSA',NULL,'1','1'
+'*','RD_SST_MSA',NULL,NULL,NULL,'N',NULL,'1163',NULL,'Sous-groupe SST dédié MSA  ','Sous-groupe SST dédié MSA ',NULL,'1','1'
+'*','RD_SST_MSA_SIA',NULL,NULL,NULL,'O',NULL,'1178',NULL,'Suivi individuel adapté','Sous-groupe SST dédié MSA  Suivi Indiv Adapté',NULL,'1','1'
+'*','RD_SST_MSA_SIR',NULL,NULL,NULL,'O',NULL,'1169',NULL,'Suivi individuel renforcé','Sous-groupe SST dédié MSA  Suivi Indiv Renforcé',NULL,'1','1'
+'*','RD_SST_MSA_SIS',NULL,NULL,NULL,'O',NULL,'1178',NULL,'Suivi individuel simple','Sous-groupe SST dédié MSA  Suivi Indiv Simple',NULL,'1','1'
+'*','RD_TRAV_AF2_STR','RD_MODE_MASQUE_DONNEE_TRAV',NULL,NULL,'N',NULL,'1163',NULL,'AF2 structures données de travail MSA','Données structures affectation : données de travail MSA',NULL,'1','1'
+##
+META_GROUPE_DONNEES (COMPANY_ID,ID_GROUPE,NOM_DONNEE,ORDRE,A_COTE_DONNEE_PRECEDENTE,SUFFIXE_OU_LIBELLE,TABLEAU_REQUETE_NOMPAGE,TABLEAU_REQUETE_IDREQUETE,NOM_PAGE_AJOUT,NOM_PAGE_MODIF,ID_REGLEGESTION_CTL_RD_SUPP,ID_REGLEGESTION_CTL_CLI_SUPP,TYPE_REGLEGESTION_CTL_CLI_SUPP,MASQUER_LE_LIBELLE,DONNEE_CODE_EDITION,MESSAGE_CONFIRMATION,BOUTONS_TABLEAU_MULTIPLE,TITRE_CMP_SORTIE_MANAGER,DEFAULT_VALUE_SORTIE_MANAGER)
+=IF_ROW_NOTEXIST=
+'*','RD_SST_MSA','#GROUPE_1','2',NULL,'RD_SST_MSA_SIS',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA','#GROUPE_2','3',NULL,'RD_SST_MSA_SIR',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA','#GROUPE_3','4',NULL,'RD_SST_MSA_SIA',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA','RD_TOP_MSA','1',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIA','#EOL_11','9',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIA','#EOL_18','4',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIA','#EOL_19','34',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIA','#EOL_20','11',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIA','#EOL_21','25',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIA','#EOL_3','15',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIA','#EOL_4','27',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIA','#EOL_5','36',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIA','#EOL_6','40',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIA','#LIBELLE_1','3','N','FormTitreµInformations du Suivi Individuel Adapté de la MSA',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIA','#TEXTE_1','21','O','BoxLabelµaffectés à des postes  pour lesquels les valeurs limites d''exposition fixées à l''article R. 4453-3 s',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIA','RD_MSA_18ANS_NONAFF','35',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIA','RD_MSA_BEBE','39',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIA','RD_MSA_DATE_SIA','5',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIA','RD_MSA_EXPO_AG_BIO2','12',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIA','RD_MSA_HAND_RECO','26',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIA','RD_MSA_NUIT_EXPO','16',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIA','RD_MSA_PENS_INV','33',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIA','RD_MSA_TRAV_NUIT','10',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#EOL_1','14',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#EOL_10','38',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#EOL_11','8',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#EOL_12','53',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#EOL_14','45',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#EOL_15','47',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#EOL_16','15',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#EOL_17','41',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#EOL_18','4',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#EOL_19','17',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#EOL_2','23',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#EOL_20','49',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#EOL_3','11',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#EOL_4','20',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#EOL_5','26',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#EOL_6','29',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#EOL_7','32',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#EOL_8','35',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#EOL_9','43',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#LIBELLE_1','3','N','FormTitreµInformations du Suivi Individuel Renforcé de la MSA',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#TEXTE_1','16','N','BTitreGµLe travailleur est exposé :',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','RD_MSA_18ANS_AFF','48',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','RD_MSA_AUT_COND','42',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','RD_MSA_DATE_SIR','5',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','RD_MSA_EXPO_AGTS_BIO','28',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','RD_MSA_EXPO_AGTS_TOX','25',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','RD_MSA_EXPO_AMIA','18',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','RD_MSA_EXPO_CHUTE','37',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','RD_MSA_EXPO_HYPER','34',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','RD_MSA_EXPO_PLOMB','21',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','RD_MSA_EXPO_RAYONS','30',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','RD_MSA_HAB_ELEC','44',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','RD_MSA_MANUT','46',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','RD_MSA_MOIS_EXAM','9',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','RD_MSA_RISQUES_PART','50','N','FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','RD_MSA_RISQ_PART_LIB','52','N','FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','RD_MSA_SIR_RESULT','12',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','#EOL_1','10',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','#EOL_10','24',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','#EOL_11','6',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','#EOL_12','29',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','#EOL_3','8',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','#EOL_4','12',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','#EOL_5','16',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','#EOL_6','18',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','#EOL_8','22',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','#EOL_9','27',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','#LIBELLE_1','3',NULL,'FormTitreµInformations du Suivi Individuel Simple de la MSA',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','RD_DSVMED_MSA','5',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','RD_MSA_APTE_EQ24','23',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','RD_MSA_APTE_SIM12','28',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','RD_MSA_APTE_SIM24','25',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','RD_MSA_CHARG_LOURDES','7',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','RD_MSA_ENGINS_LOURDS','9',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','RD_MSA_PERS_TECH','21',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','RD_MSA_RISQUES_CHIM','15',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','RD_MSA_SAISON_45J','17',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','RD_MSA_TRAV_BRUIT','11',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','RD_MSA_ZERO_RISQ','30',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_TRAV_AF2_STR','RD_TOP_MSA','11',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_TRAV_AF2_STR','RD_TRAV_ETB_MSA','12','N','FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_APP_MSA','#EOL_17','102',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+'*','RD_APP_MSA','#EOL_18','120',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_APP_MSA','#EOL_19','124',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_APP_MSA','#EOL_20','118',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_APP_MSA','#LIBELLE_1','6','N','FormTitreµMSA',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_APP_MSA','RD_MSA_EXOPAT','117',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_APP_MSA','RD_MSA_HOR_EQUIV','123',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_APP_MSA','RD_MSA_NON_MENS','119',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_APP_MSA','RD_MSA_TACHE','125',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_APP_MSA','RD_TOP_MSA','126',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_CLA_MSA','#EOL_17','102',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+'*','RD_CLA_MSA','#EOL_18','117',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_CLA_MSA','#EOL_19','120',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_CLA_MSA','#EOL_20','122',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_CLA_MSA','#LIBELLE_1','6','N','FormTitreµMSA',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_CLA_MSA','CAMSA','119','N',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+'*','RD_CLA_MSA','RD_MSA_ACT','116',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_CLA_MSA','RD_MSA_CAD','118',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_CLA_MSA','RD_MSA_QUALITE','123',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_CLA_MSA','RD_MSA_RET','121',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_CLA_MSA','RD_TOP_MSA','124',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+##
+REF_GROUPE_DONNEES (COMPANY_ID,ID_GROUPE,NOM_DONNEE,ORDRE,A_COTE_DONNEE_PRECEDENTE,SUFFIXE_OU_LIBELLE,TABLEAU_REQUETE_NOMPAGE,TABLEAU_REQUETE_IDREQUETE,NOM_PAGE_AJOUT,NOM_PAGE_MODIF,ID_REGLEGESTION_CTL_RD_SUPP,ID_REGLEGESTION_CTL_CLI_SUPP,TYPE_REGLEGESTION_CTL_CLI_SUPP,MASQUER_LE_LIBELLE,DONNEE_CODE_EDITION,MESSAGE_CONFIRMATION,BOUTONS_TABLEAU_MULTIPLE,TITRE_CMP_SORTIE_MANAGER,DEFAULT_VALUE_SORTIE_MANAGER)
+=IF_ROW_NOTEXIST=
+'*','RD_SST_MSA','#GROUPE_1','2',NULL,'RD_SST_MSA_SIS',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA','#GROUPE_2','3',NULL,'RD_SST_MSA_SIR',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA','#GROUPE_3','4',NULL,'RD_SST_MSA_SIA',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA','RD_TOP_MSA','1',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIA','#EOL_11','9',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIA','#EOL_18','4',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIA','#EOL_19','34',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIA','#EOL_20','11',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIA','#EOL_21','25',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIA','#EOL_3','15',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIA','#EOL_4','27',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIA','#EOL_5','36',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIA','#EOL_6','40',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIA','#LIBELLE_1','3','N','FormTitreµInformations du Suivi Individuel Adapté de la MSA',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIA','#TEXTE_1','21','O','BoxLabelµaffectés à des postes  pour lesquels les valeurs limites d''exposition fixées à l''article R. 4453-3 s',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIA','RD_MSA_18ANS_NONAFF','35',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIA','RD_MSA_BEBE','39',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIA','RD_MSA_DATE_SIA','5',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIA','RD_MSA_EXPO_AG_BIO2','12',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIA','RD_MSA_HAND_RECO','26',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIA','RD_MSA_NUIT_EXPO','16',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIA','RD_MSA_PENS_INV','33',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIA','RD_MSA_TRAV_NUIT','10',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#EOL_1','14',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#EOL_10','38',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#EOL_11','8',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#EOL_12','53',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#EOL_14','45',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#EOL_15','47',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#EOL_16','15',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#EOL_17','41',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#EOL_18','4',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#EOL_19','17',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#EOL_2','23',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#EOL_20','49',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#EOL_3','11',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#EOL_4','20',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#EOL_5','26',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#EOL_6','29',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#EOL_7','32',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#EOL_8','35',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#EOL_9','43',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#LIBELLE_1','3','N','FormTitreµInformations du Suivi Individuel Renforcé de la MSA',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','#TEXTE_1','16','N','BTitreGµLe travailleur est exposé :',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','RD_MSA_18ANS_AFF','48',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','RD_MSA_AUT_COND','42',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','RD_MSA_DATE_SIR','5',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','RD_MSA_EXPO_AGTS_BIO','28',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','RD_MSA_EXPO_AGTS_TOX','25',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','RD_MSA_EXPO_AMIA','18',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','RD_MSA_EXPO_CHUTE','37',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','RD_MSA_EXPO_HYPER','34',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','RD_MSA_EXPO_PLOMB','21',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','RD_MSA_EXPO_RAYONS','30',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','RD_MSA_HAB_ELEC','44',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','RD_MSA_MANUT','46',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','RD_MSA_MOIS_EXAM','9',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','RD_MSA_RISQUES_PART','50','N','FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','RD_MSA_RISQ_PART_LIB','52','N','FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIR','RD_MSA_SIR_RESULT','12',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','#EOL_1','10',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','#EOL_10','24',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','#EOL_11','6',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','#EOL_12','29',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','#EOL_3','8',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','#EOL_4','12',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','#EOL_5','16',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','#EOL_6','18',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','#EOL_8','22',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','#EOL_9','27',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','#LIBELLE_1','3',NULL,'FormTitreµInformations du Suivi Individuel Simple de la MSA',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','RD_DSVMED_MSA','5',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','RD_MSA_APTE_EQ24','23',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','RD_MSA_APTE_SIM12','28',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','RD_MSA_APTE_SIM24','25',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','RD_MSA_CHARG_LOURDES','7',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','RD_MSA_ENGINS_LOURDS','9',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','RD_MSA_PERS_TECH','21',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','RD_MSA_RISQUES_CHIM','15',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','RD_MSA_SAISON_45J','17',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','RD_MSA_TRAV_BRUIT','11',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_SST_MSA_SIS','RD_MSA_ZERO_RISQ','30',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_TRAV_AF2_STR','RD_TOP_MSA','11',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_TRAV_AF2_STR','RD_TRAV_ETB_MSA','12','N','FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_APP_MSA','#EOL_17','102',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+'*','RD_APP_MSA','#EOL_18','120',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_APP_MSA','#EOL_19','124',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_APP_MSA','#EOL_20','118',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_APP_MSA','#LIBELLE_1','6','N','FormTitreµMSA',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_APP_MSA','RD_MSA_EXOPAT','117',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_APP_MSA','RD_MSA_HOR_EQUIV','123',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_APP_MSA','RD_MSA_NON_MENS','119',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_APP_MSA','RD_MSA_TACHE','125',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_APP_MSA','RD_TOP_MSA','126',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_CLA_MSA','#EOL_17','102',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+'*','RD_CLA_MSA','#EOL_18','117',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_CLA_MSA','#EOL_19','120',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_CLA_MSA','#EOL_20','122',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_CLA_MSA','#LIBELLE_1','6','N','FormTitreµMSA',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_CLA_MSA','CAMSA','119','N',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+'*','RD_CLA_MSA','RD_MSA_ACT','116',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_CLA_MSA','RD_MSA_CAD','118',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_CLA_MSA','RD_MSA_QUALITE','123',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_CLA_MSA','RD_MSA_RET','121',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_CLA_MSA','RD_TOP_MSA','124',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+##
+META_REGLEGESTION_DESC (COMPANY_ID,ID_REGLEGESTION,TYPE_REGLE,LIBELLE,ID_PROJET,NUM_VERSION_RD,EST_SUPPRIME,REGLES_ECR,DESCRIPTION,FLAG_SPECIF_TYPE_REGLE,PERSONNALISE,REGLES_ALGO,REGLE_SYNTHETIQUE)
+=IF_ROW_NOTEXIST=
+'*','RD_AFFICHAGE_DATE_VISITE_MED','AFF','Condition d''affichage de la date de visite médicale -MSA-',NULL,'1163',NULL,'[{"TYPE":"SI","OPERANDE_1":"DONNEE£OLD_DSDCN","OPERATEUR":"NEQ","OPERANDE_2":"@vide£","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0}]','Condition d''affichage de la date de visite médicale : si WKF et embauche la donnée est masquée, si WKF et réembauche, la donnée est affichée (concerne la MSA).','C',NULL,'/*¿ * RD_AFFICHAGE_DATE_VISITE_MED :¿ * Condition d''affichage de la date de visite médicale : si WKF et embauche la donnée est masquée, si WKF et réembauche, la donnée est affichée (concerne la MSA).¿ */¿¿if (DIC_DONNEES_VIRTUELLES.OLD_DSDCN != vide) {¿}¿','Condition d''affichage de la date de visite médicale -MSA-'
+'*','RD_AFFICHAGE_EXOPAT_MSA','AFF','Affichage conditionnel demande d''exo pat MSA',NULL,'1168',NULL,'[{"TYPE":"SI","OPERANDE_1":"DONNEE£RD_TOP_MSA","OPERATEUR":"EQ","OPERANDE_2":"VALEUR£M","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ET_SI","OPERANDE_1":"DONNEE£ZA700","OPERATEUR":"IN","OPERANDE_2":"VALEUR£32,34,74£","RESULTAT":"","PAR_OUVR":1,"PAR_FERM":0},{"TYPE":"OU_SI","OPERANDE_1":"DONNEE£ZA380","OPERATEUR":"IN","OPERANDE_2":"VALEUR£39,40,41£","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":1},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0}]','Affichage conditionnel demande d''exo pat MSA : uniquement si contrat vendanges','M',NULL,'/*¿ * RD_AFFICHAGE_EXOPAT_MSA :¿ * Affichage conditionnel demande d''exo pat MSA : réservé à des motifs de recours et certains types de contrats¿ */¿¿if (DIC_DONNEES_VIRTUELLES.RD_TOP_MSA == "M" && (DIC_ADM_CONTRAT_HISTO.ZA700.IN(32, 34, 74) || DIC_ADM_CONTRAT_HISTO.ZA380.IN(39, 40, 41))) {¿}¿','Affichage conditionnel demande d''exo pat MSA'
+'*','RD_AFFICHAGE_INFOS_MSA','AFF','Affichage conditionnel des infos relatives à la MSA',NULL,'1163',NULL,'[{"TYPE":"SI","OPERANDE_1":"DONNEE£ORGANX","OPERATEUR":"EQ","OPERANDE_2":"VALEUR£M","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0}]','Affichage conditionnel des infos relatives à la MSA : affichage si donnée ORGANX = MSA','M',NULL,'/*¿ * RD_AFFICHAGE_INFOS_MSA :¿ * Affichage conditionnel des infos relatives à la MSA : affichage si donnée ORGANX = MSA¿ */¿¿if (DIC_ETABLI2.ORGANX == "M") {¿}¿','Affichage conditionnel des infos relatives à la MSA'
+'*','RD_AFF_CDD_RENOUV','AFF','Affichage données renouvel CDD',NULL,'1163',NULL,'[{"TYPE":"SI","OPERANDE_1":"DONNEE£NATCOL","OPERATEUR":"NEQ","OPERANDE_2":"@vide£","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ET_SI","OPERANDE_1":"DONNEE£NATCOL","OPERATEUR":"NEQ","OPERANDE_2":"VALEUR£NPA","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ET_SI","OPERANDE_1":"DONNEE£NATCOL","OPERATEUR":"NEQ","OPERANDE_2":"VALEUR£STA","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ET_SI","OPERANDE_1":"DONNEE£ZT061","OPERATEUR":"EQ","OPERANDE_2":"VALEUR£CDD","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ET_SI","OPERANDE_1":"DONNEE£ZA380","OPERATEUR":"IN","OPERANDE_2":"VALEUR£11,13,20,21,22,23£","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0}]','Affichage données renouvel CDD : données CDD renouvelable + CDD renouvelé et la date','M',NULL,'/*¿ * RD_AFF_CDD_RENOUV :¿ * Affichage données renouvel CDD : données CDD renouvelable + CDD renouvelé et la date¿ */¿¿if (DIC_ADM_CONTRAT.NATCOL != vide && DIC_ADM_CONTRAT.NATCOL != "NPA" && DIC_ADM_CONTRAT.NATCOL != "STA" && DIC_ADM_CONTRAT_HISTO.ZT061 == "CDD" && DIC_ADM_CONTRAT_HISTO.ZA380.IN(11, 13, 20, 21, 22, 23)) {¿}¿','Affichage données renouvel CDD'
+'*','RD_AFF_DONNEES_MSA','AFF','Affichage conditionnel des données contrat relatives à la MSA',NULL,'1163',NULL,'[{"TYPE":"SI","OPERANDE_1":"DONNEE£RD_TOP_MSA","OPERATEUR":"EQ","OPERANDE_2":"VALEUR£M","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N"},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N"},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N"}]','Affichage conditionnel des données contrat relatives à la MSA : affichage si donnée RD_TOP_MSA vaut 1','M',NULL,'/*¿ * RD_AFF_DONNEES_MSA :¿ * Affichage conditionnel des données contrat relatives à la MSA : affichage si donnée RD_TOP_MSA vaut 1¿ */¿¿if (DIC_DONNEES_VIRTUELLES.RD_TOP_MSA == "M") {¿}¿','Affichage conditionnel des données contrat relatives à la MSA'
+'*','RD_RECUP_MSA','AUT','Récup top MSA',NULL,'1163',NULL,'[{"TYPE":"OPERATION","OPERANDE_1":"££","OPERATEUR":"TAB","OPERANDE_2":"RETOURTABLE££NOM_PAGE=VALEUR^REG_RD_SALARIE_MSA§ID_REQUETE=VALEUR^10§ID_COL=VALEUR^1§PARAM_1=DONNEE^CODETB","RESULTAT":"DONNEE£RD_TOP_MSA","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":0}]','Récupération top MSA (salarié rattaché à la MSA ou non)','O',NULL,'/*¿ * RD_RECUP_MSA :¿ * Récupération top MSA (salarié rattaché à la MSA ou non)¿ */¿¿DIC_DONNEES_VIRTUELLES.RD_TOP_MSA = TAB("REG_RD_SALARIE_MSA", 10, 1, DIC_ADM_CONTRAT_HISTO.CODETB);¿','Récupération top MSA'
+'*','RD_SST_HISTO_CRTL_DATE_EFFET','CTL','Contrôle de la date d''effet sur Suivi santé au travail MSA',NULL,'1163',NULL,'[{"TYPE":"SI","OPERANDE_1":"££","OPERATEUR":"ECR_NWF","OPERANDE_2":"££","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":1},{"TYPE":"OPERATION","OPERANDE_1":"££","OPERATEUR":"TAB","OPERANDE_2":"RETOURTABLE££NOM_PAGE=VALEUR^REG_RD_DATE_EFF_IN_CONTRAT§ID_REQUETE=VALEUR^1§ID_COL=VALEUR^0§PARAM_1=DONNEE^GEN_NUMPAC§PARAM_2=DONNEE^GEN_PACMAT§PARAM_3=DONNEE^GEN_DATE_EFF","RESULTAT":"@TMPNB_CNT£","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":2},{"TYPE":"SI","OPERANDE_1":"@TMPNB_CNT£","OPERATEUR":"EQ","OPERANDE_2":"VALEUR£0","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":3},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":4},{"TYPE":"OPERATION","OPERANDE_1":"££","OPERATEUR":"ERR","OPERANDE_2":"CODEERREUR£GENCNT51£NOM_DONNEE_FOCUS=","RESULTAT":"£","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":5},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":6},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":7},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":8},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":9},{"TYPE":"OPERATION","OPERANDE_1":"££","OPERATEUR":"TAB","OPERANDE_2":"RETOURTABLE££NOM_PAGE=VALEUR^REG_RD_NB_HISTO_SST_MSA§ID_REQUETE=VALEUR^1§ID_COL=VALEUR^0§PARAM_1=DONNEE^GEN_NUMPAC§PARAM_2=DONNEE^GEN_PACMAT","RESULTAT":"@TMP1£","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":10},{"TYPE":"SI","OPERANDE_1":"@codeoperation££","OPERATEUR":"EQ","OPERANDE_2":"VALEUR£Supprimer","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":11},{"TYPE":"ET_SI","OPERANDE_1":"@TMP1£","OPERATEUR":"EQ","OPERANDE_2":"VALEUR£1","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":12},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":13},{"TYPE":"OPERATION","OPERANDE_1":"££","OPERATEUR":"ERR","OPERANDE_2":"CODEERREUR£GENCHS12£NOM_DONNEE_FOCUS=","RESULTAT":"£","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":14},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":15},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":16}]','Contrôle de la date d''effet sur sur Suivi santé au travail MSA : elle doit être comprise dans la période contractuelle','N',NULL,'/*¿ * RD_SST_HISTO_CRTL_DATE_EFFET :¿ * Contrôle de la date d''effet sur sur Suivi santé au travail MSA : elle doit être comprise dans la période contractuelle¿ */¿¿if (ECR_NWF()) {¿	TMPNB_CNT = TAB("REG_RD_DATE_EFF_IN_CONTRAT", 1, 0, DONNEE.GEN_NUMPAC, DONNEE.GEN_PACMAT, DONNEE.GEN_DATE_EFF);¿	if (TMPNB_CNT == 0) {¿		ERR("GENCNT51");¿	}¿}¿TMP1 = TAB("REG_RD_NB_HISTO_SST_MSA", 1, 0, DONNEE.GEN_NUMPAC, DONNEE.GEN_PACMAT);¿if (codeoperation == "Supprimer" && TMP1 == 1) {¿	ERR("GENCHS12");¿}¿','Contrôle de la date d''effet sur sur Suivi santé au travail MSA'
+'*','RD_SST_HISTO_VALO_DATE_EFFET','AUT','MSA Suivi santé au travail : valorisation de la date d''effet',NULL,'1163',NULL,'[{"TYPE":"OPERATION","OPERANDE_1":"££","OPERATEUR":"TAB","OPERANDE_2":"RETOURTABLE££NOM_PAGE=VALEUR^REG_RD_NB_HISTO_SST_MSA§ID_REQUETE=VALEUR^1§ID_COL=VALEUR^0§PARAM_1=DONNEE^GEN_NUMPAC§PARAM_2=DONNEE^GEN_PACMAT","RESULTAT":"@TMP1£","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":0},{"TYPE":"SI","OPERANDE_1":"@TMP1£","OPERATEUR":"EQ","OPERANDE_2":"VALEUR£0","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":1},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":2},{"TYPE":"SI","OPERANDE_1":"DONNEE£DSDCN","OPERATEUR":"LT","OPERANDE_2":"DONNEE£GEN_DATE_EFF££","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":3},{"TYPE":"ET_SI","OPERANDE_1":"DONNEE£DSSAD","OPERATEUR":"LT","OPERANDE_2":"DONNEE£GEN_DATE_EFF££","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":4},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":5},{"TYPE":"OPERATION","OPERANDE_1":"@vide££","OPERATEUR":"VAL","OPERANDE_2":"££","RESULTAT":"DONNEE£GEN_DATE_EFF","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":6},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":7},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":8},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":9},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":10}]','MSA Suivi santé au travail :valorisation de la date d''effet. Lors de la validation on met à jour la date d''effet avec la date de début du contrat. ','O',NULL,'/*¿ * RD_SST_HISTO_VALO_DATE_EFFET :¿ * MSA Suivi santé au travail :valorisation de la date d''effet. Lors de la validation on met à jour la date d''effet avec la date de début du contrat. ¿ */¿¿TMP1 = TAB("REG_RD_NB_HISTO_SST_MSA", 1, 0, DONNEE.GEN_NUMPAC, DONNEE.GEN_PACMAT);¿if (TMP1 == 0) {¿	if (DIC_ADM_CONTRAT.DSDCN < DONNEE.GEN_DATE_EFF && DIC_ADM_CONTRAT_HISTO.DSSAD < DONNEE.GEN_DATE_EFF) {¿		DONNEE.GEN_DATE_EFF = vide;¿	}¿}¿','MSA Suivi santé au travail : valorisation de la date d''effet'
+'*','RD_VALO_CDD_RENOUVELABLE','AUT','Valorisation par défaut de la donnée CDD renouvelable',NULL,'1163',NULL,'[{"TYPE":"SI","OPERANDE_1":"DONNEE£ZA380","OPERATEUR":"IN","OPERANDE_2":"VALEUR£11,13,20,21,22,23£","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"OPERATION","OPERANDE_1":"VALEUR£O","OPERATEUR":"VAL","OPERANDE_2":"££","RESULTAT":"DONNEE£RD_CDD_RENOUV","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"OPERATION","OPERANDE_1":"VALEUR£N","OPERATEUR":"VAL","OPERANDE_2":"££","RESULTAT":"DONNEE£RD_CDD_RENOUV","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0}]','Valorisation par défaut de la donnée CDD renouvelable. A Oui si motif de recours est accroissement temporaire d''activité (codes 20 et old 21, 22, 23) ou remplacement salarié quittant l''entreprise (codes 11 et 13)','O',NULL,'/*¿ * RD_VALO_CDD_RENOUVELABLE :¿ * Valorisation par défaut de la donnée CDD renouvelable. A Oui si motif de recours est accroissement temporaire d''activité (codes 20 et old 21, 22, 23) ou remplacement salarié quittant l''entreprise (codes 11 et 13)¿ */¿¿if (DIC_ADM_CONTRAT_HISTO.ZA380.IN(11, 13, 20, 21, 22, 23)) {¿	DIC_ADM_CONTRAT_HISTO.RD_CDD_RENOUV = "O";¿} else {¿	DIC_ADM_CONTRAT_HISTO.RD_CDD_RENOUV = "N";¿}¿','Valorisation par défaut de la donnée CDD renouvelable'
+'*','RD_VALO_DSVMED_MSA','AUT','Valorisation de la date de la visite médicale pour MSA',NULL,'1163',NULL,'[{"TYPE":"OPERATION","OPERANDE_1":"££","OPERATEUR":"TAB","OPERANDE_2":"RETOURTABLE££NOM_PAGE=VALEUR^REG_RD_DSVMED_MSA§ID_REQUETE=VALEUR^1§ID_COL=VALEUR^0§PARAM_1=DONNEE^GEN_MATRIC","RESULTAT":"DONNEE£RD_DSVMED_MSA","PAR_OUVR":0,"PAR_FERM":0}]','Valorisation de la date de la visite médicale pour MSA. Récup de la date de la visite pour affichage sur SST MSA.','O',NULL,'/*¿ * RD_VALO_DSVMED_MSA :¿ * Valorisation de la date de la visite médicale pour MSA. Récup de la date de la visite pour affichage sur SST MSA.¿ */¿¿DIC_DONNEES_VIRTUELLES.RD_DSVMED_MSA = TAB("REG_RD_DSVMED_MSA", 1, 0, DONNEE.GEN_MATRIC);¿','Valorisation de la date de la visite médicale pour MSA'
+'*','RD_VALO_EXOPAT_MSA','AUT','Valorisation demande exonération patronale MSA par défaut',NULL,'1163',NULL,'[{"TYPE":"SI","OPERANDE_1":"DONNEE£ZA380","OPERATEUR":"IN","OPERANDE_2":"VALEUR£39,40,41£","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":0},{"TYPE":"OU_SI","OPERANDE_1":"DONNEE£ZA700£","OPERATEUR":"IN","OPERANDE_2":"VALEUR£32,34,74£","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":1},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":2},{"TYPE":"OPERATION","OPERANDE_1":"VALEUR£O","OPERATEUR":"VAL","OPERANDE_2":"££","RESULTAT":"DONNEE£RD_MSA_EXOPAT","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":3},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":4},{"TYPE":"OPERATION","OPERANDE_1":"VALEUR£N","OPERATEUR":"VAL","OPERANDE_2":"££","RESULTAT":"DONNEE£RD_MSA_EXOPAT","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":5},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":6}]','Valorisation demande exonération patronale MSA par défaut : à Oui si contrat vendanges','O',NULL,'/*¿ * RD_VALO_EXOPAT_MSA :¿ * Valorisation demande exonération patronale MSA par défaut : à Oui si contrat vendanges¿ */¿¿if (DIC_ADM_CONTRAT_HISTO.ZA380.IN(39, 40, 41) || DIC_ADM_CONTRAT_HISTO.ZA700.IN(32, 34, 74)) {¿	DIC_ADM_CONTRAT_HISTO.RD_MSA_EXOPAT = "O";¿} else {¿	DIC_ADM_CONTRAT_HISTO.RD_MSA_EXOPAT = "N";¿}¿','Valorisation demande exonération patronale MSA par défaut'
+'*','RD_VALO_NON_MENS_MSA','AUT','Valorisation salariés exclus de la mensualisation MSA par défaut',NULL,'1163',NULL,'[{"TYPE":"SI","OPERANDE_1":"DONNEE£ZA380","OPERATEUR":"IN","OPERANDE_2":"VALEUR£39,40£","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"OPERATION","OPERANDE_1":"VALEUR£O","OPERATEUR":"VAL","OPERANDE_2":"££","RESULTAT":"DONNEE£RD_MSA_NON_MENS","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"OPERATION","OPERANDE_1":"VALEUR£N","OPERATEUR":"VAL","OPERANDE_2":"££","RESULTAT":"DONNEE£RD_MSA_NON_MENS","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0}]','Valorisation salariés exclus de la mensualisation MSA par défaut: à Oui si motif de recours = saisonnier','O',NULL,'/*¿ * RD_VALO_NON_MENS_MSA :¿ * Valorisation salariés exclus de la mensualisation MSA par défaut : à Oui si motif de recours = saisonnier ou vendanges¿ */¿¿if (DIC_ADM_CONTRAT_HISTO.ZA380.IN(39, 40)) {¿	DIC_ADM_CONTRAT_HISTO.RD_MSA_NON_MENS = "O";¿} else {¿	DIC_ADM_CONTRAT_HISTO.RD_MSA_NON_MENS = "N";¿}¿','Valorisation salariés exclus de la mensualisation MSA par défaut'
+'*','RD_VALO_STATUT_CAD_MSA','AUT','Valorisation du statut cadre ou assimilé MSA',NULL,'1163',NULL,'[{"TYPE":"SI","OPERANDE_1":"DONNEE£ZA523","OPERATEUR":"IN","OPERANDE_2":"VALEUR£11,13,20£","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"OPERATION","OPERANDE_1":"VALEUR£O","OPERATEUR":"VAL","OPERANDE_2":"££","RESULTAT":"DONNEE£RD_MSA_CAD","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"OPERATION","OPERANDE_1":"VALEUR£N","OPERATEUR":"VAL","OPERANDE_2":"££","RESULTAT":"DONNEE£RD_MSA_CAD","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0}]','Valorisation du statut cadre ou assimilé MSA selon la CATPRO','O',NULL,'/*¿ * RD_VALO_STATUT_CAD_MSA :¿ * Valorisation du statut cadre ou assimilé MSA selon la CATPRO¿ */¿¿if (DIC_ADM_CONTRAT_HISTO.ZA523.IN(11, 13, 20)) {¿	DIC_ADM_CONTRAT_HISTO.RD_MSA_CAD = "O";¿} else {¿	DIC_ADM_CONTRAT_HISTO.RD_MSA_CAD = "N";¿}¿','Valorisation du statut cadre ou assimilé MSA'
+'*','RD_VALO_TRAV_ETB_MSA','AUT','Valorisation zone trav pour ETB MSA',NULL,'1163',NULL,'[{"TYPE":"OPERATION","OPERANDE_1":"DONNEE£CODETB","OPERATEUR":"VAL","OPERANDE_2":"££","RESULTAT":"DONNEE£RD_TRAV_ETB_MSA","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":0}]','Valorisation zone trav pour ETB MSA ','O',NULL,'/*¿ * RD_VALO_TRAV_ETB_MSA :¿ * Valorisation zone trav pour ETB MSA ¿ */¿¿DIC_DONNEES_VIRTUELLES.RD_TRAV_ETB_MSA = DIC_ADM_CONTRAT_HISTO.CODETB;¿','Valorisation zone trav pour ETB MSA'
+'*','RD_VALO_TXACT','AUT','Valorisation TXACT selon Coeff majo de l''horaire de rémun',NULL,'1163',NULL,'[{"TYPE":"OPERATION","OPERANDE_1":"DONNEE£TRAV_COEF_MAJO","OPERATEUR":"MUL","OPERANDE_2":"VALEUR£100","RESULTAT":"DONNEE£TXACT","PAR_OUVR":0,"PAR_FERM":0}]','Valorisation du taux d''activité (TXACT) selon le coefficient issu de l''horaire de rémunération (TRAV_COEFF_MAJO) - NEW DPAE MSA','O',NULL,'/*¿ * RD_VALO_TXACT :¿ * Valorisation du taux d''activité (TXACT) selon le coefficient issu de l''horaire de rémunération (TRAV_COEFF_MAJO) - NEW DPAE MSA¿ */¿¿DIC_ADM_CONTRAT_HISTO.TXACT = DIC_DONNEES_VIRTUELLES.TRAV_COEF_MAJO * 100;¿','Valorisation TXACT selon Coeff majo de l''horaire de rémun'
+##
+REF_REGLEGESTION_DESC (COMPANY_ID,ID_REGLEGESTION,TYPE_REGLE,LIBELLE,ID_PROJET,NUM_VERSION_RD,EST_SUPPRIME,REGLES_ECR,DESCRIPTION,FLAG_SPECIF_TYPE_REGLE,PERSONNALISE,REGLES_ALGO,REGLE_SYNTHETIQUE)
+=IF_ROW_NOTEXIST=
+'*','RD_AFFICHAGE_DATE_VISITE_MED','AFF','Condition d''affichage de la date de visite médicale -MSA-',NULL,'1163',NULL,'[{"TYPE":"SI","OPERANDE_1":"DONNEE£OLD_DSDCN","OPERATEUR":"NEQ","OPERANDE_2":"@vide£","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0}]','Condition d''affichage de la date de visite médicale : si WKF et embauche la donnée est masquée, si WKF et réembauche, la donnée est affichée (concerne la MSA).','C',NULL,'/*¿ * RD_AFFICHAGE_DATE_VISITE_MED :¿ * Condition d''affichage de la date de visite médicale : si WKF et embauche la donnée est masquée, si WKF et réembauche, la donnée est affichée (concerne la MSA).¿ */¿¿if (DIC_DONNEES_VIRTUELLES.OLD_DSDCN != vide) {¿}¿','Condition d''affichage de la date de visite médicale -MSA-'
+'*','RD_AFFICHAGE_EXOPAT_MSA','AFF','Affichage conditionnel demande d''exo pat MSA',NULL,'1168',NULL,'[{"TYPE":"SI","OPERANDE_1":"DONNEE£RD_TOP_MSA","OPERATEUR":"EQ","OPERANDE_2":"VALEUR£M","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ET_SI","OPERANDE_1":"DONNEE£ZA700","OPERATEUR":"IN","OPERANDE_2":"VALEUR£32,34,74£","RESULTAT":"","PAR_OUVR":1,"PAR_FERM":0},{"TYPE":"OU_SI","OPERANDE_1":"DONNEE£ZA380","OPERATEUR":"IN","OPERANDE_2":"VALEUR£39,40,41£","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":1},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0}]','Affichage conditionnel demande d''exo pat MSA : uniquement si contrat vendanges','M',NULL,'/*¿ * RD_AFFICHAGE_EXOPAT_MSA :¿ * Affichage conditionnel demande d''exo pat MSA : réservé à des motifs de recours et certains types de contrats¿ */¿¿if (DIC_DONNEES_VIRTUELLES.RD_TOP_MSA == "M" && (DIC_ADM_CONTRAT_HISTO.ZA700.IN(32, 34, 74) || DIC_ADM_CONTRAT_HISTO.ZA380.IN(39, 40, 41))) {¿}¿','Affichage conditionnel demande d''exo pat MSA'
+'*','RD_AFFICHAGE_INFOS_MSA','AFF','Affichage conditionnel des infos relatives à la MSA',NULL,'1163',NULL,'[{"TYPE":"SI","OPERANDE_1":"DONNEE£ORGANX","OPERATEUR":"EQ","OPERANDE_2":"VALEUR£M","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0}]','Affichage conditionnel des infos relatives à la MSA : affichage si donnée ORGANX = MSA','M',NULL,'/*¿ * RD_AFFICHAGE_INFOS_MSA :¿ * Affichage conditionnel des infos relatives à la MSA : affichage si donnée ORGANX = MSA¿ */¿¿if (DIC_ETABLI2.ORGANX == "M") {¿}¿','Affichage conditionnel des infos relatives à la MSA'
+'*','RD_AFF_CDD_RENOUV','AFF','Affichage données renouvel CDD',NULL,'1163',NULL,'[{"TYPE":"SI","OPERANDE_1":"DONNEE£NATCOL","OPERATEUR":"NEQ","OPERANDE_2":"@vide£","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ET_SI","OPERANDE_1":"DONNEE£NATCOL","OPERATEUR":"NEQ","OPERANDE_2":"VALEUR£NPA","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ET_SI","OPERANDE_1":"DONNEE£NATCOL","OPERATEUR":"NEQ","OPERANDE_2":"VALEUR£STA","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ET_SI","OPERANDE_1":"DONNEE£ZT061","OPERATEUR":"EQ","OPERANDE_2":"VALEUR£CDD","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ET_SI","OPERANDE_1":"DONNEE£ZA380","OPERATEUR":"IN","OPERANDE_2":"VALEUR£11,13,20,21,22,23£","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0}]','Affichage données renouvel CDD : données CDD renouvelable + CDD renouvelé et la date','M',NULL,'/*¿ * RD_AFF_CDD_RENOUV :¿ * Affichage données renouvel CDD : données CDD renouvelable + CDD renouvelé et la date¿ */¿¿if (DIC_ADM_CONTRAT.NATCOL != vide && DIC_ADM_CONTRAT.NATCOL != "NPA" && DIC_ADM_CONTRAT.NATCOL != "STA" && DIC_ADM_CONTRAT_HISTO.ZT061 == "CDD" && DIC_ADM_CONTRAT_HISTO.ZA380.IN(11, 13, 20, 21, 22, 23)) {¿}¿','Affichage données renouvel CDD'
+'*','RD_AFF_DONNEES_MSA','AFF','Affichage conditionnel des données contrat relatives à la MSA',NULL,'1163',NULL,'[{"TYPE":"SI","OPERANDE_1":"DONNEE£RD_TOP_MSA","OPERATEUR":"EQ","OPERANDE_2":"VALEUR£M","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N"},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N"},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N"}]','Affichage conditionnel des données contrat relatives à la MSA : affichage si donnée RD_TOP_MSA vaut 1','M',NULL,'/*¿ * RD_AFF_DONNEES_MSA :¿ * Affichage conditionnel des données contrat relatives à la MSA : affichage si donnée RD_TOP_MSA vaut 1¿ */¿¿if (DIC_DONNEES_VIRTUELLES.RD_TOP_MSA == "M") {¿}¿','Affichage conditionnel des données contrat relatives à la MSA'
+'*','RD_RECUP_MSA','AUT','Récup top MSA',NULL,'1163',NULL,'[{"TYPE":"OPERATION","OPERANDE_1":"££","OPERATEUR":"TAB","OPERANDE_2":"RETOURTABLE££NOM_PAGE=VALEUR^REG_RD_SALARIE_MSA§ID_REQUETE=VALEUR^10§ID_COL=VALEUR^1§PARAM_1=DONNEE^CODETB","RESULTAT":"DONNEE£RD_TOP_MSA","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":0}]','Récupération top MSA (salarié rattaché à la MSA ou non)','O',NULL,'/*¿ * RD_RECUP_MSA :¿ * Récupération top MSA (salarié rattaché à la MSA ou non)¿ */¿¿DIC_DONNEES_VIRTUELLES.RD_TOP_MSA = TAB("REG_RD_SALARIE_MSA", 10, 1, DIC_ADM_CONTRAT_HISTO.CODETB);¿','Récupération top MSA'
+'*','RD_SST_HISTO_CRTL_DATE_EFFET','CTL','Contrôle de la date d''effet sur Suivi santé au travail MSA',NULL,'1163',NULL,'[{"TYPE":"SI","OPERANDE_1":"££","OPERATEUR":"ECR_NWF","OPERANDE_2":"££","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":1},{"TYPE":"OPERATION","OPERANDE_1":"££","OPERATEUR":"TAB","OPERANDE_2":"RETOURTABLE££NOM_PAGE=VALEUR^REG_RD_DATE_EFF_IN_CONTRAT§ID_REQUETE=VALEUR^1§ID_COL=VALEUR^0§PARAM_1=DONNEE^GEN_NUMPAC§PARAM_2=DONNEE^GEN_PACMAT§PARAM_3=DONNEE^GEN_DATE_EFF","RESULTAT":"@TMPNB_CNT£","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":2},{"TYPE":"SI","OPERANDE_1":"@TMPNB_CNT£","OPERATEUR":"EQ","OPERANDE_2":"VALEUR£0","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":3},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":4},{"TYPE":"OPERATION","OPERANDE_1":"££","OPERATEUR":"ERR","OPERANDE_2":"CODEERREUR£GENCNT51£NOM_DONNEE_FOCUS=","RESULTAT":"£","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":5},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":6},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":7},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":8},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":9},{"TYPE":"OPERATION","OPERANDE_1":"££","OPERATEUR":"TAB","OPERANDE_2":"RETOURTABLE££NOM_PAGE=VALEUR^REG_RD_NB_HISTO_SST_MSA§ID_REQUETE=VALEUR^1§ID_COL=VALEUR^0§PARAM_1=DONNEE^GEN_NUMPAC§PARAM_2=DONNEE^GEN_PACMAT","RESULTAT":"@TMP1£","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":10},{"TYPE":"SI","OPERANDE_1":"@codeoperation££","OPERATEUR":"EQ","OPERANDE_2":"VALEUR£Supprimer","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":11},{"TYPE":"ET_SI","OPERANDE_1":"@TMP1£","OPERATEUR":"EQ","OPERANDE_2":"VALEUR£1","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":12},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":13},{"TYPE":"OPERATION","OPERANDE_1":"££","OPERATEUR":"ERR","OPERANDE_2":"CODEERREUR£GENCHS12£NOM_DONNEE_FOCUS=","RESULTAT":"£","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":14},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":15},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":16}]','Contrôle de la date d''effet sur sur Suivi santé au travail MSA : elle doit être comprise dans la période contractuelle','N',NULL,'/*¿ * RD_SST_HISTO_CRTL_DATE_EFFET :¿ * Contrôle de la date d''effet sur sur Suivi santé au travail MSA : elle doit être comprise dans la période contractuelle¿ */¿¿if (ECR_NWF()) {¿	TMPNB_CNT = TAB("REG_RD_DATE_EFF_IN_CONTRAT", 1, 0, DONNEE.GEN_NUMPAC, DONNEE.GEN_PACMAT, DONNEE.GEN_DATE_EFF);¿	if (TMPNB_CNT == 0) {¿		ERR("GENCNT51");¿	}¿}¿TMP1 = TAB("REG_RD_NB_HISTO_SST_MSA", 1, 0, DONNEE.GEN_NUMPAC, DONNEE.GEN_PACMAT);¿if (codeoperation == "Supprimer" && TMP1 == 1) {¿	ERR("GENCHS12");¿}¿','Contrôle de la date d''effet sur sur Suivi santé au travail MSA'
+'*','RD_SST_HISTO_VALO_DATE_EFFET','AUT','MSA Suivi santé au travail : valorisation de la date d''effet',NULL,'1163',NULL,'[{"TYPE":"OPERATION","OPERANDE_1":"££","OPERATEUR":"TAB","OPERANDE_2":"RETOURTABLE££NOM_PAGE=VALEUR^REG_RD_NB_HISTO_SST_MSA§ID_REQUETE=VALEUR^1§ID_COL=VALEUR^0§PARAM_1=DONNEE^GEN_NUMPAC§PARAM_2=DONNEE^GEN_PACMAT","RESULTAT":"@TMP1£","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":0},{"TYPE":"SI","OPERANDE_1":"@TMP1£","OPERATEUR":"EQ","OPERANDE_2":"VALEUR£0","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":1},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":2},{"TYPE":"SI","OPERANDE_1":"DONNEE£DSDCN","OPERATEUR":"LT","OPERANDE_2":"DONNEE£GEN_DATE_EFF££","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":3},{"TYPE":"ET_SI","OPERANDE_1":"DONNEE£DSSAD","OPERATEUR":"LT","OPERANDE_2":"DONNEE£GEN_DATE_EFF££","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":4},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":5},{"TYPE":"OPERATION","OPERANDE_1":"@vide££","OPERATEUR":"VAL","OPERANDE_2":"££","RESULTAT":"DONNEE£GEN_DATE_EFF","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":6},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":7},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":8},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":9},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":10}]','MSA Suivi santé au travail :valorisation de la date d''effet. Lors de la validation on met à jour la date d''effet avec la date de début du contrat. ','O',NULL,'/*¿ * RD_SST_HISTO_VALO_DATE_EFFET :¿ * MSA Suivi santé au travail :valorisation de la date d''effet. Lors de la validation on met à jour la date d''effet avec la date de début du contrat. ¿ */¿¿TMP1 = TAB("REG_RD_NB_HISTO_SST_MSA", 1, 0, DONNEE.GEN_NUMPAC, DONNEE.GEN_PACMAT);¿if (TMP1 == 0) {¿	if (DIC_ADM_CONTRAT.DSDCN < DONNEE.GEN_DATE_EFF && DIC_ADM_CONTRAT_HISTO.DSSAD < DONNEE.GEN_DATE_EFF) {¿		DONNEE.GEN_DATE_EFF = vide;¿	}¿}¿','MSA Suivi santé au travail : valorisation de la date d''effet'
+'*','RD_VALO_CDD_RENOUVELABLE','AUT','Valorisation par défaut de la donnée CDD renouvelable',NULL,'1163',NULL,'[{"TYPE":"SI","OPERANDE_1":"DONNEE£ZA380","OPERATEUR":"IN","OPERANDE_2":"VALEUR£11,13,20,21,22,23£","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"OPERATION","OPERANDE_1":"VALEUR£O","OPERATEUR":"VAL","OPERANDE_2":"££","RESULTAT":"DONNEE£RD_CDD_RENOUV","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"OPERATION","OPERANDE_1":"VALEUR£N","OPERATEUR":"VAL","OPERANDE_2":"££","RESULTAT":"DONNEE£RD_CDD_RENOUV","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0}]','Valorisation par défaut de la donnée CDD renouvelable. A Oui si motif de recours est accroissement temporaire d''activité (codes 20 et old 21, 22, 23) ou remplacement salarié quittant l''entreprise (codes 11 et 13)','O',NULL,'/*¿ * RD_VALO_CDD_RENOUVELABLE :¿ * Valorisation par défaut de la donnée CDD renouvelable. A Oui si motif de recours est accroissement temporaire d''activité (codes 20 et old 21, 22, 23) ou remplacement salarié quittant l''entreprise (codes 11 et 13)¿ */¿¿if (DIC_ADM_CONTRAT_HISTO.ZA380.IN(11, 13, 20, 21, 22, 23)) {¿	DIC_ADM_CONTRAT_HISTO.RD_CDD_RENOUV = "O";¿} else {¿	DIC_ADM_CONTRAT_HISTO.RD_CDD_RENOUV = "N";¿}¿','Valorisation par défaut de la donnée CDD renouvelable'
+'*','RD_VALO_DSVMED_MSA','AUT','Valorisation de la date de la visite médicale pour MSA',NULL,'1163',NULL,'[{"TYPE":"OPERATION","OPERANDE_1":"££","OPERATEUR":"TAB","OPERANDE_2":"RETOURTABLE££NOM_PAGE=VALEUR^REG_RD_DSVMED_MSA§ID_REQUETE=VALEUR^1§ID_COL=VALEUR^0§PARAM_1=DONNEE^GEN_MATRIC","RESULTAT":"DONNEE£RD_DSVMED_MSA","PAR_OUVR":0,"PAR_FERM":0}]','Valorisation de la date de la visite médicale pour MSA. Récup de la date de la visite pour affichage sur SST MSA.','O',NULL,'/*¿ * RD_VALO_DSVMED_MSA :¿ * Valorisation de la date de la visite médicale pour MSA. Récup de la date de la visite pour affichage sur SST MSA.¿ */¿¿DIC_DONNEES_VIRTUELLES.RD_DSVMED_MSA = TAB("REG_RD_DSVMED_MSA", 1, 0, DONNEE.GEN_MATRIC);¿','Valorisation de la date de la visite médicale pour MSA'
+'*','RD_VALO_EXOPAT_MSA','AUT','Valorisation demande exonération patronale MSA par défaut',NULL,'1163',NULL,'[{"TYPE":"SI","OPERANDE_1":"DONNEE£ZA380","OPERATEUR":"IN","OPERANDE_2":"VALEUR£39,40,41£","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":0},{"TYPE":"OU_SI","OPERANDE_1":"DONNEE£ZA700£","OPERATEUR":"IN","OPERANDE_2":"VALEUR£32,34,74£","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":1},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":2},{"TYPE":"OPERATION","OPERANDE_1":"VALEUR£O","OPERATEUR":"VAL","OPERANDE_2":"££","RESULTAT":"DONNEE£RD_MSA_EXOPAT","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":3},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":4},{"TYPE":"OPERATION","OPERANDE_1":"VALEUR£N","OPERATEUR":"VAL","OPERANDE_2":"££","RESULTAT":"DONNEE£RD_MSA_EXOPAT","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":5},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":6}]','Valorisation demande exonération patronale MSA par défaut : à Oui si contrat vendanges','O',NULL,'/*¿ * RD_VALO_EXOPAT_MSA :¿ * Valorisation demande exonération patronale MSA par défaut : à Oui si contrat vendanges¿ */¿¿if (DIC_ADM_CONTRAT_HISTO.ZA380.IN(39, 40, 41) || DIC_ADM_CONTRAT_HISTO.ZA700.IN(32, 34, 74)) {¿	DIC_ADM_CONTRAT_HISTO.RD_MSA_EXOPAT = "O";¿} else {¿	DIC_ADM_CONTRAT_HISTO.RD_MSA_EXOPAT = "N";¿}¿','Valorisation demande exonération patronale MSA par défaut'
+'*','RD_VALO_NON_MENS_MSA','AUT','Valorisation salariés exclus de la mensualisation MSA par défaut',NULL,'1163',NULL,'[{"TYPE":"SI","OPERANDE_1":"DONNEE£ZA380","OPERATEUR":"IN","OPERANDE_2":"VALEUR£39,40£","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"OPERATION","OPERANDE_1":"VALEUR£O","OPERATEUR":"VAL","OPERANDE_2":"££","RESULTAT":"DONNEE£RD_MSA_NON_MENS","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"OPERATION","OPERANDE_1":"VALEUR£N","OPERATEUR":"VAL","OPERANDE_2":"££","RESULTAT":"DONNEE£RD_MSA_NON_MENS","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0}]','Valorisation salariés exclus de la mensualisation MSA par défaut: à Oui si motif de recours = saisonnier','O',NULL,'/*¿ * RD_VALO_NON_MENS_MSA :¿ * Valorisation salariés exclus de la mensualisation MSA par défaut : à Oui si motif de recours = saisonnier ou vendanges¿ */¿¿if (DIC_ADM_CONTRAT_HISTO.ZA380.IN(39, 40)) {¿	DIC_ADM_CONTRAT_HISTO.RD_MSA_NON_MENS = "O";¿} else {¿	DIC_ADM_CONTRAT_HISTO.RD_MSA_NON_MENS = "N";¿}¿','Valorisation salariés exclus de la mensualisation MSA par défaut'
+'*','RD_VALO_STATUT_CAD_MSA','AUT','Valorisation du statut cadre ou assimilé MSA',NULL,'1163',NULL,'[{"TYPE":"SI","OPERANDE_1":"DONNEE£ZA523","OPERATEUR":"IN","OPERANDE_2":"VALEUR£11,13,20£","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"OPERATION","OPERANDE_1":"VALEUR£O","OPERATEUR":"VAL","OPERANDE_2":"££","RESULTAT":"DONNEE£RD_MSA_CAD","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"OPERATION","OPERANDE_1":"VALEUR£N","OPERATEUR":"VAL","OPERANDE_2":"££","RESULTAT":"DONNEE£RD_MSA_CAD","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0}]','Valorisation du statut cadre ou assimilé MSA selon la CATPRO','O',NULL,'/*¿ * RD_VALO_STATUT_CAD_MSA :¿ * Valorisation du statut cadre ou assimilé MSA selon la CATPRO¿ */¿¿if (DIC_ADM_CONTRAT_HISTO.ZA523.IN(11, 13, 20)) {¿	DIC_ADM_CONTRAT_HISTO.RD_MSA_CAD = "O";¿} else {¿	DIC_ADM_CONTRAT_HISTO.RD_MSA_CAD = "N";¿}¿','Valorisation du statut cadre ou assimilé MSA'
+'*','RD_VALO_TRAV_ETB_MSA','AUT','Valorisation zone trav pour ETB MSA',NULL,'1163',NULL,'[{"TYPE":"OPERATION","OPERANDE_1":"DONNEE£CODETB","OPERATEUR":"VAL","OPERANDE_2":"££","RESULTAT":"DONNEE£RD_TRAV_ETB_MSA","PAR_OUVR":0,"PAR_FERM":0,"FLAG_DELETE":"N","rowIdx":0}]','Valorisation zone trav pour ETB MSA ','O',NULL,'/*¿ * RD_VALO_TRAV_ETB_MSA :¿ * Valorisation zone trav pour ETB MSA ¿ */¿¿DIC_DONNEES_VIRTUELLES.RD_TRAV_ETB_MSA = DIC_ADM_CONTRAT_HISTO.CODETB;¿','Valorisation zone trav pour ETB MSA'
+'*','RD_VALO_TXACT','AUT','Valorisation TXACT selon Coeff majo de l''horaire de rémun',NULL,'1163',NULL,'[{"TYPE":"OPERATION","OPERANDE_1":"DONNEE£TRAV_COEF_MAJO","OPERATEUR":"MUL","OPERANDE_2":"VALEUR£100","RESULTAT":"DONNEE£TXACT","PAR_OUVR":0,"PAR_FERM":0}]','Valorisation du taux d''activité (TXACT) selon le coefficient issu de l''horaire de rémunération (TRAV_COEFF_MAJO) - NEW DPAE MSA','O',NULL,'/*¿ * RD_VALO_TXACT :¿ * Valorisation du taux d''activité (TXACT) selon le coefficient issu de l''horaire de rémunération (TRAV_COEFF_MAJO) - NEW DPAE MSA¿ */¿¿DIC_ADM_CONTRAT_HISTO.TXACT = DIC_DONNEES_VIRTUELLES.TRAV_COEF_MAJO * 100;¿','Valorisation TXACT selon Coeff majo de l''horaire de rémun'
+##
+META_REGLEGESTION (COMPANY_ID,ID_REGLEGESTION,NUM_LIGNE,OPERANDE1,OPERATEUR,OPERANDE2,RESULTAT,BRANCHE_SI,BRANCHE_SINON)
+=IF_ROW_NOTEXIST=
+'*','RD_AFFICHAGE_DATE_VISITE_MED','1',NULL,'DONNEE£OLD_DSDCNµ@vide£µNEQ',NULL,NULL,'FIN','FIN'
+'*','RD_AFFICHAGE_EXOPAT_MSA','1',NULL,'DONNEE£RD_TOP_MSAµVALEUR£MµEQµDONNEE£ZA700µVALEUR£32,34,74£µINµDONNEE£ZA380µVALEUR£39,40,41£µINµ#OU#µ#ET#',NULL,NULL,'FIN','FIN'
+'*','RD_AFFICHAGE_INFOS_MSA','1',NULL,'DONNEE£ORGANXµVALEUR£MµEQ',NULL,NULL,'FIN','FIN'
+'*','RD_AFF_CDD_RENOUV','1',NULL,'DONNEE£NATCOLµ@vide£µNEQµDONNEE£NATCOLµVALEUR£NPAµNEQµ#ET#µDONNEE£NATCOLµVALEUR£STAµNEQµ#ET#µDONNEE£ZT061µVALEUR£CDDµEQµ#ET#µDONNEE£ZA380µVALEUR£11,13,20,21,22,23£µINµ#ET#',NULL,NULL,'FIN','FIN'
+'*','RD_AFF_DONNEES_MSA','1',NULL,'DONNEE£RD_TOP_MSAµVALEUR£MµEQ',NULL,NULL,'FIN','FIN'
+'*','RD_RECUP_MSA','1','££','TAB','RETOURTABLE££NOM_PAGE=VALEUR^REG_RD_SALARIE_MSA§ID_REQUETE=VALEUR^10§ID_COL=VALEUR^1§PARAM_1=DONNEE^CODETB','DONNEE£RD_TOP_MSA',NULL,NULL
+'*','RD_SST_HISTO_CRTL_DATE_EFFET','1',NULL,'££µ££µECR_NWF',NULL,NULL,'2','5'
+'*','RD_SST_HISTO_CRTL_DATE_EFFET','2','££','TAB','RETOURTABLE££NOM_PAGE=VALEUR^REG_RD_DATE_EFF_IN_CONTRAT§ID_REQUETE=VALEUR^1§ID_COL=VALEUR^0§PARAM_1=DONNEE^GEN_NUMPAC§PARAM_2=DONNEE^GEN_PACMAT§PARAM_3=DONNEE^GEN_DATE_EFF','@TMPNB_CNT£',NULL,NULL
+'*','RD_SST_HISTO_CRTL_DATE_EFFET','3',NULL,'@TMPNB_CNT£µVALEUR£0µEQ',NULL,NULL,'4','5'
+'*','RD_SST_HISTO_CRTL_DATE_EFFET','4','££','ERR','CODEERREUR£GENCNT51£NOM_DONNEE_FOCUS=','£','FIN','FIN'
+'*','RD_SST_HISTO_CRTL_DATE_EFFET','5','££','TAB','RETOURTABLE££NOM_PAGE=VALEUR^REG_RD_NB_HISTO_SST_MSA§ID_REQUETE=VALEUR^1§ID_COL=VALEUR^0§PARAM_1=DONNEE^GEN_NUMPAC§PARAM_2=DONNEE^GEN_PACMAT','@TMP1£',NULL,NULL
+'*','RD_SST_HISTO_CRTL_DATE_EFFET','6',NULL,'@codeoperation££µVALEUR£SupprimerµEQµ@TMP1£µVALEUR£1µEQµ#ET#',NULL,NULL,'8','FIN'
+'*','RD_SST_HISTO_CRTL_DATE_EFFET','8','££','ERR','CODEERREUR£GENCHS12£NOM_DONNEE_FOCUS=','£','FIN','FIN'
+'*','RD_SST_HISTO_VALO_DATE_EFFET','1','££','TAB','RETOURTABLE££NOM_PAGE=VALEUR^REG_RD_NB_HISTO_SST_MSA§ID_REQUETE=VALEUR^1§ID_COL=VALEUR^0§PARAM_1=DONNEE^GEN_NUMPAC§PARAM_2=DONNEE^GEN_PACMAT','@TMP1£',NULL,NULL
+'*','RD_SST_HISTO_VALO_DATE_EFFET','2',NULL,'@TMP1£µVALEUR£0µEQ',NULL,NULL,'3','FIN'
+'*','RD_SST_HISTO_VALO_DATE_EFFET','3',NULL,'DONNEE£DSDCNµDONNEE£GEN_DATE_EFF££µLTµDONNEE£DSSADµDONNEE£GEN_DATE_EFF££µLTµ#ET#',NULL,NULL,'5','FIN'
+'*','RD_SST_HISTO_VALO_DATE_EFFET','5','@vide££','VAL','££','DONNEE£GEN_DATE_EFF','FIN','FIN'
+'*','RD_VALO_CDD_RENOUVELABLE','1',NULL,'DONNEE£ZA380µVALEUR£11,13,20,21,22,23£µIN',NULL,NULL,'2','3'
+'*','RD_VALO_CDD_RENOUVELABLE','2','VALEUR£O','VAL','££','DONNEE£RD_CDD_RENOUV','FIN','FIN'
+'*','RD_VALO_CDD_RENOUVELABLE','3','VALEUR£N','VAL','££','DONNEE£RD_CDD_RENOUV','FIN','FIN'
+'*','RD_VALO_DSVMED_MSA','1','££','TAB','RETOURTABLE££NOM_PAGE=VALEUR^REG_RD_DSVMED_MSA§ID_REQUETE=VALEUR^1§ID_COL=VALEUR^0§PARAM_1=DONNEE^GEN_MATRIC','DONNEE£RD_DSVMED_MSA',NULL,NULL
+'*','RD_VALO_EXOPAT_MSA','1',NULL,'DONNEE£ZA380µVALEUR£39,40,41£µINµDONNEE£ZA700£µVALEUR£32,34,74£µINµ#OU#',NULL,NULL,'3','4'
+'*','RD_VALO_EXOPAT_MSA','3','VALEUR£O','VAL','££','DONNEE£RD_MSA_EXOPAT','FIN','FIN'
+'*','RD_VALO_EXOPAT_MSA','4','VALEUR£N','VAL','££','DONNEE£RD_MSA_EXOPAT','FIN','FIN'
+'*','RD_VALO_NON_MENS_MSA','1',NULL,'DONNEE£ZA380µVALEUR£39,40£µIN',NULL,NULL,'2','3'
+'*','RD_VALO_NON_MENS_MSA','2','VALEUR£O','VAL','££','DONNEE£RD_MSA_NON_MENS','FIN','FIN'
+'*','RD_VALO_NON_MENS_MSA','3','VALEUR£N','VAL','££','DONNEE£RD_MSA_NON_MENS','FIN','FIN'
+'*','RD_VALO_STATUT_CAD_MSA','1',NULL,'DONNEE£ZA523µVALEUR£11,13,20£µIN',NULL,NULL,'2','3'
+'*','RD_VALO_STATUT_CAD_MSA','2','VALEUR£O','VAL','££','DONNEE£RD_MSA_CAD','FIN','FIN'
+'*','RD_VALO_STATUT_CAD_MSA','3','VALEUR£N','VAL','££','DONNEE£RD_MSA_CAD','FIN','FIN'
+'*','RD_VALO_TRAV_ETB_MSA','1','DONNEE£CODETB','VAL','££','DONNEE£RD_TRAV_ETB_MSA',NULL,NULL
+'*','RD_VALO_TXACT','1','DONNEE£TRAV_COEF_MAJO','MUL','VALEUR£100','DONNEE£TXACT',NULL,NULL
+##
+REF_REGLEGESTION (COMPANY_ID,ID_REGLEGESTION,NUM_LIGNE,OPERANDE1,OPERATEUR,OPERANDE2,RESULTAT,BRANCHE_SI,BRANCHE_SINON)
+=IF_ROW_NOTEXIST=
+'*','RD_AFFICHAGE_DATE_VISITE_MED','1',NULL,'DONNEE£OLD_DSDCNµ@vide£µNEQ',NULL,NULL,'FIN','FIN'
+'*','RD_AFFICHAGE_EXOPAT_MSA','1',NULL,'DONNEE£RD_TOP_MSAµVALEUR£MµEQµDONNEE£ZA700µVALEUR£32,34,74£µINµDONNEE£ZA380µVALEUR£39,40,41£µINµ#OU#µ#ET#',NULL,NULL,'FIN','FIN'
+'*','RD_AFFICHAGE_INFOS_MSA','1',NULL,'DONNEE£ORGANXµVALEUR£MµEQ',NULL,NULL,'FIN','FIN'
+'*','RD_AFF_CDD_RENOUV','1',NULL,'DONNEE£NATCOLµ@vide£µNEQµDONNEE£NATCOLµVALEUR£NPAµNEQµ#ET#µDONNEE£NATCOLµVALEUR£STAµNEQµ#ET#µDONNEE£ZT061µVALEUR£CDDµEQµ#ET#µDONNEE£ZA380µVALEUR£11,13,20,21,22,23£µINµ#ET#',NULL,NULL,'FIN','FIN'
+'*','RD_AFF_DONNEES_MSA','1',NULL,'DONNEE£RD_TOP_MSAµVALEUR£MµEQ',NULL,NULL,'FIN','FIN'
+'*','RD_RECUP_MSA','1','££','TAB','RETOURTABLE££NOM_PAGE=VALEUR^REG_RD_SALARIE_MSA§ID_REQUETE=VALEUR^10§ID_COL=VALEUR^1§PARAM_1=DONNEE^CODETB','DONNEE£RD_TOP_MSA',NULL,NULL
+'*','RD_SST_HISTO_CRTL_DATE_EFFET','1',NULL,'££µ££µECR_NWF',NULL,NULL,'2','5'
+'*','RD_SST_HISTO_CRTL_DATE_EFFET','2','££','TAB','RETOURTABLE££NOM_PAGE=VALEUR^REG_RD_DATE_EFF_IN_CONTRAT§ID_REQUETE=VALEUR^1§ID_COL=VALEUR^0§PARAM_1=DONNEE^GEN_NUMPAC§PARAM_2=DONNEE^GEN_PACMAT§PARAM_3=DONNEE^GEN_DATE_EFF','@TMPNB_CNT£',NULL,NULL
+'*','RD_SST_HISTO_CRTL_DATE_EFFET','3',NULL,'@TMPNB_CNT£µVALEUR£0µEQ',NULL,NULL,'4','5'
+'*','RD_SST_HISTO_CRTL_DATE_EFFET','4','££','ERR','CODEERREUR£GENCNT51£NOM_DONNEE_FOCUS=','£','FIN','FIN'
+'*','RD_SST_HISTO_CRTL_DATE_EFFET','5','££','TAB','RETOURTABLE££NOM_PAGE=VALEUR^REG_RD_NB_HISTO_SST_MSA§ID_REQUETE=VALEUR^1§ID_COL=VALEUR^0§PARAM_1=DONNEE^GEN_NUMPAC§PARAM_2=DONNEE^GEN_PACMAT','@TMP1£',NULL,NULL
+'*','RD_SST_HISTO_CRTL_DATE_EFFET','6',NULL,'@codeoperation££µVALEUR£SupprimerµEQµ@TMP1£µVALEUR£1µEQµ#ET#',NULL,NULL,'8','FIN'
+'*','RD_SST_HISTO_CRTL_DATE_EFFET','8','££','ERR','CODEERREUR£GENCHS12£NOM_DONNEE_FOCUS=','£','FIN','FIN'
+'*','RD_SST_HISTO_VALO_DATE_EFFET','1','££','TAB','RETOURTABLE££NOM_PAGE=VALEUR^REG_RD_NB_HISTO_SST_MSA§ID_REQUETE=VALEUR^1§ID_COL=VALEUR^0§PARAM_1=DONNEE^GEN_NUMPAC§PARAM_2=DONNEE^GEN_PACMAT','@TMP1£',NULL,NULL
+'*','RD_SST_HISTO_VALO_DATE_EFFET','2',NULL,'@TMP1£µVALEUR£0µEQ',NULL,NULL,'3','FIN'
+'*','RD_SST_HISTO_VALO_DATE_EFFET','3',NULL,'DONNEE£DSDCNµDONNEE£GEN_DATE_EFF££µLTµDONNEE£DSSADµDONNEE£GEN_DATE_EFF££µLTµ#ET#',NULL,NULL,'5','FIN'
+'*','RD_SST_HISTO_VALO_DATE_EFFET','5','@vide££','VAL','££','DONNEE£GEN_DATE_EFF','FIN','FIN'
+'*','RD_VALO_CDD_RENOUVELABLE','1',NULL,'DONNEE£ZA380µVALEUR£11,13,20,21,22,23£µIN',NULL,NULL,'2','3'
+'*','RD_VALO_CDD_RENOUVELABLE','2','VALEUR£O','VAL','££','DONNEE£RD_CDD_RENOUV','FIN','FIN'
+'*','RD_VALO_CDD_RENOUVELABLE','3','VALEUR£N','VAL','££','DONNEE£RD_CDD_RENOUV','FIN','FIN'
+'*','RD_VALO_DSVMED_MSA','1','££','TAB','RETOURTABLE££NOM_PAGE=VALEUR^REG_RD_DSVMED_MSA§ID_REQUETE=VALEUR^1§ID_COL=VALEUR^0§PARAM_1=DONNEE^GEN_MATRIC','DONNEE£RD_DSVMED_MSA',NULL,NULL
+'*','RD_VALO_EXOPAT_MSA','1',NULL,'DONNEE£ZA380µVALEUR£39,40,41£µINµDONNEE£ZA700£µVALEUR£32,34,74£µINµ#OU#',NULL,NULL,'3','4'
+'*','RD_VALO_EXOPAT_MSA','3','VALEUR£O','VAL','££','DONNEE£RD_MSA_EXOPAT','FIN','FIN'
+'*','RD_VALO_EXOPAT_MSA','4','VALEUR£N','VAL','££','DONNEE£RD_MSA_EXOPAT','FIN','FIN'
+'*','RD_VALO_NON_MENS_MSA','1',NULL,'DONNEE£ZA380µVALEUR£39,40£µIN',NULL,NULL,'2','3'
+'*','RD_VALO_NON_MENS_MSA','2','VALEUR£O','VAL','££','DONNEE£RD_MSA_NON_MENS','FIN','FIN'
+'*','RD_VALO_NON_MENS_MSA','3','VALEUR£N','VAL','££','DONNEE£RD_MSA_NON_MENS','FIN','FIN'
+'*','RD_VALO_STATUT_CAD_MSA','1',NULL,'DONNEE£ZA523µVALEUR£11,13,20£µIN',NULL,NULL,'2','3'
+'*','RD_VALO_STATUT_CAD_MSA','2','VALEUR£O','VAL','££','DONNEE£RD_MSA_CAD','FIN','FIN'
+'*','RD_VALO_STATUT_CAD_MSA','3','VALEUR£N','VAL','££','DONNEE£RD_MSA_CAD','FIN','FIN'
+'*','RD_VALO_TRAV_ETB_MSA','1','DONNEE£CODETB','VAL','££','DONNEE£RD_TRAV_ETB_MSA',NULL,NULL
+'*','RD_VALO_TXACT','1','DONNEE£TRAV_COEF_MAJO','MUL','VALEUR£100','DONNEE£TXACT',NULL,NULL
+##
+META_GROUPE_DONNEES_INFO (COMPANY_ID,ID_GROUPE,ID_REGLEGESTION_AFF_RD,ID_REGLEGESTION_AFF_CLI,TYPE_REGLEGESTION_AFF_CLI,EST_ONGLET,ID_PROJET,NUM_VERSION_RD,EST_SUPPRIME,LIBELLE_GROUPE,DESCRIPTION_GROUPE,PERSONNALISE,IS_VISIBLE,DEGRE_LIBERTE)
+=IF_ROW_NOTEXIST=
+'*','RD_INIT_DONNEES_MSA',NULL,NULL,NULL,'N',NULL,'1164',NULL,'Initialisation des données MSA dès l''entrée','Groupe de données pour initialiser les données MSA dès l''embauche',NULL,'1','1'
+##
+REF_GROUPE_DONNEES_INFO (COMPANY_ID,ID_GROUPE,ID_REGLEGESTION_AFF_RD,ID_REGLEGESTION_AFF_CLI,TYPE_REGLEGESTION_AFF_CLI,EST_ONGLET,ID_PROJET,NUM_VERSION_RD,EST_SUPPRIME,LIBELLE_GROUPE,DESCRIPTION_GROUPE,PERSONNALISE,IS_VISIBLE,DEGRE_LIBERTE)
+=IF_ROW_NOTEXIST=
+'*','RD_INIT_DONNEES_MSA',NULL,NULL,NULL,'N',NULL,'1164',NULL,'Initialisation des données MSA dès l''entrée','Groupe de données pour initialiser les données MSA dès l''embauche',NULL,'1','1'
+##
+META_GROUPE_DONNEES (COMPANY_ID,ID_GROUPE,NOM_DONNEE,ORDRE,A_COTE_DONNEE_PRECEDENTE,SUFFIXE_OU_LIBELLE,TABLEAU_REQUETE_NOMPAGE,TABLEAU_REQUETE_IDREQUETE,NOM_PAGE_AJOUT,NOM_PAGE_MODIF,ID_REGLEGESTION_CTL_RD_SUPP,ID_REGLEGESTION_CTL_CLI_SUPP,TYPE_REGLEGESTION_CTL_CLI_SUPP,MASQUER_LE_LIBELLE,DONNEE_CODE_EDITION,MESSAGE_CONFIRMATION,BOUTONS_TABLEAU_MULTIPLE,TITRE_CMP_SORTIE_MANAGER,DEFAULT_VALUE_SORTIE_MANAGER)
+=IF_ROW_NOTEXIST=
+'*','RD_INIT_DONNEES_MSA','RD_MSA_18ANS_AFF','1',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_18ANS_NONAFF','2',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_APTE_EQ24','3',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_APTE_SIM12','4',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_APTE_SIM24','5',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_AUT_COND','6',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_BEBE','7',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_CAD','32',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_CHARG_LOURDES','16',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_ENGINS_LOURDS','17',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_EXOPAT','33',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_EXPO_AGTS_BIO','25',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_EXPO_AGTS_TOX','8',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_EXPO_AG_BIO2','9',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_EXPO_AMIA','10',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_EXPO_CHUTE','11',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_EXPO_HYPER','12',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_EXPO_PLOMB','13',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_EXPO_RAYONS','14',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_HAB_ELEC','15',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_HAND_RECO','23',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_HOR_EQUIV','35',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_MANUT','28',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_NON_MENS','34',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_NUIT_EXPO','20',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_PENS_INV','22',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_PERS_TECH','19',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_RET','31',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_RISQUES_CHIM','18',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_RISQUES_PART','26',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_SAISON_45J','30',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_TACHE','36',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_TRAV_BRUIT','29',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_TRAV_NUIT','21',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_ZERO_RISQ','24',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+##
+REF_GROUPE_DONNEES (COMPANY_ID,ID_GROUPE,NOM_DONNEE,ORDRE,A_COTE_DONNEE_PRECEDENTE,SUFFIXE_OU_LIBELLE,TABLEAU_REQUETE_NOMPAGE,TABLEAU_REQUETE_IDREQUETE,NOM_PAGE_AJOUT,NOM_PAGE_MODIF,ID_REGLEGESTION_CTL_RD_SUPP,ID_REGLEGESTION_CTL_CLI_SUPP,TYPE_REGLEGESTION_CTL_CLI_SUPP,MASQUER_LE_LIBELLE,DONNEE_CODE_EDITION,MESSAGE_CONFIRMATION,BOUTONS_TABLEAU_MULTIPLE,TITRE_CMP_SORTIE_MANAGER,DEFAULT_VALUE_SORTIE_MANAGER)
+=IF_ROW_NOTEXIST=
+'*','RD_INIT_DONNEES_MSA','RD_MSA_18ANS_AFF','1',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_18ANS_NONAFF','2',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_APTE_EQ24','3',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_APTE_SIM12','4',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_APTE_SIM24','5',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_AUT_COND','6',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_BEBE','7',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_CAD','32',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_CHARG_LOURDES','16',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_ENGINS_LOURDS','17',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_EXOPAT','33',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_EXPO_AGTS_BIO','25',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_EXPO_AGTS_TOX','8',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_EXPO_AG_BIO2','9',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_EXPO_AMIA','10',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_EXPO_CHUTE','11',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_EXPO_HYPER','12',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_EXPO_PLOMB','13',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_EXPO_RAYONS','14',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_HAB_ELEC','15',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_HAND_RECO','23',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_HOR_EQUIV','35',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_MANUT','28',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_NON_MENS','34',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_NUIT_EXPO','20',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_PENS_INV','22',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_PERS_TECH','19',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_RET','31',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_RISQUES_CHIM','18',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_RISQUES_PART','26',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_SAISON_45J','30',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_TACHE','36',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_TRAV_BRUIT','29',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_TRAV_NUIT','21',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+'*','RD_INIT_DONNEES_MSA','RD_MSA_ZERO_RISQ','24',NULL,'FDonneeGµ',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL
+##
+META_DONNEE_GENERALE (COMPANY_ID,NOM_DONNEE,LIBELLE_DONNEE,NOM_DICTIONNAIRE,TYPE_DONNEE,LONGUEUR_MASQUE_NB_ENTIERS,NB_DECIMAUX,CHECKBOX_VALEUR_ON,CHECKBOX_VALEUR_OFF,MODELE,UTILISATION,ACTIF,ID_PROJET,NUM_VERSION_RD,EST_SUPPRIME,PERSONNALISE,MINUSCULES_AUTORISEES,NOM_DONNEE_CLE_DIC_REFERENCE,PROPAGER_TOUTES_OCCURRENCES,DEGRE_LIBERTE)
+=IF_ROW_NOTEXIST=
+'*','RD_MSA_RISQ_PART_LIB','Précisions si poste à risques particuliers déclaré par l''employeur','DIC_SST_MSA_HISTO','X','30',NULL,NULL,NULL,NULL,'Z','O',NULL,'1169',NULL,NULL,NULL,NULL,'N',NULL
+##
+REF_DONNEE_GENERALE (COMPANY_ID,NOM_DONNEE,LIBELLE_DONNEE,NOM_DICTIONNAIRE,TYPE_DONNEE,LONGUEUR_MASQUE_NB_ENTIERS,NB_DECIMAUX,CHECKBOX_VALEUR_ON,CHECKBOX_VALEUR_OFF,MODELE,UTILISATION,ACTIF,ID_PROJET,NUM_VERSION_RD,EST_SUPPRIME,PERSONNALISE,MINUSCULES_AUTORISEES,NOM_DONNEE_CLE_DIC_REFERENCE,PROPAGER_TOUTES_OCCURRENCES,DEGRE_LIBERTE)
+=IF_ROW_NOTEXIST=
+'*','RD_MSA_RISQ_PART_LIB','Précisions si poste à risques particuliers déclaré par l''employeur','DIC_SST_MSA_HISTO','X','30',NULL,NULL,NULL,NULL,'Z','O',NULL,'1169',NULL,NULL,NULL,NULL,'N',NULL
+##
+META_DONNEE_ECRAN (COMPANY_ID,NOM_DONNEE,NOM_PAGE,LIBELLE_DONNEE,EST_OBLIGATOIRE,MODE_SAISIE,APPELTABLE_NOMPAGE,APPELTABLE_IDREQUETE,APPELTABLE_LISTELIBELLE,APPELTABLE_LISTECHAMPS,APPELTABLE_PARAMETRES,AFFICHE_CHOIX_VIDE_SELECT,VALEUR_DEFAUT,ID_REGLEGESTION_AUT_RD,ID_REGLEGESTION_AUT_CLI,TYPE_REGLEGESTION_AUT_CLI,ID_REGLEGESTION_AFF_RD,ID_REGLEGESTION_AFF_CLI,TYPE_REGLEGESTION_AFF_CLI,ID_REGLEGESTION_CTL_RD,ID_REGLEGESTION_CTL_CLI,TYPE_REGLEGESTION_CTL_CLI,SEARCH_STRUCTURE_PARAM,REFRESH_AFTER_CHANGE,SPAN_CHECK_VALUE,LIB_ALIGN_TOP,NB_LIGNE_TEXTEAREA,NB_COLONNE_TEXTEAREA)
+=IF_ROW_NOTEXIST=
+'*','RD_MSA_RISQ_PART_LIB','*','Si oui, précisez :','R_RD_AFFICHAGE_RISQ_PART_LIB','text',NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,'C','RD_AFFICHAGE_RISQ_PART_LIB',NULL,'C',NULL,NULL,'C',NULL,'N','N','N','1','0'
+##
+REF_DONNEE_ECRAN (COMPANY_ID,NOM_DONNEE,NOM_PAGE,LIBELLE_DONNEE,EST_OBLIGATOIRE,MODE_SAISIE,APPELTABLE_NOMPAGE,APPELTABLE_IDREQUETE,APPELTABLE_LISTELIBELLE,APPELTABLE_LISTECHAMPS,APPELTABLE_PARAMETRES,AFFICHE_CHOIX_VIDE_SELECT,VALEUR_DEFAUT,ID_REGLEGESTION_AUT_RD,ID_REGLEGESTION_AUT_CLI,TYPE_REGLEGESTION_AUT_CLI,ID_REGLEGESTION_AFF_RD,ID_REGLEGESTION_AFF_CLI,TYPE_REGLEGESTION_AFF_CLI,ID_REGLEGESTION_CTL_RD,ID_REGLEGESTION_CTL_CLI,TYPE_REGLEGESTION_CTL_CLI,SEARCH_STRUCTURE_PARAM,REFRESH_AFTER_CHANGE,SPAN_CHECK_VALUE,LIB_ALIGN_TOP,NB_LIGNE_TEXTEAREA,NB_COLONNE_TEXTEAREA)
+=IF_ROW_NOTEXIST=
+'*','RD_MSA_RISQ_PART_LIB','*','Si oui, précisez :','R_RD_AFFICHAGE_RISQ_PART_LIB','text',NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,'C','RD_AFFICHAGE_RISQ_PART_LIB',NULL,'C',NULL,NULL,'C',NULL,'N','N','N','1','0'
+##
+META_REGLEGESTION_DESC (COMPANY_ID,ID_REGLEGESTION,TYPE_REGLE,LIBELLE,ID_PROJET,NUM_VERSION_RD,EST_SUPPRIME,REGLES_ECR,DESCRIPTION,FLAG_SPECIF_TYPE_REGLE,PERSONNALISE,REGLES_ALGO,REGLE_SYNTHETIQUE)
+=IF_ROW_NOTEXIST=
+'*','RD_AFFICHAGE_RISQ_PART_LIB','AFF','Affichage conditionnel de la précision du risque particulier MSA -SIR-',NULL,'1169',NULL,'[{"TYPE":"SI","OPERANDE_1":"DONNEE£RD_MSA_RISQUES_PART","OPERATEUR":"EQ","OPERANDE_2":"VALEUR£O","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0}]','Affichage conditionnel de la précision du risque particulier MSA -SIR- : uniquement si le risque particulier est coché à Oui','M',NULL,'/*¿ * RD_AFFICHAGE_RISQ_PART_LIB :¿ * Affichage conditionnel de la précision du risque particulier MSA -SIR- : uniquement si le risque particulier est coché à Oui¿ */¿¿if (DIC_SST_MSA_HISTO.RD_MSA_RISQUES_PART == "O") {¿}¿','Affichage conditionnel de la précision du risque particulier MSA -SIR-'
+##
+REF_REGLEGESTION_DESC (COMPANY_ID,ID_REGLEGESTION,TYPE_REGLE,LIBELLE,ID_PROJET,NUM_VERSION_RD,EST_SUPPRIME,REGLES_ECR,DESCRIPTION,FLAG_SPECIF_TYPE_REGLE,PERSONNALISE,REGLES_ALGO,REGLE_SYNTHETIQUE)
+=IF_ROW_NOTEXIST=
+'*','RD_AFFICHAGE_RISQ_PART_LIB','AFF','Affichage conditionnel de la précision du risque particulier MSA -SIR-',NULL,'1169',NULL,'[{"TYPE":"SI","OPERANDE_1":"DONNEE£RD_MSA_RISQUES_PART","OPERATEUR":"EQ","OPERANDE_2":"VALEUR£O","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0}]','Affichage conditionnel de la précision du risque particulier MSA -SIR- : uniquement si le risque particulier est coché à Oui','M',NULL,'/*¿ * RD_AFFICHAGE_RISQ_PART_LIB :¿ * Affichage conditionnel de la précision du risque particulier MSA -SIR- : uniquement si le risque particulier est coché à Oui¿ */¿¿if (DIC_SST_MSA_HISTO.RD_MSA_RISQUES_PART == "O") {¿}¿','Affichage conditionnel de la précision du risque particulier MSA -SIR-'
+##
+META_REGLEGESTION (COMPANY_ID,ID_REGLEGESTION,NUM_LIGNE,OPERANDE1,OPERATEUR,OPERANDE2,RESULTAT,BRANCHE_SI,BRANCHE_SINON)
+=IF_ROW_NOTEXIST=
+'*','RD_AFFICHAGE_RISQ_PART_LIB','1',NULL,'DONNEE£RD_MSA_RISQUES_PARTµVALEUR£OµEQ',NULL,NULL,'FIN','FIN'
+##
+REF_REGLEGESTION (COMPANY_ID,ID_REGLEGESTION,NUM_LIGNE,OPERANDE1,OPERATEUR,OPERANDE2,RESULTAT,BRANCHE_SI,BRANCHE_SINON)
+=IF_ROW_NOTEXIST=
+'*','RD_AFFICHAGE_RISQ_PART_LIB','1',NULL,'DONNEE£RD_MSA_RISQUES_PARTµVALEUR£OµEQ',NULL,NULL,'FIN','FIN'

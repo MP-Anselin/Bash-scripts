@@ -1,0 +1,12 @@
+<interface idInterface="3040">
+	<nomInterface>Chargement des 3040</nomInterface>
+	<descriptionInterface>
+		Chargement des 3040
+	</descriptionInterface>
+	<traitements>
+		<traitement>
+			<descriptionTraitement>Appel a l'interface</descriptionTraitement>
+			<typeTraitement>3040</typeTraitement>
+		</traitement>
+	</traitements>
+</interface>

@@ -1,0 +1,105 @@
+##
+TRG_TGE_IMPUTATIONS
+=SQL=
+create or replace trigger trg_tge_imputations FOR
+  insert or
+  update or
+  delete on tge_imputations COMPOUND TRIGGER
+
+  type pacmats       is record (r_numpac varchar2(6), r_pacmat varchar2(8), r_periode_recycl number);
+  type tab_pacmats   is table of pacmats index by binary_integer;
+  tab                tab_pacmats;
+  v_recycl           varchar2(1);
+  v_periode_recycl   number;
+  v_numpac           varchar2(6);
+  v_pacmat           varchar2(8);
+  v_type_writer      varchar2(1);
+  v_paiezad          varchar2(8);
+  v_bypass_trigger   number;
+  TYPE T_PERIODE_BY_NUMPAC IS TABLE OF TGE_REF_PAC.PERIODEENCOURS%TYPE INDEX BY TGE_REF_PAC.NUMPAC%TYPE;
+  tabPeriodeByNumpac T_PERIODE_BY_NUMPAC;
+  date_test_recycl   varchar2(6);
+BEFORE EACH ROW
+IS
+begin
+  -- action de 'bypass' le trigger 
+  select count(*) into v_bypass_trigger from bypass_trg_recycl_on_session;
+  if (v_bypass_trigger = 0) then
+    -- s'il y a une ligne dans la table temporaire, alors il n'y a pas de recyclage
+
+  if deleting then
+    v_type_writer := nvl(:old.type_writer, 'O');
+  else
+    v_type_writer := nvl(:new.type_writer, 'O');
+    -- On remet TYPE_WRITER à NULL pour qu'il ne soit pas considéré comme 'N' lors des futurs update n'incluant pas cette colonne
+    :new.type_writer := null;
+  end if;
+
+  if (v_type_writer <> 'N' AND v_type_writer <> 'M') then
+    v_numpac      := nvl(:new.numpac, :old.numpac);
+    v_paiezad     := nvl(:new.paiezad, :old.paiezad);
+    select t.numpac       as r_numpac,
+      t.pacmat            as r_pacmat,
+      t.periode_recyclage as r_periode_recycl bulk collect into tab
+    from dic_adm_contrat_SITU d, secupacmat t
+    where d.numpac = v_numpac
+    and d.paiezad  = v_paiezad
+    and d.numpac   = t.numpac
+    and d.pacmat   = t.pacmat;
+    if tab.exists(1) then
+      for i in 1..tab.last
+      loop
+        v_pacmat           := tab(i).r_pacmat;
+        v_periode_recycl   := nvl(tab(i).r_periode_recycl, 1);
+ 	    if v_periode_recycl = 3 then
+	      raise_application_error(-20001, 'CODERR=GENREC02');
+	    elsif v_periode_recycl >= 10 then
+	      raise_application_error(-20001, 'CODERR=GENREC01');
+	    elsif v_periode_recycl = 1 then
+          v_recycl            := 'N';
+          IF NOT tabPeriodeByNumpac.exists(v_numpac) THEN
+            select periodeencours into tabPeriodeByNumpac(v_numpac) from tge_ref_pac where numpac = v_numpac;
+          END IF;
+          IF DELETING THEN
+            date_test_recycl := :old.periode;
+          ELSE
+            date_test_recycl := :new.periode;
+          END IF;
+          if (NVL(date_test_recycl,'000000') <= tabPeriodeByNumpac(v_numpac)) then
+            if inserting or deleting then
+              v_recycl := 'O';
+            elsif updating then
+              if :new.imputation         <> :old.imputation or (:new.imputation is not null and :old.imputation is null) or (:new.imputation is null and :old.imputation is not null) then
+                v_recycl                 := 'O';
+              elsif :new.nb_unite        <> :old.nb_unite or (:new.nb_unite is not null and :old.nb_unite is null) or (:new.nb_unite is null and :old.nb_unite is not null) then
+                v_recycl                 := 'O';
+              elsif :new.no_sequence     <> :old.no_sequence or (:new.no_sequence is not null and :old.no_sequence is null) or (:new.no_sequence is null and :old.no_sequence is not null) then
+                v_recycl                 := 'O';
+              elsif :new.origine         <> :old.origine or (:new.origine is not null and :old.origine is null) or (:new.origine is null and :old.origine is not null) then
+                v_recycl                 := 'O';
+              elsif :new.type_traitement <> :old.type_traitement or (:new.type_traitement is not null and :old.type_traitement is null) or (:new.type_traitement is null and :old.type_traitement is not null) then
+                v_recycl                 := 'O';
+              elsif :new.periode         <> :old.periode or (:new.periode is not null and :old.periode is null) or (:new.periode is null and :old.periode is not null) then
+                v_recycl                 := 'O';
+              end if;
+            end if;
+            if v_recycl = 'O' then
+              begin
+                merge into gap_recycl_matric a using (select v_numpac as numpac, v_pacmat as pacmat from dual) b on (a.pacmat = b.pacmat and a.numpac = b.numpac)
+              when not matched then
+                insert (a.numpac, a.pacmat) values (b.numpac, b.pacmat);
+              exception
+              when others then
+                --dbms_output.put_line('Collaborateur déjà en recyclage ' || v_numpac || '/' || v_pacmat);
+                --FIXME utiliser la procédure trace_dbms_output()
+                NULL;
+              end;
+            end if;
+          end if;
+        end if;
+      end loop;
+    end if;
+  end if;
+  end if;
+END BEFORE EACH ROW;
+end trg_tge_imputations;

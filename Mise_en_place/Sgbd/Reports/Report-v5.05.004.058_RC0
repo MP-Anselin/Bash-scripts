@@ -1,0 +1,1821 @@
+##
+TAG_IMPORT=5.05.004.R058_RC0
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'Conditions DOCSERV','Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionConditions.ConditionsDocserver',null,'true')
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionConditions.ConditionsDocserver','Moteur/Comp/WebAdmin/DocServer/GestionModelesDocServer.jsp')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'Champs de fusion DOCSERV','Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionChampsFusion.ExportChampsFusionDocserver',null,'true')
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionChampsFusion.ExportChampsFusionDocserver','Moteur/Comp/WebAdmin/DocServer/GestionModelesDocServer.jsp')
+##
+IDX_STD_DPAE_HISTORIQUE_1
+=SQL IF_INDEX_NOTEXIST=IDX_STD_DPAE_HISTORIQUE_1=
+CREATE INDEX IDX_STD_DPAE_HISTORIQUE_1 ON STD_DPAE_HISTORIQUE (DPAE_ID , DATE_MAJ)
+##
+SYS_SCH_SCHEMA_FULL
+==
+CREATE OR REPLACE FORCE VIEW "SYS_SCH_SCHEMA_FULL" (ROLE,THEME,CLASSEUR,LIBELLE,NOM_PAGE, DESCRIPTION, CODE_ROLE, PROFILS ) as (select  E2.LIBELLE as ROLE,E3.LIBELLE as THEME, E4.LIBELLE as CLASSEUR,  E5.LIBELLE  as LIBELLE,E5.NOM_PAGE as NOM_PAGE, E5.DESCRIPTION AS DESCRIPTION, E5.CODE_ROLE as CODE_ROLE , ( SELECT LISTAGG(PO.libelle||'('||PO.code_profil||')', ',') WITHIN GROUP (ORDER BY PO.code_profil)  FROM (select p.code_profil, nvl((select libelle from sys_sch_profil s where s.code_profil=p.code_profil),'PROFIL SUPPRIME') as libelle, p.nom_page  from sys_sch_profil_p p ) PO where PO.NOM_PAGE = E5.NOM_PAGE)  as PROFILS from SYS_SCH_ELEMENT E1, SYS_SCH_ELEMENT E2, SYS_SCH_ELEMENT E3, SYS_SCH_ELEMENT E4, SYS_SCH_ELEMENT E5, SYS_SCHEMAS S1, SYS_SCHEMAS S2, SYS_SCHEMAS S3, SYS_SCHEMAS S4, SYS_SCHEMAS S5 where S5.CODE_SCHEMA = -1 and S4.CODE_SCHEMA = -1 and S3.CODE_SCHEMA = -1 and S2.CODE_SCHEMA = -1 and S1.CODE_SCHEMA = -1 and S5.CODE_ELT = E5.CODE_ELEMENT and S5.NIVEAU = E5.NIVEAU and S4.CODE_ELT = E4.CODE_ELEMENT and S4.NIVEAU = E4.NIVEAU and S3.CODE_ELT = E3.CODE_ELEMENT and S3.NIVEAU = E3.NIVEAU and S2.CODE_ELT = E2.CODE_ELEMENT and S2.NIVEAU = E2.NIVEAU and S1.CODE_ELT = E1.CODE_ELEMENT and S1.NIVEAU = E1.NIVEAU and S5.NIVEAU ='99' and S4.NIVEAU ='4' and S3.NIVEAU ='3' and S2.NIVEAU ='2' and S1.NIVEAU ='1' and S5.CODE_ASSO_PERE = S4.CODE_ASSO and S4.CODE_ASSO_PERE = S3.CODE_ASSO and S3.CODE_ASSO_PERE = S2.CODE_ASSO and S2.CODE_ASSO_PERE = S1.CODE_ASSO)
+##
+TAG_CHARSET=@€éèç
+##
+EDI_DS_CONDITIONS
+=SQL IFNOTEXIST=EDI_DS_CONDITIONS=
+CREATE TABLE "EDI_DS_CONDITIONS" ("CODE" VARCHAR2(50 BYTE), "COMMENTAIRE" VARCHAR2(2024 BYTE), "OPERANDE1" VARCHAR2(255 BYTE) NOT NULL, "OPERANDE2" VARCHAR2(255 BYTE), "OPERATEUR" VARCHAR2(10 BYTE) NOT NULL, "REQUETE_FUSION" VARCHAR2(50 BYTE), "CODEDI" NUMBER(*,3), "FAMEDI" VARCHAR2(50 BYTE), PRIMARY KEY ("CODE","REQUETE_FUSION"))
+##
+TAG_CHARSET=@€éèç
+##
+EDI_DS_EXPORT_CHAMPS
+=SQL IFNOTEXIST=EDI_DS_EXPORT_CHAMPS=
+CREATE TABLE "EDI_DS_EXPORT_CHAMPS"("PREFIX" VARCHAR2(96 BYTE) NOT NULL, "DICTIONNAIRE" VARCHAR2(96 BYTE) NOT NULL,"ACTIF" VARCHAR2(1 BYTE) DEFAULT 'O' NOT NULL, CONSTRAINT "EDI_DS_EXPORT_CHAMPS_PK" PRIMARY KEY ("PREFIX", "DICTIONNAIRE"))
+##
+EDI_DS_EXPORT_CHAMPS
+==
+DELETE FROM EDI_DS_EXPORT_CHAMPS WHERE PREFIX IN ('ETC','CNT','ADR','STE','ETB','BQE','VIR') AND DICTIONNAIRE IN ('DIC_ADM_PERSO','DIC_ADM_CONTRAT;DIC_ADM_CONTRAT_HISTO','DIC_ADRESSE','DIC_SOCIETE','DIC_ETABLI2','DIC_BANQUE','DIC_DONNEES_VIRTUELLES')
+'ETC','DIC_ADM_PERSO','O'
+'CNT','DIC_ADM_CONTRAT;DIC_ADM_CONTRAT_HISTO','O'
+'ADR','DIC_ADRESSE','O'
+'STE','DIC_SOCIETE','O'
+'ETB','DIC_ETABLI2','O'
+'BQE','DIC_BANQUE','O'
+'VIR','DIC_DONNEES_VIRTUELLES','O'
+##
+TAG_CHARSET=@€éèç
+##
+EDI_DS_TABLE_PERSO
+=SQL IFNOTEXIST=EDI_DS_TABLE_PERSO=
+CREATE TABLE "EDI_DS_TABLE_PERSO"("COMMENTAIRE" VARCHAR2(2048 BYTE), "NOM_TABLE" VARCHAR2(255 BYTE) NOT NULL, "CONDITION_WHERE" VARCHAR2(2048 BYTE), "PARAM_WHERE" VARCHAR2(2048 BYTE), "PREFIX" VARCHAR2(2048 BYTE) NOT NULL, "ORDRE" NUMBER NOT NULL, "SELECT_DATA" VARCHAR2(2048 BYTE) NOT NULL,"ACTIF" VARCHAR2(1 BYTE) DEFAULT 'O' NOT NULL,CONSTRAINT "EDI_DS_TABLE_PERSO_PK" PRIMARY KEY ("PREFIX", "NOM_TABLE", "SELECT_DATA", "ORDRE"))
+##
+TAG_CHARSET=@€éèç
+##
+EDI_DS_WKF_MAQUETTE
+=SQL IFNOTEXIST=EDI_DS_WKF_MAQUETTE=
+CREATE TABLE "EDI_DS_WKF_MAQUETTE"("CODE_MAQUETTE" VARCHAR2(255 BYTE) NOT NULL, "SEQUENCE" NUMBER NOT NULL, "OPERANDE1" VARCHAR2(2048 BYTE) NOT NULL, "OPERATEUR" VARCHAR2(1024 BYTE) NOT NULL, "OPERANDE2" VARCHAR2(2048 BYTE) NOT NULL, CONSTRAINT "EDI_DS_WKF_MAQUETTE_PK" PRIMARY KEY ("CODE_MAQUETTE", "SEQUENCE"))
+##
+TAG_CHARSET=@€éèç
+##
+EDI_REQ_EXIT
+==
+DELETE FROM EDI_REQ_EXIT WHERE NOMREQ = 'RD_EDI_CLIENT'
+'RD_EDI_CLIENT','fr.adp.com.gxp.std.mot_met.lib.objects.docserver.moduleeditique.ModuleEditionDocServMgr'
+##
+EDI_REQ_SQL
+==
+DELETE FROM EDI_REQ_SQL WHERE NOMREQ = 'RD_EDI_CLIENT'
+'RD_EDI_CLIENT','FROM DUAL','~',';','-','N','0',null
+##
+TAG_CHARSET=@€éèç
+##
+HELPDESK_FICHE_PROCESSUS
+=SQL IFNOTEXIST=HELPDESK_FICHE_PROCESSUS=
+CREATE TABLE HELPDESK_FICHE_PROCESSUS (CODFICHE NUMBER NOT NULL ENABLE,ID_PROCESSUS VARCHAR2(50 BYTE) NOT NULL ENABLE,DATE1 DATE, DATE2 DATE, BOOL VARCHAR(1 BYTE), NUM1 NUMBER, NUM2 NUMBER, NUM3 NUMBER, NUM4 NUMBER, COMMENTAIRE_DEMANDEUR VARCHAR2(400 BYTE), COMMENTAIRE_VALIDEUR VARCHAR2(400 BYTE), LISTE_VALEUR1 VARCHAR2(100 BYTE), LISTE_VALEUR2 VARCHAR2(100 BYTE), LISTE_VALEUR3 VARCHAR2(100 BYTE), TEXTE1 VARCHAR2(400 BYTE), TEXTE2 VARCHAR2(400 BYTE), TEXTE3 VARCHAR2(400 BYTE), PJ_UPLOAD VARCHAR2(400 BYTE), PRIMARY KEY (CODFICHE))
+##
+TAG_CHARSET=@€éèç
+##
+HELPDESK_PROCESSUS
+=SQL IFNOTEXIST=HELPDESK_PROCESSUS=
+CREATE TABLE HELPDESK_PROCESSUS( ID_PROCESSUS VARCHAR2(50 BYTE) NOT NULL, ACTEUR_CIBLE VARCHAR2 (1 BYTE), PROCESSUS_DESC VARCHAR2(4000 BYTE), VALID_MANAGER VARCHAR2(1 BYTE), ID_COMPAGNE NUMBER, PJ_DOWNLOAD VARCHAR2 (400 BYTE), NUMPAC VARCHAR2(6 BYTE),ID_THEME NUMBER(38,0) , TRT_POST_VALID VARCHAR2 (1 BYTE), EST_ACTIF  VARCHAR2(1 BYTE), VERSION_PROCESSUS VARCHAR2(50 BYTE),EST_AUTOMATIQUE VARCHAR2(2 BYTE), PRIMARY KEY (ID_PROCESSUS) )
+##
+TAG_CHARSET=@€éèç
+##
+HELPDESK_PROCESSUS_DONNEES
+=SQL IFNOTEXIST=HELPDESK_PROCESSUS_DONNEES=
+CREATE TABLE HELPDESK_PROCESSUS_DONNEES(ID_PROCESSUS  VARCHAR2(3 BYTE) NOT NULL , PROCESSUS_DONNEE VARCHAR2 (50 BYTE) NOT NULL, ACTIVE VARCHAR2(1 BYTE), LIBELLE_DONNEE VARCHAR2 (200 BYTE), VALEUR_DEFAUT VARCHAR2 (200 BYTE), THEME_DONNEE VARCHAR2 (100 BYTE), AIDE_MESSAGE VARCHAR2(4000 BYTE),OPTIONNEL VARCHAR2(1 BYTE), LONGEUR_MAX NUMBER , CONTROLE VARCHAR2(1000 BYTE), ORDRE NUMBER, PRIMARY KEY (ID_PROCESSUS ,PROCESSUS_DONNEE))
+##
+HELPDESK_STATUT
+==
+DELETE FROM HELPDESK_STATUT WHERE CODSTA IN ( '7' )
+'7','Réalisé avec mise à jour GAP','6','O','N','O',null,'Fermée',null,'O'
+##
+HELPDESK_TYPE
+=SQL IFNOTEXIST=HELPDESK_TYPE=EST_PROCESSUS=
+ALTER TABLE HELPDESK_TYPE ADD EST_PROCESSUS varchar2(1)
+##
+TAG_CHARSET=@€éèç
+##
+STD_DPAE_HISTORIQUE
+=SQL IFNOTEXIST=STD_DPAE_HISTORIQUE=
+CREATE TABLE STD_DPAE_HISTORIQUE(DPAE_ID NUMBER(4) NOT NULL, DATE_MAJ DATE, CODE_STATUT NUMBER(*,0), UTILISATEUR VARCHAR2(32))
+##
+STD_DPAE_HISTORIQUE
+=SQL IFNOTEXIST=STD_DPAE_HISTORIQUE=RETOUR_AR=
+ALTER TABLE STD_DPAE_HISTORIQUE ADD ( RETOUR_AR VARCHAR2(10) )
+##
+TAG_CHARSET=@€éèç
+##
+STD_ICON
+=SQL IFNOTEXIST=STD_ICON=
+CREATE TABLE STD_ICON( ID VARCHAR2(200), PRIMARY KEY (ID) )
+##
+STD_ICON
+==
+DELETE FROM STD_ICON
+'icon-taxes-form1099m'
+'fa-500px'
+'icon-adp'
+'icon-adp-marketplace'
+'icon-adp-payments'
+'icon-adp-payments-euro'
+'icon-paycal-adp-banks-closed'
+'icon-adpr'
+'icon-avs'
+'icon-accessall'
+'icon-accessnone'
+'icon-accesssome'
+'icon-action-alt'
+'icon-active-tour'
+'icon-activity-dashboard'
+'icon-add-all'
+'icon-add-contractor'
+'icon-folder-add'
+'icon-add-new-hire'
+'fa-user-plus'
+'fa-cart-plus'
+'fa-address-book'
+'fa-address-book-o'
+'fa-address-card'
+'fa-address-card-o'
+'fa-file-pdf-o'
+'icon-file-type-ind2'
+'icon-adv-details'
+'icon-us-state-al'
+'icon-us-state-ak'
+'icon-ca-prov-ab'
+'fa-amazon'
+'fa-cc-amex'
+'fa-anchor'
+'fa-android'
+'fa-angellist'
+'fa-angle-double-down'
+'fa-angle-double-left'
+'fa-angle-double-right'
+'fa-angle-double-up'
+'fa-adn'
+'fa-apple'
+'icon-approved-time-off'
+'fa-archive'
+'icon-archive'
+'fa-file-archive-o'
+'icon-adp-arcoe'
+'fa-area-chart'
+'icon-chart-area'
+'icon-us-state-az'
+'icon-us-state-ar'
+'fa-arrow-circle-down'
+'fa-arrow-circle-left'
+'fa-arrow-circle-o-down'
+'fa-arrow-circle-o-left'
+'fa-arrow-circle-o-right'
+'fa-arrow-circle-o-up'
+'fa-arrow-circle-right'
+'fa-arrow-circle-up'
+'fa-arrows'
+'fa-arrows-alt'
+'fa-arrows-h'
+'fa-arrows-v'
+'fa-at'
+'icon-attach-document1'
+'icon-attach-document2'
+'icon-attached-single-document'
+'icon-attached-documents'
+'fa-file-audio-o'
+'icon-auto-payroll'
+'icon-auto-payroll-euro'
+'icon-background-checks'
+'icon-frown2'
+'icon-frown2-o'
+'fa-balance-scale'
+'fa-bandcamp'
+'icon-bank-o'
+'fa-bar-chart'
+'fa-bars'
+'fa-bath'
+'fa-battery-half'
+'fa-battery-quarter'
+'fa-battery-three-quarters'
+'fa-battery-empty'
+'fa-battery-full'
+'fa-bed'
+'fa-behance'
+'fa-behance-square'
+'fa-bell-o'
+'fa-bell-slash'
+'fa-bell-slash-o'
+'icon-benchmark'
+'fa-bicycle'
+'fa-binoculars'
+'fa-birthday-cake'
+'fa-bitbucket'
+'fa-bitbucket-square'
+'fa-btc'
+'fa-bluetooth'
+'fa-bluetooth-b'
+'fa-bomb'
+'fa-bookmark-o'
+'icon-borrowed-employee'
+'fa-briefcase'
+'icon-ca-prov-bc'
+'icon-chart-bubble'
+'fa-bug'
+'fa-building'
+'fa-building-o'
+'icon-chart-bullet'
+'fa-bullseye'
+'fa-bus'
+'icon-business-card'
+'icon-business-owner-policy'
+'fa-buysellads'
+'fa-css3'
+'icon-calc-payroll'
+'fa-calculator'
+'icon-calculator'
+'fa-calendar-check-o'
+'icon-calendar-custom'
+'icon-calendar-date'
+'icon-calendar-hire-date'
+'fa-calendar-minus-o'
+'icon-calendar-pay-period'
+'fa-calendar-plus-o'
+'fa-calendar-times-o'
+'icon-us-state-ca'
+'icon-canada'
+'fa-car'
+'icon-career-growth'
+'fa-caret-down'
+'fa-caret-left'
+'fa-caret-right'
+'fa-caret-square-o-down'
+'fa-caret-square-o-left'
+'fa-caret-square-o-right'
+'fa-caret-square-o-up'
+'fa-caret-up'
+'icon-certificate_insurance'
+'fa-chain-broken'
+'icon-change-password'
+'icon-chat'
+'fa-check'
+'fa-check-circle'
+'fa-check-circle-o'
+'fa-check-square'
+'fa-check-square-o'
+'fa-chevron-circle-down'
+'fa-chevron-circle-left'
+'fa-chevron-circle-right'
+'fa-chevron-circle-up'
+'fa-child'
+'icon-chiropractic'
+'fa-chrome'
+'fa-circle'
+'fa-circle-o'
+'fa-circle-o-notch'
+'fa-circle-thin'
+'icon-client-info'
+'icon-clients-book'
+'icon-clients-info'
+'fa-clipboard'
+'fa-clock-o'
+'icon-clocked-in'
+'fa-clone'
+'icon-close-thin'
+'fa-cc'
+'fa-cloud'
+'fa-cloud-download'
+'fa-cloud-upload'
+'icon-clover-logo'
+'fa-code'
+'fa-file-code-o'
+'fa-codepen'
+'fa-codiepie'
+'fa-coffee'
+'icon-us-state-co'
+'icon-chart-column'
+'fa-columns'
+'fa-commenting'
+'fa-commenting-o'
+'icon-commercialauto-o'
+'icon-common-templates'
+'icon-company-holiday'
+'fa-compass'
+'icon-compass-alt'
+'fa-compress'
+'fa-connectdevelop'
+'icon-connect-to-adp'
+'icon-us-state-ct'
+'fa-contao'
+'fa-copyright'
+'fa-creative-commons'
+'fa-credit-card-alt'
+'fa-crosshairs'
+'fa-cube'
+'fa-cubes'
+'fa-cutlery'
+'icon-cycle'
+'icon-dna-strand'
+'fa-dashcube'
+'fa-database'
+'icon-daylight-savings'
+'icon-us-state-de'
+'fa-delicious'
+'icon-dental'
+'icon-gl-deselect-column'
+'icon-gl-deselect-row'
+'icon-smile2'
+'icon-smile2-o'
+'fa-desktop'
+'fa-diamond'
+'fa-digg'
+'fa-cc-diners-club'
+'icon-print-directdebit'
+'icon-disciplinary'
+'icon-discounts'
+'icon-discounts-euro'
+'fa-cc-discover'
+'icon-dock'
+'icon-dockit'
+'icon-chart-donut'
+'fa-dot-circle-o'
+'fa-download'
+'fa-dribbble'
+'fa-dropbox'
+'fa-drupal'
+'fa-edge'
+'fa-eercast'
+'fa-ellipsis-h'
+'fa-ellipsis-v'
+'icon-employee_access'
+'icon-employee_handbook'
+'icon-employee-on-loan'
+'icon-employee-on-loan-euro'
+'icon-enter-emp-changes'
+'fa-envelope'
+'fa-envelope-open'
+'fa-envelope-open-o'
+'fa-envelope-o'
+'fa-envelope-square'
+'fa-etsy'
+'fa-eur'
+'fa-file-excel-o'
+'fa-exchange'
+'fa-exclamation-circle'
+'fa-exclamation-triangle'
+'fa-expand'
+'icon-expand-arrow'
+'fa-expeditedssl'
+'icon-gl-expression'
+'icon-expression'
+'fa-external-link'
+'fa-external-link-square'
+'fa-eye'
+'fa-eye-slash'
+'fa-eyedropper'
+'fa-facebook'
+'fa-facebook-official'
+'fa-facebook-square'
+'fa-fax'
+'fa-female'
+'icon-portal-fields'
+'icon-file-def'
+'fa-file-text-o'
+'fa-files-o'
+'fa-film'
+'fa-filter'
+'icon-svg-filter'
+'icon-svg-filter-checkmark'
+'icon-financial-wellness'
+'icon-financial-wellness-euro'
+'fa-firefox'
+'icon-pagination-first'
+'fa-flag-o'
+'fa-flask'
+'fa-flickr'
+'fa-floppy-o'
+'icon-us-state-fl'
+'fa-folder'
+'fa-folder-open'
+'fa-folder-open-o'
+'fa-folder-o'
+'fa-black-tie'
+'fa-fonticons'
+'fa-fort-awesome'
+'fa-forumbee'
+'fa-foursquare'
+'fa-free-code-camp'
+'icon-frown'
+'fa-frown-o'
+'icon-function'
+'fa-futbol-o'
+'fa-gbp'
+'fa-gg'
+'fa-gg-circle'
+'fa-empire'
+'fa-gamepad'
+'fa-gavel'
+'fa-genderless'
+'icon-general-ledger'
+'fa-file-o'
+'icon-us-state-ga'
+'fa-get-pocket'
+'fa-git'
+'fa-git-square'
+'fa-github'
+'fa-github-alt'
+'fa-github-square'
+'fa-glass'
+'fa-globe'
+'fa-google'
+'fa-google-plus'
+'fa-google-plus-square'
+'fa-google-wallet'
+'fa-graduation-cap'
+'fa-gratipay'
+'fa-grav'
+'icon-grip2'
+'icon-grip'
+'icon-group-life'
+'icon-us-state-gu'
+'fa-h-square'
+'fa-hdd-o'
+'icon-hr411'
+'icon-hr-business-apps'
+'icon-hsa'
+'fa-html5'
+'fa-hacker-news'
+'fa-hand-o-down'
+'fa-hand-o-left'
+'fa-hand-o-right'
+'fa-hand-o-up'
+'fa-hand-peace-o'
+'fa-hand-pointer-o'
+'fa-handshake-o'
+'fa-hashtag'
+'icon-us-state-hi'
+'icon-health-benefits'
+'icon-health-insurance'
+'fa-heart'
+'icon-heart-broken'
+'fa-heart-o'
+'fa-heartbeat'
+'icon-chart-heatmap'
+'icon-help-desk'
+'icon-hiring'
+'icon-hiring-toolkit'
+'fa-history'
+'icon-portal-home'
+'icon-slider-grip-horz'
+'fa-hourglass'
+'fa-hourglass-end'
+'fa-hourglass-half'
+'fa-hourglass-o'
+'fa-hourglass-start'
+'fa-houzz'
+'fa-i-cursor'
+'fa-id-badge'
+'fa-id-card'
+'fa-id-card-o'
+'fa-imdb'
+'icon-us-state-id'
+'icon-us-state-il'
+'fa-file-image-o'
+'icon-import'
+'icon-import-time-and-pay'
+'icon-task-impt'
+'fa-indent'
+'fa-inr'
+'icon-us-state-in'
+'fa-industry'
+'icon-industry-type'
+'icon-industry-specific-templates'
+'fa-info'
+'fa-info-circle'
+'icon-insights'
+'fa-instagram'
+'icon-insurance'
+'fa-internet-explorer'
+'icon-invoice-accounting'
+'icon-us-state-ia'
+'fa-cc-jcb'
+'fa-jpy'
+'icon-job'
+'fa-joomla'
+'icon-us-state-ks'
+'icon-us-state-ky'
+'fa-keyboard-o'
+'fa-krw'
+'fa-language'
+'fa-laptop'
+'icon-page-last'
+'icon-pagination-last'
+'fa-leanpub'
+'fa-lemon-o'
+'fa-level-down'
+'fa-level-up'
+'icon-life-insurance'
+'fa-life-ring'
+'fa-lightbulb-o'
+'fa-bolt'
+'fa-line-chart'
+'icon-chart-line'
+'fa-link'
+'fa-linkedin'
+'fa-linkedin-square'
+'fa-linode'
+'fa-linux'
+'fa-hand-lizard-o'
+'icon-loan'
+'fa-long-arrow-down'
+'fa-long-arrow-left'
+'fa-long-arrow-right'
+'fa-long-arrow-up'
+'icon-long-term-disability'
+'icon-us-state-la'
+'icon-magic-wand-alt'
+'icon-us-state-me'
+'fa-male'
+'fa fa-users'
+'icon-mgr-edited-transaction'
+'icon-mgr-note'
+'icon-ca-prov-mb'
+'icon-manual-check'
+'icon-manual-check-euro'
+'fa-map'
+'fa-map-o'
+'fa-map-pin'
+'fa-map-signs'
+'fa-mars'
+'fa-mars-double'
+'fa-mars-stroke'
+'fa-mars-stroke-h'
+'fa-mars-stroke-v'
+'icon-us-state-md'
+'icon-us-state-ma'
+'fa-cc-mastercard'
+'fa-maxcdn'
+'icon-maximize'
+'fa-medium'
+'fa-meetup'
+'icon-meh'
+'fa-meh-o'
+'fa-mercury'
+'icon-merge'
+'icon-file-type-msg2'
+'icon-us-state-mi'
+'fa-microchip'
+'fa-microphone-slash'
+'icon-minimize'
+'icon-us-state-mn'
+'icon-minor-employee'
+'fa-minus-circle'
+'fa-minus-square'
+'fa-minus-square-o'
+'icon-missing-punch'
+'icon-us-state-ms'
+'icon-us-state-mo'
+'fa-mixcloud'
+'icon-mobile-connect'
+'fa-mobile'
+'fa-modx'
+'fa-money'
+'icon-mongo'
+'icon-us-state-mt'
+'fa-moon-o'
+'icon-paycal-most-banks-closed'
+'fa-motorcycle'
+'fa-mouse-pointer'
+'fa-music'
+'icon-security-profile'
+'icon-mysql-logo'
+'icon-ny-disability'
+'icon-gl-named-constant'
+'icon-us-state-ne'
+'fa-neuter'
+'icon-us-state-nv'
+'icon-ca-prov-nb'
+'icon-us-state-nh'
+'icon-newhire-paperwork'
+'icon-new-hire-review'
+'icon-us-state-nj'
+'icon-us-state-nm'
+'icon-us-state-ny'
+'icon-ca-prov-nl'
+'fa-newspaper-o'
+'icon-pagination-next'
+'icon-us-state-nc'
+'icon-us-state-nd'
+'icon-ca-prov-nt'
+'icon-not-editable'
+'icon-note'
+'icon-ca-prov-ns'
+'icon-ca-prov-nu'
+'fa-object-group'
+'fa-object-ungroup'
+'fa-odnoklassniki'
+'fa-odnoklassniki-square'
+'icon-us-state-oh'
+'icon-us-state-ok'
+'icon-on-call-shift'
+'icon-ca-prov-on'
+'fa-opencart'
+'fa-openid'
+'fa-opera'
+'fa-optin-monster'
+'icon-oracle-logo'
+'icon-us-state-or'
+'icon-org-chart-opening'
+'fa-outdent'
+'icon-overflow'
+'icon-overtime-shift'
+'fa-pagelines'
+'icon-portal-pages'
+'fa-paint-brush'
+'fa-hand-paper-o'
+'fa-paper-plane'
+'fa-paper-plane-o'
+'fa-paperclip'
+'icon-leaf'
+'icon-part-time-employee'
+'fa-pause-circle'
+'fa-pause-circle-o'
+'fa-paw'
+'icon-pay'
+'icon-paycal-dates-week-number'
+'icon-shift-pay'
+'icon-pay-by-pay-euro'
+'icon-pay-by-pay'
+'fa-paypal'
+'fa-cc-paypal'
+'icon-payroll'
+'icon-payroll-euro'
+'fa-pencil-square'
+'fa-pencil-square-o'
+'icon-pending'
+'icon-us-state-pa'
+'fa-percent'
+'icon-pip'
+'icon-performance-toolkit'
+'icon-perscription-insurance2'
+'icon-perscription-insurance'
+'fa-phone'
+'fa-phone-square'
+'fa-picture-o'
+'fa-pie-chart'
+'fa-pied-piper-alt'
+'fa-pied-piper'
+'fa-pinterest'
+'fa-pinterest-p'
+'fa-pinterest-square'
+'icon-plane-o'
+'fa-play-circle'
+'fa-play-circle-o'
+'fa-plug'
+'fa-plus-circle'
+'fa-plus-square'
+'fa-plus-square-o'
+'fa-podcast'
+'icon-policy-toolkit'
+'fa-power-off'
+'icon-powered-by-adp'
+'fa-file-powerpoint-o'
+'icon-premium-only-plan'
+'icon-pagination-previous'
+'icon-ca-prov-pe'
+'icon-print-check'
+'fa-product-hunt'
+'icon-us-state-pr'
+'fa-puzzle-piece'
+'fa-qq'
+'icon-adjustment-quarterly'
+'icon-ca-prov-'
+'fa-question'
+'fa-question-circle'
+'icon-globe-wire'
+'fa-quora'
+'fa-rss-square'
+'fa-ravelry'
+'fa-rebel'
+'icon-recordkeeping-toolkit'
+'fa-recycle'
+'fa-reddit-alien'
+'fa-registered'
+'icon-rehire'
+'icon-remove-all'
+'fa-user-times'
+'fa-renren'
+'icon-reorder'
+'fa-repeat'
+'fa-reply'
+'icon-reset'
+'icon-restore'
+'icon-retirement'
+'icon-svg-review-result'
+'icon-review-results'
+'icon-us-state-ri'
+'icon-ribbon'
+'fa-hand-rock-o'
+'icon-run'
+'icon-run-payroll'
+'icon-run-payroll-euro'
+'fa-rub'
+'fa-s15'
+'icon-sbs-community'
+'icon-stressed-anxious'
+'fa-safari'
+'icon-ca-prov-sk'
+'icon-chart-scatter'
+'icon-scheduled-earning-deductions'
+'icon-scheduled-earning-deductions-euro'
+'icon-calendar-scheduling'
+'fa-scissors'
+'fa-hand-scissors-o'
+'fa-scribd'
+'fa-search'
+'fa-search-minus'
+'fa-search-plus'
+'icon-secondary-position'
+'icon-gl-select-column'
+'icon-gl-select-row'
+'icon-adv-details-select'
+'icon-expression-select'
+'icon-file-def-select'
+'icon-import-select'
+'icon-mapping-select'
+'icon-translations-select'
+'fa-sellsy'
+'icon-semi-year'
+'fa-server'
+'icon-set-pin'
+'fa-share'
+'fa-share-alt'
+'fa-share-alt-square'
+'fa-share-square'
+'fa-share-square-o'
+'icon-sharepoint'
+'fa-ils'
+'icon-shift-pay-euro'
+'fa-ship'
+'fa-shirtsinbulk'
+'fa-shopping-bag'
+'fa-shopping-basket'
+'icon-shopping-cart'
+'fa-cart-arrow-down'
+'icon-short-term-disability'
+'fa-shower'
+'fa-sign-in'
+'fa-sign-out'
+'fa-simplybuilt'
+'fa-sitemap'
+'fa-skype'
+'fa-slack'
+'fa-sliders'
+'fa-slideshare'
+'icon-small-business-company'
+'icon-smile'
+'fa-smile-o'
+'fa-snowflake-o'
+'icon-software-on-demand'
+'fa-sort'
+'fa-sort-alpha-asc'
+'fa-sort-alpha-desc'
+'fa-sort-amount-asc'
+'fa-sort-amount-desc'
+'fa-sort-asc'
+'fa-sort-desc'
+'fa-sort-numeric-asc'
+'fa-sort-numeric-desc'
+'fa-soundcloud'
+'icon-us-state-sc'
+'icon-us-state-sd'
+'fa-space-shuttle'
+'icon-special-payroll'
+'icon-special-payroll-euro'
+'fa-spinner'
+'icon-split'
+'fa-hand-spock-o'
+'fa-spotify'
+'fa-square'
+'fa-square-o'
+'fa-stack-exchange'
+'fa-stack-overflow'
+'fa-star'
+'fa-star-half-o'
+'fa-star-o'
+'icon-start-new-cycle'
+'icon-status-active'
+'icon-status-away'
+'icon-status-busy'
+'icon-status-chat'
+'icon-status-inmtg'
+'icon-status-offline'
+'fa-steam'
+'fa-steam-square'
+'icon-chart-step'
+'fa-stethoscope'
+'fa-sticky-note'
+'fa-sticky-note-o'
+'fa-stop-circle'
+'fa-stop-circle-o'
+'icon-storyboard'
+'fa-street-view'
+'fa-strikethrough'
+'fa-cc-stripe'
+'fa-stumbleupon-circle'
+'fa-stumbleupon'
+'fa-subway'
+'fa-suitcase'
+'fa-sun-o'
+'fa-superpowers'
+'icon-support'
+'icon-taxes-td1'
+'icon-tlm-organize'
+'icon-tlm-policy'
+'icon-tlm-section'
+'icon-tops'
+'fa-tty'
+'fa-tachometer'
+'icon-mapping'
+'fa-tasks'
+'fa-taxi'
+'icon-taztag-logo'
+'icon-teampay-logo'
+'fa-telegram'
+'fa-television'
+'fa-tencent-weibo'
+'icon-us-state-tn'
+'fa-terminal'
+'icon-us-state-tx'
+'icon-the-bridge'
+'icon-portal-themes'
+'fa-thermometer'
+'fa-thermometer-full'
+'fa-thermometer-half'
+'fa-thermometer-three-quarters'
+'fa-thermometer-empty'
+'fa-thermometer-quarter'
+'fa-thumb-tack'
+'fa-thumbs-o-down'
+'fa-thumbs-o-up'
+'fa-ticket'
+'fa-times'
+'fa-times-circle'
+'fa-times-circle-o'
+'icon-timesheet-import'
+'fa-toggle-off'
+'fa-toggle-on'
+'icon-tools'
+'fa-trademark'
+'fa-train'
+'fa-transgender'
+'fa-transgender-alt'
+'icon-gl-translation'
+'icon-translations'
+'fa-trash'
+'fa-trash-o'
+'fa-tree'
+'icon-chart-tree'
+'fa-trello'
+'fa-tripadvisor'
+'fa-tumblr'
+'fa-tumblr-square'
+'fa-try'
+'fa-twitch'
+'fa-twitter'
+'fa-twitter-square'
+'icon-cogs-alt'
+'fa-usd'
+'icon-us-state-vi'
+'fa-usb'
+'fa-umbrella'
+'icon-umbrella-insurance'
+'fa-underline'
+'fa-undo'
+'icon-undock'
+'icon-usa'
+'fa-university'
+'fa-unlock-alt'
+'icon-unscheduled-shift-location'
+'icon-unscheduled-shift'
+'icon-upgrade'
+'icon-upgrade-cancelled'
+'fa-upload'
+'icon-folder-upload'
+'fa-user'
+'fa-user-o'
+'icon-user-card'
+'fa-user-circle'
+'fa-user-circle-o'
+'fa-user-secret'
+'fa-users'
+'icon-us-state-ut'
+'fa-vk'
+'icon-file-type-vsd2'
+'icon-vacation-timeoff'
+'icon-vault'
+'fa-venus'
+'fa-venus-double'
+'fa-venus-mars'
+'icon-verify-input'
+'icon-us-state-vt'
+'icon-slider-grip-vert'
+'fa-viacoin'
+'fa-video-camera'
+'fa-file-video-o'
+'icon-view-pay-data'
+'icon-view-pay-data-euro'
+'icon-view-report'
+'fa-vimeo'
+'fa-vimeo-square'
+'fa-vine'
+'icon-us-state-va'
+'fa-cc-visa'
+'icon-vision'
+'icon-vistaplus'
+'icon-void-checks'
+'icon-void-checks-euro'
+'icon-volume-slash'
+'icon-taxes-w2'
+'icon-taxes-w4'
+'fa-wpexplorer'
+'icon-us-state-wa'
+'icon-us-state-dc'
+'fa-weibo'
+'fa-weixin'
+'icon-us-state-wv'
+'fa-whatsapp'
+'fa-wheelchair'
+'icon-whole-year'
+'fa-wifi'
+'fa-wikipedia-w'
+'fa-window-close'
+'fa-window-close-o'
+'fa-window-maximize'
+'fa-window-minimize'
+'fa-window-restore'
+'fa-windows'
+'icon-us-state-wi'
+'icon-adp-wisely'
+'fa-file-word-o'
+'fa-wordpress'
+'icon-workers-comp'
+'fa-wrench'
+'icon-us-state-wy'
+'fa-xing'
+'fa-xing-square'
+'fa-y-combinator'
+'fa-yahoo'
+'fa-yelp'
+'fa-youtube'
+'fa-youtube-play'
+'fa-youtube-square'
+'icon-ca-prov-yt'
+'icon-ziprecruiter'
+'icon-zoom-in'
+'icon-zoom-out'
+'fa-adjust'
+'fa-align-center'
+'fa-align-justify'
+'fa-align-left'
+'fa-align-right'
+'fa-ambulance'
+'fa-angle-down'
+'fa-angle-left'
+'fa-angle-right'
+'fa-angle-up'
+'fa-arrow-down'
+'fa-arrow-left'
+'fa-arrow-right'
+'fa-arrow-up'
+'fa-asterisk'
+'fa-backward'
+'fa-ban'
+'fa-barcode'
+'fa-beer'
+'fa-bell'
+'fa-bold'
+'fa-book'
+'fa-bookmark'
+'fa-bullhorn'
+'fa-calendar'
+'fa-calendar-o'
+'fa-camera'
+'fa-camera-retro'
+'fa-certificate'
+'fa-chevron-down'
+'fa-chevron-left'
+'fa-chevron-right'
+'fa-chevron-up'
+'fa-code-fork'
+'fa-cog'
+'fa-cogs'
+'fa-comment'
+'fa-comment-o'
+'fa-comments'
+'fa-comments-o'
+'fa-credit-card'
+'fa-crop'
+'fa-deviantart'
+'icon-esignature-not-signed'
+'icon-esignature-signed'
+'fa-eject'
+'fa-eraser'
+'fa-exclamation'
+'fa-fast-backward'
+'fa-fast-forward'
+'fa-fighter-jet'
+'fa-fire'
+'fa-fire-extinguisher'
+'fa-flag'
+'fa-flag-checkered'
+'fa-font'
+'fa-forward'
+'fa-gift'
+'fa-header'
+'fa-headphones'
+'fa-home'
+'fa-hospital-o'
+'fa-inbox'
+'fa-ioxhost'
+'fa-italic'
+'fa-jsfiddle'
+'fa-key'
+'fa-lastfm'
+'fa-lastfm-square'
+'fa-leaf'
+'fa-list'
+'fa-list-alt'
+'fa-list-ol'
+'fa-list-ul'
+'fa-location-arrow'
+'fa-lock'
+'fa-magic'
+'fa-magnet'
+'fa-map-marker'
+'fa-meanpath'
+'fa-medkit'
+'fa-microphone'
+'fa-minus'
+'fa-paragraph'
+'fa-pause'
+'fa-pencil'
+'fa-plane'
+'fa-play'
+'fa-plus'
+'fa-print'
+'fa-qrcode'
+'fa-quote-left'
+'fa-quote-right'
+'fa-random'
+'fa-reddit'
+'fa-reddit-square'
+'fa-refresh'
+'fa-reply-all'
+'fa-retweet'
+'fa-road'
+'fa-rocket'
+'fa-rss'
+'fa-shield'
+'fa-shopping-cart'
+'fa-signal'
+'fa-skyatlas'
+'fa-spoon'
+'fa-star-half'
+'fa-step-backward'
+'fa-step-forward'
+'fa-stop'
+'fa-subscript'
+'fa-superscript'
+'fa-table'
+'fa-tablet'
+'fa-tag'
+'fa-tags'
+'fa-text-height'
+'fa-text-width'
+'fa-th'
+'fa-th-large'
+'fa-th-list'
+'fa-thumbs-down'
+'fa-thumbs-up'
+'fa-tint'
+'fa-trophy'
+'fa-truck'
+'fa-unlock'
+'fa-user-md'
+'fa-volume-down'
+'fa-volume-off'
+'fa-volume-up'
+'icon-sql-logo'
+'icon-ca-prov-qc'
+'icon-teampay-logo-fr'
+'icon-file-type-ind'
+'icon-file-type-zip'
+'icon-file-type-msg'
+'icon-file-type-ai'
+'icon-file-type-tif'
+'icon-file-type-png'
+'icon-file-type-gif'
+'icon-file-type-jpg'
+'icon-file-type-avi'
+'icon-file-type-swf'
+'icon-file-type-mp4'
+'icon-file-type-mov'
+'icon-file-type-fla'
+'icon-file-type-html'
+'icon-file-type-pdf'
+'icon-file-type-ppt'
+'icon-file-type-csv'
+'icon-file-type-xls'
+'icon-file-type-txt'
+'icon-file-type-rtf'
+'icon-file-type-doc'
+'icon-file-type-generic'
+'icon-file-type-psd'
+'icon-file-type-wav'
+'icon-file-type-mpa'
+'icon-file-type-mp3'
+'icon-import-disabled'
+'icon-mapping-disabled'
+'icon-expression-disabled'
+'icon-translations-disabled'
+'icon-file-def-disabled'
+'icon-adv-details-disabled'
+'icon-page-first'
+'icon-file-type-xml'
+'icon-file-type-wmv'
+'icon-file-type-bmp'
+'icon-file-type-vsd'
+'icon-file-type-docx'
+'icon-file-type-pptx'
+'icon-file-type-xlsx'
+'icon-blank-button-slider'
+'icon-certificate-insurance'
+'icon-employee-access'
+'icon-employee-handbook'
+'icon-no-button-slider'
+'icon-recordkeeping_toolkit'
+'icon-yes-button-slider'
+'icon-angular'
+'icon-jquery'
+'icon-lidless-can'
+'icon-can-lid'
+'icon-prescription-insurance'
+'icon-prescription-insurance2'
+'icon-paycal-company-holiday'
+##
+STD_ICON
+==
+DELETE FROM STD_ICON WHERE ID IN('icon-ca-prov-', 'icon-certificate_insurance', 'icon-employee_access', 'icon-employee_handbook', 'icon-perscription-insurance', 'icon-perscription-insurance2', 'icon-recordkeeping-toolkit')
+##
+TAG_CHARSET=@€éèç
+##
+SYS_ACCUEIL_LIENS
+=SQL IFNOTEXIST=SYS_ACCUEIL_LIENS=ICON=
+alter table SYS_ACCUEIL_LIENS ADD ICON VARCHAR2(200) DEFAULT 'fa-external-link'
+##
+SYS_ACCUEIL_LIENS
+=SQL=
+UPDATE SYS_ACCUEIL_LIENS SET ICON = 'fa-link' WHERE TYPE != 'E'
+##
+TAG_CHARSET=@€éèç
+##
+SYS_ACCUEIL_TYPE_CADRE
+=SQL=
+UPDATE SYS_ACCUEIL_TYPE_CADRE SET LIBELLE = 'Liens fixes' WHERE TYPE_CADRE = '-14'
+##
+SYS_ACCUEIL_TYPE_CADRE
+=SQL=
+UPDATE SYS_ACCUEIL_TYPE_CADRE SET LIBELLE = 'Bandeau d''accueil' WHERE TYPE_CADRE = '-4'
+##
+SYS_ACCUEIL_TYPE_CADRE
+=SQL=
+UPDATE SYS_ACCUEIL_TYPE_CADRE SET LIBELLE = 'Carrousel' WHERE TYPE_CADRE = '-19'
+##
+SYS_ACCUEIL_TYPE_CADRE
+=SQL=
+UPDATE SYS_ACCUEIL_TYPE_CADRE SET LIBELLE = 'Actions en cours' WHERE TYPE_CADRE = '-6'
+##
+SYS_ACCUEIL_TYPE_CADRE
+=SQL=
+UPDATE SYS_ACCUEIL_TYPE_CADRE SET LIBELLE = 'Historiques formations' WHERE TYPE_CADRE = '-9'
+##
+SYS_DEF_FONCTION_EXIT
+==
+DELETE FROM SYS_DEF_FONCTION_EXIT WHERE NOM_FONCTION = 'USER_PREFERENCE'
+'USER_PREFERENCE','_toDefine_','InfoExit','InfoExit','Fonction exit permettant d''effectuer des actions spécifiques lors de la mise à jour des préférences utilisateur (SlidePreferenceJsonServlet)'
+##
+SYS_DEF_LIBELLE_ML
+==
+DELETE FROM SYS_DEF_LIBELLE_ML WHERE TYPE IN ('Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionConditions.ConditionsDocserver') and CODE_LIBELLE IN ('label_rafraichir','label_ajouter','label_supprimer','grid_code','grid_operande1','grid_operande2','grid_operateur','grid_commentaire','grid_edition','label_attention')
+'Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionConditions.ConditionsDocserver','fr_fr', 'label_rafraichir','Rafraichir'
+'Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionConditions.ConditionsDocserver','fr_fr', 'label_ajouter','Ajouter une condition'
+'Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionConditions.ConditionsDocserver','fr_fr', 'label_supprimer','Supprimer la condition'
+'Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionConditions.ConditionsDocserver','fr_fr', 'grid_code','Code'
+'Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionConditions.ConditionsDocserver','fr_fr', 'grid_operande1','Opérande 1'
+'Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionConditions.ConditionsDocserver','fr_fr', 'grid_operande2','Opérande 2'
+'Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionConditions.ConditionsDocserver','fr_fr', 'grid_operateur','Opérateur'
+'Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionConditions.ConditionsDocserver','fr_fr', 'grid_commentaire','Commentaire'
+'Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionConditions.ConditionsDocserver','fr_fr', 'grid_edition','Edition'
+'Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionConditions.ConditionsDocserver','fr_fr', 'label_attention','Attention'
+##
+SYS_DEF_LIBELLE_ML
+==
+DELETE FROM SYS_DEF_LIBELLE_ML WHERE TYPE IN ('Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionConditions.ConditionDocserverCM') and CODE_LIBELLE IN ('label_code','label_donnee','label_operateur','label_valeur','label_edition','label_commentaire','label_valider','label_annuler','label_exporter','label_message')
+'Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionConditions.ConditionDocserverCM','fr_fr', 'label_code','Code de la condition'
+'Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionConditions.ConditionDocserverCM','fr_fr', 'label_donnee','Donnée à conditionner'
+'Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionConditions.ConditionDocserverCM','fr_fr', 'label_operateur','Opérateur de la condition'
+'Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionConditions.ConditionDocserverCM','fr_fr', 'label_valeur','Valeur à conditionner'
+'Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionConditions.ConditionDocserverCM','fr_fr', 'label_edition','Edition'
+'Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionConditions.ConditionDocserverCM','fr_fr', 'label_commentaire','Commentaire'
+'Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionConditions.ConditionDocserverCM','fr_fr', 'label_valider','Valider'
+'Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionConditions.ConditionDocserverCM','fr_fr', 'label_annuler','Annuler'
+##
+SYS_DEF_LIBELLE_ML
+==
+DELETE FROM SYS_DEF_LIBELLE_ML WHERE TYPE IN ('Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionChampsFusion.ExportChampsFusionDocserver') and CODE_LIBELLE IN ('label_exporter','label_message')
+'Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionChampsFusion.ExportChampsFusionDocserver','fr_fr', 'label_exporter','Exporter les champs de fusion'
+'Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionChampsFusion.ExportChampsFusionDocserver','fr_fr', 'label_message','Cet export doit obligatoirement être lancé depuis l''environnement de développement.<br/> Il permet de générer le couple nom technique/libellé des champs de fusion issus des dictionnaires paramétrés sur la table EDI_DS_EXPORT_CHAMPS.'
+##
+SYS_DEF_LIBELLE_ML
+==
+DELETE FROM SYS_DEF_LIBELLE_ML WHERE TYPE = 'Ext.adp.MainDesk.view.eastregion.theme.Theme'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','appel_table','Appel table'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','boutton_afficher','Afficher'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','boutton_ajouter','Ajouter'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','boutton_creer','Créer'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','boutton_dupliquer','Dupliquer'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','boutton_supprimer','Supprimer'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','boutton_valider','Valider'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','case_a_cocher','Case à cocher'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','case_a_cocher_desactivee','Case à cocher désactivée'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','champ_date','Champ date'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','champ_texte','Champ texte'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','creer_theme','Commencez par sélectionner les couleurs principales du thème, vous pourrez ensuite affiner votre sélection par composant.'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','duppli_ok','dupliqué avec succès.'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','grille','Grille'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','lib_donnee','Libellé de la donnée'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','liste_deroulante','Liste déroulante'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','matricule_rh','Matricule RH'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','menu','Menu'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','message_avertissement','Message d''avertissement'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','message_avertissement_lib','Ceci est un message d''avertissement'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','message_confirmation','Message de confirmation'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','message_confirmation_lib','Ceci est un message de confirmation'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','message_erreur','Message d''erreur'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','message_erreur_lib','Ceci est un message d''erreur'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','message_information','Message d''information'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','message_information_lib','Ceci est un message d''information'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','modif_interdite','Impossible de modifier un thème standard'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','nom','Nom'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','pac','PAC'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','prenom','Prénom'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','radio','Bouton radio'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','radio_desactivee','Bouton radio désactivée'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','recherche_structure','Recherche structure'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','regroupement','Regroupement'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','supp_ok','supprimé avec succès.'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','supp_theme','Voulez-vous supprimer ce thème ?'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','suppression','Suppression'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','theme','Thème'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','titre_champs_saisie','Champs saisie'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','val_donnee','Valeur de la donnée'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','valid_theme','Thème enregistré avec succès'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','screen_test','Ecran de test'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','themes','Thèmes'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','operation_terminee','Opération terminée'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','operation_en_cours','Opération en cours'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','operation_non_terminee','Opération non terminée'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','ecran_complete','Ecran complété'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','ecran_en_cours_saisie_obligatoire','Ecran en cours avec saisie obligatoire'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','ecran_en_cours_saisie_facultative','Ecran en cours sans saisie obligatoire'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','ecran_ignore','Ecran ignoré'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','fr_fr','ecran_non_complete','Ecran non complété'
+##
+SYS_DEF_LIBELLE_ML
+==
+DELETE FROM SYS_DEF_LIBELLE_ML WHERE TYPE = 'Ext.adp.MainDesk.view.eastregion.theme.Logo'
+'Ext.adp.MainDesk.view.eastregion.theme.Logo','fr_fr','logo_et_icone','Logo et icône'
+'Ext.adp.MainDesk.view.eastregion.theme.Logo','fr_fr','logo_entreprise','Logo de l''entreprise'
+'Ext.adp.MainDesk.view.eastregion.theme.Logo','fr_fr','favicon','Icône favoris'
+'Ext.adp.MainDesk.view.eastregion.theme.Logo','fr_fr','marque_entreprise','Marque de l''entreprise'
+'Ext.adp.MainDesk.view.eastregion.theme.Logo','fr_fr','nom_du_client','Nom du client'
+##
+TAG_CHARSET=@€éèç
+##
+SYS_DEF_PREFERENCES
+=SQL IFNOTEXIST=SYS_DEF_PREFERENCES=
+CREATE TABLE "SYS_DEF_PREFERENCES" (	"CODE_PREF" VARCHAR2(20 BYTE), 	"LIB_PREF" VARCHAR2(30 BYTE), 	"ORDRE" NUMBER(3,0), 	"MODE_SAISIE" VARCHAR2(10 BYTE), 	"APPELTABLE_NOMPAGE" VARCHAR2(100 BYTE), 	"APPELTABLE_IDREQUETE" VARCHAR2(30 BYTE), 	"VALEUR_DEFAUT" VARCHAR2(4000 BYTE) )
+##
+SYS_DEF_PREFERENCES
+==
+DELETE FROM SYS_DEF_PREFERENCES
+'CODE_LANGUE','Langue','1','select',NULL,NULL,'fr_fr'
+'NAV_BAR','Nagivation','2','radio','TAB_RD_NAVIGATION','1','HOR'
+'NOM_THEME','Thème','3','select','TAB_RD_THEME','1','0'
+##
+SYS_DEF_PREFERENCES
+=SQL IFNOTEXIST=SYS_DEF_PREFERENCES=ACTIF=
+ALTER TABLE SYS_DEF_PREFERENCES ADD ACTIF VARCHAR2(1)
+##
+SYS_DEF_PREFERENCES
+=SQL IFEXIST=SYS_DEF_PREFERENCES=
+UPDATE SYS_DEF_PREFERENCES SET ACTIF = 'O'
+##
+SYS_DEF_PREFERENCES
+=SQL IFNOTEXIST=SYS_DEF_PREFERENCES=CONFIG=
+ALTER TABLE sys_def_preferences ADD CONFIG CLOB
+##
+sys_def_preferences
+==
+DELETE FROM sys_def_preferences WHERE CODE_PREF = 'FONT_SIZE'
+'FONT_SIZE','Taille de la police','4','number',NULL,NULL,'100','O','{"minVal": 100, "maxVal": 300}'
+##
+TAG_CHARSET=@€éèç
+##
+SYS_DEF_THEME
+=SQL IFNOTEXIST=SYS_DEF_THEME=
+CREATE TABLE SYS_DEF_THEME ( VAR_NAME VARCHAR2(50 BYTE) NOT NULL, LIBELLE VARCHAR2(50 BYTE), GROUPE VARCHAR2(50 BYTE), DEFAULT_COLOR VARCHAR2(50 BYTE), CONSTRAINT SYS_DEF_THEME_PK PRIMARY KEY (VAR_NAME))
+##
+SYS_DEF_THEME
+==
+DELETE FROM SYS_DEF_THEME
+'action-color','Lien et icône','Lien & Icône',NULL
+'action-color-hover','Lien et icône au survol','Lien & Icône','action-color#40'
+'appbar-bg-color','Fond de la barre de recherche','Navigation','btn-color#-40'
+'appbar-bg-color-light','Fond du champ de recherche','Navigation','btn-color#20'
+'appbar-bg-color-transparent','Surlignage dans la recherche','Navigation','btn-color#80'
+'appbar-font-color','Texte dans la barre de navigation','Navigation',NULL
+'avatar-bg-color','Fond de l''avatar','Avatar','btn-color#30'
+'appbar-icon-color','Icône de la barre de navigation','Navigation','#ffffff'
+'appbar-icon-color-hover','Icône de la barre de navigation au survol','Navigation','btn-color#-40'
+'bandeau-donnee-info-collab-color','Données du collaborateur dans le bandeau','Bandeau',NULL
+'bandeau-periode-ouverte-color','Période ouverte','Bandeau','bandeau-salarie-non-present-color#0'
+'bandeau-manager-color','Badge manager','Bandeau','#324fa5'
+'bandeau-badge-salarie-non-present-color','Badge pour un salarié sorti','Bandeau','#F9C4C3'
+'bandeau-badge-salarie-non-present-text-color','Texte du badge pour un salarié sorti','Bandeau','#A12F1F'
+'bandeau-badge-salarie-present-color','Badge pour un salarié présent','Bandeau','#C2F2C3'
+'bandeau-badge-salarie-present-text-color','Texte du badge pour un salarié présent','Bandeau','#2F5B22'
+'bandeau-badge-manager-color','Badge pour un manager','Bandeau','#D8E5F9'
+'bandeau-badge-manager-text-color','Texte du badge pour un manager','Bandeau','#324FA5'
+'bg-color','Bureau','Couleur de fond',NULL
+'bg-color-bandeau','Bandeau','Couleur de fond',NULL
+'bg-color-margin','Marges','Couleur de fond','bg-color#-70'
+'btn-color','Fond et bordures','Bouton',NULL
+'btn-hover-color','Fond au survol (boutons primaires)','Bouton','btn-color#-30'
+'btn-hover-color-light','Fond au survol (bouton secondaire et tableau)','Bouton','btn-color#80'
+'btn-primary-color','Fond du bouton primaire','Bouton','appbar-font-color#0'
+'busy-indicator-bg-color','Fond du chargement','Lien & Icône','btn-color#80'
+'busy-indicator-bg-mask','Masque du chargement','Lien & Icône','#00000080'
+'busy-indicator-color','Chargement','Lien & Icône','btn-color#0'
+'checkbox-radio-color','Non sélectionné','Checkbox & Radio','text-color#40'
+'checkbox-radio-color-checked','Sélectionné','Checkbox & Radio','btn-color#0'
+'checkbox-radio-color-checked-hover','Sélectionné au survol','Checkbox & Radio','btn-color#-30'
+'checkbox-radio-color-hover','Non sélectionné au survol','Checkbox & Radio','text-color#0'
+'checkbox-radio-color-disabled','Désactiver','Checkbox & Radio',NULL
+'checkbox-radio-color-disabled-checked','Désactiver sélectionné','Checkbox & Radio',NULL
+'checkbox-color-disabled-checked','Désactiver checkbox sélectionné','Checkbox & Radio',NULL
+'combo-hover-bg-color','Option au survol ','Liste déroulante','bg-color#0'
+'combo-selected-bg-color','Option sélectionnée','Liste déroulante','btn-color#70'
+'grid-body-bg-color','Fond','Grille','tuile-bg-color#0'
+'grid-header-bg-color','Entete','Grille','tuile-bg-color#0'
+'grid-header-font-color','Texte de l''entête','Grille','text-color#0'
+'grid-header-font-hover-color','Texte de l''entête au survol','Grille','text-color#40'
+'grid-header-hover-bg-color','Entete au survol','Grille','btn-color#90'
+'grid-item-font-color','Texte d''une ligne','Grille','text-color#0'
+'grid-item-font-hover-color','Texte d''une ligne au survol','Grille','text-color#40'
+'grid-item-hover-bg-color','Ligne au survol','Grille','btn-color#70'
+'grid-item-hover-border-color','Bordure au survol','Grille','action-color#20'
+'input-icon-color','Icône input','Bouton','text-color#0'
+'input-icon-color-focus','Icône input au focus','Bouton','#2a70e8'
+'input-icon-color-hover','Icône input au survol','Bouton','action-color#20'
+'input-color','Bordure','Champ de saisie','text-color#80'
+'input-error-color','Erreur','Champ de saisie','#9C2514'
+'input-hover-color','Bordure au survol','Champ de saisie','action-color#40'
+'input-text-color','Texte des champs','Champ de saisie','text-color#0'
+'msg-error-bg-color','Fond (erreur)','Message','#FAD9D9'
+'msg-error-icon-color','Texte & Icône (erreur)','Message','#9C2514'
+'msg-info-bg-color','Fond (information)','Message','#E8EFFA'
+'msg-info-icon-color','Texte & Icône (information)','Message','#324FA5'
+'msg-success-bg-color','Fond (succès)','Message','#DBF7DC'
+'msg-success-icon-color','Texte & Icône (succès)','Message','#2F5B22'
+'msg-text-color','Fond Info bulle','Message','btn-color#-40'
+'msg-tooltip-color','Texte Info bulle','Message','appbar-font-color#0'
+'msg-warning-bg-color','Fond (warning)','Message','#F8EED9'
+'msg-warning-icon-color','Texte & Icône (warning)','Message','#983F00'
+'navbar-bg-color','Fond de la barre de navigation','Navigation','bg-color'
+'navbar-not-selected-font','Texte d''un menu non sélectionné','Navigation','msg-text-color'
+'navbar-selected-border','Bordure du menu sélectionné','Navigation',NULL
+'preference-item-color','Texte des items du menu préférence','Bandeau','#393533'
+'preference-text-color','Texte de l''entête du menu préférence','Bandeau','#262321'
+'text-color','Libellé','Texte',NULL
+'text-color-light','Donnée','Texte','text-color#40'
+'tuile-bg-color','Fond','Tuile',NULL
+'tuile-icon-extern-color','Lien externe','Tuile','navbar-selected-border#0'
+'tuile-icon-intern-color','Lien interne','Tuile','action-color#0'
+'menu-hover-bg-color','Option au survol dans menu','Liste déroulante','#e8effa'
+'wizard-step-completed','Opération terminée','Workflow','#324fa5'
+'wizard-step-in-process','Opération en cours','Workflow','#476bc3'
+'wizard-step-not-completed','Opération non complétée','Workflow','#d8e5f9'
+'wizard-ariane-step-in-process-with-mandatory','Ecran en cours avec saisie obligatoire','Workflow','#ff0000'
+'wizard-ariane-step-in-process-without-mandatory','Ecran en cours sans saisie obligatoire','Workflow','#ffb400'
+'wizard-ariane-step-completed','Ecran complété','Workflow','#008000'
+'wizard-ariane-step-not-completed','Ecran non complété','Workflow','#476bc3'
+'wizard-ariane-step-skipped','Ecran ignoré','Workflow','#808080'
+##
+SYS_PAGES_MODAL
+==
+delete from SYS_PAGES_MODAL where NOM_PAGE = 'Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionConditions.ConditionDocserverCM'
+'Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionConditions.ConditionDocserverCM', 'Création/Modification d''une condition'
+##
+SYS_PAGES_MODAL
+==
+delete from SYS_PAGES_MODAL where NOM_PAGE = 'Ext.adp.MainDesk.view.eastregion.slideDateEffet.DateEffetDetails'
+'Ext.adp.MainDesk.view.eastregion.slideDateEffet.DateEffetDetails', 'Détails des données modifiées'
+##
+SYS_PAGES_MODAL
+==
+DELETE FROM SYS_PAGES_MODAL WHERE NOM_PAGE = 'Ext.adp.MainDesk.view.eastregion.theme.Theme'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','Gestion du look & feel'
+##
+SYS_PAGES_MODAL
+==
+DELETE FROM SYS_PAGES_MODAL WHERE NOM_PAGE = 'Ext.adp.MainDesk.view.eastregion.theme.Logo'
+'Ext.adp.MainDesk.view.eastregion.theme.Logo','Personnalisation du logo'
+##
+SYS_PAGES_MODAL
+==
+DELETE FROM SYS_PAGES_MODAL WHERE nom_page = 'Moteur/Comp/WebAdmin/Purge/ParametragePurgeTablesAjoutModif.jsp'
+'Moteur/Comp/WebAdmin/Purge/ParametragePurgeTablesAjoutModif.jsp','Ajout et modification d''un paramétrage de purge'
+##
+SYS_PAGES_MODAL
+==
+DELETE FROM SYS_PAGES_MODAL WHERE nom_page = 'Moteur/Comp/WebAdmin/Purge/ParametragePurgeTablesAjoutModifTableLiee.jsp'
+'Moteur/Comp/WebAdmin/Purge/ParametragePurgeTablesAjoutModifTableLiee.jsp','Ajout et modification d''un paramétrage de purge liée'
+##
+SYS_REQUETES_JSP
+==
+DELETE FROM sys_requetes_jsp WHERE nompage='LienFixeEdit.js' and idrequete=1
+'LienFixeEdit.js','1','Utilisateur','SYS_SCH_ELEMENT','LIBELLE','LIBELLE,NOM_PAGE','NIVEAU=99 AND  NVL(DESCRIPTION,''0'') not like ''%BACASABLE%'' AND NOM_PAGE not like ''%BacASable%'' AND NOM_PAGE not like ''%idProjet%''','0',NULL,'NOM_PAGE',NULL,NULL,'Nom de la page'
+##
+SYS_REQUETES_JSP
+==
+DELETE FROM SYS_REQUETES_JSP WHERE NOMPAGE = 'TAB_RD_LANGUE' AND IDREQUETE = 1
+'TAB_RD_LANGUE','1','Utilisateur','SYS_DEF_LANGUE sdl INNER JOIN SYS_DEF_LIBELLE_ML sdlm ON sdl.CODE_LANGUE = SDLM.CODE_LANGUE AND TO_CHAR(SDL.CODE_LIBELLE) = SDLM.CODE_LIBELLE','SDL.CODE_LANGUE,SDLM.LIBELLE','SDL.CODE_LANGUE,SDLM.LIBELLE',NULL,'0','false','TO_CHAR(SDLM.LIBELLE)',NULL,'Liste des langues disponible dans l''application','Code langue,Libellé langue'
+##
+SYS_REQUETES_JSP
+==
+DELETE FROM SYS_REQUETES_JSP WHERE NOMPAGE = 'TAB_RD_NAVIGATION' AND IDREQUETE = 1
+'TAB_RD_NAVIGATION','1','Utilisateur','(SELECT ''HOR'' AS CODE, ''Horizontale'' AS LIBELLE FROM DUAL UNION ALL SELECT ''VER'' AS CODE, ''Verticale'' AS LIBELLE FROM DUAL)','CODE,LIBELLE','CODE,LIBELLE',NULL,'0',NULL,NULL,NULL,'Disposition de la barre de navigation','Code, Libellé'
+##
+SYS_REQUETES_JSP
+==
+DELETE FROM SYS_REQUETES_JSP WHERE NOMPAGE = 'TAB_RD_THEME' AND IDREQUETE = 1
+'TAB_RD_THEME','1','Utilisateur','SYS_USR_THEME','ID_THEME,NOM_THEME','ID_THEME,NOM_THEME',NULL,'0',NULL,NULL,NULL,'Thème de l''application','Identifiant du thème, Nom du thème'
+##
+SYS_REQUETES_JSP
+==
+DELETE FROM sys_requetes_jsp WHERE nompage='LienFixeEdit.js' and idrequete=1
+'LienFixeEdit.js','1','Utilisateur','SYS_SCH_SCHEMA_FULL','ROLE,LIBELLE','ROLE,LIBELLE,NOM_PAGE','NOM_PAGE not like (''%BacASable%'') AND NOM_PAGE not like (''%ADP_ONLY%'')','0',NULL,'ROLE,LIBELLE',NULL,NULL,'Rôle,Libellé'
+##
+sys_requetes_jsp
+==
+DELETE FROM sys_requetes_jsp WHERE nompage = 'ParametragePurgeTablesAjoutModif.jsp' and idrequete = '2071'
+'ParametragePurgeTablesAjoutModif.jsp','2071','Utilisateur','USER_TAB_COLUMNS','COLUMN_NAME','COLUMN_NAME','TABLE_NAME=''%1''','0',NULL,'COLUMN_NAME','COLUMN_NAME','Nom de la colonne',NULL
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE nom_page = 'Moteur/Delegation/AdministrationDelegationRestriction.jsp'
+'Moteur/Delegation/AdministrationDelegationRestriction.jsp','AdministrationDelegationJsonServlet'
+'Moteur/Delegation/AdministrationDelegationRestriction.jsp','CreationDelegationJsonServlet'
+'Moteur/Delegation/AdministrationDelegationRestriction.jsp','DetailsDelegationJsonServlet'
+'Moteur/Delegation/AdministrationDelegationRestriction.jsp','DuplicationDelegationJsonServlet'
+'Moteur/Delegation/AdministrationDelegationRestriction.jsp','ModificationDelegationJsonServlet'
+'Moteur/Delegation/AdministrationDelegationRestriction.jsp','ValidationDelegationJsonServlet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE IN ('Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionConditions.ConditionsDocserver','Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionConditions.ConditionsDocserver')
+'Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionConditions.ConditionsDocserver','ConditionDocserverCMJsonServlet'
+'Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionConditions.ConditionsDocserver','ConditionsDocserverJsonServlet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionChampsFusion.ExportChampsFusionDocserver'
+'Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionChampsFusion.ExportChampsFusionDocserver','ExportChampsFusionDocserverServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.MainDesk.view.eastregion.theme.Theme'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','ThemeJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.MainDesk.view.eastregion.theme.Logo'
+'Ext.adp.MainDesk.view.eastregion.theme.Logo','LogoJsonServlet'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+DELETE FROM SYS_SCH_PAGE_INITIALIZER WHERE NOM_PAGE IN ('Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionConditions.ConditionsDocserver', 'Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionConditions.ConditionDocserverCM')
+'Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionConditions.ConditionsDocserver', null, 'EDICND01;EDICND02;EDICND03', 'TOOLS_ML'
+'Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionConditions.ConditionDocserverCM', null, 'STD00032;STD00034;EDICND01;EDICND02;EDICND03;EDICND04;EDICND05;EDICND06;EDICND07;EDICND08;EDICND09', 'TOOLS_ML'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+DELETE FROM SYS_SCH_PAGE_INITIALIZER WHERE NOM_PAGE = 'Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionChampsFusion.ExportChampsFusionDocserver'
+'Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionChampsFusion.ExportChampsFusionDocserver',null,'EDICHS01','TOOLS_ML'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+DELETE FROM SYS_SCH_PAGE_INITIALIZER WHERE NOM_PAGE = 'Ext.adp.MainDesk.view.eastregion.theme.Theme'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme',NULL,NULL,'TOOLS_ML'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+delete from SYS_SCH_PAGE_INITIALIZER where NOM_PAGE =  'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInAjoutBridgingModel'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInAjoutBridgingModel', null, null, 'TOOLS_ML'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+DELETE FROM SYS_SCH_PAGE_INITIALIZER WHERE NOM_PAGE = 'Ext.adp.MainDesk.view.eastregion.theme.Logo'
+'Ext.adp.MainDesk.view.eastregion.theme.Logo',NULL,NULL,'TOOLS_ML'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE synonyme = 'HelpDeskConfirmGapCMSServiceLet'
+'S','HelpDeskConfirmGapCMSServiceLet','fr.adp.com.gxp.std.modules.lib.servicelet.HelpDesk.HelpDeskConfirmGapCMSServiceLet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME IN ('ConditionsDocserverJsonServlet','ConditionDocserverCMJsonServlet')
+'J','ConditionsDocserverJsonServlet','fr.adp.com.gxp.std.mot_met.lib.objects.docserver.moduleeditique.ConditionsDocserverJsonServlet','O'
+'J','ConditionDocserverCMJsonServlet','fr.adp.com.gxp.std.mot_met.lib.objects.docserver.moduleeditique.ConditionDocserverCMJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME IN ('ExportChampsFusionDocserverServlet')
+'J','ExportChampsFusionDocserverServlet','fr.adp.com.gxp.std.mot_met.lib.objects.docserver.moduleeditique.ExportChampsFusionDocserverServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE synonyme = 'HelpDeskConfirmGapCMSServiceLet'
+'S','HelpDeskConfirmGapCMSServiceLet','fr.adp.com.gxp.std.modules.lib.servicelet.helpdeskservicelet.HelpDeskConfirmGapCMSServiceLet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE TYP = 'J' AND SYNONYME = 'SlidePreferenceJsonServlet'
+'J','SlidePreferenceJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.SlidePreferenceJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE TYP = 'J' AND SYNONYME = 'ThemeJsonServlet'
+'J','ThemeJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.theme.ThemeJsonServlet','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE TYP = 'J' AND SYNONYME = 'LogoJsonServlet'
+'J','LogoJsonServlet','fr.adp.com.gxp.std.mot_met.lib.servicelet.theme.LogoJsonServlet','O'
+##
+TAG_CHARSET=@€éèç
+##
+SYS_USR_HABILITE_RGPD
+=SQL IFNOTEXIST=SYS_USR_HABILITE_RGPD=
+CREATE TABLE SYS_USR_HABILITE_RGPD(AOID VARCHAR2 (32) NOT NULL, DateMaj DATE NOT NULL, CONSTRAINT SYS_USR_HABILITE_RGPD_PK PRIMARY KEY (AOID))
+##
+TAG_CHARSET=@€éèç
+##
+SYS_USR_THEME
+=SQL IFNOTEXIST=SYS_USR_THEME=
+CREATE TABLE SYS_USR_THEME ( ID_THEME NUMBER, NOM_THEME VARCHAR2(30), "OWNER" VARCHAR2(32), "PUBLIC" VARCHAR2(1), DATE_CREATION DATE, DATE_MODIF DATE, PRIMARY KEY (ID_THEME) )
+##
+SYS_USR_THEME
+==
+DELETE FROM SYS_USR_THEME WHERE ID_THEME = 0
+##
+SYS_USR_THEME
+=SQL=
+INSERT INTO SYS_USR_THEME ("ID_THEME","NOM_THEME","OWNER","PUBLIC","DATE_CREATION","DATE_MODIF") VALUES ('0','DEFAUT','*','O',SYSDATE,SYSDATE)
+##
+SYS_USR_THEME
+=SQL IFEXIST=SYS_USR_THEME=
+UPDATE SYS_USR_THEME SET NOM_THEME = 'ADPONEUX' WHERE ID_THEME = 0 AND OWNER = '*'
+##
+TAG_CHARSET=@€éèç
+##
+SYS_USR_THEME_CONFIG
+=SQL IFNOTEXIST=SYS_USR_THEME_CONFIG=
+CREATE TABLE SYS_USR_THEME_CONFIG( ID_THEME NUMBER NOT NULL, VAR_NAME VARCHAR2(50) NOT NULL, COLOR VARCHAR2(30) NOT NULL, CONSTRAINT SYS_USR_THEME_CONFIG_PK PRIMARY KEY (ID_THEME,VAR_NAME) )
+##
+SYS_USR_THEME_CONFIG
+==
+DELETE FROM SYS_USR_THEME_CONFIG WHERE id_theme = 0
+'0','action-color','#476bc3'
+'0','action-color-hover','#324fa5'
+'0','appbar-bg-color','#121C4E'
+'0','appbar-bg-color-light','#414971'
+'0','appbar-bg-color-transparent','#bcc2e3'
+'0','appbar-font-color','#FFFFFF'
+'0','appbar-icon-color','#ffffff'
+'0','appbar-icon-color-hover','#4d557a'
+'0','avatar-bg-color','#3a40a2'
+'0','bandeau-donnee-info-collab-color','#000000'
+'0','bandeau-periode-ouverte-color','#ec5b4e'
+'0','bandeau-badge-salarie-non-present-color','#F9C4C3'
+'0','bandeau-badge-salarie-non-present-text-color','#A12F1F'
+'0','bandeau-badge-salarie-present-color','#C2F2C3'
+'0','bandeau-badge-salarie-present-text-color','#2F5B22'
+'0','bandeau-badge-manager-color','#D8E5F9'
+'0','bandeau-badge-manager-text-color','#324FA5'
+'0','bg-color','#ffffff'
+'0','bg-color-bandeau','#ffffff'
+'0','bg-color-margin','#121212'
+'0','btn-color','#324fa5'
+'0','btn-hover-color','#20337d'
+'0','btn-hover-color-light','#e8effa'
+'0','btn-primary-color','#FFFFFF'
+'0','busy-indicator-bg-color','#b5d0ff'
+'0','busy-indicator-bg-mask','#00000080'
+'0','busy-indicator-color','#324fa5'
+'0','checkbox-color-disabled-checked','#b2aba5'
+'0','checkbox-radio-color','#938c85'
+'0','checkbox-radio-color-checked','#324fa5'
+'0','checkbox-radio-color-checked-hover','#121c4e'
+'0','checkbox-radio-color-disabled','#e3dfda'
+'0','checkbox-radio-color-disabled-checked','#938c85'
+'0','checkbox-radio-color-hover','#544e4a'
+'0','combo-hover-bg-color','#F5F8FF'
+'0','combo-selected-bg-color','#d8e5f9'
+'0','grid-body-bg-color','#FFFFFF'
+'0','grid-header-bg-color','#FFFFFF'
+'0','grid-header-font-color','#1F2937'
+'0','grid-header-font-hover-color','#9CA4AB'
+'0','grid-header-hover-bg-color','#F5F8FF'
+'0','grid-item-font-color','#1F2937'
+'0','grid-item-font-hover-color','#9CA4AB'
+'0','grid-item-hover-bg-color','#F5F8FF'
+'0','grid-item-hover-border-color','#75a8ff'
+'0','input-color','#DDDAD9'
+'0','input-error-color','#c53422'
+'0','input-hover-color','#9BB9FC'
+'0','input-icon-color','#393533'
+'0','input-icon-color-focus','#2a70e8'
+'0','input-icon-color-hover','#4C82FA'
+'0','input-text-color','#1F2937'
+'0','menu-hover-bg-color','#e8effa'
+'0','msg-error-bg-color','#fad9d9'
+'0','msg-error-icon-color','#9c2514'
+'0','msg-info-bg-color','#e8effa'
+'0','msg-info-icon-color','#324fa5'
+'0','msg-success-bg-color','#dbf7dc'
+'0','msg-success-icon-color','#2f5b22'
+'0','msg-text-color','#262321'
+'0','msg-tooltip-color','#ffffff'
+'0','msg-warning-bg-color','#f8eed9'
+'0','msg-warning-icon-color','#983f00'
+'0','navbar-bg-color','#ffffff'
+'0','navbar-not-selected-font','#262321'
+'0','navbar-selected-border','#324fa5'
+'0','preference-item-color','#393533'
+'0','preference-text-color','#262321'
+'0','text-color','#1F2937'
+'0','text-color-light','#000000'
+'0','tuile-bg-color','#ffffff'
+'0','tuile-icon-extern-color','#f2635d'
+'0','tuile-icon-intern-color','#20337d'
+'0','wizard-ariane-step-completed','#407b30'
+'0','wizard-ariane-step-in-process-with-mandatory','#c53422'
+'0','wizard-ariane-step-in-process-without-mandatory','#476bc3'
+'0','wizard-ariane-step-not-completed','#cc730d'
+'0','wizard-ariane-step-skipped','#726c66'
+'0','wizard-step-completed','#7ca1e6'
+'0','wizard-step-in-process','#121c4e'
+'0','wizard-step-not-completed','#e3dfda'
+##
+SYS_DEF_ERREURS
+==
+DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'GAP00229'
+'GAP00229','GAP','fr_fr','0','Attention, le thème est utilisé dans le processus libre "#1".','2'
+##
+SYS_DEF_ERREURS
+==
+DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'GAP00230'
+'GAP00230','GAP','fr_fr','0','Une erreur de paramétrage est survenue. Veuillez contacter votre administrateur.','1'
+##
+SYS_DEF_ERREURS
+==
+delete from SYS_DEF_ERREURS where CODMOD = 'EDI' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('EDICND01', 'EDICND02', 'EDICND03', 'EDICND04', 'EDICND05', 'EDICND06', 'EDICND07', 'EDICND08', 'EDICND09')
+'EDICND01','EDI','fr_fr','0','Souhaitez-vous supprimer la condition ?','1'
+'EDICND02','EDI','fr_fr','0','Le code de la condition n''est pas valorisé.','3'
+'EDICND03','EDI','fr_fr','0','Veuillez sélectionner une condition.','3'
+'EDICND04','EDI','fr_fr','0','Une erreur est survenue sur l''écran. ','3'
+'EDICND05','EDI','fr_fr','0','Erreur lors de la suppression de la règle.','3'
+'EDICND06','EDI','fr_fr','0','La condition n''a pu être déterminée.','3'
+'EDICND07','EDI','fr_fr','0','Erreur lors de la validation de la condition.','3'
+'EDICND08','EDI','fr_fr','0','Le code de la condition existe déjà sur cette édition.','3'
+'EDICND09','EDI','fr_fr','0','Une erreur est survenue lors de l''enregistrement de la condition.','3'
+##
+SYS_DEF_ERREURS
+==
+delete from SYS_DEF_ERREURS where CODMOD = 'EDI' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR = 'EDICHS01'
+'EDICHS01','EDI','fr_fr','0','Une erreur est survenue lors de l''export des champs de fusion.','3'
+##
+SYS_DEF_ERREURS
+==
+delete from SYS_DEF_ERREURS where CODMOD = 'EDI' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and  CODERR in ('EDI00099') 
+'EDI00099','EDI','fr_fr','0','La génération est en cours, merci de patienter. Vous pouvez fermer cette fenêtre, vous verrez le fichier apparaître dans "Mes fichiers récents".','2'
+##
+SYS_DEF_ERREURS
+==
+DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'FDSP0003' AND CODLANG = 'fr_fr' AND NIV_DEFINITION = 0
+'FDSP0003','STD','fr_fr','0','Vous consultez actuellement les livrables de paie des traitements du #1 au #2','1'
+##
+SYS_VARSYS
+==
+call ADM_ADD_OR_UPDATE_VARSYS ('STD', 'EDITIQUE_FONCTIONS_CHAMPS', 'false','Booléen', 'Booléen permettant d''activer(true)/désactiver(false) la gestion des champs de fusion en majuscule, minuscule, et nom propre, pour le module éditique.')
+##
+SYS_VARSYS
+=SQL=
+DECLARE
+	varsysok NUMBER;
+BEGIN
+	select count(*) into varsysok from sys_varsys where module = 'STD' AND codvar ='NOM_THEME';
+	if (varsysok = 0) then
+		INSERT INTO SYS_VARSYS VALUES ('STD','NOM_THEME','DEFAUT','Texte','Nom du thème utilisé pour le bureau et configuré dans la table SYS_USR_THEME/SYS_USR_THEME_CONFIG.');
+	END IF;
+END;
+##
+SYS_VARSYS
+=SQL=
+DECLARE
+	varsysok NUMBER;
+BEGIN
+	select count(*) into varsysok from sys_varsys where module = 'STD' AND codvar = 'MARGIN_SIZE';
+	if (varsysok = 0) then
+		INSERT INTO SYS_VARSYS VALUES ('STD','MARGIN_SIZE','0','Entier','Taille des marges gauche et droite du bureau.');
+	END IF;
+END;
+##
+sys_varsys
+==
+DELETE FROM sys_varsys WHERE codvar = 'DESK_NOM_CLIENT' and module = 'STD'
+'STD','DESK_NOM_CLIENT',NULL,'Texte','A la place du logo de l''entreprise, il est possible d''afficher le nom du client au format texte'
+##
+SYS_VARSYS
+=SQL IFEXIST=SYS_VARSYS=
+UPDATE SYS_VARSYS SET DESCRIPTION = 'Dans cette VarSys est déclaré le nom de l''image (celui paramétré sur Bibliothèque d''image et de documents) qui est utilisée pour être affichée comme favicon' WHERE CODVAR = 'DESK_FAVICON' AND MODULE = 'STD'
+##
+SYS_VARSYS
+==
+DELETE FROM SYS_VARSYS WHERE MODULE = 'STD' AND CODVAR = 'DESK_THEME_DEFAUT'
+'STD','DESK_THEME_DEFAUT','ADPONEUX','Texte','Look & Feel par défaut utilisé dans l''application lorsque l''utilisateur n''a pas de préférence enregistrée'
+##
+SYS_VARSYS
+==
+DELETE FROM SYS_VARSYS WHERE MODULE = 'STD' AND CODVAR = 'DESK_MENUPREFERENCE_ACTIF'
+'STD','DESK_MENUPREFERENCE_ACTIF','false','Booléen','Afficher (true) ou masquer (false) le menu des préférences utilisateur'
+##
+sys_varsys
+==
+DELETE FROM sys_varsys WHERE codvar = 'DESK_PERSOLOGO' and module = 'STD'
+'STD','DESK_PERSOLOGO','false', 'Booléen','Afficher l''icône personnalisation du logo pour l''utilisateur connecté (par défaut à FALSE)'
+##
+sys_varsys
+==
+UPDATE SYS_VARSYS SET DESCRIPTION = 'Conditionne l''affichage de la favicon (true = afficher, false = ne pas afficher).' WHERE CODVAR = 'DESK_SHOW_FAVICONE' AND MODULE = 'STD'
+##
+sys_varsys
+==
+DELETE FROM SYS_VARSYS WHERE CODVAR = 'DESK_FAVICON' AND MODULE = 'STD'
+'STD','DESK_FAVICON','','Texte','Libellé de l''image du favicon (dans bibliothèque d''image et de documents). Ne pas saisir le nom du fichier.'
+##
+sys_varsys
+==
+DELETE FROM SYS_VARSYS WHERE CODVAR = 'DESK_LOGO_ENTREPRISE' AND MODULE = 'STD'
+'STD','DESK_LOGO_ENTREPRISE','','Texte','Libellé de l''image du logo d''entreprise (dans bibliothèque d''image et de documents). Ne pas saisir le nom du fichier.'
+##
+sys_varsys
+==
+DELETE FROM SYS_VARSYS WHERE CODVAR = 'DESK_LEFTMENU' AND MODULE = 'STD'
+##
+sys_varsys
+==
+DELETE FROM sys_varsys WHERE codvar = 'DESK_COPYRIGHT' and module = 'STD'
+'STD','DESK_COPYRIGHT','Copyright 2022 ADP, Inc.','Texte','Copyright ADP'
+##
+sys_varsys
+==
+DELETE FROM SYS_VARSYS WHERE CODVAR = 'LIBELLE_SALARIE_PRESENT' AND MODULE = 'STD'
+'STD','LIBELLE_SALARIE_PRESENT','Présent(e)','Texte','Mot pour qualifier une personne présente à l''effectif. On retrouve ce terme dans les badges du bandeau. Par défaut ( Présent(e) ).'
+##
+sys_varsys
+==
+DELETE FROM SYS_VARSYS WHERE CODVAR = 'LIBELLE_SALARIE_NON_PRESENT' AND MODULE = 'STD'
+'STD','LIBELLE_SALARIE_NON_PRESENT','Sorti(e)','Texte','Mot pour qualifier une personne non présente à l''effectif. On retrouve ce terme dans les badges du bandeau. Par défaut ( Sorti(e) ).'
+##
+sys_varsys
+==
+DELETE FROM SYS_VARSYS WHERE CODVAR = 'LIBELLE_MANAGER' AND MODULE = 'STD'
+'STD','LIBELLE_MANAGER','Manager','Texte','Mot pour qualifier un manager. On retrouve ce terme dans les badges du bandeau. Par défaut ( Manager ).'

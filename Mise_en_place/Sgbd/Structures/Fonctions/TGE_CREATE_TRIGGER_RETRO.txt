@@ -1,0 +1,240 @@
+##
+TAG_CHARSET=@€éèç
+##
+TGE_CREATE_TRIGGER_RETRO
+=SQL=
+CREATE OR REPLACE FUNCTION TGE_CREATE_TRIGGER_RETRO(NOM_TABLE IN VARCHAR2)
+RETURN CLOB
+AS
+  v_retour CLOB;
+
+  champDateEffetRetro VARCHAR2(50);
+  conditionRetro CLOB;
+  procRetroPaiezadCodeChrono VARCHAR(4000);
+
+  CURSOR cur_mapdoRetro IS
+    SELECT LISTAGG(numpac,',') WITHIN GROUP (ORDER BY numpac) as numpacs, donneegxp, clause_date_eff_retro, data_type from (
+      SELECT DISTINCT dz.numpac, md.donneegxp, REGEXP_REPLACE(mddr.clause_date_eff_retro,':(new|old)','v_lig\1',1,0,'i') as clause_date_eff_retro, utc.data_type
+      FROM tge_ref_dicoz dz 
+      INNER JOIN TGE_REF_MAPDO_RESOLVED md ON md.element = dz.element AND md.numpac = dz.numpac
+      LEFT JOIN tge_ref_mapdo_dteff_retro mddr ON mddr.element = dz.element AND (mddr.numpac = dz.numpac OR (mddr.numpac = '*' AND NOT EXISTS (SELECT 1 FROM tge_ref_mapdo_dteff_retro zdr WHERE zdr.numpac= dz.numpac AND zdr.element = dz.element)))
+      ,user_tab_cols utc
+      WHERE 
+        utc.column_name=md.donneegxp and utc.table_name=nom_table 
+        and dz.calcul_retro = '1' 
+        AND TABLEGXP IN (
+          SELECT tableparam 
+          FROM tge_ref_mapta 
+          WHERE tablephy = NOM_TABLE
+        )
+    )
+    GROUP BY donneegxp, clause_date_eff_retro, data_type
+    ORDER BY donneegxp, clause_date_eff_retro;
+
+  lig_mapdoRetro cur_mapdoRetro%rowtype;
+  vFunctionCompare VARCHAR2(10);
+  vFunctionCompareParam3 VARCHAR2(50);
+
+BEGIN
+
+  BEGIN EXECUTE_IMMEDIATE_STRING( 'DROP PROCEDURE CHECK_RETRO_'||NOM_TABLE,0); EXCEPTION WHEN OTHERS THEN NULL; END;
+
+  v_retour := 'CREATE OR REPLACE PROCEDURE CHECK_RETRO_'||NOM_TABLE||'(v_ligOld '||NOM_TABLE||'%ROWTYPE, v_ligNew '||NOM_TABLE||'%ROWTYPE, v_numpac VARCHAR2, v_pacmat VARCHAR2, v_paiezad IN OUT VARCHAR2, v_retro IN OUT VARCHAR2, tabRefPacByNumpac IN OUT ALIM_IDX.T_REF_PAC_BY_NUMPAC) IS 
+ v_matric VARCHAR2(32);
+ existNumpacPaizad NUMBER; 
+ V_DE_SSAAMM               VARCHAR2(6); 
+ V_DE_SSAAMM_TMP           VARCHAR2(6); 
+ V_DATE_EFFET_RETRO        DATE;
+ V_DE_SSAAMM_DEFAULT	   VARCHAR2(6); 
+ V_DATE_LIMITE_RETRO       VARCHAR2(6); 
+ V_DEB_RETRO               VARCHAR2(6); 
+ V_DEB_HISTO_RETRO         VARCHAR2(6); 
+ V_PERIODEENCOURS          VARCHAR2(6); 
+ V_CODE_CHRONO             VARCHAR2(6); 
+ v_nb_mois_retro           NUMBER; 
+ V_DATE_EFF                VARCHAR2(6); 
+
+BEGIN
+ v_matric := NVL(v_ligNew.MATRIC,v_ligOld.MATRIC);
+';
+
+  IF NOM_TABLE           = 'DIC_ADM_CONTRAT' THEN
+    champDateEffetRetro := 'DSDCN' ;
+  ELSE
+    BEGIN
+      SELECT a.column_name
+      INTO champDateEffetRetro
+      FROM SYS.USER_CONS_COLUMNS a, USER_TAB_COLUMNS b
+      WHERE 
+        a.table_name = NOM_TABLE
+        AND a.table_name=b.table_name
+        AND a.column_name=b.column_name
+        AND b.data_type = 'DATE'
+        AND constraint_name IN (
+          SELECT c.constraint_name
+          FROM user_constraints c
+          WHERE c.table_name =a.table_name AND CONSTRAINT_TYPE='P'
+        );
+    EXCEPTION
+      WHEN OTHERS THEN
+        champDateEffetRetro := NULL;
+    END;
+  END IF;
+
+  IF champDateEffetRetro IS NULL THEN
+  	RETURN NULL;
+  END IF;
+
+  procRetroPaiezadCodeChrono := NULL;
+  IF nom_table='DIC_ADM_CONTRAT_HISTO' THEN
+    -- Traitement spécifique pour DIC_ADM_CONTRAT_HISTO : dans un trigger, il n'est pas possible de lire la table en cours de modification
+    -- De toute façon il n'y a pas besoin : on a le paiezad dans le v_ligNew/v_ligOld, il faut juste lire DIC_ADM_CONTRAT_SITU pour récupérer le CODE_CHRONO
+    procRetroPaiezadCodeChrono := ' 
+BEGIN 
+ IF DELETING THEN
+  V_PAIEZAD := v_ligOld.PAIEZAD;
+ ELSE
+  V_PAIEZAD := v_ligNew.PAIEZAD;
+ END IF;
+ SELECT dacs.code_chrono 
+ INTO V_CODE_CHRONO 
+ FROM dic_adm_contrat_situ dacs 
+ WHERE dacs.numpac = V_NUMPAC AND dacs.pacmat = V_PACMAT AND dacs.numcnt = NVL(v_ligNew.NUMCNT,v_ligOld.NUMCNT) AND dacs.paiezad = V_PAIEZAD; 
+EXCEPTION 
+ WHEN OTHERS THEN 
+  v_retro := ''N''; 
+END;
+';
+  ELSE
+    procRetroPaiezadCodeChrono := ' 
+BEGIN 
+ SELECT dacs.code_chrono, dach.paiezad, TO_CHAR(dach.DATE_EFF, ''YYYYMM'') 
+ INTO V_CODE_CHRONO, V_PAIEZAD, V_DATE_EFF 
+ FROM dic_adm_contrat_histo dach , dic_adm_contrat_situ dacs 
+ WHERE dach.numpac = V_NUMPAC AND dach.pacmat = V_PACMAT AND dach.matric = v_matric AND dacs.numpac = dach.numpac AND dacs.pacmat = dach.pacmat AND dacs.numcnt = dach.numcnt AND dacs.paiezad = dach.paiezad AND dach.date_eff = (
+  select min(z.date_eff) 
+  from dic_adm_contrat_histo z 
+  where z.matric = dach.matric AND z.date_sortie_sit_bo >= NVL(v_ligNew.' || champDateEffetRetro ||',v_ligOld.' || champDateEffetRetro || ') 
+ );  
+
+ -- La période rétro doit être >= à la 1ère date d''effet du salarié
+ IF (V_DE_SSAAMM < V_DATE_EFF) THEN
+  V_DE_SSAAMM := V_DATE_EFF; 
+ END IF;
+EXCEPTION 
+ WHEN OTHERS THEN 
+  v_retro := ''N''; 
+END; 
+';
+  END IF;
+
+  conditionRetro  :=NULL;
+  OPEN cur_mapdoRetro;
+  LOOP FETCH cur_mapdoRetro INTO lig_mapdoRetro ;
+  
+    EXIT WHEN cur_mapdoRetro%NOTFOUND;
+
+    IF lig_mapdoRetro.donneegxp IS NOT NULL THEN
+      conditionRetro := conditionRetro||'
+IF ';
+      IF NOT lig_mapdoRetro.numpacs = '*' THEN
+        conditionRetro := conditionRetro||'INSTR('''||lig_mapdoRetro.numpacs||''',v_numpac)>0 AND ';
+      END IF;
+
+      vFunctionCompare := 'IS_EQ';
+      vFunctionCompareParam3 := NULL;
+      IF lig_mapdoRetro.data_type = 'DATE' THEN
+        vFunctionCompare := 'IS_EQ_DATE';
+        vFunctionCompareParam3 := ',''yyyymmddhh24miss''';
+      END IF;
+      conditionRetro  :=conditionRetro||' NOT '||vFunctionCompare||'(v_ligNew.'||lig_mapdoRetro.donneegxp||',v_ligOld.'||lig_mapdoRetro.donneegxp||vFunctionCompareParam3||') THEN 
+ v_retro :=''O''; ';
+      IF lig_mapdoRetro.clause_date_eff_retro IS NULL THEN
+        conditionRetro :=conditionRetro||' 	
+ V_DE_SSAAMM := LEAST(NVL(V_DE_SSAAMM_DEFAULT, V_DE_SSAAMM), NVL(V_DE_SSAAMM, V_DE_SSAAMM_DEFAULT)); ';
+      ELSE
+        conditionRetro := conditionRetro || ' 
+ ' || lig_mapdoRetro.clause_date_eff_retro || '; 
+V_DE_SSAAMM := LEAST(NVL(V_DE_SSAAMM_TMP, V_DE_SSAAMM), NVL(V_DE_SSAAMM, V_DE_SSAAMM_TMP));	';
+      END IF;
+      conditionRetro := conditionRetro || ' 
+END IF; ';
+    END IF;
+  END LOOP;
+  CLOSE cur_mapdoRetro;
+
+  IF conditionRetro IS NULL THEN
+    RETURN NULL;
+  END IF;
+
+  v_retour := v_retour||' 
+ IF NVL(v_retro,''N'') = ''Z'' THEN 
+  RETURN; 
+ END IF;
+
+ IF NOT tabRefPacByNumpac.exists(V_NUMPAC) THEN
+  SELECT * 
+  INTO tabRefPacByNumpac(V_NUMPAC) 
+  FROM TGE_REF_PAC 
+  WHERE NUMPAC = V_NUMPAC; 
+ END IF;
+ V_PERIODEENCOURS := tabRefPacByNumpac(V_NUMPAC).PERIODEENCOURS;
+ V_DEB_RETRO := tabRefPacByNumpac(V_NUMPAC).DEB_RETRO;
+ V_DEB_HISTO_RETRO := GET_DEB_HISTO_PACMAT(V_NUMPAC,V_PACMAT);
+ V_NB_MOIS_RETRO := NVL(tabRefPacByNumpac(V_NUMPAC).NB_MOIS_RETRO, 0);
+
+ IF V_PERIODEENCOURS < V_DEB_RETRO OR V_DEB_RETRO IS NULL THEN 
+  RETURN; 
+ END IF;
+
+ -- La période rétro doit être >= à : 
+ -- - La date de début des histos de rétro 
+ -- - La période en cours - le nombre de mois de rétro 
+ -- On prend donc la plus grande de ces 2 dates + la date d''effet
+ IF DELETING THEN
+  V_DATE_EFFET_RETRO := v_ligOld.'||champDateEffetRetro||';
+ ELSE
+  V_DATE_EFFET_RETRO := v_ligNew.'||champDateEffetRetro||';
+ END IF;
+ V_DE_SSAAMM_DEFAULT       := GREATEST(TO_CHAR(V_DATE_EFFET_RETRO ,''YYYYMM''),V_DEB_HISTO_RETRO,TO_CHAR(ADD_MONTHS(to_date(V_PERIODEENCOURS,''YYYYMM''),-V_NB_MOIS_RETRO),''YYYYMM''));
+ V_DE_SSAAMM := NULL;
+
+ IF V_DE_SSAAMM_DEFAULT >= V_PERIODEENCOURS THEN 
+  RETURN; 
+ END IF;
+
+ v_retro :=''N''; 
+ IF (INSERTING and v_ligOld.MATRIC IS NULL) OR (DELETING and v_ligNew.MATRIC IS NULL) THEN 
+  -- En insertion, si on n''a pas récupéré de ''OLD'' (seulement dans le cas de DIC_ADM_CONTRAT_HISTO), on inscrit forcément en rétro
+  -- En suppression, si on n''a pas récupéré de ''NEW'' (seulement dans le cas de DIC_ADM_CONTRAT_HISTO), on inscrit forcément en rétro
+  v_retro:=''O''; 
+  V_DE_SSAAMM := V_DE_SSAAMM_DEFAULT;
+ ELSE 
+  -- Sinon, on compare ''OLD'' et ''NEW''
+  '|| conditionRetro ||'
+ END IF; -- FIN updating
+
+ IF NOT v_retro = ''O'' THEN 
+  RETURN; 
+ END IF;
+
+ '|| procRetroPaiezadCodeChrono ||' 
+ IF V_DE_SSAAMM IS NULL OR V_DE_SSAAMM >= V_PERIODEENCOURS OR NOT v_retro = ''O'' THEN 
+  RETURN; 
+ END IF;
+
+ -- On positionne une valeur reconnaissable pour savoir qu''on a déjà trouvé notre bonheur 
+ -- Pas la peine de refaire tous les select pour les autres couples NUMPAC/PACMAT 
+ v_retro := ''Z''; 
+ TGE_RETRO_INSCRIPTION(V_NUMPAC, V_PACMAT, V_DE_SSAAMM, V_CODE_CHRONO, V_PAIEZAD, ''' || NOM_TABLE ||'''); 
+END CHECK_RETRO_'||NOM_TABLE||';';
+
+  EXECUTE_IMMEDIATE_STRING( v_retour,0);
+
+  v_retour :=  '
+-- DEBUT TRAITEMENT RETRO
+CHECK_RETRO_'||NOM_TABLE||'(v_ligOld, v_ligNew, v_numpac, v_pacmat, v_paiezad, v_retro, tabRefPacByNumpac);
+-- FIN TRAITEMENT RETRO';
+ 
+  return v_retour;
+END TGE_CREATE_TRIGGER_RETRO;

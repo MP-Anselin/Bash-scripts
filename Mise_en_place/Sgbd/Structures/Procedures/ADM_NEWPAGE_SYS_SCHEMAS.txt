@@ -1,0 +1,159 @@
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+=SQL=
+CREATE OR REPLACE PROCEDURE adm_newpage_sys_schemas (
+    p_nom_page           IN   VARCHAR2,
+    p_nom_page_exemple   IN   VARCHAR2
+) IS
+
+    p_code_schema            NUMBER := -1;
+    p_niveau                 NUMBER;
+    p_niveau_exemple         NUMBER;
+    p_code_element           NUMBER;
+    p_code_element_exemple   NUMBER;
+    p_code_asso_pere         NUMBER;
+    p_code_asso              NUMBER;
+    p_count_exemple          NUMBER;
+    p_count                  NUMBER;
+    p_ordre                  NUMBER;
+    count_code_elt           NUMBER := 0;
+    count_code_elt_exemple   NUMBER := 0;
+    
+BEGIN
+     --Vérification existance page exemple dans sys_sch_element
+    SELECT
+        count(*)
+    INTO p_count_exemple
+    FROM
+        sys_sch_element
+    WHERE
+        nom_page = p_nom_page_exemple;
+    
+    IF p_count_exemple = 0 THEN
+       RETURN ;
+    END IF ;
+    
+    --Vérification existance page à insérer dans sys_sch_element
+    SELECT
+        count(*)
+    INTO p_count
+    FROM
+        sys_sch_element
+    WHERE
+        nom_page = p_nom_page;
+    
+    IF p_count = 0 THEN
+        raise_application_error(-20001, 'la page '||p_nom_page||' n''existe pas dans la table SYS_SCH_ELEMENT ');
+    END IF;   
+
+    
+    --Vérification du niveau de la page exemple
+    SELECT
+        min(niveau)
+    INTO p_niveau_exemple
+    FROM
+        sys_sch_element
+    WHERE
+        nom_page = p_nom_page_exemple;
+    
+    IF p_niveau_exemple <> 99 THEN
+        raise_application_error(-20001, 'Le code niveau '||p_nom_page_exemple||' ne correspond pas à 99');
+    END IF;
+    
+    --Vérification  du niveau de la page
+    SELECT
+        min(niveau)
+    INTO p_niveau
+    FROM
+        sys_sch_element
+    WHERE
+        nom_page = p_nom_page;
+
+    IF p_niveau <> 99 THEN
+        raise_application_error(-20001, 'Le code niveau '||p_nom_page||' ne correspond pas à 99');
+    END IF;
+    
+    --Récupération du code element de la page à insérer
+    SELECT
+        MIN(code_element)
+    INTO p_code_element
+    FROM
+        sys_sch_element
+    WHERE
+        nom_page = p_nom_page;
+    
+    --Récupération du code element de la page exemple
+    SELECT
+        MIN(code_element)
+    INTO p_code_element_exemple
+    FROM
+        sys_sch_element
+    WHERE
+        nom_page = p_nom_page_exemple
+        AND niveau = 99;
+
+    --Vérification de la présence de la page dans le schéma
+    SELECT
+        COUNT(*)
+    INTO count_code_elt
+    FROM
+        sys_schemas
+    WHERE
+        niveau = 99
+    AND code_elt = p_code_element;
+    
+    --Vérification de la présence de la page exemple dans le schéma
+    SELECT
+        COUNT(*)
+    INTO count_code_elt_exemple
+    FROM
+        sys_schemas
+    WHERE
+        niveau = 99
+    AND code_elt = p_code_element_exemple;
+    
+    -- Si la page existe déjà dans le schéma ou si  la page exemple n'existe pas : ne rien insérer
+    IF(count_code_elt_exemple > 0 AND count_code_elt = 0  ) THEN
+    --Récupération du code asso pere de la page exemple
+    SELECT
+        code_asso_pere
+    INTO p_code_asso_pere
+    FROM
+        sys_schemas
+    WHERE
+        code_elt = p_code_element_exemple
+    AND niveau = 99;
+    
+    --Calcul de l'ordre de la page dans le classeur
+        SELECT
+            MAX(ordre) + 1
+        INTO p_ordre
+        FROM
+            sys_schemas
+        WHERE
+            code_asso_pere = p_code_asso_pere;
+
+    --Calcul d'un nouveau code asso 
+        SELECT
+            MAX(code_asso) + 1
+        INTO p_code_asso
+        FROM
+            sys_schemas;
+    --Insertion de la page dans le schéma
+        INSERT INTO sys_schemas (
+            code_schema,
+            code_asso,
+            code_asso_pere,
+            code_elt,
+            niveau,
+            ordre
+        ) VALUES (
+            p_code_schema,
+            p_code_asso,
+            p_code_asso_pere,
+            p_code_element,
+            p_niveau,
+            p_ordre
+        );
+     END IF ;   
+END adm_newpage_sys_schemas;

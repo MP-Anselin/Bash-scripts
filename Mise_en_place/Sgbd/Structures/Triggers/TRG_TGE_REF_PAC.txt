@@ -1,0 +1,13 @@
+##
+TAG_CHARSET=@€éèç
+##
+TRG_TGE_REF_PAC
+=SQL=
+create or replace trigger TRG_TGE_REF_PAC before update on TGE_REF_PAC for each row
+begin
+if ( (:OLD.MPE = 'C') and (:NEW.MPE != 'C')) then
+  raise_application_error(-20000, 'Désactivation des CSCP non autorisée pour le pac '||:OLD.numpac);
+elsif ( (:OLD.MPE != 'N' and :OLD.MPE != ' ') and (:NEW.MPE = 'N' or :NEW.MPE = ' ' )) then
+  raise_application_error(-20000, 'Passage de MPE à non MPE non autorisé pour le pac '||:OLD.numpac);
+end if;
+end TRG_TGE_REF_PAC;

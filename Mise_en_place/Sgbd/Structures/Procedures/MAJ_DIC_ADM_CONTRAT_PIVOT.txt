@@ -1,0 +1,194 @@
+##
+MAJ_DIC_ADM_CONTRAT_PIVOT
+=SQL=
+create or replace PROCEDURE MAJ_DIC_ADM_CONTRAT_PIVOT ( numpac   VARCHAR2, pacmat   VARCHAR2,
+ numcnt   VARCHAR2
+ ) IS
+ v_count                       NUMBER;
+ nbtabledach                   NUMBER;
+ insertclause                  VARCHAR(1000); 
+ reqmajdateeffdachX            VARCHAR(4000);
+ reqmaj_date_eff               VARCHAR(4000);
+ reqsqlmajdatefin              VARCHAR(4000);
+ reqsqlmajdatefin1             VARCHAR(4000);
+ reqrazdic_adm_contrat_pivot   VARCHAR(4000);
+ p_id                          NUMBER;
+ BEGIN
+ IF (numpac IS NULL ) THEN
+ return;
+ END IF;
+ /*Si le numcnt est renseigné et pacmat est null exit*/
+ IF (PACMAT IS NULL AND NUMCNT IS NOT NULL) THEN 
+ return;
+ END IF; 
+ /*récupération de la varsys NB_EXTENSION_DACH*/
+ SELECT to_number(valvar) INTO nbtabledach FROM sys_varsys WHERE codvar = 'NB_EXTENSION_DACH' AND module = 'SYS';
+ /*Si la varsys NB_EXTENSION_DACH est null ou supérieur à 5 exit*/
+ IF ( nbtabledach IS NULL OR nbtabledach = 0 OR nbtabledach > 5 ) THEN
+ return;
+ END IF;
+ /*Récupération pId pour la gestion des traces */
+ SELECT
+ gap_trt_seq_id.NEXTVAL
+ INTO p_id
+ FROM
+ dual;
+ fsed.fsed_avancement_plsql(p_id, 'MAJ_DIC_ADM_CONTRAT_PIVOT (Begin)', 'MAJ_DIC_ADM_CONTRAT_PIVOT (NUMPAC: '|| numpac||' ,PACMAT: '|| pacmat ||' ,NUMCNT:'|| numcnt || ')');
+ reqrazdic_adm_contrat_pivot := 'delete FROM dic_adm_contrat_pivot WHERE NUMPAC =: 1';
+ reqmaj_date_eff := ' INSERT INTO dic_adm_contrat_pivot ( numpac,date_eff,pacmat,numcnt,paiezad )(SELECT * FROM ( SELECT h1.numpac,h1.date_eff,h1.pacmat,h1.numcnt,h1.paiezad
+ FROM dic_adm_contrat_histo h1 ' ;
+ reqsqlmajdatefin := 'UPDATE dic_adm_contrat_pivot pv SET pv.date_fin = (SELECT date_fin FROM (SELECT date_eff,paiezad, numcnt,pacmat,numpac, LEAD(h1.date_eff - 1, 1)
+ OVER( PARTITION BY h1.numpac, h1.pacmat, h1.numcnt, h1.paiezad ORDER BY  h1.date_eff, h1.pacmat, h1.numcnt, h1.paiezad ) AS date_fin
+ FROM dic_adm_contrat_pivot h1 )WHERE date_eff = pv.date_eff AND numcnt = pv.numcnt AND numpac = pv.numpac AND paiezad = pv.paiezad AND pacmat = pv.pacmat )';
+ reqsqlmajdatefin1 := 'UPDATE dic_adm_contrat_pivot pv SET pv.date_fin = ( select DATE_FIN FROM (SELECT NUMPAC , NUMCNT,PAIEZAD, pacmat, max (date_fin) AS DATE_FIN 
+        FROM (SELECT NUMPAC ,NUMCNT,PAIEZAD,pacmat,date_fin   from dic_adm_contrat_histo ';   
+ reqmajdateeffdachX := 'UPDATE dic_adm_contrat_pivot SET date_eff_dach = (SELECT MAX(h1.date_eff) FROM dic_adm_contrat_histo h1
+ WHERE dic_adm_contrat_pivot.paiezad = h1.paiezad
+ AND dic_adm_contrat_pivot.numpac = h1.numpac
+ AND dic_adm_contrat_pivot.pacmat = h1.pacmat
+ AND dic_adm_contrat_pivot.numcnt = h1.numcnt
+ AND h1.date_eff <= dic_adm_contrat_pivot.date_eff )';  
+ IF ( pacmat IS NOT NULL AND numcnt IS NOT NULL ) THEN 
+ /*Suppression des situations qu'on va recalculer de la table dic_adm_contrat_pivot*/
+ reqrazdic_adm_contrat_pivot := reqrazdic_adm_contrat_pivot || 'AND   PACMAT =:2 AND   NUMCNT =:3 ';
+ EXECUTE IMMEDIATE reqrazdic_adm_contrat_pivot USING numpac, pacmat, numcnt;
+ fsed.fsed_avancement_plsql(p_id, 'MAJ_DIC_ADM_CONTRAT_PIVOT (RAZ_DIC_ADM_CONTRAT_PIVOT)', reqrazdic_adm_contrat_pivot); 
+  /* MAJ DATE_EFF de la table MAJ_DIC_ADM_CONTRAT_PIVOT*/
+ v_count :=1;
+        WHILE ( v_count <= nbtabledach ) LOOP
+            reqmaj_date_eff := reqmaj_date_eff
+                            || ' UNION  SELECT h.numpac,h.date_eff, h.pacmat,h.numcnt, h.paiezad FROM dic_adm_contrat_histo'||v_count||' h ';
+            v_count := v_count + 1;
+        END LOOP;
+ reqmaj_date_eff := reqmaj_date_eff || ') WHERE NUMPAC= :1 AND PACMAT =:2 AND NUMCNT =:3 )';
+ EXECUTE IMMEDIATE reqmaj_date_eff USING numpac ,pacmat,numcnt;
+ fsed.fsed_avancement_plsql(p_id, 'MAJ_DIC_ADM_CONTRAT_PIVOT (MAJ_DATE_EFF)', reqmaj_date_eff);
+   /* MAJ DATE_FIN de la table MAJ_DIC_ADM_CONTRAT_PIVOT*/
+ reqsqlmajdatefin := reqsqlmajdatefin || 'WHERE NUMPAC= :1 AND PACMAT =:2 AND NUMCNT =:3 ';
+ fsed.fsed_avancement_plsql(p_id, 'MAJ_DIC_ADM_CONTRAT_PIVOT (MAJ_DATE_FIN1)', reqsqlmajdatefin);
+ EXECUTE IMMEDIATE reqsqlmajdatefin USING numpac, pacmat,numcnt;
+ v_count := 1; 
+    WHILE ( v_count <= nbtabledach ) LOOP  
+            reqsqlmajdatefin1 := reqsqlmajdatefin1
+                            || ' UNION SELECT NUMPAC ,NUMCNT,PAIEZAD,pacmat,date_fin from dic_adm_contrat_histo'||v_count;
+            v_count := v_count + 1;
+        END LOOP;
+        reqsqlmajdatefin1 := reqsqlmajdatefin1||' ) GROUP BY numpac,numcnt,paiezad, pacmat)WHERE numcnt = pv.numcnt AND numpac = pv.numpac
+            AND paiezad = pv.paiezad AND pacmat = pv.pacmat )WHERE pv.date_fin IS NULL AND numpac = :1 AND pacmat = :2 AND numcnt = :3'; 
+ EXECUTE IMMEDIATE reqsqlmajdatefin1 USING numpac, pacmat,numcnt;
+ fsed.fsed_avancement_plsql(p_id, 'MAJ_DIC_ADM_CONTRAT_PIVOT (MAJ_DATE_FIN2)', reqsqlmajdatefin1);
+ /* MAJ des DATE_EFF_DACH de la table MAJ_DIC_ADM_CONTRAT_PIVOT*/
+ reqmajdateeffdachX := reqmajdateeffdachX || ' WHERE NUMPAC =:1 AND PACMAT  =:2 AND   NUMCNT =:3';
+ EXECUTE IMMEDIATE reqmajdateeffdachX USING numpac, pacmat, numcnt;
+ fsed.fsed_avancement_plsql(p_id, 'MAJ_DIC_ADM_CONTRAT_PIVOT (MAJ_DATE_EFF_DACH)', reqmajdateeffdachX);
+ v_count := 1; 
+  WHILE ( v_count <= nbtabledach ) LOOP    
+    reqmajdateeffdachX := 'UPDATE dic_adm_contrat_pivot SET date_eff_dach'||v_count||' = (SELECT MAX(h1.date_eff) FROM dic_adm_contrat_histo'||v_count||' h1
+        WHERE dic_adm_contrat_pivot.paiezad = h1.paiezad
+        AND dic_adm_contrat_pivot.numpac = h1.numpac
+        AND dic_adm_contrat_pivot.pacmat = h1.pacmat
+        AND dic_adm_contrat_pivot.numcnt = h1.numcnt
+        AND h1.date_eff <= dic_adm_contrat_pivot.date_eff )  WHERE NUMPAC =:1 AND PACMAT  =:2 AND  NUMCNT =:3' ;
+     EXECUTE IMMEDIATE reqmajdateeffdachX USING numpac, pacmat, numcnt;
+     fsed.fsed_avancement_plsql(p_id, 'MAJ_DIC_ADM_CONTRAT_PIVOT (MAJ_DATE_EFF_DACH'||v_count||')', reqmajdateeffdachX); 
+     v_count := v_count + 1;
+    END LOOP; 
+ ELSIF ( pacmat IS NOT NULL ) THEN
+ /*Suppression des situations qu'on va recalculer de la table dic_adm_contrat_pivot*/
+ reqrazdic_adm_contrat_pivot := reqrazdic_adm_contrat_pivot || 'AND   PACMAT =:2 ';
+ EXECUTE IMMEDIATE reqrazdic_adm_contrat_pivot USING numpac, pacmat; 
+ fsed.fsed_avancement_plsql(p_id, 'MAJ_DIC_ADM_CONTRAT_PIVOT (RAZ_DIC_ADM_CONTRAT_PIVOT)', reqrazdic_adm_contrat_pivot); 
+ /* MAJ DATE_EFF de la table MAJ_DIC_ADM_CONTRAT_PIVOT*/
+ v_count :=1;
+        WHILE ( v_count <= nbtabledach ) LOOP
+            reqmaj_date_eff := reqmaj_date_eff
+                            || ' UNION  SELECT h.numpac,h.date_eff, h.pacmat,h.numcnt, h.paiezad FROM dic_adm_contrat_histo'||v_count||' h ';
+            v_count := v_count + 1;
+        END LOOP;
+ reqmaj_date_eff := reqmaj_date_eff || ') WHERE NUMPAC= :1 AND PACMAT =:2 )'; 
+ EXECUTE IMMEDIATE reqmaj_date_eff USING numpac ,pacmat;
+ fsed.fsed_avancement_plsql(p_id, 'MAJ_DIC_ADM_CONTRAT_PIVOT (MAJ_DATE_EFF)', reqmaj_date_eff);
+  /* MAJ DATE_FIN de la table MAJ_DIC_ADM_CONTRAT_PIVOT*/
+ reqsqlmajdatefin := reqsqlmajdatefin || 'WHERE NUMPAC= :1 AND PACMAT =:2 ';
+ fsed.fsed_avancement_plsql(p_id, 'MAJ_DIC_ADM_CONTRAT_PIVOT (MAJ_DATE_FIN1)', reqsqlmajdatefin);
+ EXECUTE IMMEDIATE reqsqlmajdatefin USING numpac, pacmat;
+ v_count := 1; 
+    WHILE ( v_count <= nbtabledach ) LOOP  
+            reqsqlmajdatefin1 := reqsqlmajdatefin1
+                            || ' UNION SELECT NUMPAC ,NUMCNT,PAIEZAD,pacmat,date_fin from dic_adm_contrat_histo'||v_count;
+            v_count := v_count + 1;
+        END LOOP;
+        reqsqlmajdatefin1 := reqsqlmajdatefin1||' ) GROUP BY numpac,numcnt,paiezad, pacmat)WHERE numcnt = pv.numcnt AND numpac = pv.numpac
+            AND paiezad = pv.paiezad AND pacmat = pv.pacmat )WHERE pv.date_fin IS NULL AND numpac = :1 AND pacmat = :2 '; 
+ EXECUTE IMMEDIATE reqsqlmajdatefin1 USING numpac, pacmat;
+ fsed.fsed_avancement_plsql(p_id, 'MAJ_DIC_ADM_CONTRAT_PIVOT (MAJ_DATE_FIN2)', reqsqlmajdatefin1);
+  /* MAJ des DATE_EFF_DACH de la table MAJ_DIC_ADM_CONTRAT_PIVOT*/
+ reqmajdateeffdachX := reqmajdateeffdachX || ' WHERE NUMPAC =:1 AND PACMAT  =:2 ';
+ EXECUTE IMMEDIATE reqmajdateeffdachX USING numpac, pacmat;
+ fsed.fsed_avancement_plsql(p_id, 'MAJ_DIC_ADM_CONTRAT_PIVOT (MAJ_DATE_EFF_DACH)', reqmajdateeffdachX);
+ v_count := 1; 
+  WHILE ( v_count <= nbtabledach ) LOOP    
+    reqmajdateeffdachX := 'UPDATE dic_adm_contrat_pivot SET date_eff_dach'||v_count||' = (SELECT MAX(h1.date_eff) FROM dic_adm_contrat_histo'||v_count||' h1
+        WHERE dic_adm_contrat_pivot.paiezad = h1.paiezad
+        AND dic_adm_contrat_pivot.numpac = h1.numpac
+        AND dic_adm_contrat_pivot.pacmat = h1.pacmat
+        AND dic_adm_contrat_pivot.numcnt = h1.numcnt
+        AND h1.date_eff <= dic_adm_contrat_pivot.date_eff )  WHERE NUMPAC =:1 AND PACMAT  =:2 ' ;
+     EXECUTE IMMEDIATE reqmajdateeffdachX USING numpac, pacmat;
+     fsed.fsed_avancement_plsql(p_id, 'MAJ_DIC_ADM_CONTRAT_PIVOT (MAJ_DATE_EFF_DACH'||v_count||')', reqmajdateeffdachX); 
+     v_count := v_count + 1;
+    END LOOP; 
+ ELSE 
+ /*Suppression des situations qu'on va recalculer de la table dic_adm_contrat_pivot*/
+ EXECUTE IMMEDIATE reqrazdic_adm_contrat_pivot USING numpac;
+ fsed.fsed_avancement_plsql(p_id, 'MAJ_DIC_ADM_CONTRAT_PIVOT (RAZ_DIC_ADM_CONTRAT_PIVOT)', reqrazdic_adm_contrat_pivot); 
+   /* MAJ DATE_EFF de la table MAJ_DIC_ADM_CONTRAT_PIVOT*/
+ v_count :=1;
+        WHILE ( v_count <= nbtabledach ) LOOP
+            reqmaj_date_eff := reqmaj_date_eff
+                            || ' UNION  SELECT h.numpac,h.date_eff, h.pacmat,h.numcnt, h.paiezad FROM dic_adm_contrat_histo'||v_count||' h ';
+            v_count := v_count + 1;
+        END LOOP;
+ reqmaj_date_eff := reqmaj_date_eff || ') WHERE NUMPAC= :1 )';
+ EXECUTE IMMEDIATE reqmaj_date_eff USING numpac ;
+ fsed.fsed_avancement_plsql(p_id, 'MAJ_DIC_ADM_CONTRAT_PIVOT (MAJ_DATE_EFF)', reqmaj_date_eff);
+   /* MAJ DATE_FIN de la table MAJ_DIC_ADM_CONTRAT_PIVOT*/
+ reqsqlmajdatefin := reqsqlmajdatefin || 'WHERE NUMPAC= :1  ';
+ fsed.fsed_avancement_plsql(p_id, 'MAJ_DIC_ADM_CONTRAT_PIVOT (MAJ_DATE_FIN1)', reqsqlmajdatefin);
+ EXECUTE IMMEDIATE reqsqlmajdatefin USING numpac;
+ v_count := 1; 
+    WHILE ( v_count <= nbtabledach ) LOOP  
+            reqsqlmajdatefin1 := reqsqlmajdatefin1
+                            || ' UNION SELECT NUMPAC ,NUMCNT,PAIEZAD,pacmat,date_fin from dic_adm_contrat_histo'||v_count;
+            v_count := v_count + 1;
+        END LOOP;
+        reqsqlmajdatefin1 := reqsqlmajdatefin1||' ) GROUP BY numpac,numcnt,paiezad, pacmat)WHERE numcnt = pv.numcnt AND numpac = pv.numpac
+            AND paiezad = pv.paiezad AND pacmat = pv.pacmat )WHERE pv.date_fin IS NULL AND numpac = :1  '; 
+ EXECUTE IMMEDIATE reqsqlmajdatefin1 USING numpac;   
+ fsed.fsed_avancement_plsql(p_id, 'MAJ_DIC_ADM_CONTRAT_PIVOT (MAJ_DATE_FIN2)', reqsqlmajdatefin1);
+ /* MAJ des DATE_EFF_DACH de la table MAJ_DIC_ADM_CONTRAT_PIVOT*/
+ reqmajdateeffdachX := reqmajdateeffdachX || ' WHERE NUMPAC =:1 ';
+ EXECUTE IMMEDIATE reqmajdateeffdachX USING numpac;
+ fsed.fsed_avancement_plsql(p_id, 'MAJ_DIC_ADM_CONTRAT_PIVOT (MAJ_DATE_EFF_DACH)', reqmajdateeffdachX);
+ v_count := 1; 
+  WHILE ( v_count <= nbtabledach ) LOOP    
+    reqmajdateeffdachX := 'UPDATE dic_adm_contrat_pivot SET date_eff_dach'||v_count||' = (SELECT h1.date_eff FROM dic_adm_contrat_histo'||v_count||' h1
+        WHERE dic_adm_contrat_pivot.paiezad = h1.paiezad
+        AND dic_adm_contrat_pivot.numpac = h1.numpac
+        AND dic_adm_contrat_pivot.pacmat = h1.pacmat
+        AND dic_adm_contrat_pivot.numcnt = h1.numcnt
+        AND h1.date_eff <= dic_adm_contrat_pivot.date_eff
+        AND dic_adm_contrat_pivot.date_fin <= h1.date_fin )  WHERE NUMPAC =:1  ' ;
+     EXECUTE IMMEDIATE reqmajdateeffdachX USING numpac;
+     fsed.fsed_avancement_plsql(p_id, 'MAJ_DIC_ADM_CONTRAT_PIVOT (MAJ_DATE_EFF_DACH'||v_count||')', reqmajdateeffdachX); 
+     v_count := v_count + 1;
+    END LOOP; 
+ END IF; 
+ fsed.fsed_avancement_plsql(p_id, 'MAJ_DIC_ADM_CONTRAT_PIVOT (Fin)', 'MAJ_DIC_ADM_CONTRAT_PIVOT (NUMPAC: '|| numpac||' ,PACMAT: '|| pacmat ||' ,NUMCNT:'|| numcnt || ')');
+ EXCEPTION
+ WHEN OTHERS THEN
+ fsed.fsed_erreur(p_id, 'MAJ_DIC_ADM_CONTRAT_PIVOT (Erreur) ', 'Erreur est survenue à L''execution du CALL MAJ_DIC_ADM_CONTRAT_PIVOT (NUMPAC: '|| numpac||' ,PACMAT: '|| pacmat||', NUMCNT: ' || numcnt|| ' ', sqlcode || '-'|| sqlerrm);
+ dbms_output.put_line(sqlerrm);
+ RAISE;
+ END ;
+ 

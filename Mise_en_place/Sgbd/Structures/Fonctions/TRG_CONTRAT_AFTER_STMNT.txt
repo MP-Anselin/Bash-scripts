@@ -1,0 +1,64 @@
+##
+TAG_CHARSET=@€éèç
+##
+TRG_CONTRAT_AFTER_STMNT
+=SQL=
+CREATE OR REPLACE FUNCTION TRG_CONTRAT_AFTER_STMNT RETURN CLOB AS 
+BEGIN
+  RETURN '
+  IF DELETING THEN
+    -- On a supprimé des lignes : on va parcourir les couples NUMPAC/PACMAT supprimés pour voir si c''était le seul contrat du couple
+    IF v_TAB_NUMPAC_PACMAT IS NOT NULL THEN
+      FOR i IN v_TAB_NUMPAC_PACMAT.first..v_TAB_NUMPAC_PACMAT.last LOOP
+        SELECT COUNT(*) INTO v_nbLig FROM DIC_ADM_CONTRAT WHERE NUMPAC=v_TAB_NUMPAC_PACMAT(i).NUMPAC AND PACMAT=v_TAB_NUMPAC_PACMAT(i).PACMAT;
+        IF v_nbLig=0 THEN
+          -- On vient de supprimer le dernier contrat du couple NUMPAC/PACMAT : on va vérifier s''il faut le supprimer de SECUPACMAT
+          SELECT COUNT(*) INTO v_nbLig FROM SECUPACMAT WHERE MATRIC=v_TAB_NUMPAC_PACMAT(i).MATRIC AND NOT (NUMPAC=v_TAB_NUMPAC_PACMAT(i).NUMPAC AND PACMAT=v_TAB_NUMPAC_PACMAT(i).PACMAT);
+          IF v_nbLig>0 THEN
+            -- Il existe dans SECUPACMAT au moins une ligne pour le MATRIC, avec un autre couple NUMPAC/PACMAT que celui dont on vient de supprimer le dernier contrat : on supprime ce couple de SECUPACMAT
+            DELETE FROM SECUPACMAT WHERE NUMPAC=v_TAB_NUMPAC_PACMAT(i).NUMPAC AND PACMAT=v_TAB_NUMPAC_PACMAT(i).PACMAT;
+          END IF;
+        END IF;
+        IF v_listMatricToUpdate IS NULL OR INSTR(v_listMatricToUpdate,v_TAB_NUMPAC_PACMAT(i).MATRIC)<=0 THEN
+          -- On stocke la liste des NUMPAC/PACMAT modifiés
+          IF v_nbMatricToUpdate=1000 THEN
+            v_nbMatricToUpdate := 0;
+            v_listMatricToUpdate := v_listMatricToUpdate||'') OR MATRIC IN ('';
+          ELSIF v_nbMatricToUpdate>0 THEN
+            v_listMatricToUpdate := v_listMatricToUpdate||'','';
+          END IF;
+          v_listMatricToUpdate := v_listMatricToUpdate||''''''''||v_TAB_NUMPAC_PACMAT(i).MATRIC||'''''''';
+          v_nbMatricToUpdate := v_nbMatricToUpdate+1;
+        END IF;
+      END LOOP;
+    END IF;
+  END IF;
+  IF v_listMatricToUpdate IS NOT NULL THEN
+    -- On insère dans la table temporaire les NUMPAC/PACMAT/MATRIC à mettre à jour
+    --DBMS_OUTPUT.PUT_LINE(''CONTRAT UPDATING ''||v_listMatricToUpdate);
+    --FIXME utiliser la procédure trace_dbms_output()
+    EXECUTE_IMMEDIATE_STRING( ''INSERT INTO SECUPACMAT_TMP_CONTRAT (NUMPAC, PACMAT, MATRIC) SELECT DISTINCT NUMPAC, PACMAT, MATRIC FROM SECUPACMAT WHERE MATRIC IN (''||v_listMatricToUpdate||'')'',0);
+    SECNAV_MAJ_CURRENT_CONTRAT(''DO_MAJ'', 1, 0, 0);
+    DELETE FROM SECUPACMAT_TMP_CONTRAT;
+    IF INSERTING THEN
+      v_actionIdx := ''I'';
+    ELSIF UPDATING THEN
+      v_actionIdx := ''U'';
+    ELSIF DELETING THEN
+      v_actionIdx := ''D'';
+    END IF;
+    DBMS_JOB.SUBMIT(v_jobIdx , ''BEGIN NULL; END;'' , sysdate+1);
+    DBMS_JOB.WHAT(v_jobIdx , ''ALIM_IDX.COMPARE_CONTRAT_JOB(''||v_jobIdx||'', ''''''||v_actionIdx||'''''');'');
+ 	DBMS_JOB.NEXT_DATE(v_jobIdx ,  sysdate-1);
+    INSERT INTO DIC_IDX_JOB_KEYS SELECT v_jobIdx, T.* FROM TABLE(v_cles_idx_contrat) T;
+    IF INSERTING OR UPDATING THEN
+      INSERT INTO DIC_IDX_JOB_OLD_DATAS VALUES (v_jobIdx, ANYDATA.CONVERTCOLLECTION(GET_DAC_MULTI_HORS_TRANSAC(v_cles_idx_contrat)));
+    END IF;
+    IF v_doMajPerso=1 THEN
+      EXECUTE_IMMEDIATE_STRING( ''INSERT INTO SECUPACMAT_TMP_PERSO (MATRIC) SELECT DISTINCT MATRIC FROM SECUPACMAT WHERE MATRIC IN (''||v_listMatricToUpdate||'')'',0);
+      SECNAV_MAJ_CURRENT_PERSO(''DO_MAJ'', 1, 1, 0);
+      DELETE FROM SECUPACMAT_TMP_PERSO;
+    END IF;
+  END IF;
+';
+END TRG_CONTRAT_AFTER_STMNT;

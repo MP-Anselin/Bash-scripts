@@ -1,0 +1,71 @@
+##
+TAG_CHARSET=@€ιθη
+##
+STD_SITUATION_SALARIE_PAC
+=SQL=
+CREATE OR REPLACE FORCE VIEW  STD_SITUATION_SALARIE_PAC (NUMPAC, PACMAT, MATRICULE, NOM, PRENOM, TITRE, PRIORITE_SITUATION, INTITULE1, VALEUR1, INTITULE2, VALEUR2, INTITULE3, VALEUR3, INTITULE4, VALEUR4, INTITULE5, VALEUR5, INTITULE6, VALEUR6, INTITULE7, VALEUR7, INTITULE8, VALEUR8, INTITULE9, VALEUR9, INTITULE10, VALEUR10, INTITULE11, VALEUR11, INTITULE12, VALEUR12, INTITULE13, VALEUR13)
+AS
+  (SELECT numpac       AS numpac,
+    pacmat             AS pacmat,
+    matric             AS matricule,
+    nom                AS nom,
+    prenom             AS prenom,
+    titre              AS titre,
+    priorite_situation AS priorite_situation,
+    'ETABLISSEMENT' AS intitule1,
+    (SELECT LIBELLE_ENTITE AS libelle
+    FROM std_struc_entite_view e 
+    WHERE e.CODE_ENTITE=CODETB and e.CID = (select GET_CID_FOR_NUMPAC(NUMPAC) from dual) 
+    )       AS valeur1,
+    'NUM_SS' AS intitule2,
+    SEXESS
+    ||ANNESS
+    ||MOISSS
+    ||DEPTSS
+    ||SECTSS
+    ||ORDRSS
+    ||CLCTSS                                            AS valeur2,
+    'DATE_NAISSANCE'                                 AS intitule3,
+    TO_CHAR (TO_DATE (dsnai, 'yyyymmdd'), 'dd/mm/yyyy') AS valeur3,
+    'DATE_ANCIENNETE_GROUPE'                         AS intitule4,
+    TO_CHAR (TO_DATE (dsagp, 'yyyymmdd'), 'dd/mm/yyyy') AS valeur4,
+    'DATE_ANCIENNETE'                                AS intitule5,
+    TO_CHAR (TO_DATE (dsato, 'yyyymmdd'), 'dd/mm/yyyy') AS valeur5,
+    'DEB_CNT'                          AS intitule6,
+    TO_CHAR (TO_DATE (dsdcn, 'yyyymmdd'), 'dd/mm/yyyy') AS valeur6,
+    'FIN_CNT'                            AS intitule7,
+    TO_CHAR (TO_DATE (dsfcn, 'yyyymmdd'), 'dd/mm/yyyy') AS valeur7,
+    'NAT_CNT'                                 AS intitule8,
+	(SELECT libelle_long
+	FROM GA_ZWNATURCNT
+	WHERE GA_ZWNATURCNT.code_naturcnt = SECUPACMAT.ZT061
+	)                 AS valeur8,
+	'TYPE_CNT' AS intitule9,
+	(SELECT max(libelle) FROM GA_ZWTYPCNT WHERE GA_ZWTYPCNT.code_type = SECUPACMAT.ZA700
+	)        AS valeur9,
+
+    'EMPLOI' AS intitule10,
+    (SELECT LIBELLE
+    FROM GA_FILIERE
+    WHERE GA_FILIERE.FILIERE          =SECUPACMAT.FILIR
+    AND GA_FILIERE.REGROUPEMENT_METIER=SECUPACMAT.SSFIL
+    AND GA_FILIERE.METIER             =SECUPACMAT.METIER
+    AND GA_FILIERE.QUALIFICATION      = SECUPACMAT.EMPLOI
+     AND GA_FILIERE.NUMPAC      = SECUPACMAT.NUMPAC
+    )                            AS valeur10,
+    'CPN'                        AS intitule11,
+    CODCPN                       AS valeur11,
+    'AFFECTATION_ADMINISTRATIVE' AS intitule12,
+    (SELECT LIBELLE_ENTITE AS libelle
+    FROM std_struc_entite_view e
+    WHERE e.CODE_ENTITE=AFFS02 and e.CID = (select GET_CID_FOR_NUMPAC(NUMPAC) from dual) 
+    )                       AS valeur12,
+    'TAUX_EMPLOI'        AS intitule13,
+    TXACT
+    ||'%' AS valeur13
+  FROM SECUPACMAT
+  )
+##
+STD_SITUATION_SALARIE
+=SQL=
+CREATE OR REPLACE FORCE VIEW STD_SITUATION_SALARIE AS SELECT * FROM STD_SITUATION_SALARIE_PAC WHERE PRIORITE_SITUATION=0

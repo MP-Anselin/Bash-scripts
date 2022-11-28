@@ -1,0 +1,25 @@
+##
+CAD_CALCUL_JOUR_SEMAINE
+=SQL=
+create or replace
+FUNCTION "CAD_CALCUL_JOUR_SEMAINE" (JourSemaine varchar2,numSemaine varchar2, annee varchar2, mois varchar2) RETURN VARCHAR2 AS jour varchar2(2);
+ BEGIN
+ 
+ if JourSemaine='L' then
+ jour:=to_char(   next_day(to_date(annee||mois||'01','yyyymmdd' ), to_char(to_date('20121001','yyyymmdd'),'DAY')) + (to_number( numSemaine)-1 )*7    ,'dd') ;
+ elsif JourSemaine='M' then
+ jour:=to_char(next_day(to_date(annee||mois||'01','yyyymmdd' ), to_char(to_date('20121002','yyyymmdd'),'DAY')  ) + (to_number( numSemaine)-1 )*7    ,'dd') ;
+ elsif JourSemaine='W' then
+ jour:=to_char(next_day(to_date(annee||mois||'01','yyyymmdd' ), to_char(to_date('20121003','yyyymmdd'),'DAY')  )+ (to_number( numSemaine)-1 )*7    ,'dd') ;
+ elsif JourSemaine='J' then
+ jour:=to_char(next_day(to_date(annee||mois||'01','yyyymmdd' ), to_char(to_date('20121004','yyyymmdd'),'DAY')  ) + (to_number( numSemaine)-1 )*7    ,'dd') ;
+ elsif JourSemaine='V' then
+ jour:=to_char( next_day(to_date(annee||mois||'01','yyyymmdd' ), to_char(to_date('20121005','yyyymmdd'),'DAY')  )+ (to_number( numSemaine)-1 )*7    ,'dd') ;
+ elsif JourSemaine='S' then
+ jour:=to_char(next_day(to_date(annee||mois||'01','yyyymmdd' ), to_char(to_date('20121006','yyyymmdd'),'DAY')  ) + (to_number( numSemaine)-1 )*7    ,'dd') ;
+ elsif JourSemaine='D' then
+ jour:=to_char(next_day(to_date(annee||mois||'01','yyyymmdd' ), to_char(to_date('20121001','yyyymmdd'),'DAY')  ) + (to_number( numSemaine)-1 )*7    ,'dd') ;
+ end if;
+ 
+ RETURN jour;
+ END CAD_CALCUL_JOUR_SEMAINE;

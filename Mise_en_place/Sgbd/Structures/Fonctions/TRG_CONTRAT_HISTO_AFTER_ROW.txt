@@ -1,0 +1,242 @@
+##
+TAG_CHARSET=@€éèç
+##
+TRG_CONTRAT_HISTO_AFTER_ROW
+=SQL=
+CREATE OR REPLACE FUNCTION TRG_CONTRAT_HISTO_AFTER_ROW
+  RETURN CLOB
+AS
+  v_retour CLOB;
+  v_prec_donneegxp VARCHAR2(4000);
+  CURSOR cur_mapdo
+  IS
+    SELECT
+      NUMPAC,
+      ELEMENT,
+      DONNEEGXP,
+      data_type
+    FROM
+      TGE_REF_MAPDO,user_tab_cols
+    WHERE
+      column_name=donneegxp and table_name='DIC_ADM_CONTRAT_HISTO' and
+      ELEMENT IN
+      (
+        SELECT
+          'A301'
+        FROM
+          dual
+      UNION ALL
+      SELECT
+        'A302'
+      FROM
+        dual
+      UNION
+      SELECT
+        nom_elt
+      FROM
+        tge_map_arg_elt
+      WHERE
+        code_table = 'LTP'
+      )
+    ORDER BY
+      ELEMENT,
+      NUMPAC DESC;
+    lig_mapdo cur_mapdo%rowtype;
+    lig_mapdo_prec cur_mapdo%rowtype := NULL;
+    v_selectDeb VARCHAR2(100);
+    v_selectFin VARCHAR2(100);
+  BEGIN
+    v_retour :=
+    ' 
+v_numpac := NVL(v_ligNew.NUMPAC,v_ligOld.NUMPAC); 
+
+v_pacmat :=NVL(v_ligNew.PACMAT,v_ligOld.PACMAT);
+IF DELETING THEN
+ v_paiezad := v_ligOld.paiezad;
+ v_periode := TO_CHAR(v_ligOld.date_eff, ''YYYYMM'');
+ELSE
+ v_paiezad := v_ligNew.paiezad;
+ v_periode := TO_CHAR(v_ligNew.date_eff, ''YYYYMM'');
+END IF; 
+-- On ne traite que l''UPDATE, et on n''ajoute chaque couple NUMPAC/PAIEZAD qu''une seule fois 
+IF NOT tabTrtPeriodesIndividuelles.exists(v_numpac||v_paiezad) THEN 
+ tabTrtPeriodesIndividuelles(v_numpac||v_paiezad) := ''O''; 
+ IF INSERTING OR DELETING THEN 
+  alimPeriodesIndiv := TRUE; 
+ ELSE 
+  alimPeriodesIndiv := FALSE; '
+    ;
+    OPEN cur_mapdo;
+    LOOP
+      FETCH
+        cur_mapdo
+      INTO
+        lig_mapdo ;
+        
+      IF lig_mapdo_prec.element IS NOT NULL AND
+        (
+          cur_mapdo%NOTFOUND OR NOT lig_mapdo_prec.element=lig_mapdo.element
+        )
+        THEN
+        -- La dernière ligne traitée était la dernière ligne de mapping pour l'
+        -- élément précédent
+        -- Si c'était le PAC *, c'est le cas par défaut (ELSE), sinon, on
+        -- continue de tester le PAC
+       
+        IF lig_mapdo_prec.numpac='*' THEN
+          v_retour             := v_retour||' 
+ELSE ';
+        ELSE
+          v_retour := v_retour||' 
+ELSIF v_numpac='''||lig_mapdo_prec.numpac||
+          ''' THEN ';
+        END IF;
+        v_retour := v_retour||' 
+tabValToCompare(''old'||lig_mapdo_prec.element
+        ||''') := '||v_prec_donneegxp||'; 
+tabValToCompare(''new'||
+        lig_mapdo_prec.element||''') := '||REPLACE(v_prec_donneegxp,'v_ligOld','v_ligNew')||'; 
+END IF; ';
+        IF NOT lig_mapdo_prec.numpac='*' THEN
+          -- Pas de ligne avec un PAC * : cas par défaut --> NULL
+          v_retour := v_retour||' 
+ELSE 
+tabValToCompare(''old'||
+          lig_mapdo_prec.element||''') := NULL; 
+tabValToCompare(''new'||
+          lig_mapdo_prec.element||''') := NULL; 
+END IF; ';
+        END IF;
+      END IF;
+      EXIT
+    WHEN cur_mapdo%NOTFOUND;
+
+    v_selectDeb := 'v_ligOld.';
+    v_selectFin := NULL;
+    IF lig_mapdo.data_type = 'DATE' THEN
+      v_selectDeb := 'TO_CHAR(v_ligOld.';
+      v_selectFin := ',''yyyymmddhh24miss'')';
+    END IF;
+       SELECT
+          v_selectDeb
+          ||LISTAGG(donneegxp,v_selectFin||'||'||v_selectDeb) WITHIN GROUP (
+        ORDER BY
+          donneegxp)
+          ||v_selectFin
+        INTO
+          v_prec_donneegxp
+        FROM
+          (
+            SELECT
+              numpac,
+              donneegxp
+            FROM
+              TABLE (get_gxp_trt_particulier_datas('DIC_ADM_CONTRAT_HISTO',lig_mapdo.element))
+            UNION
+            SELECT
+              lig_mapdo.numpac,
+              lig_mapdo.donneegxp
+            FROM
+              dual
+          );  
+    
+    
+      -- C'est la toute première ligne, ou bien la ligne précédente était la
+      -- dernière ligne de mapping pour l'élément précédent
+      -- On recommence un nouveau bloc IF
+      IF lig_mapdo_prec.element IS NULL OR NOT lig_mapdo_prec.element=
+        lig_mapdo.element THEN
+        v_retour := v_retour||' 
+tabValToCompare(''old'||lig_mapdo.element||
+        ''') := NULL; 
+tabValToCompare(''new'||lig_mapdo.element||
+        ''') := NULL; 
+IF v_numpac IS NULL THEN NULL; ';
+      END IF;
+      IF NOT lig_mapdo.numpac='*' THEN
+        v_retour            := v_retour||' 
+ELSIF v_numpac='''||
+        lig_mapdo.numpac||''' THEN 
+tabValToCompare(''old'||lig_mapdo.element||
+        ''') := '||v_prec_donneegxp||'; 
+tabValToCompare(''new'||
+        lig_mapdo.element||''') := '||REPLACE(v_prec_donneegxp,'v_ligOld','v_ligNew')||';  ';
+      END IF;
+      lig_mapdo_prec := lig_mapdo;
+    END LOOP;
+    CLOSE cur_mapdo;
+    IF lig_mapdo_prec.element IS NOT NULL THEN
+      -- On est passé au moins une fois dans la boucle
+      lig_mapdo_prec := NULL;
+      OPEN cur_mapdo;
+      LOOP
+        FETCH
+          cur_mapdo
+        INTO
+          lig_mapdo ;
+        EXIT
+      WHEN cur_mapdo%NOTFOUND;
+        -- C'est la toute première ligne, ou bien la ligne précédente était la
+        -- dernière ligne de mapping pour l'élément précédent
+        IF lig_mapdo_prec.element IS NULL OR NOT lig_mapdo_prec.element=lig_mapdo.element THEN
+          v_retour := v_retour||' 
+IF NOT IS_EQ(tabValToCompare(''new'||lig_mapdo.element||'''),tabValToCompare(''old'||lig_mapdo.element||''')) THEN 
+alimPeriodesIndiv := TRUE; 
+END IF; ';
+        END IF;
+        lig_mapdo_prec := lig_mapdo;
+      END LOOP;
+      CLOSE cur_mapdo;
+    END IF;
+    v_retour := v_retour||
+    ' 
+END IF; 
+IF alimPeriodesIndiv THEN 
+-- Modification de la date de début ou de fin de suspension : on met à jour la table des périodes individuelles 
+idxPeriodesIndiv := null; 
+FOR i IN 1..paiezadTab.count LOOP 
+IF numpacTab(i) = v_numpac AND paiezadTab(i) = v_paiezad THEN 
+idxPeriodesIndiv := i; 
+EXIT; 
+END IF; 
+end LOOP ;  
+
+IF idxPeriodesIndiv IS NOT NULL THEN 
+periodeTab(idxPeriodesIndiv) := LEAST(periodeTab(idxPeriodesIndiv), v_periode); 
+ELSE 
+paiezadTab.EXTEND ; 
+paiezadTab(paiezadTab.LAST) := v_paiezad; 
+numpacTab.EXTEND ; 
+numpacTab(numpacTab.LAST) := v_numpac; 
+periodeTab.EXTEND ; 
+periodeTab(periodeTab.LAST) := v_periode; 
+END IF; 
+END IF; 
+END IF; 
+IF NOT tabPresenceFichierPacmat.exists(v_numpac||v_pacmat) THEN
+  tabPresenceFichierPacmat(v_numpac||v_pacmat).NUMPAC := v_numpac; 
+  tabPresenceFichierPacmat(v_numpac||v_pacmat).PACMAT := v_pacmat;
+END IF; 
+IF  v_lanceRecalculHp THEN 
+ in_calc_hp := T_TRAITEMENT_PERIODES_INDIV();
+ in_calc_hp(''P_NUMPAC''):=NVL(v_ligNew.NUMPAC,v_ligOld.NUMPAC); 
+ in_calc_hp(''P_PACMAT''):=NVL(v_ligNew.PACMAT,v_ligOld.PACMAT); 
+ in_calc_hp(''P_NUMCNT''):=TO_CHAR(NVL(v_ligNew.NUMCNT,v_ligOld.NUMCNT)); 
+ IF DELETING THEN
+  in_calc_hp(''P_PAIEZAD''):=v_ligOld.PAIEZAD; 
+  in_calc_hp(''P_DATE_EFF''):=TO_CHAR(v_ligOld.DATE_EFF,''DD/MM/YYYY''); 
+  in_calc_hp(''P_DATE_SORTIE_SIT_BO''):=TO_CHAR(v_ligOld.date_sortie_sit_bo,''DD/MM/YYYY'');
+ ELSE
+  in_calc_hp(''P_PAIEZAD''):=v_ligNew.PAIEZAD; 
+  in_calc_hp(''P_DATE_EFF''):=TO_CHAR(v_ligNew.DATE_EFF,''DD/MM/YYYY''); 
+  in_calc_hp(''P_DATE_SORTIE_SIT_BO''):=TO_CHAR(v_ligNew.date_sortie_sit_bo,''DD/MM/YYYY'');
+ END IF; 
+ in_calc_hp(''P_LOGIN'') :=''TRIGGER''; 
+ in_calc_hp(''p_isDeleting'') :=v_isDeleting;
+ calcHpTab.EXTEND ;
+ calcHpTab(calcHpTab.LAST) := in_calc_hp;
+END IF; 
+'
+    ;
+    RETURN v_retour;
+  END TRG_CONTRAT_HISTO_AFTER_ROW;

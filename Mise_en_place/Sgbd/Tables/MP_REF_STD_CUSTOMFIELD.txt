@@ -1,0 +1,30 @@
+##
+TAG_CHARSET=@€ιθη
+##
+MP_REF_STD_CUSTOMFIELD
+=SQL IFNOTEXIST=MP_REF_STD_CUSTOMFIELD=
+CREATE TABLE MP_REF_STD_CUSTOMFIELD (CUSTOMFIELD_ID VARCHAR2(500), STD_CUSTOMFIELD_ID VARCHAR2(500))
+##
+MP_REF_STD_CUSTOMFIELD
+==
+DELETE FROM MP_REF_STD_CUSTOMFIELD WHERE CUSTOMFIELD_ID IN ('typeContrat','TypeReembauche','initialCddTerminationDate')
+'typeContrat', 'contractType'
+'TypeReembauche', 'rehireType'
+'initialCddTerminationDate', 'fixedTermContractInitialTerminationDate'
+##
+MP_REF_STD_CUSTOMFIELD
+==
+DELETE FROM MP_REF_STD_CUSTOMFIELD WHERE CUSTOMFIELD_ID IN ('gtaCode','diplomePlusEleveObtenu','natureExoPro','niveauFormation','categorieSalarieAbattementFraisPro','pourcentageImpositionCICE','situationAvantContrat','tpsPartielCotisTxPlein','txEmploiAide','txTransportEtab','lotPermanent','RAZPourcentageImpositionCICE','exoTaxeTransport')
+'gtaCode','tlmCode'
+'diplomePlusEleveObtenu','highestDegreeObtained'
+'natureExoPro','professionalExemptionType'
+'niveauFormation','trainingLevel'
+'categorieSalarieAbattementFraisPro','professionalExpenseAllowanceType'
+'pourcentageImpositionCICE','CICETaxPercentage'
+'situationAvantContrat','situationBeforeContract'
+'tpsPartielCotisTxPlein','partTimeContributorAtFullRate'
+'txEmploiAide','supportedEmploymentRate'
+'txTransportEtab','workLocationTransportPaymentRate'
+'lotPermanent','permanentLot'
+'RAZPourcentageImpositionCICE','CICETaxPercentageReset'
+'exoTaxeTransport','transportPaymentExemption'

@@ -1,0 +1,45 @@
+##
+TAG_CHARSET=@€éèç
+##
+SYS_TRT_TOMAKELIB
+==
+DELETE FROM SYS_TRT_TOMAKELIB WHERE ID_TRT like 'Traitement_ESignature' 
+'Traitement_ESignature','Envoi des documents signés vers Container'
+##
+SYS_TRT_TOMAKELIB
+==
+DELETE FROM SYS_TRT_TOMAKELIB WHERE ID_TRT like 'Traitement_EnvoieWorkerDex' 
+'Traitement_EnvoieWorkerDex','Envoi des modifications de dossier vers DEX'
+##
+SYS_TRT_TOMAKELIB
+==
+DELETE FROM SYS_TRT_TOMAKELIB WHERE ID_TRT like 'Traitement_ExtractionDemat' 
+'Traitement_ExtractionDemat','Extraction autorisation/refus de dématérialisation'
+##
+SYS_TRT_TOMAKELIB
+==
+DELETE FROM SYS_TRT_TOMAKELIB WHERE ID_TRT like 'Traitement_EnvoieJobStatusChange' 
+'Traitement_EnvoieJobStatusChange','Envoi des notifications de paie vers MarketPlace'
+##
+SYS_TRT_TOMAKELIB
+==
+DELETE FROM SYS_TRT_TOMAKELIB WHERE ID_TRT like 'Traitement_MoveReportDumaFile' 
+'Traitement_MoveReportDumaFile','Copie des rapports dumafile -> fic disponibles'
+##
+SYS_TRT_TOMAKELIB
+=SQL IFEXIST=SYS_TRT_TOMAKELIB=
+DELETE FROM SYS_TRT_TOMAKELIB WHERE ID_TRT = 'Traitement_PropagerCAD' AND LIBELLE = 'Traitement de propagation des CAD après import GAP'
+##
+SYS_TRT_TOMAKELIB
+=SQL IFEXIST=SYS_TRT_TOMAKELIB=
+INSERT INTO SYS_TRT_TOMAKELIB VALUES ('Traitement_PropagerCAD','Traitement de propagation des CAD après import GAP')
+##
+SYS_TRT_TOMAKELIB
+==
+DELETE FROM SYS_TRT_TOMAKELIB WHERE ID_TRT like 'Traitement_ControleMail' 
+'Traitement_ControleMail','Conformité des adresses mails à la norme.'
+##
+SYS_TRT_TOMAKELIB
+==
+DELETE FROM SYS_TRT_TOMAKELIB WHERE ID_TRT = 'Traitement_ExportDroitACE'
+'Traitement_ExportDroitACE','Traitement d''export des droits ACE'

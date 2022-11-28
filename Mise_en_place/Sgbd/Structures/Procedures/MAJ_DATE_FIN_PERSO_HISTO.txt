@@ -1,0 +1,20 @@
+##
+MAJ_DATE_FIN_PERSO_HISTO
+=SQL=
+CREATE OR REPLACE PROCEDURE MAJ_DATE_FIN_PERSO_HISTO 
+IS 
+BEGIN 
+  UPDATE dic_adm_perso_histo
+  SET date_fin=
+    (SELECT MIN(h.date_eff)-1
+    FROM dic_adm_perso_histo h
+    WHERE h.matric=dic_adm_perso_histo.matric
+    AND h.date_eff>dic_adm_perso_histo.date_eff
+    )
+  WHERE EXISTS
+    (SELECT *
+    FROM dic_adm_perso_histo h
+    WHERE h.matric=dic_adm_perso_histo.matric
+    AND h.date_eff>dic_adm_perso_histo.date_eff
+    );
+END MAJ_DATE_FIN_PERSO_HISTO;

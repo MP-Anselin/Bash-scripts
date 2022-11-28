@@ -1,0 +1,6 @@
+##
+TAG_CHARSET=@€ιθη
+##
+HRORG_SECU_GV
+==
+CREATE OR REPLACE FORCE VIEW "HRORG_SECU_GV" ("CODTS", "CODE_ENTITE", "DATE_EFF", "DATE_FIN", "LOGIN", "CID") AS   ( select a.codts, a.code_entite, a.date_eff, a.date_fin, gv.login, a.cid from std_struc_arbre a, sys_groupe_valideurs gv where a.groupe_valideurs=gv.groupe_valideurs  union all  select distinct a.codts, i.code_entite, i.date_eff, i.date_fin, gv.login, a.cid from std_struc_arbre a, std_struc_arbre_ratt_indirect i, sys_groupe_valideurs gv where a.groupe_valideurs=gv.groupe_valideurs and a.codts=i.codts and a.cid = i.cid and i.date_eff < a.date_fin and i.date_fin > a.date_eff and a.code_entite=i.code_ent_mere  ) 

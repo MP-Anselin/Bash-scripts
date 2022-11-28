@@ -1,0 +1,41 @@
+##
+HR_LINEARISE_PARTICIPANTABSENT
+=SQL=
+CREATE OR REPLACE
+  FUNCTION HR_LINEARISE_PARTICIPANTABSENT(
+      pcodfor IN VARCHAR2,
+      pcodses IN VARCHAR2,
+      poccseq IN VARCHAR2,
+      sep     IN VARCHAR2 )
+    RETURN VARCHAR2
+  IS
+  type tcur
+IS
+  ref
+  CURSOR;
+    cur tcur;
+    retourselect VARCHAR2(2000);
+    retour CLOB;
+  BEGIN
+    OPEN cur FOR SELECT '&nbsp;'||SECUMATRIC.NOM||' '||SECUMATRIC.PRENOM FROM SECUMATRIC, FOR_SEQNSUIV F WHERE SECUMATRIC.matric = F.matric AND codfor = pcodfor AND codses = pcodses AND occseq = poccseq
+    UNION ALL
+  SELECT '&nbsp;'
+    ||FOR_EXT_AGT.nomfam
+    ||' '
+    ||FOR_EXT_AGT.prenom
+  FROM FOR_EXT_AGT,
+    FOR_SEQNSUIV F
+  WHERE FOR_EXT_AGT.matric = F.matric
+  AND codfor               = pcodfor
+  AND codses               = pcodses
+  AND occseq               = poccseq
+  ORDER BY 1 ASC ;
+  LOOP
+    FETCH cur INTO retourselect;
+    EXIT
+  WHEN cur % NOTFOUND;
+    retour := retour || retourselect || sep;
+  END LOOP ;
+  CLOSE cur;
+  RETURN SUBSTR(retour, 0, LENGTH(retour)-LENGTH(sep));
+END; 

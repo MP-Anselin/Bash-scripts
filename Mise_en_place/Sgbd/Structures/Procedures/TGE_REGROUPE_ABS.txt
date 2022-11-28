@@ -1,0 +1,179 @@
+## 
+TAG_CHARSET=@€éèç 
+##
+TGE_REGROUPE_ABS
+=SQL=
+CREATE OR REPLACE PROCEDURE TGE_REGROUPE_ABS(
+    P_CLE_IMPORT IN VARCHAR2)
+AS
+BEGIN
+
+	SYS_RECALCUL_STATS('TGE_ABSENCES');
+	SYS_RECALCUL_STATS('TGE_INCIDENTS_PAIE');
+
+  /*
+  * Etape 1
+  * Mise à jour des date de fin des absences pouvant être regroupé
+  *
+  */
+  MERGE INTO TGE_ABSENCES USING
+  (SELECT DISTINCT 
+ 	(SELECT MIN(CLE_ABSENCE) FROM TGE_INCIDENTS_PAIE INC2 WHERE INC2.NUMPAC = TB1.NUMPAC AND INC2.PAIEZAD = TB1.PAIEZAD AND INC2.DATE_EFFET = TB1.NEW_DATE_DEBUT AND INC2.ORIGINE = TB1.ORIGINE AND INC2.CODE_IP = TB1.CODE_IP and substr(REGEXP_REPLACE(INC2.CLE_IMPORT,'#\d+$',''),0,80) = P_CLE_IMPORT) AS CLE_ABSENCE,
+ 	NEW_DATE_FIN,ORIGINE
+ FROM (SELECT  NUMPAC,
+    PAIEZAD,
+    CODE_IP,
+    MIN(d) NEW_DATE_DEBUT,
+    MAX(d) NEW_DATE_FIN,
+    ORIGINE
+  FROM
+    (SELECT INC.NUMPAC,
+      INC.PAIEZAD,
+      INC.CODE_IP,
+      INC.ORIGINE ,
+      INC.DATE_EFFET d,  
+      ROW_NUMBER() OVER(ORDER BY INC.NUMPAC,INC.PAIEZAD,INC.CODE_IP, INC.ORIGINE, INC.DATE_EFFET) i
+    FROM TGE_INCIDENTS_PAIE INC
+    LEFT JOIN TGE_INCIDENTS_PAIE INCHP
+    ON INC.NUMPAC      = INCHP.NUMPAC
+    AND INC.PAIEZAD    = INCHP.PAIEZAD
+    AND INC.DATE_EFFET = INCHP.DATE_EFFET
+    AND INC.ORIGINE = INCHP.ORIGINE
+    AND INC.ID        != INCHP.ID
+    AND INCHP.CODE_IP  = 'HP'
+	AND substr(REGEXP_REPLACE(INCHP.CLE_IMPORT,'#\d+$',''),0,80) = P_CLE_IMPORT
+    INNER JOIN TGE_REF_PRE PRE
+    ON INC.NUMPAC   = PRE.NUMPAC
+    AND INC.CODE_IP = PRE.CODE_INCIDENT
+    WHERE 
+    substr(REGEXP_REPLACE(INC.CLE_IMPORT,'#\d+$',''),0,80) = P_CLE_IMPORT
+    AND INC.CODE_IP     != 'HP'
+    AND INC.CLE_ABSENCE IS NOT NULL
+    AND (nvl(INC.HEURES,'0') = '0'
+    OR (INC.HEURES      >= INCHP.HEURES)
+    OR (PRE.UNITE        = 'J'
+    AND INC.HEURES      >= 1))
+    GROUP BY INC.NUMPAC,
+      INC.PAIEZAD,
+      INC.CODE_IP,
+      INC.ORIGINE,
+      INC.DATE_EFFET
+    )
+  GROUP BY NUMPAC,
+    PAIEZAD,
+    CODE_IP,
+    ORIGINE	,
+    (d-i)
+   
+  )TB1) TB ON (TGE_ABSENCES.ID = TB.CLE_ABSENCE and TGE_ABSENCES.ORIGINE = TB.ORIGINE)
+WHEN MATCHED THEN
+  UPDATE SET TGE_ABSENCES.DATE_FIN = TB.NEW_DATE_FIN;
+  /*
+  * Etape 2
+  * Suppresion des absences pouvant être regroupé
+  *
+  */
+ DELETE
+ FROM TGE_ABSENCES
+ WHERE
+ substr(REGEXP_REPLACE(TGE_ABSENCES.CLE_IMPORT,'#\d+$',''),0,80) = P_CLE_IMPORT
+ AND exists
+ (WITH inc_regroup as (
+    SELECT
+        inc.numpac,
+        inc.paiezad,
+        inc.code_ip,
+        inc.date_effet d,
+        inc.origine,
+        inc.cle_absence,
+        ROW_NUMBER() OVER(
+            ORDER BY
+                inc.numpac, inc.paiezad, inc.code_ip, inc.origine, inc.date_effet
+        ) i
+    FROM
+        tge_incidents_paie   inc
+        LEFT JOIN tge_incidents_paie   inchp ON inc.numpac = inchp.numpac
+                                              AND inc.paiezad = inchp.paiezad
+                                              AND inc.date_effet = inchp.date_effet
+                                              AND inc.id != inchp.id
+                                              AND inchp.code_ip = 'HP'
+                                              AND substr(regexp_replace(inchp.cle_import, '#\d+$', ''
+                                              ), 0, 80) = P_CLE_IMPORT
+        INNER JOIN tge_ref_pre          pre ON inc.numpac = pre.numpac
+                                      AND inc.code_ip = pre.code_incident
+    WHERE
+        substr(regexp_replace(inc.cle_import, '#\d+$', ''), 0, 80) = P_CLE_IMPORT
+        AND inc.code_ip != 'HP'
+        AND inc.cle_absence IS NOT NULL
+        AND ( nvl(inc.heures, '0') = '0'
+              OR ( inc.heures >= inchp.heures )
+              OR ( pre.unite = 'J'
+                   AND inc.heures >= 1 ) )
+ )
+ SELECT 1 from inc_regroup inc_source
+ WHERE inc_source.cle_absence = TGE_ABSENCES.id
+ AND NOT EXISTS (
+ SELECT * from (
+                SELECT
+                    (
+                        SELECT
+                            MIN(cle_absence)
+                        FROM
+                            tge_incidents_paie inc2
+                        WHERE
+                            inc2.numpac = tb1.numpac
+                            AND inc2.paiezad = tb1.paiezad
+                            AND inc2.date_effet = tb1.new_date_debut
+                            AND inc2.origine = tb1.origine
+                            AND tb1.code_ip = inc2.code_ip
+                            AND substr(regexp_replace(inc2.cle_import, '#\d+$', ''), 0, 80) = P_CLE_IMPORT
+                    ) AS cle_absence
+                FROM
+                    (
+                        SELECT
+                            numpac,
+                            paiezad,
+                            code_ip,
+                            MIN(d) new_date_debut,
+                            origine
+                        FROM
+                            (
+                                inc_regroup
+                            )
+                        GROUP BY
+                            numpac,
+                            paiezad,
+                            code_ip,
+                            ( d - i ),
+                            origine
+                    ) tb1)tb2 WHERE inc_source.cle_absence = tb2.cle_absence)
+ );
+  /*
+  * Etape 3
+  * Mise à jour des clé absences des incidents paie liée a des absences ayant été regroupé
+  *
+  */
+  MERGE INTO TGE_INCIDENTS_PAIE USING
+  (SELECT DISTINCT INC.ID AS ID,
+    MIN(ABS.ID)       AS CLE
+  FROM TGE_INCIDENTS_PAIE INC
+  INNER JOIN DIC_ADM_CONTRAT_SITU S
+  ON S.NUMPAC   = INC.NUMPAC
+  AND S.PAIEZAD = INC.PAIEZAD
+  AND INC.DATE_EFFET BETWEEN S.DSDSC AND S.DSFSC
+  INNER JOIN TGE_ABSENCES ABS
+  ON ABS.MATRIC   = S.MATRIC
+  AND INC.CODE_IP = ABS.MOTIF
+  AND INC.DATE_EFFET BETWEEN ABS.DATE_DEBUT AND ABS.DATE_FIN
+  AND INC.ORIGINE = ABS.ORIGINE
+  WHERE NOT EXISTS
+    (SELECT 1 FROM TGE_ABSENCES WHERE ID = INC.CLE_ABSENCE
+    )
+  AND substr(REGEXP_REPLACE(INC.CLE_IMPORT,'#\d+$',''),0,80) = P_CLE_IMPORT
+  AND substr(REGEXP_REPLACE(ABS.CLE_IMPORT,'#\d+$',''),0,80) = P_CLE_IMPORT   
+  AND INC.CLE_ABSENCE            IS NOT NULL
+  GROUP BY INC.ID
+  ) TB ON ( TGE_INCIDENTS_PAIE.ID = TB.ID)
+WHEN MATCHED THEN
+  UPDATE SET TGE_INCIDENTS_PAIE.CLE_ABSENCE = TB.CLE;
+END TGE_REGROUPE_ABS;

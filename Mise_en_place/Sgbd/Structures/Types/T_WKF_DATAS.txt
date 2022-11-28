@@ -1,0 +1,4 @@
+##
+T_WKF_DATAS
+==
+create or replace TYPE T_WKF_DATAS FORCE AS TABLE OF T_WKF_DATA

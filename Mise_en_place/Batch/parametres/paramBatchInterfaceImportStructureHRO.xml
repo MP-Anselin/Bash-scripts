@@ -1,0 +1,21 @@
+<interface idInterface="InterfaceImportStructureHRO">
+	<nomInterface>Import InterfaceImportStructureHRO</nomInterface>
+	<descriptionInterface>Import de fichiers d'entites, arbres, affectations, responsables dans HRO</descriptionInterface>
+	<traitements>
+		<traitement>
+			<descriptionTraitement>Appel a l'interface</descriptionTraitement>
+			<typeTraitement>InterfaceImportStructureHRO</typeTraitement>
+			<!-- Nombre de lignes par commit -->
+			<nbLig>10000</nbLig>
+			<fichier>A_PARAMETRER.zip</fichier>
+			<fichierInclus>A_PARAMETRER.xls</fichierInclus>
+			<!--
+				1 -> Arbre
+				2 -> Entite
+				3 -> Responsable
+				4 -> Affectation
+			-->
+			<typeImport>1</typeImport>
+		</traitement>
+	</traitements>
+</interface>

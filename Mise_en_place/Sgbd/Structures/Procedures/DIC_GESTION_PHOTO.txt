@@ -1,0 +1,53 @@
+##
+DIC_GESTION_PHOTO
+=SQL=
+CREATE OR REPLACE PROCEDURE DIC_GESTION_PHOTO(nomTable VARCHAR2) AS 
+  nombre NUMBER;
+  requete CLOB;
+  numpac VARCHAR2(40) := 'NUMPAC VARCHAR2(6), PACMAT VARCHAR2(8)';
+  cle VARCHAR2(50);
+BEGIN
+  SELECT COUNT(*) INTO nombre FROM TGE_REF_MAPDO DO, TGE_REF_MAPTA TA WHERE TA.tablephy=nomTable AND DO.tablegxp=TA.tableparam AND TA.allerretour in ('A','2');
+      IF nombre>0 THEN
+        requete := '';
+        FOR une_ligne IN (SELECT column_name, data_type, data_length, data_precision, data_scale
+                          FROM user_tab_cols
+                          WHERE table_name=nomTable)
+        LOOP
+          IF une_ligne.column_name != 'CURRENT_IDPACMAT' AND une_ligne.column_name != 'IDPACMAT' AND une_ligne.column_name != 'NUMPAC' AND une_ligne.column_name != 'PACMAT' THEN
+            IF une_ligne.data_type='DATE' THEN
+              requete := requete || ',' || une_ligne.column_name || ' DATE';
+            ELSIF une_ligne.data_type='NUMBER' THEN
+              requete := requete || ',' || une_ligne.column_name || ' ' || une_ligne.data_type || '(' || une_ligne.data_precision || ', ' || une_ligne.data_scale || ')';
+            ELSE
+              requete := requete || ',' || une_ligne.column_name || ' ' || une_ligne.data_type || '(' || une_ligne.data_length || ')';
+            END IF;
+          ELSIF une_ligne.column_name = 'CURRENT_IDPACMAT' OR une_ligne.column_name = 'IDPACMAT' THEN
+            requete := requete || ',' || une_ligne.column_name || ' VARCHAR2(14)';
+          END IF;
+        END LOOP;
+        requete := numpac || requete;
+        BEGIN
+          EXECUTE_IMMEDIATE_STRING('DROP TABLE PH_PH_' || nomTable,0);
+        EXCEPTION WHEN OTHERS THEN NULL; END;
+        EXECUTE_IMMEDIATE_STRING('CREATE TABLE PH_PH_' || nomTable || ' (' || requete || ')',0) ;
+        BEGIN
+          EXECUTE_IMMEDIATE_STRING('DROP TABLE PHOTO_' || nomTable,0);
+        EXCEPTION WHEN OTHERS THEN NULL; END;
+        EXECUTE_IMMEDIATE_STRING('CREATE TABLE PHOTO_' || nomTable || ' AS SELECT * FROM PH_PH_' || nomTable,0);
+        
+        cle := 'NUMPAC,PACMAT';
+        FOR une_cle IN (SELECT cc.table_name, cc.column_name
+                        FROM user_cons_columns cc, user_constraints u
+                        WHERE cc.table_name=nomTable
+                        AND cc.constraint_name = u .constraint_name
+                        AND u.constraint_type='P')
+        LOOP
+          IF une_cle.column_name != 'NUMPAC' AND une_cle.column_name != 'PACMAT' THEN
+            cle := cle || ',' || une_cle.column_name;
+          END IF;
+        END LOOP;
+        EXECUTE_IMMEDIATE_STRING( 'ALTER TABLE PH_PH_' || nomTable || ' ADD PRIMARY KEY (' || cle || ')',0);
+        EXECUTE_IMMEDIATE_STRING ('ALTER TABLE PHOTO_' || nomTable || ' ADD PRIMARY KEY (' || cle || ')',0);
+      END IF;
+END DIC_GESTION_PHOTO;

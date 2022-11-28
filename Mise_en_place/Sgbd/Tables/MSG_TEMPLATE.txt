@@ -1,0 +1,29 @@
+##
+TAG_CHARSET=@€éèç
+##
+MSG_TEMPLATE
+==
+DELETE FROM MSG_TEMPLATE WHERE MSG_CODE in ('RD_TRT_ML','RD_TRT_MLR')
+'RD_TRT_ML','fr_fr','02','Fin du traitement "NOM_TRT" du pac NUMPAC','RD_TRT_ML',null,'0'
+'RD_TRT_MLR','fr_fr','02','Erreur du traitement "NOM_TRT" du pac NUMPAC','RD_TRT_ML_ERR',null,'0'
+##
+MSG_TEMPLATE
+==
+DELETE FROM MSG_TEMPLATE WHERE MSG_CODE IN ( 'HDECT','HDREA' )
+'HDECT','fr_fr','06','|#DOMAINE#| : La fiche N°|#CODFICHE#| est en cours de traitement : |#LIBFICHE#|','HELPDESK_ECT',NULL,'0'
+'HDREA','fr_fr','06','|#DOMAINE#| : Réalisation de la fiche N°|#CODFICHE#| : |#LIBFICHE#|','HELPDESK_REA',NULL,'0'
+##
+MSG_TEMPLATE
+==
+DELETE FROM msg_template WHERE msg_code = 'RD_TRT_MLW'
+'RD_TRT_MLW','fr_fr','02','Alerte au niveau du traitement "NOM_TRT" du pac NUMPAC','RD_TRT_ML_ATT',NULL,'0'
+##
+MSG_TEMPLATE
+==
+DELETE FROM msg_template WHERE msg_code = 'RD_TRT_MLW'
+'RD_TRT_MLW','fr_fr','02','Alerte au niveau du traitement "NOM_TRT" du pac NUMPAC','RD_TRT_ML_ATT',NULL,'0'
+##
+MSG_TEMPLATE
+==
+DELETE FROM msg_template WHERE msg_code = 'RD_TRT_MLI'
+'RD_TRT_MLI','fr_fr','02','Arrêt manuel du traitement "NOM_TRT" du pac NUMPAC','RD_TRT_ML_INT',NULL,'0'

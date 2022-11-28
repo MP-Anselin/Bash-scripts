@@ -1,0 +1,90 @@
+##
+LVRD_ORDRE_DONNEE_IN_GROUPE
+=SQL=
+create or replace FUNCTION LVRD_ORDRE_DONNEE_IN_GROUPE(
+ p_num_livrable VARCHAR2,
+ p_company_id VARCHAR2,
+ p_id_groupe  VARCHAR2,
+ p_nom_donnee VARCHAR2)
+ RETURN NUMBER
+ IS
+ v_ordreDonneeOuGroupe NUMBER;
+ v_retour              NUMBER;
+ BEGIN
+ BEGIN
+ IF NOT SUBSTR(p_nom_donnee,1,1)='#' OR INSTR(p_nom_donnee,'£')=0 THEN
+ SELECT ORDRE
+ INTO v_retour
+ FROM LVRD_GROUPE_DONNEES
+ WHERE COMPANY_ID=p_company_id
+ AND ID_GROUPE   =p_id_groupe
+ AND NOM_DONNEE  =p_nom_donnee
+ AND NUM_LIVRABLE  =p_num_livrable;
+ ELSE
+ SELECT ORDRE
+ INTO v_retour
+ FROM LVRD_GROUPE_DONNEES
+ WHERE COMPANY_ID=p_company_id
+ AND ID_GROUPE   =p_id_groupe
+ AND NOM_DONNEE  =SUBSTR(p_nom_donnee,1,INSTR(p_nom_donnee,'£')-1)
+ AND ID_GROUPE   =SUBSTR(p_nom_donnee,INSTR(p_nom_donnee,'£')  +1)
+ AND NUM_LIVRABLE  =p_num_livrable;
+ END IF;
+ v_ordreDonneeOuGroupe := v_retour;
+ EXCEPTION
+ WHEN NO_DATA_FOUND THEN
+ v_retour := 0;
+ DECLARE
+ CURSOR v_tabSousGroupes
+ IS
+ SELECT *
+ FROM LVRD_GROUPE_DONNEES
+ WHERE COMPANY_ID=p_company_id
+ AND ID_GROUPE   =p_id_groupe
+ AND NOM_DONNEE LIKE '#GROUPE%'
+ AND NUM_LIVRABLE  =p_num_livrable;
+ v_ligneSousGroupe LVRD_GROUPE_DONNEES%ROWTYPE;
+ v_ordreTmp NUMBER;
+ BEGIN
+ OPEN v_tabSousGroupes;
+ LOOP
+ FETCH v_tabSousGroupes INTO v_ligneSousGroupe;
+ EXIT
+ WHEN v_tabSousGroupes%NOTFOUND OR v_retour>0;
+ v_ordreTmp                             := LVRD_ORDRE_DONNEE_IN_GROUPE(p_num_livrable, p_company_id, v_ligneSousGroupe.SUFFIXE_OU_LIBELLE, p_nom_donnee);
+ IF v_ordreTmp                           >0 THEN
+ v_retour                             := v_ligneSousGroupe.ORDRE+v_ordreTmp-1;
+ v_ordreDonneeOuGroupe                := v_ligneSousGroupe.ORDRE;
+ END IF;
+ END LOOP;
+ CLOSE v_tabSousGroupes;
+ END;
+ WHEN OTHERS THEN
+ RETURN 0;
+ END;
+ IF v_retour IS NULL OR v_retour=0 THEN
+ RETURN 0;
+ END IF;
+ DECLARE
+ CURSOR v_tabSousGroupes
+ IS
+ SELECT *
+ FROM LVRD_GROUPE_DONNEES
+ WHERE COMPANY_ID=p_company_id
+ AND ID_GROUPE   =p_id_groupe
+ AND NOM_DONNEE LIKE '#GROUPE%'
+ AND ORDRE<v_ordreDonneeOuGroupe
+ AND NUM_LIVRABLE  =p_num_livrable;
+ v_ligneSousGroupe LVRD_GROUPE_DONNEES%ROWTYPE;
+ BEGIN
+ OPEN v_tabSousGroupes;
+ LOOP
+ FETCH v_tabSousGroupes INTO v_ligneSousGroupe;
+ EXIT
+ WHEN v_tabSousGroupes%NOTFOUND OR v_retour>1000;
+ v_retour                               := v_retour+(LVRD_MAX_ORDRE_GROUPE_DONNEES(p_num_livrable,p_company_id, v_ligneSousGroupe.SUFFIXE_OU_LIBELLE)-1);
+ END LOOP;
+ CLOSE v_tabSousGroupes;
+ END;
+ RETURN v_retour;
+ END LVRD_ORDRE_DONNEE_IN_GROUPE;

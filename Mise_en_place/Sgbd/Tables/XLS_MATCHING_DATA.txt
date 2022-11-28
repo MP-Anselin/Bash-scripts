@@ -1,0 +1,103 @@
+##
+TAG_CHARSET=@€ιθη
+##
+XLS_MATCHING_DATA
+==
+delete from XLS_MATCHING_DATA where CODDOC = 'TGE_EXP_ANN' and DTEFFET = '20201130'
+'TGE_EXP_ANN', '20201130', 0, 0, 'matricule', 'String', 32, 'Y', null
+'TGE_EXP_ANN', '20201130', 0, 1, 'numPac', 'String', 6, 'Y', null
+'TGE_EXP_ANN', '20201130', 0, 2, 'pacMat', 'String', 8, 'Y', null
+'TGE_EXP_ANN', '20201130', 0, 3, 'codeElement', 'String', 4, 'Y', null
+'TGE_EXP_ANN', '20201130', 0, 4, 'origine', 'String', 1, 'Y', null
+'TGE_EXP_ANN', '20201130', 0, 5, 'periode', 'String', 6, 'Y', null
+'TGE_EXP_ANN', '20201130', 0, 6, 'paieZad', 'String', 8, 'Y', null
+'TGE_EXP_ANN', '20201130', 0, 7, 'erreurs', 'String', 3000, 'Y', null
+##
+XLS_MATCHING_DATA
+==
+delete from XLS_MATCHING_DATA where CODDOC = 'IMP_META_DATA' and DTEFFET = '20140131'
+'IMP_META_DATA','20140131','0','0','NOM_DONNEE','String','20','Y',NULL
+'IMP_META_DATA','20140131','0','1','NOM_PAGE','String','100','Y',NULL
+'IMP_META_DATA','20140131','0','2','LIBELLE_DONNEE','String','100','Y',NULL
+'IMP_META_DATA','20140131','0','3','TYPE_DONNEE','String','1','Y',NULL
+'IMP_META_DATA','20140131','0','4','NOM_DICTIONNAIRE','String','24','Y',NULL
+'IMP_META_DATA','20140131','0','5','LONGUEUR_MASQUE_NB_ENTIERS','String','10','Y',NULL
+'IMP_META_DATA','20140131','0','6','NB_DECIMAUX','String','1','Y',NULL
+'IMP_META_DATA','20140131','0','7','MODELE','String','50','Y',NULL
+'IMP_META_DATA','20140131','0','8','UTILISATION','String','50','Y',NULL
+'IMP_META_DATA','20140131','0','9','MINUSCULES_AUTORISEES','String','1','Y',NULL
+'IMP_META_DATA','20140131','0','10','PROPAGER_TOUTES_OCCURRENCES','String','1','Y',NULL
+'IMP_META_DATA','20140131','0','11','NOM_DONNEE_CLE_DIC_REFERENCE','String','20','Y',NULL
+'IMP_META_DATA','20140131','0','12','EST_OBLIGATOIRE','String','1','Y',NULL
+'IMP_META_DATA','20140131','0','13','MODE_SAISIE','String','20','Y',NULL
+'IMP_META_DATA','20140131','0','14','APPELTABLE_NOMPAGE','String','100','Y',NULL
+'IMP_META_DATA','20140131','0','15','APPELTABLE_IDREQUETE','Number','38','Y',NULL
+'IMP_META_DATA','20140131','0','16','APPELTABLE_LISTELIBELLE','String','100','Y',NULL
+'IMP_META_DATA','20140131','0','17','APPELTABLE_LISTECHAMPS','String','4000','Y',NULL
+'IMP_META_DATA','20140131','0','18','APPELTABLE_PARAMETRES','String','4000','Y',NULL
+'IMP_META_DATA','20140131','0','19','AFFICHE_CHOIX_VIDE_SELECT','String','1','Y',NULL
+'IMP_META_DATA','20140131','0','20','VALEUR_DEFAUT','String','50','Y',NULL
+'IMP_META_DATA','20140131','0','21','ID_REGLEGESTION_AUT_RD','String','50','Y',NULL
+'IMP_META_DATA','20140131','0','22','ID_REGLEGESTION_AUT_CLI','String','50','Y',NULL
+'IMP_META_DATA','20140131','0','23','TYPE_REGLEGESTION_AUT_CLI','String','1','Y',NULL
+'IMP_META_DATA','20140131','0','24','ID_REGLEGESTION_AFF_RD','String','50','Y',NULL
+'IMP_META_DATA','20140131','0','25','ID_REGLEGESTION_AFF_CLI','String','50','Y',NULL
+'IMP_META_DATA','20140131','0','26','TYPE_REGLEGESTION_AFF_CLI','String','1','Y',NULL
+'IMP_META_DATA','20140131','0','27','ID_REGLEGESTION_CTL_RD','String','50','Y',NULL
+'IMP_META_DATA','20140131','0','28','ID_REGLEGESTION_CTL_CLI','String','50','Y',NULL
+'IMP_META_DATA','20140131','0','29','TYPE_REGLEGESTION_CTL_CLI','String','1','Y',NULL
+'IMP_META_DATA','20140131','0','30','REFRESH_AFTER_CHANGE','String','1','Y',NULL
+'IMP_META_DATA','20140131','0','31','CHECKBOX_VALEUR_ON','String','10','Y',NULL
+'IMP_META_DATA','20140131','0','32','CHECKBOX_VALEUR_OFF','String','10','Y',NULL
+'IMP_META_DATA','20140131','0','33','SPAN_CHECK_VALUE','String','10','Y',NULL
+'IMP_META_DATA','20140131','0','34','LIB_ALIGN_TOP','String','1','Y',NULL
+'IMP_META_DATA','20140131','0','35','NB_LIGNE_TEXTEAREA','String','3','Y',NULL
+'IMP_META_DATA','20140131','0','36','NB_COLONNE_TEXTEAREA','String','3','Y',NULL
+##
+XLS_MATCHING_DATA
+==
+delete from XLS_MATCHING_DATA where CODDOC = 'TGE_EXP_IMP' and DTEFFET = '20211130'
+'TGE_EXP_IMP', '20211130', 0, 0, 'matricule', 'String', 32, 'Y', null
+'TGE_EXP_IMP', '20211130', 0, 1, 'numpac', 'String', 6, 'Y', null
+'TGE_EXP_IMP', '20211130', 0, 2, 'pacmat', 'String', 8, 'Y', null
+'TGE_EXP_IMP', '20211130', 0, 3, 'paiezad', 'String', 8, 'Y', null
+'TGE_EXP_IMP', '20211130', 0, 4, 'codeImputation', 'String', 18, 'Y', null
+'TGE_EXP_IMP', '20211130', 0, 5, 'codeUnite', 'String', 3, 'Y', null
+'TGE_EXP_IMP', '20211130', 0, 6, 'nombreUnite', 'String', 500, 'Y', null
+'TGE_EXP_IMP', '20211130', 0, 7, 'origine', 'String', 1, 'Y', null
+'TGE_EXP_IMP', '20211130', 0, 8, 'typeTraitement', 'String', 2, 'Y', null
+'TGE_EXP_IMP', '20211130', 0, 9, 'periode', 'String', 6, 'Y', null
+'TGE_EXP_IMP', '20211130', 0, 10, 'erreurs', 'String', 3000, 'Y', null
+##
+XLS_MATCHING_DATA
+==
+delete from XLS_MATCHING_DATA where CODDOC = 'TGE_EXP_IMP_I' and DTEFFET = '20211130'
+'TGE_EXP_IMP_I', '20211130', 0, 0, 'numpac', 'String', 6, 'Y', null
+'TGE_EXP_IMP_I', '20211130', 0, 1, 'codeEnregistrement', 'String', 18, 'Y', null
+'TGE_EXP_IMP_I', '20211130', 0, 2, 'paiezad', 'String', 8, 'Y', null
+'TGE_EXP_IMP_I', '20211130', 0, 3, 'cle', 'String', 8, 'Y', null
+'TGE_EXP_IMP_I', '20211130', 0, 4, 'nombreUnite', 'String', 500, 'Y', null
+'TGE_EXP_IMP_I', '20211130', 0, 5, 'codeUnite', 'String', 3, 'Y', null
+'TGE_EXP_IMP_I', '20211130', 0, 6, 'codeImputation', 'String', 18, 'Y', null
+'TGE_EXP_IMP_I', '20211130', 0, 7, 'codeAnnulation', 'String', 8, 'Y', null
+'TGE_EXP_IMP_I', '20211130', 0, 8, 'pacmat', 'String', 8, 'Y', null
+'TGE_EXP_IMP_I', '20211130', 0, 9, 'codeChronologique', 'String', 8, 'Y', null
+'TGE_EXP_IMP_I', '20211130', 0, 10, 'origine', 'String', 1, 'Y', null
+'TGE_EXP_IMP_I', '20211130', 0, 11, 'codeRemplacement', 'String', 8, 'Y', null
+'TGE_EXP_IMP_I', '20211130', 0, 12, 'codeUtilisateur', 'String', 8, 'Y', null
+'TGE_EXP_IMP_I', '20211130', 0, 13, 'dateSaisie', 'String', 10, 'Y', null
+'TGE_EXP_IMP_I', '20211130', 0, 14, 'heureSaisie', 'String', 10, 'Y', null
+'TGE_EXP_IMP_I', '20211130', 0, 15, 'dateEffet', 'String', 10, 'Y', null
+'TGE_EXP_IMP_I', '20211130', 0, 16, 'periode', 'String', 7, 'Y', null
+'TGE_EXP_IMP_I', '20211130', 0, 17, 'periodeEffet', 'String', 7, 'Y', null
+'TGE_EXP_IMP_I', '20211130', 0, 18, 'typeTraitement', 'String', 2, 'Y', null
+'TGE_EXP_IMP_I', '20211130', 0, 19, 'population', 'String', 6, 'Y', null
+'TGE_EXP_IMP_I', '20211130', 0, 20, 'classeDistrib', 'String', 6, 'Y', null
+'TGE_EXP_IMP_I', '20211130', 0, 21, 'typePaie', 'String', 6, 'Y', null
+'TGE_EXP_IMP_I', '20211130', 0, 22, 'codeMonnaie', 'String', 6, 'Y', null
+'TGE_EXP_IMP_I', '20211130', 0, 23, 'donneeRetro', 'String', 6, 'Y', null
+'TGE_EXP_IMP_I', '20211130', 0, 24, 'erreurs', 'String', 3000, 'Y', null
+##
+XLS_MATCHING_DATA
+==
+update XLS_MATCHING_DATA set MAX_SIZE = '60' WHERE ATTRIBUTE_NAME = 'EST_OBLIGATOIRE' AND CODDOC = 'IMP_META_DATA'

@@ -1,0 +1,379 @@
+##
+PARTITIONNEMENT
+=SQL=
+create or replace PROCEDURE PARTITIONNEMENT(
+  p_table                   IN VARCHAR2,
+  p_column                  IN VARCHAR2,
+  p_column_date             IN VARCHAR2,
+  p_force_statistics        IN NUMBER)
+AS
+  v_user                    VARCHAR2(255);
+  v_table                   VARCHAR2(255);	-- le nom de la table partitionnée (issue de p_table)
+  v_table_sav               VARCHAR2(255); -- le nom de p_table après le renommage
+  v_type                    VARCHAR2(255);
+  v_type_name               VARCHAR2(255);
+  v_columns                 CLOB; -- liste des colonnes de p_table
+  v_columns_with_struct     CLOB; -- liste des colonnes avec leur type de p_table
+  v_pk_unique_index         VARCHAR2(255); -- nom de l'index préfixé par PK_ de la table partitionnée
+
+  v_max_length_table_name   INTEGER := 30; -- longeur maximale autorisée pour le nom d'une table
+  v_max_length_index_name   INTEGER := 30; -- longeur maximale autorisée pour le nom d'un index
+
+  v_nb_null                 NUMBER := 0; -- nombre de valeur à NULL pour les colonnes clés des partitions
+
+  CURSOR c_indexes          IS SELECT table_name,
+                                      index_name,
+                                      TRIM(REPLACE(REPLACE(REPLACE(dbms_metadata.get_ddl('INDEX', index_name),
+                                                                   CHR(34) || v_user || CHR(34) || '.'
+                                                                  ),
+                                                           CHR(34)
+                                                          ),
+                                                    ';'
+                                                   )
+                                          )AS sql_code
+                               FROM user_indexes
+                                WHERE table_name = v_table;
+
+  CURSOR c_constraints      IS SELECT table_name,
+                                      constraint_name,
+                                      TRIM(REPLACE(REPLACE(REPLACE(dbms_metadata.get_ddl('CONSTRAINT', constraint_name),
+                                                                   CHR(34) || v_user || CHR(34) || '.'
+                                                                  ),
+                                                           CHR(34)
+                                                          ),
+                                                   ';'
+                                                  )
+                                          ) AS sql_code
+                               FROM user_constraints
+                                WHERE table_name = v_table AND constraint_type = 'P';
+
+  CURSOR c_triggers         IS SELECT table_name,
+                                      trigger_name,
+                                      TRIM(REPLACE(REPLACE(dbms_metadata.get_ddl('TRIGGER', trigger_name),
+                                                           CHR(34) || v_user || CHR(34) || '.'
+                                                          ),
+                                                   CHR(34)
+                                                  )
+                                          ) AS sql_code
+                               FROM user_triggers
+                                WHERE table_name = v_table;
+
+  CURSOR c_virtuals         IS SELECT table_name,
+                                      column_name,
+                                      data_default,
+                                      data_length,
+                                      data_type
+                               FROM user_tab_cols
+                                WHERE table_name = v_table AND virtual_column = 'YES';
+
+  v_option_by_list          BOOLEAN := FALSE;
+  v_option_by_hash          BOOLEAN := FALSE;
+  v_option_by_range         BOOLEAN := FALSE;
+  v_error                   CLOB;
+BEGIN
+  -- TYPE DE PARTITIONNEMENT À LANCER
+  IF (p_column = 'CODTS' AND p_column_date IS NULL) THEN
+    v_option_by_list := TRUE;
+  ELSIF (p_column = 'NUMPAC' AND p_column_date IS NULL) THEN
+    v_option_by_hash := TRUE;
+  ELSIF (p_column = 'NUMPAC' AND p_column_date IS NOT NULL) THEN
+    v_option_by_range := TRUE;
+  END IF;
+
+  -- VÉRIFIER QUE LA TABLE EST CONFORME
+  BEGIN
+    IF (v_option_by_range) THEN
+      SELECT DISTINCT(table_name) INTO v_table FROM user_tab_cols WHERE column_name IN (p_column, p_column_date)
+       AND table_name = p_table AND table_name NOT IN (SELECT DISTINCT(table_name) FROM user_tab_partitions);
+    ELSIF (v_option_by_hash OR v_option_by_list) THEN
+      SELECT DISTINCT(table_name) INTO v_table FROM user_tab_cols WHERE column_name = p_column
+       AND table_name = p_table AND table_name NOT IN (SELECT DISTINCT(table_name) FROM user_tab_partitions);
+    END IF;
+  EXCEPTION WHEN OTHERS THEN
+    v_table := NULL;
+  END;
+
+   -- VÉRIFIER QUE LES COLONNES SERVANT DE CLES POUR LES PARTITIONS NE CONTIENNENT PAS DE VALEUR NULL
+  BEGIN 
+    IF (v_option_by_range) THEN
+      EXECUTE IMMEDIATE 'SELECT count(*) FROM ' || p_table || ' WHERE ' || p_column || ' IS NULL OR ' || p_column_date || ' IS NULL' INTO v_nb_null;
+      IF (v_nb_null > 0) THEN
+        RAISE_APPLICATION_ERROR(-20000, 'Les colonnes clés des partitions contiennent des valeurs (' || v_nb_null || ') à NULL');
+      END IF;
+    ELSIF (v_option_by_hash OR v_option_by_list) THEN
+      EXECUTE IMMEDIATE 'SELECT COUNT(*) FROM ' || p_table || ' WHERE ' || p_column || ' IS NULL' INTO v_nb_null;
+      IF (v_nb_null > 0) THEN
+        RAISE_APPLICATION_ERROR(-20000, 'La colonnes clé de la partition contient des valeurs (' || v_nb_null || ') à NULL');
+      END IF;
+    END IF;
+  EXCEPTION WHEN OTHERS THEN
+    v_table := NULL;
+  END;
+
+  IF (v_table = p_table) THEN -- TABLE CONFORME ET NON PARTITIONNÉE
+
+    INSERT INTO partition_log_struct_table(dte, table_name, log)
+     VALUES (SYSDATE, p_table, 'Lancement de la procédure PARTITIONNEMENT(' || NVL(p_table, 'NULL') || ',' || NVL(p_column, 'NULL') || ',' || NVL(p_column_date, 'NULL') || ',' || p_force_statistics || ')'); COMMIT;
+
+    -- EFFACER LES ANCIENNES SAUVEGARDES DE STRUCTURES (EVITE LES DOUBLONS)
+    DELETE FROM partition_sav_struct_table WHERE partition_sav_struct_table.table_name IN (p_table); COMMIT;
+
+    INSERT INTO partition_log_struct_table(dte, table_name, log)
+     VALUES (SYSDATE, 'PARTITION_SAV_STRUCT_TABLE', '  1 - Effacer les anciennes sauvegardes de structures'); COMMIT;
+
+    SELECT user INTO v_user FROM dual;
+
+    v_table_sav := 'SAV_' || v_table;
+    IF (LENGTH(v_table_sav) > v_max_length_table_name) THEN
+      v_table_sav := SUBSTR(v_table_sav, 0, v_max_length_table_name);
+    END IF;
+
+    INSERT INTO partition_log_struct_table(dte, table_name, log)
+     VALUES (SYSDATE, v_table, '  2 - Sauvegarde de structure pour ' || v_table); COMMIT;
+
+    -- SAUVEGARDER LES INDEX
+    FOR v_indexes IN c_indexes
+    LOOP
+      -- ON PREFIXE L'INDEX PAR PK_
+      v_pk_unique_index := 'PK_' || v_indexes.index_name;
+      IF (LENGTH(v_pk_unique_index) > v_max_length_index_name) THEN
+        v_pk_unique_index := SUBSTR(v_pk_unique_index, 0, v_max_length_index_name);
+      END IF;
+
+      -- AVEC INDEX LOCAL
+      IF (INSTR(v_indexes.sql_code, p_column) != 0) OR (INSTR(v_indexes.sql_code, p_column_date) != 0) THEN
+
+        IF v_option_by_list THEN
+          INSERT INTO partition_sav_struct_table(table_name, type, type_name, sql_code)
+           VALUES(v_indexes.table_name, 'INDEX', v_indexes.index_name, REPLACE(v_indexes.sql_code, 'CREATE UNIQUE INDEX ' || v_indexes.index_name, 'CREATE UNIQUE INDEX ' || v_pk_unique_index) ||
+                                                                      ' LOCAL (PARTITION CODTS_1, ' ||
+                                                                              'PARTITION CODTS_2, ' ||
+                                                                              'PARTITION CODTS_3, ' ||
+                                                                              'PARTITION CODTS_4, ' ||
+                                                                              'PARTITION CODTS_5, ' ||
+                                                                              'PARTITION CODTS_6, ' ||
+                                                                              'PARTITION CODTS_DEFAULT' ||
+                                                                             ')'); COMMIT;
+       ELSIF v_option_by_hash THEN
+          INSERT INTO partition_sav_struct_table(table_name, type, type_name, sql_code)
+           VALUES(v_indexes.table_name, 'INDEX', v_indexes.index_name, REPLACE(v_indexes.sql_code, 'CREATE UNIQUE INDEX ' || v_indexes.index_name, 'CREATE UNIQUE INDEX ' || v_pk_unique_index) ||
+                                                                      ' LOCAL (PARTITION NUMPAC_1, ' ||
+                                                                              'PARTITION NUMPAC_2, ' ||
+                                                                              'PARTITION NUMPAC_3, ' ||
+                                                                              'PARTITION NUMPAC_4, ' ||
+                                                                              'PARTITION NUMPAC_5, ' ||
+                                                                              'PARTITION NUMPAC_6, ' ||
+                                                                              'PARTITION NUMPAC_7, ' ||
+                                                                              'PARTITION NUMPAC_8' ||
+                                                                             ')'); COMMIT;
+        ELSIF v_option_by_range THEN
+          INSERT INTO partition_sav_struct_table(table_name, type, type_name, sql_code)
+           VALUES(v_indexes.table_name, 'INDEX', v_indexes.index_name, REPLACE(v_indexes.sql_code, 'CREATE UNIQUE INDEX ' || v_indexes.index_name, 'CREATE UNIQUE INDEX ' || v_pk_unique_index) || ' LOCAL'); COMMIT;
+        END IF;
+
+      -- SANS INDEX LOCAL
+      ELSE
+        INSERT INTO partition_sav_struct_table(table_name, type, type_name, sql_code)
+         VALUES(v_indexes.table_name, 'INDEX', v_indexes.index_name, REPLACE(v_indexes.sql_code, 'CREATE UNIQUE INDEX ' || v_indexes.index_name, 'CREATE UNIQUE INDEX ' || v_pk_unique_index)); COMMIT;
+      END IF;
+
+    END LOOP;
+
+    INSERT INTO partition_log_struct_table(dte, table_name, log)
+     VALUES (SYSDATE, v_table, '      Index sauvegardé(s)'); COMMIT;
+
+    -- SAUVEGARDE LES CONTRAINTES
+    FOR v_constraints IN c_constraints
+    LOOP
+      INSERT INTO partition_sav_struct_table(table_name, type, type_name, sql_code)
+       VALUES(v_constraints.table_name, 'CONSTRAINT', v_constraints.constraint_name, v_constraints.sql_code); COMMIT;
+    END LOOP;
+
+    INSERT INTO partition_log_struct_table(dte, table_name, log)
+     VALUES (SYSDATE, v_table, '      Contrainte(s) sauvegardée(s)'); COMMIT;
+
+     -- SAUVEGARDER LES DECLENCHEURS
+    FOR v_triggers IN c_triggers
+    LOOP
+      INSERT INTO partition_sav_struct_table(table_name, type, type_name, sql_code)
+       VALUES (v_triggers.table_name, 'TRIGGER', v_triggers.trigger_name, REGEXP_REPLACE(REPLACE(v_triggers.sql_code, 'ALTER TRIGGER ' || v_triggers.trigger_name || ' ENABLE'), '/' || CHR(10) || ';')); COMMIT;
+    END LOOP;
+
+    INSERT INTO partition_log_struct_table(dte, table_name, log)
+     VALUES (SYSDATE, v_table, '      Déclencheur(s) sauvegardé(s)'); COMMIT;
+
+    -- SAUVEGARDER LES COLONNES VIRTUELLES
+    FOR v_virtuals IN c_virtuals
+    LOOP
+      INSERT INTO partition_sav_struct_table(table_name, type, type_name, sql_code)
+       VALUES(v_virtuals.table_name, 'VIRTUAL COLUMN', v_virtuals.column_name, 'ALTER TABLE ' || v_table || ' ADD ' || v_virtuals.column_name || ' ' || v_virtuals.data_type || '(' || v_virtuals.data_length || ' BYTE) GENERATED ALWAYS AS (' || v_virtuals.data_default || ') VIRTUAL VISIBLE'); COMMIT;
+    END LOOP;
+
+    INSERT INTO partition_log_struct_table(dte, table_name, log)
+     VALUES (SYSDATE, v_table, '      Colonnes virtuelles sauvegardée(s)'); COMMIT;
+
+    -- RENOMMER TABLE PAR SAV_xxx
+    EXECUTE_IMMEDIATE_STRING( 'ALTER TABLE ' || v_table || ' RENAME TO '  || v_table_sav,1);-- COMMIT;
+
+    INSERT INTO partition_log_struct_table(dte, table_name, log)
+     VALUES (SYSDATE, v_table, '  3 - Renommer la table ' || v_table || ' en SAV_' || v_table_sav || ' terminé'); COMMIT;
+
+    INSERT INTO partition_log_struct_table(dte, table_name, log)
+     VALUES (SYSDATE, v_table, '  4 - Creation de la table partitionnée'); COMMIT;
+
+    IF v_option_by_list THEN
+      EXECUTE_IMMEDIATE_STRING( 'CREATE TABLE ' || v_table || ' PARTITION BY LIST (CODTS) (PARTITION CODTS_1 VALUES(1), ' ||
+                                                                                      'PARTITION CODTS_2 VALUES(2), ' ||
+                                                                                      'PARTITION CODTS_3 VALUES(3), ' ||
+                                                                                      'PARTITION CODTS_4 VALUES(4), ' ||
+                                                                                      'PARTITION CODTS_5 VALUES(5), ' ||
+                                                                                      'PARTITION CODTS_6 VALUES(6), ' ||
+                                                                                      'PARTITION CODTS_DEFAULT VALUES(DEFAULT)) ' ||
+                       'AS SELECT * FROM ' || v_table_sav,1);-- COMMIT;
+
+      INSERT INTO partition_log_struct_table(dte, table_name, log)
+       VALUES (SYSDATE, v_table, '      Partition BY LIST(CODTS) terminé'); COMMIT;
+
+    ELSIF v_option_by_hash THEN
+      EXECUTE_IMMEDIATE_STRING( 'CREATE TABLE ' || v_table || ' PARTITION BY HASH (NUMPAC) (PARTITION NUMPAC_1, ' ||
+                                                                                         'PARTITION NUMPAC_2, ' ||
+                                                                                         'PARTITION NUMPAC_3, ' ||
+                                                                                         'PARTITION NUMPAC_4, ' ||
+                                                                                         'PARTITION NUMPAC_5, ' ||
+                                                                                         'PARTITION NUMPAC_6, ' ||
+                                                                                         'PARTITION NUMPAC_7, ' ||
+                                                                                         'PARTITION NUMPAC_8) ' || 
+                         'AS SELECT * FROM ' || v_table_sav,1);-- COMMIT;
+
+      INSERT INTO partition_log_struct_table(dte, table_name, log)
+       VALUES (SYSDATE, v_table, '      Partition BY HASH(NUMPAC) terminé'); COMMIT;
+
+    ELSIF v_option_by_range THEN
+       FOR m IN (SELECT column_name, data_type ||
+                 CASE
+                 WHEN data_precision IS NOT NULL AND nvl(data_scale, 0) > 0 THEN '(' || data_precision || ',' || data_scale || ')'
+                 WHEN data_precision IS NOT NULL AND nvl(data_scale, 0) = 0 THEN '(' || data_precision || ')'
+                 WHEN data_precision IS NULL AND data_scale IS NOT NULL THEN '(*,' || data_scale || ')'
+                 WHEN char_length > 0 THEN '(' || char_length ||
+                  CASE char_used
+                   WHEN 'B' THEN ' BYTE'
+                   WHEN 'C' THEN ' CHAR'
+                   ELSE NULL 
+                  END || ')'
+                 END --|| DECODE(nullable, 'N', ' NOT NULL')
+               AS data_type
+               FROM user_tab_cols WHERE table_name = v_table_sav AND virtual_column = 'NO' ORDER BY column_id ASC)
+       LOOP
+         v_columns := v_columns || m.column_name || ',';
+         v_columns_with_struct := v_columns_with_struct || m.column_name || ' ' || m.data_type || ',';
+       END LOOP;
+       v_columns := substr(v_columns, 0, LENGTH(v_columns) - 1);
+       v_columns_with_struct := substr(v_columns_with_struct, 0, LENGTH(v_columns_with_struct) - 1);
+
+       -- CRÉATION NOUVELLE TABLE PARTITIONNÉE
+       EXECUTE_IMMEDIATE_STRING( 'CREATE TABLE ' || v_table || ' ('
+                    || v_columns_with_struct
+                    || ') PARTITION BY RANGE (' || p_column_date || ') INTERVAL (NUMTOYMINTERVAL(1, ''MONTH''))'
+                    || ' SUBPARTITION BY HASH (NUMPAC)'
+                    || ' SUBPARTITIONS 8 (PARTITION BEFORE_2013 VALUES LESS THAN (TO_DATE(''01-01-2013'', ''dd-MM-yyyy'')))',1);--COMMIT;
+
+       -- COPIE DES DONNÉES DANS LA NOUVELLE TABLE
+       EXECUTE_IMMEDIATE_STRING( 'INSERT INTO ' || v_table || ' (' || v_columns || ') SELECT ' || v_columns || ' FROM ' || v_table_sav,1);--COMMIT;
+
+        INSERT INTO partition_log_struct_table(dte, table_name, log)
+      VALUES (SYSDATE, v_table, '      Partition BY RANGE(' || p_column_date || ') + SUBPARTITION BY HASH(NUMPAC) terminé'); COMMIT;
+     END IF;
+
+     INSERT INTO partition_log_struct_table(dte, table_name, log)
+      VALUES (SYSDATE, v_table_sav, '  5 - Supprimer la table ' || v_table_sav); COMMIT;
+
+     -- SUPPRIMER TABLE _SAV
+     EXECUTE_IMMEDIATE_STRING( 'DROP TABLE ' || v_table_sav,0);
+
+     -- RECALCUL DES STATISTIQUES
+     BEGIN
+       IF (p_force_statistics = 1) THEN
+         INSERT INTO partition_log_struct_table(dte, table_name, log)
+          VALUES (SYSDATE, v_table, '  6 - Relancer les statistiques pour ' || v_table); COMMIT;
+         dbms_stats.gather_table_stats(ownname => sys_context('USERENV','SESSION_SCHEMA'), tabname => v_table, cascade => true);
+       END IF;
+     EXCEPTION WHEN OTHERS THEN
+       v_error := SQLCODE || '-' || sqlerrm;
+       INSERT INTO partition_log_struct_table(dte, table_name, log)
+        VALUES (SYSDATE, p_table, '      Recalcul des statistiques impossible. ' || v_error); COMMIT;
+     END;
+
+     INSERT INTO partition_log_struct_table(dte, table_name, log)
+      VALUES (SYSDATE, v_table, '  7 - Structure de table ' || v_table); COMMIT;
+
+     -- MISE EN PLACE DES COLONNES VIRTUELLES
+     BEGIN
+       FOR j IN (SELECT * FROM partition_sav_struct_table WHERE table_name = v_table AND type = 'VIRTUAL COLUMN')
+       LOOP
+         v_type := j.type;
+         v_type_name := j.type_name;
+         EXECUTE_IMMEDIATE_STRING( j.sql_code,1);--COMMIT;
+       END LOOP;
+       INSERT INTO partition_log_struct_table(dte, table_name, log)
+        VALUES (SYSDATE, v_table, '      Mise en place des colonnes virtuelles terminée'); COMMIT;
+     EXCEPTION WHEN OTHERS THEN
+       v_error := SQLCODE || '-' || sqlerrm;
+       INSERT INTO partition_log_struct_table(dte, table_name, log)
+        VALUES (SYSDATE, p_table, '      Mise en place des colonnes virtuelles impossible. ' || v_error); COMMIT;
+     END;
+
+     -- MISE EN PLACE DES INDEX
+     BEGIN
+       FOR j IN (SELECT * FROM partition_sav_struct_table WHERE table_name = v_table AND type = 'INDEX')
+       LOOP
+         v_type := j.type;
+         v_type_name := j.type_name;
+         EXECUTE_IMMEDIATE_STRING( j.sql_code,1);--COMMIT;
+       END LOOP;  
+       INSERT INTO partition_log_struct_table(dte, table_name, log)
+        VALUES (SYSDATE, v_table, '      Mise en place des index terminée'); COMMIT;
+     EXCEPTION WHEN OTHERS THEN
+       v_error := SQLCODE || '-' || sqlerrm;
+       INSERT INTO partition_log_struct_table(dte, table_name, log)
+        VALUES (SYSDATE, p_table, '      Mise en place des index impossible. ' || v_error); COMMIT;
+     END;
+
+     -- MISE EN PLACE DES CONTRAINTES
+     BEGIN
+       FOR j IN (SELECT * FROM partition_sav_struct_table WHERE table_name = v_table AND type = 'CONSTRAINT')
+       LOOP
+         v_type := j.type;
+         v_type_name := j.type_name;
+         EXECUTE_IMMEDIATE_STRING( j.sql_code,1);--COMMIT;
+       END LOOP;
+       INSERT INTO partition_log_struct_table(dte, table_name, log)
+        VALUES (SYSDATE, v_table, '      Mise en place des contraintes terminée'); COMMIT;
+     EXCEPTION WHEN OTHERS THEN
+       v_error := SQLCODE || '-' || sqlerrm;
+       INSERT INTO partition_log_struct_table(dte, table_name, log)
+        VALUES (SYSDATE, p_table, '      Mise en place des contraintes impossible. ' || v_error); COMMIT;
+     END;
+
+     -- MISE EN PLACE DES DECLENCHEURS
+     BEGIN
+       FOR j IN (SELECT * FROM partition_sav_struct_table WHERE table_name = v_table AND type = 'TRIGGER')
+       LOOP
+         v_type := j.type;
+         v_type_name := j.type_name;
+         EXECUTE_IMMEDIATE_STRING( j.sql_code,1);--COMMIT;
+       END LOOP;
+       INSERT INTO partition_log_struct_table(dte, table_name, log)
+        VALUES (SYSDATE, v_table, '      Mise en place des déclencheurs terminée'); COMMIT;
+     EXCEPTION WHEN OTHERS THEN
+       v_error := SQLCODE || '-' || sqlerrm;
+       INSERT INTO partition_log_struct_table(dte, table_name, log)
+        VALUES (SYSDATE, p_table, '      Mise en place des déclencheurs impossible. ' || v_error); COMMIT;
+     END;
+  END IF;
+
+  EXCEPTION WHEN OTHERS THEN
+    v_error := SQLCODE || '-' || sqlerrm;
+    INSERT INTO partition_log_struct_table(dte, table_name, log)
+     VALUES (SYSDATE, v_table, ('Erreur: ' || v_error || '[table=' || v_table || '], [table_sav=' || v_table_sav || '], [type=' || v_type || '], [type_name=' || v_type_name || ']')); COMMIT;
+    RAISE_APPLICATION_ERROR(-20000, 'Problème(s) durant le partitionnement des tables. ' || v_error);
+END PARTITIONNEMENT;

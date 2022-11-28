@@ -1,0 +1,239 @@
+##
+TAG_CHARSET=@€éèç
+##
+ORG_C_ARBRE_TO_NIV
+=SQL=
+create or replace
+TRIGGER "ORG_C_ARBRE_TO_NIV" BEFORE INSERT 
+ON STD_STRUC_ARBRE FOR EACH ROW
+declare 
+-- trigger qui créer dans la table de niveau et la table adresse appropriée l'occurrence correspondante à une insertion dans STD_STRUC_ARBRE
+  dateouv VARCHAR2(8) := '';
+  dateferm VARCHAR2(8) := '';
+  lib VARCHAR2(255) := '';
+  derniv NUMBER := 0;
+  codniv1 VARCHAR2(10) := '';
+  codniv2 VARCHAR2(10) := '';
+  codniv3 VARCHAR2(10) := '';
+  codniv4 VARCHAR2(10) := '';
+  idAdr VARCHAR2(25) := '';
+  sirenAdr VARCHAR2(14) := '';
+  nicAdr VARCHAR2(5) := '';
+  sigleAdr VARCHAR2(20) := '';
+  comAdr VARCHAR2(50) := '';
+  numvoiAdr VARCHAR2(4) := '';
+  bisterAdr VARCHAR2(1) := '';
+  typvoiAdr VARCHAR2(3) := '';
+  nomvoiAdr VARCHAR2(35) := '';
+  cinseeAdr VARCHAR2(6) := '';
+  bourgAdr VARCHAR2(30) := '';
+  copostAdr VARCHAR2(5) := '';
+  budistAdr VARCHAR2(30) := '';
+  noteleAdr VARCHAR2(20) := '';
+  nofaxAdr VARCHAR2(20) := '';
+  emailAdr VARCHAR2(50) := '';
+  copaysAdr VARCHAR2(3) := '';
+  typstrAdr VARCHAR2(4) := '';
+  table_mutante EXCEPTION;
+  pragma exception_init(table_mutante,   -4091);
+  le$trop_long EXCEPTION;
+  pragma exception_init(le$trop_long,   -12899);
+BEGIN
+-- si l'occurrence de STD_STRUC_ARBRE est à la date du jour on va tenter la création dans une table de niveau
+  if to_char(SYSDATE,'yyyymmdd') between :new.date_eff and :new.date_fin then
+-- recuperation du niveau
+    begin 
+      select Sn.niveau,se.id_adresse,se.SIREN,se.NIC into derNiv,idAdr,sirenAdr,nicAdr from  std_struc_entite se, std_struc_niv sn
+      where sn.codts=:new.CODTS and se.type_entite=sn.type_entite and se.code_entite=:new.CODE_ENTITE
+      and to_char(SYSDATE,'yyyymmdd') between se.date_eff and se.date_fin 
+      and to_char(SYSDATE,'yyyymmdd') between sn.date_eff and sn.date_fin ;
+      --dbms_output.put_line('derNiv : '||derNiv);
+      --dbms_output.put_line('adresse id : '||idAdr);
+      --FIXME utiliser la procédure trace_dbms_output()
+    exception
+     when no_data_found then
+       --dbms_output.put_line('pas de donnée trouvée');
+       --FIXME utiliser la procédure trace_dbms_output()
+       NULL;
+     when others then
+       --dbms_output.put_line('pas de niveau'||derNiv);
+       --FIXME utiliser la procédure trace_dbms_output()
+       NULL;
+    end;
+    begin 
+      select date_ouv,date_ferm into dateouv,dateferm from STD_STRUC_ENTITE_OPEN WHERE CODE_ENTITE=:new.CODE_ENTITE ;
+    exception
+     when no_data_found then
+      --dbms_output.put_line('Date ouv : '||dateouv||'Date ferm : '||dateferm);
+      --FIXME utiliser la procédure trace_dbms_output()
+      NULL;
+    end;
+    begin 
+      select libelle into lib from STD_STRUC_ENTITE WHERE CODE_ENTITE=:new.CODE_ENTITE AND  to_char(SYSDATE,'yyyymmdd') between DATE_EFF and DATE_FIN  ;
+      --dbms_output.put_line('libelle : '||lib);
+      --FIXME utiliser la procédure trace_dbms_output()
+    exception
+      when no_data_found then
+        --dbms_output.put_line('pas de donnée trouvée libellé : '||lib);
+        --FIXME utiliser la procédure trace_dbms_output()
+        NULL;
+      when others then
+        --dbms_output.put_line('problème recherche libellé : '||lib);
+        --FIXME utiliser la procédure trace_dbms_output()
+        NULL;
+    end;
+    begin 
+       --dbms_output.put_line('Recherche des informations de l''adresse : ');
+       --FIXME utiliser la procédure trace_dbms_output()
+       if idAdr is not null then
+        select SIGLE,COMADR,NUMVOI,BISTER,TYPVOI,NOMVOI,CINSEE,BOURG,COPOST,BUDIST,COPAYS,NOTELE,NOFAX,EMAIL into  sigleAdr,comAdr,numvoiAdr,bisterAdr,typvoiAdr,nomvoiAdr , cinseeAdr, bourgAdr,copostAdr, budistAdr,copaysAdr,  noteleAdr, nofaxAdr ,  emailAdr    from  STD_ADRESSE WHERE ID_ADRESSE=idAdr;
+       --dbms_output.put_line('identifiant adresse : '||idAdr||' comadr : '||COMADR);
+       --FIXME utiliser la procédure trace_dbms_output()
+       end if;
+    exception
+       when no_data_found then
+         --dbms_output.put_line('pas de donnée trouvée adresse'||idAdr);
+         --FIXME utiliser la procédure trace_dbms_output()
+         NULL;
+       when others then
+         --dbms_output.put_line('problème recherche adresse : '||idAdr);
+         --FIXME utiliser la procédure trace_dbms_output()
+         NULL;
+       end;
+    BEGIN
+         if derNiv =1 then 
+  --insertion dans NIV1
+            if lib is not null then
+             insert into NIV1 (CODTS,CODNIV1,LIBNIV1,DATE_OUV,DATE_FERM,EST_PREV ) values (:new.CODTS,:new.CODE_ENTITE,SUBSTR(lib,0,100),dateouv,dateferm,0);
+            else
+            insert into NIV1 (CODTS,CODNIV1,LIBNIV1,DATE_OUV,DATE_FERM,EST_PREV ) values (:new.CODTS,:new.CODE_ENTITE,null,dateouv,dateferm,0);
+            end if;
+              if ( idAdr is not null or sirenAdr is not null or nicAdr is not null)   then
+                 --dbms_output.put_line('Création dans la table adresses : '||idAdr);
+                 --FIXME utiliser la procédure trace_dbms_output()
+               insert into STD_ADRSTR (CODTS,CODNIV1,CODNIV2,CODNIV3,CODNIV4,CODNIV5,CODNIV6,SIGLE,CPLADR,NUMV,BTQ,TYPV,NOMV,INSEE,COM,CP,DISTRI,TEL,SIREN,NIC,FAX,EMAIL,CODP,TYPSTR) values (:new.CODTS,:new.CODE_ENTITE,'','','','','',sigleAdr,comAdr,numvoiAdr,bisterAdr,typvoiAdr,nomvoiAdr,cinseeAdr,bourgAdr,copostAdr,budistAdr,noteleAdr,sirenAdr,nicAdr,nofaxAdr,emailAdr,copaysAdr,typstrAdr);            
+            end if;
+
+         end if;
+        if derNiv =2 then 
+  --insertion dans NIV2
+            if lib is not null then
+             insert into NIV2 (CODTS,CODNIV1,CODNIV2,LIBNIV2,DATE_OUV,DATE_FERM,EST_PREV ) values (:new.CODTS,:new.CODE_ENT_MERE,:new.CODE_ENTITE,SUBSTR(lib,0,100),dateouv,dateferm,0);
+            else
+            insert into NIV2 (CODTS,CODNIV1,CODNIV2,LIBNIV2,DATE_OUV,DATE_FERM,EST_PREV ) values (:new.CODTS,:new.CODE_ENT_MERE,:new.CODE_ENTITE,null,dateouv,dateferm,0);
+            end if;
+             if ( idAdr is not null or sirenAdr is not null or nicAdr is not null)   then
+               insert into STD_ADRSTR (CODTS,CODNIV1,CODNIV2,CODNIV3,CODNIV4,CODNIV5,CODNIV6,SIGLE,CPLADR,NUMV,BTQ,TYPV,NOMV,INSEE,COM,CP,DISTRI,TEL,SIREN,NIC,FAX,EMAIL,CODP,TYPSTR) values (:new.CODTS,:new.CODE_ENT_MERE,:new.CODE_ENTITE,'','','','',sigleAdr,comAdr,numvoiAdr,bisterAdr,typvoiAdr,nomvoiAdr,cinseeAdr,bourgAdr,copostAdr,budistAdr,noteleAdr,sirenAdr,nicAdr,nofaxAdr,emailAdr,copaysAdr,typstrAdr);            
+            end if;
+         end if;
+   --insertion dans NIV3
+         if derNiv =3 then
+         BEGIN 
+           select CODE_ENT_MERE into codniv1 from STD_STRUC_ARBRE where CODTS=:new.CODTS and CODE_ENTITE= :new.CODE_ENT_MERE AND  to_char(SYSDATE,'yyyymmdd') between DATE_EFF and DATE_FIN ;
+          EXCEPTION
+          WHEN TABLE_MUTANTE THEN 
+            --DBMS_OUTPUT.PUT_LINE('Fausse alerte');
+            --FIXME utiliser la procédure trace_dbms_output()
+            NULL;    
+          END ;
+             if lib is not null then
+             insert into NIV3 (CODTS,CODNIV1,CODNIV2,CODNIV3,LIBNIV3,DATE_OUV,DATE_FERM,EST_PREV ) values (:new.CODTS,codniv1,:new.CODE_ENT_MERE,:new.CODE_ENTITE,SUBSTR(lib,0,100),dateouv,dateferm,0);
+            else
+            insert into NIV3 (CODTS,CODNIV1,CODNIV2,CODNIV3,LIBNIV3,DATE_OUV,DATE_FERM,EST_PREV ) values (:new.CODTS,codniv1,:new.CODE_ENT_MERE,:new.CODE_ENTITE,null,dateouv,dateferm,0);
+            end if;
+              if ( idAdr is not null or sirenAdr is not null or nicAdr is not null)   then
+              insert into STD_ADRSTR (CODTS,CODNIV1,CODNIV2,CODNIV3,CODNIV4,CODNIV5,CODNIV6,SIGLE,CPLADR,NUMV,BTQ,TYPV,NOMV,INSEE,COM,CP,DISTRI,TEL,SIREN,NIC,FAX,EMAIL,CODP,TYPSTR) values (:new.CODTS,codniv1,:new.CODE_ENT_MERE,:new.CODE_ENTITE,'','','',sigleAdr,comAdr,numvoiAdr,bisterAdr,typvoiAdr,nomvoiAdr,cinseeAdr,bourgAdr,copostAdr,budistAdr,noteleAdr,sirenAdr,nicAdr,nofaxAdr,emailAdr,copaysAdr,typstrAdr);            
+            end if;
+        end if;
+         --insertion dans NIV4
+    if derNiv =4 then 
+          begin
+            select CODE_ENT_MERE into codniv2 from STD_STRUC_ARBRE where CODTS=:new.CODTS and CODE_ENTITE= :new.CODE_ENT_MERE AND  to_char(SYSDATE,'yyyymmdd') between DATE_EFF and DATE_FIN ;
+            select CODE_ENT_MERE into codniv1 from STD_STRUC_ARBRE where CODTS=:new.CODTS and CODE_ENTITE= codniv2 AND  to_char(SYSDATE,'yyyymmdd') between DATE_EFF and DATE_FIN ;
+          EXCEPTION
+          WHEN TABLE_MUTANTE THEN 
+            --DBMS_OUTPUT.PUT_LINE('Fausse alerte');
+            --FIXME utiliser la procédure trace_dbms_output()
+            NULL;    
+          END ;
+             --dbms_output.put_line('codniv1 : '||codniv1);
+             --dbms_output.put_line('codniv2 : '||codniv2);
+             --FIXME utiliser la procédure trace_dbms_output()
+              if lib is not null then
+             insert into NIV4 (CODTS,CODNIV1,CODNIV2,CODNIV3,CODNIV4,LIBNIV4,DATE_OUV,DATE_FERM,EST_PREV ) values (:new.CODTS,codniv1,codniv2,:new.CODE_ENT_MERE,:new.CODE_ENTITE,SUBSTR(lib,0,100),dateouv,dateferm,0);
+            else
+            insert into NIV4 (CODTS,CODNIV1,CODNIV2,CODNIV3,CODNIV4,LIBNIV4,DATE_OUV,DATE_FERM,EST_PREV ) values (:new.CODTS,codniv1,codniv2,:new.CODE_ENT_MERE,:new.CODE_ENTITE,null,dateouv,dateferm,0);
+            end if;
+              if ( idAdr is not null or sirenAdr is not null or nicAdr is not null)   then
+              insert into STD_ADRSTR (CODTS,CODNIV1,CODNIV2,CODNIV3,CODNIV4,CODNIV5,CODNIV6,SIGLE,CPLADR,NUMV,BTQ,TYPV,NOMV,INSEE,COM,CP,DISTRI,TEL,SIREN,NIC,FAX,EMAIL,CODP,TYPSTR) values (:new.CODTS,codniv1,codniv2,:new.CODE_ENT_MERE,:new.CODE_ENTITE,'','',sigleAdr,comAdr,numvoiAdr,bisterAdr,typvoiAdr,nomvoiAdr,cinseeAdr,bourgAdr,copostAdr,budistAdr,noteleAdr,sirenAdr,nicAdr,nofaxAdr,emailAdr,copaysAdr,typstrAdr);            
+            end if;
+        end if;
+         --insertion dans NIV5
+    if derNiv =5 then
+      begin
+            select CODE_ENT_MERE into codniv3 from STD_STRUC_ARBRE where CODTS=:new.CODTS and CODE_ENTITE= :new.CODE_ENT_MERE AND  to_char(SYSDATE,'yyyymmdd') between DATE_EFF and DATE_FIN ;
+            select CODE_ENT_MERE into codniv2 from STD_STRUC_ARBRE where CODTS=:new.CODTS and CODE_ENTITE= codniv3 AND  to_char(SYSDATE,'yyyymmdd') between DATE_EFF and DATE_FIN ;
+            select CODE_ENT_MERE into codniv1 from STD_STRUC_ARBRE where CODTS=:new.CODTS and CODE_ENTITE= codniv2 AND  to_char(SYSDATE,'yyyymmdd') between DATE_EFF and DATE_FIN ;
+            --dbms_output.put_line('codniv1 : '||codniv1);
+            --dbms_output.put_line('codniv2 : '||codniv2);
+            --dbms_output.put_line('codniv3 : '||codniv3);
+            --FIXME utiliser la procédure trace_dbms_output()
+          EXCEPTION
+          WHEN TABLE_MUTANTE THEN 
+            --DBMS_OUTPUT.PUT_LINE('Fausse alerte');
+            --FIXME utiliser la procédure trace_dbms_output()
+            NULL;    
+          END ;
+             if lib is not null then
+             insert into NIV5 (CODTS,CODNIV1,CODNIV2,CODNIV3,CODNIV4,CODNIV5,LIBNIV5,DATE_OUV,DATE_FERM,EST_PREV ) values (:new.CODTS,codniv1,codniv2,codniv3,:new.CODE_ENT_MERE,:new.CODE_ENTITE,SUBSTR(lib,0,100),dateouv,dateferm,0);
+            else
+            insert into NIV5 (CODTS,CODNIV1,CODNIV2,CODNIV3,CODNIV4,CODNIV5,LIBNIV5,DATE_OUV,DATE_FERM,EST_PREV ) values (:new.CODTS,codniv1,codniv2,codniv3,:new.CODE_ENT_MERE,:new.CODE_ENTITE,null,dateouv,dateferm,0);
+            end if;
+             if ( idAdr is not null or sirenAdr is not null or nicAdr is not null)   then
+               insert into STD_ADRSTR (CODTS,CODNIV1,CODNIV2,CODNIV3,CODNIV4,CODNIV5,CODNIV6,SIGLE,CPLADR,NUMV,BTQ,TYPV,NOMV,INSEE,COM,CP,DISTRI,TEL,SIREN,NIC,FAX,EMAIL,CODP,TYPSTR) values (:new.CODTS,codniv1,codniv2,codniv3,:new.CODE_ENT_MERE,:new.CODE_ENTITE,'',sigleAdr,comAdr,numvoiAdr,bisterAdr,typvoiAdr,nomvoiAdr,cinseeAdr,bourgAdr,copostAdr,budistAdr,noteleAdr,sirenAdr,nicAdr,nofaxAdr,emailAdr,copaysAdr,typstrAdr);            
+            end if;
+        end if;
+         --insertion dans NIV6
+           if derNiv =6 then 
+           begin
+           select CODE_ENT_MERE into codniv4 from STD_STRUC_ARBRE where CODTS=:new.CODTS and CODE_ENTITE= :new.CODE_ENT_MERE AND  to_char(SYSDATE,'yyyymmdd') between DATE_EFF and DATE_FIN ;
+            select CODE_ENT_MERE into codniv3 from STD_STRUC_ARBRE where CODTS=:new.CODTS and CODE_ENTITE= codniv4 AND  to_char(SYSDATE,'yyyymmdd') between DATE_EFF and DATE_FIN ;
+            select CODE_ENT_MERE into codniv2 from STD_STRUC_ARBRE where CODTS=:new.CODTS and CODE_ENTITE= codniv3 AND  to_char(SYSDATE,'yyyymmdd') between DATE_EFF and DATE_FIN ;
+            select CODE_ENT_MERE into codniv1 from STD_STRUC_ARBRE where CODTS=:new.CODTS and CODE_ENTITE= codniv2 AND  to_char(SYSDATE,'yyyymmdd') between DATE_EFF and DATE_FIN ;
+            --dbms_output.put_line('codniv1 : '||codniv1);
+            --dbms_output.put_line('codniv2 : '||codniv2);
+            --dbms_output.put_line('codniv3 : '||codniv3);
+            --dbms_output.put_line('codniv4 : '||codniv4);
+            --FIXME utiliser la procédure trace_dbms_output()
+          EXCEPTION
+          WHEN TABLE_MUTANTE THEN 
+            --DBMS_OUTPUT.PUT_LINE('Fausse alerte');
+            --FIXME utiliser la procédure trace_dbms_output()
+            NULL;    
+          END ;
+           if lib is not null then
+             insert into NIV6 (CODTS,CODNIV1,CODNIV2,CODNIV3,CODNIV4,CODNIV5,CODNIV6,LIBNIV6,DATE_OUV,DATE_FERM,EST_PREV ) values (:new.CODTS,codniv1,codniv2,codniv3,codniv4,:new.CODE_ENT_MERE,:new.CODE_ENTITE,SUBSTR(lib,0,100),dateouv,dateferm,0);
+            else
+            insert into NIV6 (CODTS,CODNIV1,CODNIV2,CODNIV3,CODNIV4,CODNIV5,CODNIV6,LIBNIV6,DATE_OUV,DATE_FERM,EST_PREV ) values (:new.CODTS,codniv1,codniv2,codniv3,codniv4,:new.CODE_ENT_MERE,:new.CODE_ENTITE,null,dateouv,dateferm,0);
+            end if;
+             if (idAdr is not null or sirenAdr is not null or nicAdr is not null ) then
+              insert into STD_ADRSTR (CODTS,CODNIV1,CODNIV2,CODNIV3,CODNIV4,CODNIV5,CODNIV6,SIGLE,CPLADR,NUMV,BTQ,TYPV,NOMV,INSEE,COM,CP,DISTRI,TEL,SIREN,NIC,FAX,EMAIL,CODP,TYPSTR) values (:new.CODTS,codniv1,codniv2,codniv3,codniv4,:new.CODE_ENT_MERE,:new.CODE_ENTITE,sigleAdr,comAdr,numvoiAdr,bisterAdr,typvoiAdr,nomvoiAdr,cinseeAdr,bourgAdr,copostAdr,budistAdr,noteleAdr,sirenAdr,nicAdr,nofaxAdr,emailAdr,copaysAdr,typstrAdr);            
+            end if;
+       end if;
+    exception
+    when LE$trop_long then
+      --dbms_output.put_line('Une des colonnes de NIV1 dans la liste n''a pas la taille attendue : CODNIV1 - '||:new.CODE_ENTITE||' DATE_OUV - '||dateouv||' DATE_FERM - '||dateferm);
+      --FIXME utiliser la procédure trace_dbms_output()
+      NULL;
+    When OTHERS then
+      --dbms_output.put_line('Problème sur requête de recherche de niveau');
+      --dbms_output.put_line( 'Code    erreur : ' || to_char( SQLCODE )) ;
+      --dbms_output.put_line( 'libellé erreur : ' || to_char( SQLERRM )) ; 
+      null;
+     end ;
+  end if;
+END;
+##
+ORG_C_ARBRE_TO_NIV
+=SQL=
+DROP TRIGGER ORG_C_ARBRE_TO_NIV

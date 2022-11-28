@@ -1,0 +1,123 @@
+##
+DIC_MODIF_STRUCTURE
+=SQL=
+create or replace PROCEDURE DIC_MODIF_STRUCTURE(
+    p_nomTable IN user_tables.table_name%TYPE,
+    p_nomCol IN user_tab_cols.column_name%TYPE,
+    p_oldType IN user_tab_cols.data_type%TYPE,
+    p_oldLength IN user_tab_cols.data_length%TYPE,
+    p_oldPrecision IN user_tab_cols.data_precision%TYPE,
+    p_oldScale IN user_tab_cols.data_scale%TYPE,
+    p_newType IN user_tab_cols.data_type%TYPE,
+    p_newLength IN user_tab_cols.data_length%TYPE,
+    p_newPrecision IN user_tab_cols.data_precision%TYPE,
+    p_newScale IN user_tab_cols.data_scale%TYPE) AS 
+  oldLength user_tab_cols.data_length%TYPE;
+  oldPrecision user_tab_cols.data_precision%TYPE;
+  oldScale user_tab_cols.data_scale%TYPE;
+  newLength user_tab_cols.data_length%TYPE;
+  newPrecision user_tab_cols.data_precision%TYPE;
+  newScale user_tab_cols.data_scale%TYPE;
+  maxLgPartieEntiere NUMBER;
+  maxLgPartieDecimale NUMBER;
+  maxPrecision NUMBER;
+  maxScale NUMBER;
+  req CLOB;
+BEGIN
+  oldLength := p_oldLength;
+  oldPrecision := p_oldPrecision;
+  IF oldPrecision IS NULL THEN
+    oldPrecision := 38;
+  END IF;
+  oldScale := p_oldScale;
+  IF oldScale IS NULL THEN
+    oldScale := 38;
+  END IF;
+
+  newLength := p_newLength;
+  newPrecision := p_newPrecision;
+  IF newPrecision IS NULL THEN
+    newPrecision := 38;
+  END IF;
+  newScale := p_newScale;
+  IF newScale IS NULL THEN
+    newScale := 38;
+  END IF;
+
+  req := 'ALTER TABLE ' || p_nomTable;
+  
+  IF p_oldType IS NULL THEN
+    -- La colonne n'existe pas dans la table : on ajoute
+    req := req || ' ADD';
+    oldLength := 0;
+    oldPrecision := 0;
+    oldScale := 0;
+    DIC_AJOUT_CHAMP_REQUETE(p_nomTable,p_nomCol);
+  ELSE
+    -- La colonne existe dans la table : on modifie seulement si on est sur le même type
+    IF NOT p_newType=p_oldType THEN
+      --DBMS_OUTPUT.PUT_LINE('Types différents : pas de modification');
+      --FIXME utiliser la procédure trace_dbms_output()
+      RETURN;
+    END IF;
+    req := req || ' MODIFY';
+  END IF;
+  req := req || ' (' || p_nomCol || ' ' || p_newType;
+  IF p_newType='VARCHAR2' THEN
+    IF newLength<=oldLength THEN
+      --DBMS_OUTPUT.PUT_LINE('VARCHAR2 de longueur plus petite ou égale : pas de modification');
+      --FIXME utiliser la procédure trace_dbms_output()
+      RETURN;
+    END IF;
+    req := req || '(' || newLength || ')';
+  ELSIF p_newType='NUMBER' THEN
+    IF(oldPrecision = 38) THEN
+      --DBMS_OUTPUT.PUT_LINE('COLONNE '||p_nomCol||' de type NUMBER déjà à 38 , on ne fait rien');
+      --FIXME utiliser la procédure trace_dbms_output()
+      RETURN;
+    END IF;
+    
+    IF (newPrecision-newScale)>(oldPrecision-oldScale) THEN
+      maxLgPartieEntiere := (newPrecision-newScale);
+    ELSE
+      maxLgPartieEntiere := (oldPrecision-oldScale);
+    END IF;
+    IF newScale>oldScale THEN
+      maxLgPartieDecimale := newScale;
+    ELSE
+      maxLgPartieDecimale := oldScale;
+    END IF;
+    maxPrecision := (maxLgPartieEntiere+maxLgPartieDecimale);
+    maxScale := maxLgPartieDecimale;
+    IF maxPrecision<=oldPrecision AND maxScale<=oldScale THEN
+      --DBMS_OUTPUT.PUT_LINE('NUMBER de précision ou scale plus petite ou égale : pas de modification');
+      --FIXME utiliser la procédure trace_dbms_output()
+      RETURN;
+    END IF;
+    IF (maxPrecision > 38) THEN
+      maxPrecision :=38;
+    END IF ;
+    req := req || '(' || maxPrecision || ', ' || maxScale || ')';
+  ELSIF p_oldType IS NOT NULL THEN
+    --DBMS_OUTPUT.PUT_LINE('Type autre que VARCHAR2 ou NUMBER : pas de modification');
+    --FIXME utiliser la procédure trace_dbms_output()
+    RETURN;
+  END IF;
+  req := req || ')';
+  --DBMS_OUTPUT.PUT_LINE(req);
+  --FIXME utiliser la procédure trace_dbms_output()
+  BEGIN
+    EXECUTE_IMMEDIATE_STRING (req,0);
+    IF UPPER(p_nomTable)='SECUPACMAT' THEN
+      req := REPLACE(req, 'ALTER TABLE ' || p_nomTable, 'ALTER TABLE ' || p_nomTable || '_TMP');
+      --DBMS_OUTPUT.PUT_LINE(req);
+      --FIXME utiliser la procédure trace_dbms_output()
+      EXECUTE_IMMEDIATE_STRING( req,0);
+    END IF;
+  EXCEPTION 
+      WHEN OTHERS THEN
+        --dbms_output.put_line('Erreur avec la modification de la table  : ' || p_nomTable || ' et de la colonne ' || p_nomCol || ')');
+        --FIXME utiliser la procédure trace_dbms_output()
+        RETURN;
+    END;
+END DIC_MODIF_STRUCTURE;

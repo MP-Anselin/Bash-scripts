@@ -1,0 +1,25 @@
+##
+TAG_CHARSET=@€éèç
+##
+GET_CID_FOR_LOGIN
+=SQL=
+CREATE OR REPLACE FUNCTION GET_CID_FOR_LOGIN(p_login IN VARCHAR2) 
+	RETURN VARCHAR2 
+AS 
+	v_retour VARCHAR2(32);
+BEGIN
+	/**
+	 * Dans le cadre du multiclient, la table SYS_USR_CID permet d'associer un LOGIN avec un COMPANY_ID (CID).
+	 * Le problème, c'est que cette table n'existe pas dans ADP Link car on est monoclient.
+	 * Cette fonction va permettre de récupérer le CID associé à un login sans avoir à s'interroger sur l'existence ou non de la table.
+	 * Si la table existe, on utilise les données de SYS_USR_CID, 
+	 * sinon on va utiliser la table SYS_USR_CONFIG et la valeur du CID contenue dans la varsys "NS_CLIENT_ID"
+	 * ATTENTION, les utilisateurs techniques (SYS_USR_ADMIN_ONLY) sont exclus
+	*/
+	select COMPANY_ID into v_retour from GET_SYS_USR_CID() where LOGIN = p_login;
+	return v_retour;
+EXCEPTION
+	WHEN NO_DATA_FOUND THEN
+    -- Le login n'a pas été trouvé  	
+    return NULL;
+END GET_CID_FOR_LOGIN;

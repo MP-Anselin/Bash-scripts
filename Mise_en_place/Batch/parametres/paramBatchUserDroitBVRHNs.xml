@@ -1,0 +1,19 @@
+<interface idInterface="ALP_BVRH">
+	<nomInterface>Synchro ALP BVRH</nomInterface>
+	<descriptionInterface>
+	extraction population,juridique, structure
+	</descriptionInterface>
+	<traitement>
+		<descriptionTraitement>Export profile User</descriptionTraitement>
+		<typeTraitement>InterfaceExportDroitAlpBvrh</typeTraitement>
+		<modeDebug>false</modeDebug>
+		<versionTraitement>V1</versionTraitement>
+		<fichierSecuritePopPac>SYS_SEC_RESOLUE_POP_PAC.csv</fichierSecuritePopPac>
+		<fichierSecuritePopReq>SYS_SEC_RESOLUE_POP_REQ.csv</fichierSecuritePopReq>
+		<fichierSecuriteStruct>SYS_SEC_RESOLUE_STRUCT.csv</fichierSecuriteStruct>
+		<fichierSecuriteStructReq>SYS_SEC_RESOLUE_STRUCT_REQ.csv</fichierSecuriteStructReq>
+		<fichierUserProf>SYS_USR_PROFILE.csv</fichierUserProf>
+		<activerMail>NON</activerMail>
+		<continueSiErreur>OUI</continueSiErreur>
+	</traitement>
+</interface>

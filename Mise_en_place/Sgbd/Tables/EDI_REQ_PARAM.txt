@@ -1,0 +1,7 @@
+##
+TAG_CHARSET=@€ιθη
+##
+EDI_REQ_PARAM
+==
+DELETE FROM EDI_REQ_PARAM WHERE NOMREQ = 'Historique des connexions pour un utilisateur' AND NOMPARAM ='LOGIN'
+'Historique des connexions pour un utilisateur','LOGIN','true'

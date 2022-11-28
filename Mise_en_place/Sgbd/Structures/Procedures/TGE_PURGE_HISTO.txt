@@ -1,0 +1,38 @@
+##
+TGE_PURGE_HISTO
+=SQL=
+create or replace PROCEDURE TGE_PURGE_HISTO(
+  p_numpac                  IN VARCHAR2,
+  p_periode_en_cours        IN VARCHAR2)
+AS
+  TYPE t_col_name           IS TABLE OF user_tab_cols.column_name%TYPE;
+  l_col_date                t_col_name;                                 -- la liste des colonnes de type DATE
+  v_periode                 tge_ref_pac.periodeencours%type;            -- la periode en cours utilisée par le DELETE
+BEGIN 
+  -- définir la période
+  IF p_periode_en_cours IS NULL THEN
+    SELECT periodeencours INTO v_periode FROM TGE_REF_PAC WHERE NUMPAC = p_numpac;
+  ELSE
+    v_periode := p_periode_en_cours;
+  END IF;
+
+  IF (v_periode IS NOT NULL) THEN
+    -- table(s) à traiter
+    FOR ligne IN (SELECT * FROM TGE_REF_MAPTA WHERE NUMPAC = p_numpac AND ALLERRETOUR IN ('R','2') AND TO_NUMBER(NVL(NBMOISCONS, '0')) > 0 
+                  UNION ALL(SELECT * FROM TGE_REF_MAPTA a WHERE NUMPAC = '*'  AND ALLERRETOUR IN ('R','2') AND TO_NUMBER(NVL(NBMOISCONS, '0')) > 0 
+                         AND NOT EXISTS (SELECT * FROM TGE_REF_MAPTA b WHERE p_numpac = b.NUMPAC AND a.TABLEPARAM = b.TABLEPARAM))) 
+    LOOP
+      -- colonne(s) date(s)
+      EXECUTE IMMEDIATE 'SELECT tc.column_name FROM user_constraints c, user_cons_columns cc, user_tab_cols tc WHERE c.constraint_name = cc.constraint_name ' ||
+                        'AND c.table_name = cc.table_name AND cc.table_name = tc.table_name AND cc.column_name = tc.column_name AND c.constraint_type =''P'' ' ||
+                        'AND tc.data_type = ''DATE'' AND c.table_name = ''' || ligne.tablephy || '''' BULK COLLECT INTO l_col_date;
+      -- vérifier qu'il n'y a qu'une seul colonne de récupérée, si ce n'est pas le cas ne pas faire la purge
+      IF (l_col_date IS NOT NULL AND l_col_date.COUNT = 1) THEN
+        EXECUTE IMMEDIATE 'DELETE FROM ' || ligne.tablephy || ' WHERE NUMPAC = :1 AND ' || l_col_date(1) || ' < ADD_MONTHS(TO_DATE(:2, ''yyyymm''), :3)' USING p_numpac, v_periode, -ligne.nbmoiscons;
+      END IF;
+    END LOOP; 
+  END IF;
+EXCEPTION
+WHEN OTHERS THEN
+  raise_application_error(-20000, 'TGE_PURGE_HISTO(' || NVL(p_numpac, 'NULL') || ',' || NVL(p_periode_en_cours, 'NULL') || '). Cause: ' || SQLCODE || '-' || sqlerrm);
+END TGE_PURGE_HISTO;

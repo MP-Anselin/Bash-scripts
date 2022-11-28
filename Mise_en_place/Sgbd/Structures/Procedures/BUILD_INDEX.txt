@@ -1,0 +1,204 @@
+##
+TAG_CHARSET=@€éèç
+##
+BUILD_INDEX
+=SQL=
+create or replace PROCEDURE "BUILD_INDEX"(
+    p_codts IN std_struc_arbre.codts%TYPE,
+    p_dateEff IN std_struc_arbre.date_eff%TYPE, -- Calcul à partir d'une date précise ou calcul de toutes les dates si null (19010101)
+    p_cid IN std_struc_index.cid%TYPE default null) -- Le cid peut être null car la procédure peut être appelé par le service client ADP Link
+AS
+  /**
+   * Procédure de mise à jour des données d'une structure dans la table STD_STRUC_INDEX
+   * Si p_dateEff n'est pas vide le calcul se fait à partir de la date d'effet
+   * sinon le calcul se fait à partir du début (19010101).
+   * Le codTs -99 correspond au lancement d'un traitement de défragmentation sur la table
+   */
+
+  v_cid std_struc_index.cid%TYPE;
+  
+  TYPE tcur IS REF CURSOR;
+  tabCodtsDate tcur;
+
+  v_lgnReqCodts std_struc_arbre.codts%TYPE;
+  v_lgnReqDateEff std_struc_arbre.date_eff%TYPE;
+  v_lgnReqDateFin std_struc_arbre.date_fin%TYPE;
+  v_codTs99     INTEGER :=NULL;
+  v_codTsLock   INTEGER := NULL;
+  v_dateEff     VARCHAR2(8);
+  v_dateFinBefore VARCHAR2(8);
+  v_dateFinAfter  VARCHAR2(8);
+  req           VARCHAR2(200);
+  retour        INTEGER;
+  err_msg  VARCHAR(1000);
+  err_code VARCHAR(200);
+  
+  BEGIN
+	  
+  v_cid := p_cid;
+  IF (v_cid IS NULL) THEN
+  	BEGIN
+  		SELECT VALVAR INTO v_cid FROM SYS_VARSYS where CODVAR = 'NS_CLIENT_ID';
+  	EXCEPTION
+  	WHEN NO_DATA_FOUND THEN
+  		v_cid := null;
+  	END;
+  END IF;
+  IF (v_cid IS NULL) THEN
+  	-- En mode multiclient, la varsys peut être null et le passage du paramêtre pCid est obligatoire
+  	RAISE_APPLICATION_ERROR(-20000, 'Le cid n''est pas passé en paramètre et on est en mode multiclient.');
+  END IF;
+	  
+  -- Récupération si un traitement de "défragmentation" a été lancé (codTs = -99)
+  BEGIN
+    SELECT codTs
+    INTO v_codTs99
+    FROM build_index_lock
+    WHERE codTs = -99 AND codTs_lock > 0;
+  EXCEPTION
+    -- Pas du tout de ligne pour le codTs -99
+    WHEN NO_DATA_FOUND THEN
+      v_codTs99 := NULL;
+  END;
+  
+  -- Récupération si une structure est déjà lockée
+  BEGIN
+    SELECT codTs_lock, date_eff
+    INTO v_codTsLock, v_dateEff
+    FROM build_index_lock
+    WHERE codTs = p_codts;
+  EXCEPTION
+    -- La structure n'a pas encore été initialisée dans la table
+  WHEN NO_DATA_FOUND THEN
+    v_codTsLock := NULL;
+    v_dateEff := NULL;
+  END; 
+  
+  IF (v_codTsLock IS NOT NULL AND v_codTsLock > 0) OR (v_codTs99 IS NOT NULL) THEN
+    -- La structure est lockée ou un traitement de défragmentation a été lancé
+    IF p_codTs <> -99 THEN
+      -- On met à jour le lock de la structure 
+      -- (sauf pour le traitement de défragmentation qui n'a pas besoin d'être relancé plusieurs fois à la suite)
+      req := 'UPDATE build_index_lock SET codTs_lock = '||(v_codTsLock + 1);
+      IF v_dateEff IS NULL OR v_dateEff > p_dateEff THEN
+        -- On met à jour la date que si celle si est plus petite que la précédente
+        req := req||', date_eff = '||p_dateEff;
+      END IF;
+      req := req||' WHERE codTs = '||p_codTs;
+    
+      EXECUTE_IMMEDIATE_STRING(req,0);
+      COMMIT;
+    END IF;
+  ELSE
+    -- La structure n'est pas lockée, on commence par locker la structure et ensuite on lance le build
+    IF v_codTsLock IS NULL THEN
+      -- Insertion d'un ligne pour locker la structure
+      INSERT INTO build_index_lock (codTs, codTs_lock, date_eff)
+      VALUES(p_codTs, 1, null);
+    ELSE
+      -- Modification de la ligne existante pour locker la structure (on laisse à vide la date d'effet)
+      UPDATE build_index_lock
+      SET codTs_lock = 1
+      WHERE codTs = p_codTs;
+    END IF;
+    COMMIT; -- Commite de l'insert/update du lock
+
+    v_dateFinBefore := NULL;
+    v_dateFinAfter := NULL;
+
+    IF p_dateEff IS NOT NULL THEN
+      -- On récupère la date de fin de l'historique qu'on va mettre à jour
+      BEGIN
+        SELECT date_fin
+        INTO v_dateFinBefore
+        FROM std_struc_index
+        WHERE cid = v_cid and codTs = p_codts and date_eff = p_dateEff and rownum = 1;
+      EXCEPTION
+        -- L'historique n'existe pas
+        WHEN NO_DATA_FOUND THEN
+          v_dateFinBefore := NULL;
+      END;
+    END IF; 
+
+    -- Suppression des lignes qui vont être recalculées 
+    -- (pour éviter la fragmentation, un traitement périodique lance régulièrement un truncate de la table)
+    DELETE FROM std_struc_index WHERE cid = v_cid and codts = p_codts
+    AND date_eff >= nvl(p_dateEff, '19010101');
+     
+    -- Lancement du build dans la table STD_STRUC_INDEX
+    OPEN tabCodtsDate 
+      FOR SELECT codts,
+        date_eff,
+        NVL(lead(date_fin, 1) over(partition BY codts order by date_eff),'20991231' ) AS date_fin
+      FROM
+        ( SELECT DISTINCT codts,
+          date_eff ,
+          TO_CHAR(to_date(date_eff,'yyyymmdd')-1,'yyyymmdd') date_fin
+        FROM std_struc_arbre
+        WHERE cid = v_cid  
+          AND codts = p_codts
+          AND date_eff >= nvl(p_dateEff, '19010101')
+        ORDER BY codts, date_eff
+        )
+      ORDER BY date_eff, date_fin;
+    LOOP
+      FETCH tabCodtsDate INTO v_lgnReqCodts, v_lgnReqDateEff, v_lgnReqDateFin;
+      EXIT
+    WHEN tabCodtsDate%NOTFOUND ;
+      DBMS_OUTPUT.PUT_LINE(v_cid||' :' ||p_codts||' :' ||v_lgnReqDateEff|| ' : '||v_lgnReqDateFin);
+      retour := BUILD_TABLE_INDEX(v_cid, p_codts, v_lgnReqDateEff, v_lgnReqDateFin) ;
+    END LOOP;
+    CLOSE tabCodtsDate;
+
+    IF p_dateEff IS NOT NULL THEN
+      -- On récupère la date de fin de l'historique qu'on a mis à jour
+      BEGIN
+        SELECT date_fin
+        INTO v_dateFinAfter
+        FROM std_struc_index
+        WHERE cid = v_cid and codTs = p_codts and date_eff = p_dateEff and rownum = 1;
+      EXCEPTION
+        -- L'historique n'existe plus
+        WHEN NO_DATA_FOUND THEN
+          v_dateFinAfter := NULL;
+      END;
+      
+      IF v_dateFinBefore IS NULL AND v_dateFinAfter IS NOT NULL THEN
+        -- L'historique a été créé : on met à jour la date précédente pour positionner la date de fin à J-1 du nouvel historique
+        UPDATE STD_STRUC_INDEX I1 SET DATE_FIN=TO_CHAR(TO_DATE(p_dateEff,'yyyymmdd')-1,'yyyymmdd') WHERE CID = v_cid and CODTS=p_codts AND NOT DATE_EFF=p_dateEff AND DATE_FIN=v_dateFinAfter;
+      ELSIF v_dateFinBefore IS NOT NULL AND v_dateFinAfter IS NULL THEN
+        -- L'historique a été supprimé : on met à jour la date précédente pour positionner la date de fin à la date de fin de l'historique supprimé
+        UPDATE STD_STRUC_INDEX I1 SET DATE_FIN=v_dateFinBefore WHERE CID = v_cid and CODTS=p_codts AND DATE_FIN=TO_CHAR(TO_DATE(p_dateEff,'yyyymmdd')-1,'yyyymmdd');
+      END IF;
+    END IF; 
+
+    -- Après le build des index, on vérifie que d'autres build n'ont pas voulu être lancé (dte not null)
+    SELECT codTs_lock, date_eff
+    INTO v_codTsLock, v_dateEff
+    FROM build_index_lock
+    WHERE codTs = p_codts;
+    
+    -- On délock la structure    
+    UPDATE build_index_lock SET codTs_lock = 0, date_eff = NULL WHERE codTs = p_codTs;     
+    
+    -- On commite
+    COMMIT;
+    
+     -- Si la structure avait plus que 1 lock alors on relance la procédure
+    IF v_codTsLock > 1 THEN
+      BUILD_INDEX(p_codTs, v_dateEff, v_cid);
+    END IF;
+  END IF;
+EXCEPTION
+WHEN OTHERS THEN
+  -- Tracer l'erreur
+   ERR_CODE := SQLCODE;
+   ERR_MSG  := SQLERRM;
+   INSERT INTO SYS_TRC_ERR VALUES (CURRENT_TIMESTAMP,ERR_CODE||'  MESSAGE='||ERR_MSG,'BUILD_INDEX p_cid='||p_cid||' p_codts='||p_codts||' p_dateEff = '||p_dateEff,'PL_SQL');
+  -- Une exception a été lancé, on déclock la structure
+  UPDATE build_index_lock 
+  SET codTs_lock = 0,
+  date_eff = NULL
+  WHERE codTs = p_codTs;
+  COMMIT;
+END BUILD_INDEX;

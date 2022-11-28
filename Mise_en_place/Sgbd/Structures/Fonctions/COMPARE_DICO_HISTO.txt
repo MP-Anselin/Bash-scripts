@@ -1,0 +1,118 @@
+##
+TAG_CHARSET=@€éèç
+##
+COMPARE_DICO_HISTO
+=SQL=
+/*********************************************************
+Permet de comparer deux lignes d'un dictionnaire historisé
+*********************************************************/
+create or replace FUNCTION COMPARE_DICO_HISTO (
+NOM_DICO IN VARCHAR2,
+MATRIC IN VARCHAR2,
+NUMPAC IN VARCHAR2,
+PACMAT IN VARCHAR2,
+PAIEZAD_CLE1 IN VARCHAR2,
+DATE_EFFET_CLE1 IN VARCHAR2,
+PAIEZAD_CLE2 IN VARCHAR2,
+DATE_EFFET_CLE2 IN VARCHAR2,
+TYPE_CLE IN VARCHAR2
+)
+RETURN COMPARE_DICO_HISTO_TAB
+AS
+retour COMPARE_DICO_HISTO_TAB := COMPARE_DICO_HISTO_TAB();
+
+--gestion du curseur et du retour
+TYPE refCursor IS REF CURSOR;
+cur_val refCursor;
+
+NOM_DONNEE VARCHAR2(20);
+LIB_DONNEE VARCHAR2(50);
+VALEUR_SELECT VARCHAR2(100);
+VALEUR_PREC VARCHAR2(100);
+
+--variables pour la requête
+WHERE1 VARCHAR2(4000);
+WHERE2 VARCHAR2(4000);
+query CLOB;
+PREMIER NUMBER;
+COLS CLOB;
+COLS_AS CLOB;
+
+table_dico_exist number;
+
+BEGIN    
+    --on vérifie que le dictionnaire existe
+    SELECT COUNT(*) INTO  table_dico_exist FROM USER_TABLES WHERE TABLE_NAME = NOM_DICO;
+    IF table_dico_exist > 0 THEN
+        --on génére les clause where en fonction du type de clé de l'écran        
+        IF upper(type_cle) like 'N' THEN
+            /** Ecran de type matricule de paie (NUMPAC/PACMAT) */
+            WHERE1 := 'NUMPAC = '''|| NUMPAC ||''' AND PACMAT = '''|| PACMAT ||''' AND TO_DATE('''|| DATE_EFFET_CLE1 ||''',''DD.MM.YYYY'') BETWEEN DATE_EFF AND DATE_FIN';
+            WHERE2 := 'NUMPAC = '''|| NUMPAC ||''' AND PACMAT = '''|| PACMAT ||''' AND TO_DATE('''|| DATE_EFFET_CLE2 ||''',''DD.MM.YYYY'') BETWEEN DATE_EFF AND DATE_FIN';                                    
+        ELSIF upper(type_cle) like 'M' THEN 
+            /** Ecran de type période d'emploi (NUMPAC/PAIEZAD) */
+            WHERE1 := 'PAIEZAD = '''|| PAIEZAD_CLE1 ||''' AND PACMAT = '''|| PACMAT ||''' AND TO_DATE('''|| DATE_EFFET_CLE1 ||''',''DD.MM.YYYY'') BETWEEN DATE_EFF AND DATE_FIN';
+            WHERE2 := 'PAIEZAD = '''|| PAIEZAD_CLE2 ||''' AND PACMAT = '''|| PACMAT ||''' AND TO_DATE('''|| DATE_EFFET_CLE2 ||''',''DD.MM.YYYY'') BETWEEN DATE_EFF AND DATE_FIN';
+        ELSE
+            /** Ecran de type matricule RHID (MATRIC) : type_cle = R ou R%*/
+            WHERE1 := 'MATRIC = '''|| MATRIC ||''' AND TO_DATE('''|| DATE_EFFET_CLE1 ||''',''DD.MM.YYYY'') BETWEEN DATE_EFF AND DATE_FIN';
+            WHERE2 := 'MATRIC = '''|| MATRIC ||''' AND TO_DATE('''|| DATE_EFFET_CLE2 ||''',''DD.MM.YYYY'') BETWEEN DATE_EFF AND DATE_FIN'; 
+        END IF;
+
+
+        PREMIER := 0;
+        COLS := '';
+        COLS_AS := '';
+        FOR col IN (SELECT COLUMN_NAME,DATA_TYPE FROM USER_TAB_COLS UTC WHERE TABLE_NAME = NOM_DICO)
+        LOOP
+            IF PREMIER = 0 THEN
+                PREMIER := 1;
+            ELSE
+                COLS := COLS||',';
+            COLS_AS := COLS_AS||',';
+            END IF;
+            COLS_AS := COLS_AS||col.COLUMN_NAME||' AS '''||col.COLUMN_NAME||'''';
+    
+            IF col.DATA_TYPE = 'DATE' THEN
+                COLS := COLS||' TO_CHAR('||col.COLUMN_NAME||',''DD.MM.YYYY'') AS '||col.COLUMN_NAME;
+            ELSIF col.DATA_TYPE = 'NUMBER' THEN
+                COLS := COLS||'REGEXP_REPLACE(TO_CHAR('||col.COLUMN_NAME||'),''^,'',''0,'') AS '||col.COLUMN_NAME;
+            ELSE
+                COLS := COLS||col.COLUMN_NAME;
+            END IF;
+        END LOOP;
+    
+        query := 'SELECT a.COLONNE,a.COLONNE as LIB_DONNEE, a.VALEUR,b.VALEUR FROM (';
+        --------------
+        query := query ||' SELECT * FROM (';
+        query := query ||' SELECT ';
+        query := query ||' '||COLS;
+        query := query ||' FROM '||NOM_DICO;
+        query := query ||' WHERE '||WHERE1;
+        query := query ||' ) UNPIVOT INCLUDE NULLS ( VALEUR FOR COLONNE IN (';
+        query := query ||' '||COLS_AS;
+        query := query ||' ))';
+        query := query ||') a INNER JOIN (';
+        --------------
+        query := query ||' SELECT * FROM (';
+        query := query ||' SELECT ';
+        query := query ||' '||COLS;
+        query := query ||' FROM '||NOM_DICO;
+        query := query ||' WHERE '||WHERE2;
+        query := query ||' ) UNPIVOT INCLUDE NULLS ( VALEUR FOR COLONNE IN (';
+        query := query ||' '||COLS_AS;
+        query := query ||' ))';
+        query := query ||') b ON a.COLONNE = b.COLONNE';
+        query := query ||' WHERE NVL(a.VALEUR,''NULL'') != NVL(b.VALEUR,''NULL'')';
+    
+    
+        OPEN cur_val  FOR  query;
+        LOOP
+            FETCH cur_val INTO nom_donnee ,lib_donnee, valeur_prec, valeur_select ;
+            EXIT WHEN cur_val%NOTFOUND ;
+            retour.extend();
+            retour(retour.last):= COMPARE_DICO_HISTO_LIGNE(nom_donnee, lib_donnee, valeur_prec, valeur_select);
+        END LOOP;
+    END IF;
+	RETURN retour;
+END COMPARE_DICO_HISTO;

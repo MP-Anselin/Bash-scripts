@@ -1,0 +1,57 @@
+##
+TAG_CHARSET=@€ιθη
+##
+WKF_OP_ROLE
+==
+delete from WKF_OP_ROLE WHERE OP_NUM in (55000,55001,55002)
+55000,3,'*'
+55001,3,'*'
+55002,3,'*'
+##
+WKF_OP_ROLE
+==
+delete from WKF_OP_ROLE WHERE OP_NUM in (55100,55102)
+55100,3,'*'
+55102,3,'*'
+##
+WKF_OP_ROLE
+==
+Delete from WKF_OP_ROLE where OP_NUM IN( select OP_NUM from WKF_OPERATIONS where PROC_NUM in ('5052'))
+'55200','3','*'
+'55201','3','*'
+##
+WKF_OP_ROLE
+==
+delete from WKF_OP_ROLE WHERE OP_NUM in (55300,55301)
+55300,1,'*'
+55301,3,'*'
+##
+WKF_OP_ROLE
+==
+delete from WKF_OP_ROLE WHERE OP_NUM in ('63010','63015')
+'63010','1','*'
+'63015','3','*'
+##
+WKF_OP_ROLE
+==
+delete from WKF_OP_ROLE WHERE OP_NUM = 53803
+'53803','3','*'
+##
+WKF_OP_ROLE
+==
+delete from WKF_OP_ROLE WHERE OP_NUM in (40203,40201)
+'40203','3','*'
+'40201','3','*'
+##
+WKF_OP_ROLE
+==
+delete from WKF_OP_ROLE WHERE OP_NUM in (51500,51501)
+'51500','1','*'
+'51501','3','*'
+##
+WKF_OP_ROLE
+==
+delete from WKF_OP_ROLE WHERE OP_NUM IN ('5510','5520','5530')
+'5510','3','*'
+'5520','3','*'
+'5530','3','*'

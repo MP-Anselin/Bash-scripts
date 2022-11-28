@@ -1,0 +1,158 @@
+##
+TAG_CHARSET=@€éèç
+##
+SYS_GRAPH_DEFINITION
+=SQL IFNOTEXIST=SYS_GRAPH_DEFINITION=
+create table SYS_GRAPH_DEFINITION (ID_TYPE_GRAPH NUMBER,PARAM_NAME VARCHAR2(255),VALUE_TYPE VARCHAR2(255),REQUIRED CHAR(1),DEFAULT_VALUE VARCHAR2(255),DESCRIPTION VARCHAR2(255), primary key (ID_TYPE_GRAPH, PARAM_NAME))
+##
+SYS_GRAPH_DEFINITION
+=SQL IFEXIST=SYS_GRAPH_DEFINITION=
+delete from SYS_GRAPH_DEFINITION
+##
+SYS_GRAPH_DEFINITION
+=SQL IFEXIST=SYS_GRAPH_DEFINITION=
+insert into SYS_GRAPH_DEFINITION values ( 1, 'angleField', 'TEXT', '1', 'angle', 'Alias de colonne à utiliser dans la requête SQL')
+##
+SYS_GRAPH_DEFINITION
+=SQL IFEXIST=SYS_GRAPH_DEFINITION=
+insert into SYS_GRAPH_DEFINITION values ( 2, 'angleField', 'TEXT', '1', 'angle', 'Alias de colonne à utiliser dans la requête SQL')
+##
+SYS_GRAPH_DEFINITION
+=SQL IFEXIST=SYS_GRAPH_DEFINITION=
+insert into SYS_GRAPH_DEFINITION values ( 1, 'labelField', 'TEXT', '1', 'libelle', 'Alias de colonne à utiliser dans la requête SQL')
+##
+SYS_GRAPH_DEFINITION
+=SQL IFEXIST=SYS_GRAPH_DEFINITION=
+insert into SYS_GRAPH_DEFINITION values ( 2, 'labelField', 'TEXT', '1', 'libelle', 'Alias de colonne à utiliser dans la requête SQL')
+##
+SYS_GRAPH_DEFINITION
+=SQL IFEXIST=SYS_GRAPH_DEFINITION=
+insert into SYS_GRAPH_DEFINITION values ( 3, 'axeX', 'TEXT', '1', 'AXEX', 'Alias de colonne à utiliser dans la requête SQL')
+##
+SYS_GRAPH_DEFINITION
+=SQL IFEXIST=SYS_GRAPH_DEFINITION=
+insert into SYS_GRAPH_DEFINITION values ( 3, 'axeY', 'TEXT', '1', 'AXEY', 'Alias de colonne à utiliser dans la requête SQL')
+##
+SYS_GRAPH_DEFINITION
+=SQL IFEXIST=SYS_GRAPH_DEFINITION=
+insert into SYS_GRAPH_DEFINITION values ( 3, 'showLabelX', 'BOOL', '1', 'false', 'Affichage des libellés sur l''axe X')
+##
+SYS_GRAPH_DEFINITION
+=SQL IFEXIST=SYS_GRAPH_DEFINITION=
+insert into SYS_GRAPH_DEFINITION values ( 3, 'showLabelY', 'BOOL', '1', 'false', 'Affichage des libellés sur l''axe Y')
+##
+SYS_GRAPH_DEFINITION
+=SQL IFEXIST=SYS_GRAPH_DEFINITION=
+insert into SYS_GRAPH_DEFINITION values ( 3, 'managePivot', 'BOOL', '0', 'false', 'Applique une fonction oracle pivot (tableau croisé)')
+##
+SYS_GRAPH_DEFINITION
+=SQL IFEXIST=SYS_GRAPH_DEFINITION=
+insert into SYS_GRAPH_DEFINITION values ( 4, 'axeX', 'TEXT', '1', 'AXEX', 'Alias de colonne à utiliser dans la requête SQL')
+##
+SYS_GRAPH_DEFINITION
+=SQL IFEXIST=SYS_GRAPH_DEFINITION=
+insert into SYS_GRAPH_DEFINITION values ( 4, 'axeY', 'TEXT', '1', 'AXEY', 'Alias de colonne à utiliser dans la requête SQL')
+##
+SYS_GRAPH_DEFINITION
+=SQL IFEXIST=SYS_GRAPH_DEFINITION=
+insert into SYS_GRAPH_DEFINITION values ( 4, 'showLabelX', 'BOOL', '1', 'false', 'Affichage des libellés sur l''axe X')
+##
+SYS_GRAPH_DEFINITION
+=SQL IFEXIST=SYS_GRAPH_DEFINITION=
+insert into SYS_GRAPH_DEFINITION values ( 4, 'showLabelY', 'BOOL', '1', 'false', 'Affichage des libellés sur l''axe Y')
+##
+SYS_GRAPH_DEFINITION
+=SQL IFEXIST=SYS_GRAPH_DEFINITION=
+insert into SYS_GRAPH_DEFINITION values ( 4, 'managePivot', 'BOOL', '0', 'false', 'Applique une fonction oracle pivot (tableau croisé)')
+##
+SYS_GRAPH_DEFINITION
+=SQL IFEXIST=SYS_GRAPH_DEFINITION=
+insert into SYS_GRAPH_DEFINITION values ( 5, 'axeX', 'TEXT', '1', 'AXEX', 'Alias de colonne à utiliser dans la requête SQL')
+##
+SYS_GRAPH_DEFINITION
+=SQL IFEXIST=SYS_GRAPH_DEFINITION=
+insert into SYS_GRAPH_DEFINITION values ( 5, 'axeY', 'TEXT', '1', 'AXEY', 'Alias de colonne à utiliser dans la requête SQL')
+##
+SYS_GRAPH_DEFINITION
+=SQL IFEXIST=SYS_GRAPH_DEFINITION=
+insert into SYS_GRAPH_DEFINITION values ( 5, 'showLabelX', 'BOOL', '1', 'false', 'Affichage des libellés sur l''axe X')
+##
+SYS_GRAPH_DEFINITION
+=SQL IFEXIST=SYS_GRAPH_DEFINITION=
+insert into SYS_GRAPH_DEFINITION values ( 5, 'showLabelY', 'BOOL', '1', 'false', 'Affichage des libellés sur l''axe Y')
+##
+SYS_GRAPH_DEFINITION
+=SQL IFEXIST=SYS_GRAPH_DEFINITION=
+insert into SYS_GRAPH_DEFINITION values ( 6, 'axeX', 'TEXT', '1', 'AXEX', 'Alias de colonne à utiliser dans la requête SQL')
+##
+SYS_GRAPH_DEFINITION
+=SQL IFEXIST=SYS_GRAPH_DEFINITION=
+insert into SYS_GRAPH_DEFINITION values ( 6, 'axeY', 'TEXT', '1', 'AXEY', 'Alias de colonne à utiliser dans la requête SQL')
+##
+SYS_GRAPH_DEFINITION
+=SQL IFEXIST=SYS_GRAPH_DEFINITION=
+insert into SYS_GRAPH_DEFINITION values ( 6, 'showLabelX', 'BOOL', '1', 'false', 'Affichage des libellés sur l''axe X')
+##
+SYS_GRAPH_DEFINITION
+=SQL IFEXIST=SYS_GRAPH_DEFINITION=
+insert into SYS_GRAPH_DEFINITION values ( 6, 'showLabelY', 'BOOL', '1', 'false', 'Affichage des libellés sur l''axe Y')
+##
+SYS_GRAPH_DEFINITION
+=SQL IFEXIST=SYS_GRAPH_DEFINITION=
+insert into SYS_GRAPH_DEFINITION values ( 7, 'axeX', 'TEXT', '1', 'AXEX', 'Alias de colonne à utiliser dans la requête SQL')
+##
+SYS_GRAPH_DEFINITION
+=SQL IFEXIST=SYS_GRAPH_DEFINITION=
+insert into SYS_GRAPH_DEFINITION values ( 7, 'axeY', 'TEXT', '1', 'AXEY', 'Alias de colonne à utiliser dans la requête SQL')
+##
+SYS_GRAPH_DEFINITION
+=SQL IFEXIST=SYS_GRAPH_DEFINITION=
+insert into SYS_GRAPH_DEFINITION values ( 7, 'showLabelX', 'BOOL', '1', 'false', 'Affichage des libellés sur l''axe X')
+##
+SYS_GRAPH_DEFINITION
+=SQL IFEXIST=SYS_GRAPH_DEFINITION=
+insert into SYS_GRAPH_DEFINITION values ( 7, 'showLabelY', 'BOOL', '1', 'false', 'Affichage des libellés sur l''axe Y')
+##
+SYS_GRAPH_DEFINITION
+=SQL IFEXIST=SYS_GRAPH_DEFINITION=
+insert into SYS_GRAPH_DEFINITION values ( 7, 'managePivot', 'BOOL', '0', 'false', 'Applique une fonction oracle pivot (tableau croisé)')
+##
+SYS_GRAPH_DEFINITION
+=SQL IFEXIST=SYS_GRAPH_DEFINITION=
+insert into SYS_GRAPH_DEFINITION values ( 8, 'libelleAxeX', 'TEXT', '1', 'libelle', 'Alias de colonne à utiliser dans la requête SQL')
+##
+SYS_GRAPH_DEFINITION
+=SQL IFEXIST=SYS_GRAPH_DEFINITION=
+insert into SYS_GRAPH_DEFINITION values ( 8, 'data1', 'TEXT', '1', 'data', 'Alias de colonne à utiliser dans la requête SQL')
+##
+SYS_GRAPH_DEFINITION
+=SQL IFEXIST=SYS_GRAPH_DEFINITION=
+insert into SYS_GRAPH_DEFINITION values ( 8, 'showLabelX', 'BOOL', '1', 'false', 'Affichage des libellés sur l''axe X')
+##
+SYS_GRAPH_DEFINITION
+=SQL IFEXIST=SYS_GRAPH_DEFINITION=
+insert into SYS_GRAPH_DEFINITION values ( 8, 'showLabelY', 'BOOL', '1', 'false', 'Affichage des libellés sur l''axe Y')
+##
+SYS_GRAPH_DEFINITION
+=SQL IFEXIST=SYS_GRAPH_DEFINITION=
+insert into SYS_GRAPH_DEFINITION values (-1, 'codeColorList', 'COLOR', '1', 'CONTRASTSHORT', 'Ensemble de couleurs du graphe')
+##
+SYS_GRAPH_DEFINITION
+=SQL IFEXIST=SYS_GRAPH_DEFINITION=
+insert into SYS_GRAPH_DEFINITION values (-1, 'orderby', 'MULTIPLE', '1', 'NO', 'Applique un tri sur la colonne 1')
+##
+SYS_GRAPH_DEFINITION
+=SQL IFEXIST=SYS_GRAPH_DEFINITION=
+insert into SYS_GRAPH_DEFINITION values (-1, 'codeFilter', 'TEXT', '0', '', 'Alias utilisé dans la requête SQL pour le chainage')
+##
+SYS_GRAPH_DEFINITION
+=SQL IFEXIST=SYS_GRAPH_DEFINITION=
+insert into SYS_GRAPH_DEFINITION values (-1, 'mandatoryFilter', 'BOOL', '0', 'false', 'Indique si le filtre est nécessaire et obligatoire pour chainer')
+##
+SYS_GRAPH_DEFINITION
+=SQL IFEXIST=SYS_GRAPH_DEFINITION=
+insert into SYS_GRAPH_DEFINITION values (-1, 'fieldUnit', 'TEXT', '0', '', 'Positionne un libellé sur l''affichage de la donnée')
+##
+SYS_GRAPH_DEFINITION
+=SQL IFEXIST=SYS_GRAPH_DEFINITION=
+insert into SYS_GRAPH_DEFINITION values (-1, 'fieldNumberFormat', 'TEXT', '0', '0', 'Permet de donner un format numérique')

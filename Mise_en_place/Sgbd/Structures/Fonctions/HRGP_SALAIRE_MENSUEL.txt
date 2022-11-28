@@ -1,0 +1,23 @@
+##
+HRGP_SALAIRE_MENSUEL
+=SQL=
+CREATE OR REPLACE
+  FUNCTION HRGP_SALAIRE_MENSUEL(
+      p_matric IN donpaie.matric%TYPE,
+      p_annee  IN donpaie.an%TYPE)
+    RETURN NUMBER
+  IS
+    le_salaire NUMBER;
+  BEGIN
+    IF hrgp_existsalaire(p_matric, p_annee, 'A')   = 0 THEN
+      IF hrgp_existsalaire(p_matric, p_annee, 'M') = 0 THEN
+        le_salaire                                := 0;
+      ELSE
+        le_salaire := hrgp_salaire_mensuel_mois(p_matric, p_annee);
+      END IF;
+    ELSE
+      le_salaire := hrgp_salaire_mensuel_an(p_matric, p_annee);
+    END IF;
+    RETURN le_salaire;
+  END hrgp_salaire_mensuel; 
+  

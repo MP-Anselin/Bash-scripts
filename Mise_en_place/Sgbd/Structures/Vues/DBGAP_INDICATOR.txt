@@ -1,0 +1,4 @@
+##
+DBGAP_INDICATOR
+==
+CREATE OR REPLACE FORCE VIEW "DBGAP_INDICATOR" ("LIBELLE", "INDIC", "VALUE") AS select 'Nombre de ligne dans DIC_ADM_CONTRAT' as LIBELLE, 'DIC_ADM_CONTRAT' as INDIC,count(*) as VALUE from DIC_ADM_CONTRAT union select 'Nombre de ligne dans DIC_ADM_CONTRAT_HISTO' as LIBELLE, 'DIC_ADM_CONTRAT_HISTO' as INDIC,count(*) as VALUE from DIC_ADM_CONTRAT_HISTO union select 'Nombre de ligne dans DIC_ADM_PERSO' as LIBELLE, 'DIC_ADM_PERSO' as INDIC,count(*) as VALUE from DIC_ADM_PERSO union select 'Nombre de ligne dans DIC_ADM_PERSO_HISTO' as LIBELLE, 'DIC_ADM_PERSO_HISTO' as INDIC,count(*) as VALUE from DIC_ADM_PERSO_HISTO union select 'Nombre de société présente dans DIC_SOCIETE mais pas dans la table STD_STRUC_ENTITE ' as LIBELLE, 'DIC_SOCIETE NOT IN STD_STRUC_ENTITE' as INDIC,count(*) as VALUE from DIC_SOCIETE where CODSTE_STE not in (select CODE_ENTITE from STD_STRUC_ENTITE)

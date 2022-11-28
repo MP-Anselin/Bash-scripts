@@ -1,0 +1,29 @@
+##
+PARTITIONNEMENT_MULTI
+=SQL=
+create or replace PROCEDURE PARTITIONNEMENT_MULTI(
+  p_request                 IN VARCHAR2, -- SELECT table_name FROM user_tab_cols WHERE column_name = 'CODTS' AND table_name NOT LIKE 'TMP%' AND table_name NOT LIKE 'FOR%' AND table_name NOT LIKE '%Z2X%' AND  table_name not like 'C99%'
+  p_column                  IN VARCHAR2,
+  p_column_date             IN VARCHAR2,
+  p_force_statistics        IN NUMBER)
+AS
+  v_error                   CLOB;
+
+  TYPE t_ref_table          IS REF CURSOR;
+  c_tables                  t_ref_table;
+  v_table                   VARCHAR2(255);
+BEGIN
+  OPEN c_tables FOR p_request;
+  LOOP
+    FETCH c_tables INTO v_table; -- récupère les tables une à une
+    EXIT WHEN c_tables%NOTFOUND;
+    IF (v_table IS NOT NULL) THEN
+      partitionnement(v_table, p_column, p_column_date, p_force_statistics);
+    END IF;
+  END LOOP;
+  EXCEPTION WHEN OTHERS THEN
+    v_error := SQLCODE || '-' || sqlerrm;
+    INSERT INTO partition_log_struct_table(dte, table_name, log)
+     VALUES (SYSDATE, '', 'Erreur (PARTITIONNEMENT_MULTI): ' || v_error); COMMIT;
+    RAISE_APPLICATION_ERROR(-20000, 'Problème(s) durant le partitionnement des tables ' || v_error);
+END PARTITIONNEMENT_MULTI;

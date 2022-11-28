@@ -1,0 +1,595 @@
+##
+TAG_CHARSET=@€éèç
+##
+ALIM_IDX
+=SQL=
+CREATE OR REPLACE PACKAGE ALIM_IDX
+AS
+  TYPE T_IDX_DONNEE IS TABLE OF DIC_IDX_CONTRAT_HISTO%ROWTYPE INDEX BY VARCHAR2(32);
+
+  TYPE T_EXISTE_RUPT_DONNEE IS TABLE OF INTEGER INDEX BY VARCHAR2(30);
+
+  TYPE T_EXISTE_IDX_DONNEE IS TABLE OF INTEGER INDEX BY VARCHAR2(32);
+
+  TYPE T_REF_PAC_BY_NUMPAC IS TABLE OF TGE_REF_PAC%ROWTYPE INDEX BY TGE_REF_PAC.NUMPAC%TYPE;
+
+  PROCEDURE COMPARE_CONTRAT_JOB(
+    p_job_number NUMBER,
+    p_action VARCHAR2);
+
+  PROCEDURE COMPARE_CONTRAT(
+    p_listeClesIdxContrat T_CLES_IDX_CONTRAT_HISTO, 
+    p_action VARCHAR2, 
+    p_tabDac T_TAB_DAC, 
+    p_listeDonneesRupt ALIM_IDX.T_EXISTE_RUPT_DONNEE);
+
+  PROCEDURE COMPARE_CONTRAT_HISTO_JOB(
+    p_job_number NUMBER,
+    p_action VARCHAR2);
+
+  PROCEDURE COMPARE_CONTRAT_HISTO(
+    p_listeClesIdxContrat T_CLES_IDX_CONTRAT_HISTO, 
+    p_action VARCHAR2, 
+    p_tabDach T_TAB_DACH, 
+    p_listeDonneesRupt ALIM_IDX.T_EXISTE_RUPT_DONNEE);
+
+  PROCEDURE INSERT_DATA_CONTRAT(
+    p_nomDonnee VARCHAR2, 
+    p_emptyValue VARCHAR2, 
+    p_valueLignePrec CLOB, 
+    p_valueLigne CLOB, 
+    p_ligne T_LIG_DAC);
+
+  PROCEDURE UPDATE_DATA_CONTRAT(
+    p_nomDonnee VARCHAR2, 
+    p_emptyValue VARCHAR2, 
+    p_valueLignePrec CLOB, 
+    p_valueLigne CLOB, 
+    p_valueLigneSuiv CLOB, 
+    p_valueOldContrat CLOB, 
+    p_lignePrec T_LIG_DAC, 
+    p_ligne T_LIG_DAC, 
+    p_ligneSuiv T_LIG_DAC, 
+    p_listeDonneesIdx T_EXISTE_IDX_DONNEE, 
+    p_listeDonneesRupt T_EXISTE_RUPT_DONNEE);
+
+  PROCEDURE INSERT_DATA_CONTRAT_HISTO(
+    p_nomDonnee VARCHAR2, 
+    p_emptyValue VARCHAR2, 
+    p_valueLignePrec CLOB, 
+    p_valueLigne CLOB, 
+    p_valueLigneSuiv CLOB, 
+    p_ligne T_LIG_DACH, 
+    p_ligneSuiv T_LIG_DACH, 
+    p_dsfcn DATE, 
+    p_listeDonneesIdx T_IDX_DONNEE, 
+    p_listeDonneesRupt T_EXISTE_RUPT_DONNEE);
+
+  PROCEDURE UPDATE_DATA_CONTRAT_HISTO(
+    p_nomDonnee VARCHAR2, 
+    p_emptyValue VARCHAR2, 
+    p_valueLignePrec CLOB, 
+    p_valueLigne CLOB, 
+    p_valueLigneSuiv CLOB, 
+    p_valueOldContratHisto CLOB, 
+    p_lignePrec T_LIG_DACH, 
+    p_ligne T_LIG_DACH, 
+    p_ligneSuiv T_LIG_DACH, 
+    p_dsdcn DATE, 
+    p_dsfcn DATE, 
+    p_listeDonneesIdx T_IDX_DONNEE, 
+    p_listeDonneesRupt T_EXISTE_RUPT_DONNEE);
+END ALIM_IDX;
+##
+ALIM_IDX
+=SQL=
+CREATE OR REPLACE PACKAGE BODY ALIM_IDX AS 
+
+  PROCEDURE COMPARE_CONTRAT_JOB(
+      p_job_number NUMBER,
+      p_action     VARCHAR2) IS
+    v_listeClesIdxContrat T_CLES_IDX_CONTRAT_HISTO := T_CLES_IDX_CONTRAT_HISTO();
+    v_anyData ANYDATA;
+    v_tabDac T_TAB_DAC;
+    TYPE tcur IS REF CURSOR; 
+    cur tcur; 
+    v_nomDonnee VARCHAR2(30); 
+    v_listeDonneesRupt ALIM_IDX.T_EXISTE_RUPT_DONNEE;
+  BEGIN
+    SELECT T_CLE_IDX_CONTRAT_HISTO(MATRIC, NUMPAC, PACMAT, NUMCNT, DATE_IDX) BULK COLLECT INTO v_listeClesIdxContrat FROM DIC_IDX_JOB_KEYS WHERE JOB_NUMBER=p_job_number;
+    DELETE FROM DIC_IDX_JOB_KEYS WHERE JOB_NUMBER=p_job_number;
+    IF p_action = 'D' THEN
+      ALIM_IDX_DELETE_CONTRAT(v_listeClesIdxContrat);
+    ELSE
+      SELECT OLD_DATAS INTO v_anyData FROM DIC_IDX_JOB_OLD_DATAS WHERE JOB_NUMBER=p_job_number;
+      IF NOT v_anyData.getCollection(v_tabDac) = dbms_types.success THEN
+        v_tabDac := T_TAB_DAC();
+      END IF;
+      DELETE FROM DIC_IDX_JOB_OLD_DATAS WHERE JOB_NUMBER=p_job_number;
+      OPEN cur FOR SELECT NOM_DONNEE FROM DIC_IDX_DONNEE_RUPTURE_CONTRAT;
+      LOOP
+        FETCH cur INTO v_nomDonnee;
+        EXIT WHEN cur % NOTFOUND;
+        v_listeDonneesRupt(v_nomDonnee) := 1;
+      END LOOP;
+      CLOSE cur;
+      COMPARE_CONTRAT(v_listeClesIdxContrat, p_action, v_tabDac, v_listeDonneesRupt);
+    END IF;
+  END COMPARE_CONTRAT_JOB;
+
+  PROCEDURE COMPARE_CONTRAT(
+      p_listeClesIdxContrat T_CLES_IDX_CONTRAT_HISTO, 
+      p_action VARCHAR2, 
+      p_tabDac T_TAB_DAC, 
+      p_listeDonneesRupt ALIM_IDX.T_EXISTE_RUPT_DONNEE) IS 
+    TYPE T_EXISTE_MATRIC IS TABLE OF INTEGER INDEX BY VARCHAR2(32);
+    v_listeMatricules T_EXISTE_MATRIC;
+    TYPE T_EXISTE_CLES_CONTRAT IS TABLE OF T_CLE_IDX_CONTRAT_HISTO INDEX BY VARCHAR2(40);
+    v_listeClesIdxContrat T_EXISTE_CLES_CONTRAT;
+    v_matric VARCHAR(32);
+    v_cpt NUMBER;
+    TYPE tcur IS REF CURSOR;
+    cur tcur;
+    v_dacMatric T_TAB_DAC;
+    v_lignePrec T_LIG_DAC := GET_EMPTY_LIG_DAC();
+    v_ligne T_LIG_DAC := GET_EMPTY_LIG_DAC();
+    v_ligneSuiv T_LIG_DAC := GET_EMPTY_LIG_DAC();
+  BEGIN
+    FOR i in 1..p_listeClesIdxContrat.count LOOP
+      v_listeMatricules(p_listeClesIdxContrat(i).MATRIC) := 1;
+      v_listeClesIdxContrat(LPAD(p_listeClesIdxContrat(i).MATRIC,32,'0')||TO_CHAR(p_listeClesIdxContrat(i).DATE_IDX,'yyyymmdd')) := p_listeClesIdxContrat(i);
+    END LOOP;
+    -- Pour chaque salarié (MATRIC) ayant été mis à jour
+    v_matric := v_listeMatricules.FIRST;
+    WHILE v_matric IS NOT NULL LOOP
+      v_dacMatric := GET_DAC_MATRIC(v_matric);
+      v_cpt := 0;
+      LOOP
+        EXIT WHEN v_dacMatric.COUNT=0;
+        v_cpt := v_cpt+1;
+        IF v_cpt = 1 THEN
+          -- Premier passage dans la boucle : le premier contrat est le "courant" (celui qu'on va traiter)
+          v_ligne := v_dacMatric(v_cpt);
+          v_cpt := v_cpt+1;
+        END IF;
+        EXIT WHEN v_cpt>v_dacMatric.COUNT;
+        -- On récupère le contrat suivant
+        v_ligneSuiv := v_dacMatric(v_cpt);
+        IF v_listeClesIdxContrat.exists(LPAD(v_matric,32,'0')||TO_CHAR(v_ligne.DSDCN,'yyyymmdd')) THEN
+          -- Le contrat "courant" vient d'être inséré ou modifié : on appelle la procédure en passant le contrat précédent et le contrat suivant
+          IF p_action = 'I' THEN
+            ALIM_IDX_INSERT_CONTRAT(v_lignePrec, v_ligne, v_ligneSuiv);
+          ELSIF p_action = 'U' THEN
+            ALIM_IDX_UPDATE_CONTRAT(v_lignePrec, v_ligne, v_ligneSuiv, p_tabDac, p_listeDonneesRupt);
+          END IF;
+        END IF;
+        -- Le contrat "courant" devient le précédent
+        v_lignePrec := v_ligne;
+        -- Le contrat suivant devient le "courant"
+        v_ligne := v_ligneSuiv;
+      END LOOP;
+      v_ligneSuiv := NULL;
+      IF v_listeClesIdxContrat.exists(LPAD(v_matric,32,'0')||TO_CHAR(v_ligne.DSDCN,'yyyymmdd')) THEN
+        -- Le dernier contrat vient d'être inséré ou modifié : on appelle la procédure en passant le contrat précédent (et le contrat suivant, même s'il est vide)
+        IF p_action = 'I' THEN
+          ALIM_IDX_INSERT_CONTRAT(v_lignePrec, v_ligne, v_ligneSuiv);
+        ELSIF p_action = 'U' THEN
+          ALIM_IDX_UPDATE_CONTRAT(v_lignePrec, v_ligne, v_ligneSuiv, p_tabDac, p_listeDonneesRupt);
+        END IF;
+      END IF;
+      -- Salarié suivant
+      v_matric := v_listeMatricules.NEXT(v_matric);
+    END LOOP;
+  END COMPARE_CONTRAT;
+
+  PROCEDURE COMPARE_CONTRAT_HISTO_JOB(
+      p_job_number NUMBER,
+      p_action     VARCHAR2) IS
+    v_listeClesIdxContrat T_CLES_IDX_CONTRAT_HISTO := T_CLES_IDX_CONTRAT_HISTO();
+    v_anyData ANYDATA;
+    v_tabDach T_TAB_DACH;
+    TYPE tcur IS REF CURSOR; 
+    cur tcur; 
+    v_nomDonnee VARCHAR2(30); 
+    v_listeDonneesRupt ALIM_IDX.T_EXISTE_RUPT_DONNEE;
+  BEGIN
+    SELECT T_CLE_IDX_CONTRAT_HISTO(MATRIC, NUMPAC, PACMAT, NUMCNT, DATE_IDX) BULK COLLECT INTO v_listeClesIdxContrat FROM DIC_IDX_JOB_KEYS WHERE JOB_NUMBER=p_job_number;
+    DELETE FROM DIC_IDX_JOB_KEYS WHERE JOB_NUMBER=p_job_number;
+    IF p_action = 'D' THEN
+      ALIM_IDX_DELETE_CONTRAT_HISTO(v_listeClesIdxContrat);
+    ELSE
+      SELECT OLD_DATAS INTO v_anyData FROM DIC_IDX_JOB_OLD_DATAS WHERE JOB_NUMBER=p_job_number;
+      IF NOT v_anyData.getCollection(v_tabDach) = dbms_types.success THEN
+        v_tabDach := T_TAB_DACH();
+      END IF;
+      DELETE FROM DIC_IDX_JOB_OLD_DATAS WHERE JOB_NUMBER=p_job_number;
+      OPEN cur FOR SELECT NOM_DONNEE FROM DIC_IDX_DONNEE_RUPTURE_CONTRAT;
+      LOOP
+        FETCH cur INTO v_nomDonnee;
+        EXIT WHEN cur % NOTFOUND;
+        v_listeDonneesRupt(v_nomDonnee) := 1;
+      END LOOP;
+      CLOSE cur;
+      COMPARE_CONTRAT_HISTO(v_listeClesIdxContrat, p_action, v_tabDach, v_listeDonneesRupt);
+    END IF;
+  END COMPARE_CONTRAT_HISTO_JOB;
+
+  PROCEDURE COMPARE_CONTRAT_HISTO(
+      p_listeClesIdxContrat T_CLES_IDX_CONTRAT_HISTO, 
+      p_action VARCHAR2, 
+      p_tabDach T_TAB_DACH, 
+      p_listeDonneesRupt ALIM_IDX.T_EXISTE_RUPT_DONNEE) IS 
+    TYPE T_EXISTE_MATRIC IS TABLE OF INTEGER INDEX BY VARCHAR2(32);
+    v_listeMatricules T_EXISTE_MATRIC;
+    TYPE T_EXISTE_CLES_CONTRAT IS TABLE OF T_CLE_IDX_CONTRAT_HISTO INDEX BY VARCHAR2(40);
+    v_listeClesIdxContrat T_EXISTE_CLES_CONTRAT;
+    v_matric VARCHAR(32);
+    v_cpt NUMBER;
+    TYPE tcur IS REF CURSOR;
+    cur tcur;
+    v_dachMatric T_TAB_DACH;
+    v_lignePrec T_LIG_DACH := GET_EMPTY_LIG_DACH();
+    v_ligne T_LIG_DACH := GET_EMPTY_LIG_DACH();
+    v_ligneSuiv T_LIG_DACH := GET_EMPTY_LIG_DACH();
+    v_ligneSupp T_LIG_DACH := GET_EMPTY_LIG_DACH();
+    v_cleRechercheSupp VARCHAR(40);
+  BEGIN
+    FOR i in 1..p_listeClesIdxContrat.count LOOP
+      v_listeMatricules(p_listeClesIdxContrat(i).MATRIC) := 1;
+      v_listeClesIdxContrat(LPAD(p_listeClesIdxContrat(i).MATRIC,32,'0')||TO_CHAR(p_listeClesIdxContrat(i).DATE_IDX,'yyyymmdd')) := p_listeClesIdxContrat(i);
+    END LOOP;
+    -- Pour chaque salarié (MATRIC) ayant été mis à jour
+    v_matric := v_listeMatricules.FIRST;
+    WHILE v_matric IS NOT NULL LOOP
+      v_dachMatric := GET_DACH_MATRIC(v_matric);
+      v_cpt := 0;
+      LOOP
+        EXIT WHEN v_dachMatric.COUNT=0;
+        v_cpt := v_cpt+1;
+        IF v_cpt = 1 THEN
+          -- Premier passage dans la boucle : la première occurrence est la "courante" (celle qu'on va traiter)
+          v_ligne := v_dachMatric(v_cpt);
+          v_cpt := v_cpt+1;
+        END IF;
+        EXIT WHEN v_cpt>v_dachMatric.COUNT;
+        -- On récupère l'occurrence suivante
+        v_ligneSuiv := v_dachMatric(v_cpt);
+        IF p_action = 'D' THEN
+          IF v_cpt > 1 THEN
+            -- Ce n'est pas le premier passage dans la boucle : on va vérifier qu'on n'a pas un contrat supprimé entre l'occurrence précédente et la "courante"
+            v_cleRechercheSupp := v_listeClesIdxContrat.NEXT(LPAD(v_matric,32,'0')||TO_CHAR(v_lignePrec.DATE_EFF,'yyyymmdd'));
+            WHILE v_cleRechercheSupp < LPAD(v_matric,32,'0')||TO_CHAR(v_ligne.DATE_EFF,'yyyymmdd') LOOP
+              -- On a dans v_listeClesIdxContrat une clé qui n'existe plus : on va faire comme si on avait mis à jour la ligne suivante
+              v_ligneSupp.NUMPAC := '_SUPP_';
+              ALIM_IDX_UPDATE_CONTRAT_HISTO(v_lignePrec, v_ligne, v_ligneSupp, p_tabDach, p_listeDonneesRupt);
+              v_cleRechercheSupp := v_listeClesIdxContrat.NEXT(v_cleRechercheSupp);
+            END LOOP;
+          END IF;
+        ELSIF v_listeClesIdxContrat.exists(LPAD(v_matric,32,'0')||TO_CHAR(v_ligne.DATE_EFF,'yyyymmdd')) THEN
+          -- L'occurrence "courante" vient d'être insérée ou modifiée : on appelle la procédure en passant l'occurrence précédente et l'occurrence suivante
+          IF p_action = 'I' THEN
+            ALIM_IDX_INSERT_CONTRAT_HISTO(v_lignePrec, v_ligne, v_ligneSuiv);
+          ELSIF p_action = 'U' THEN
+            ALIM_IDX_UPDATE_CONTRAT_HISTO(v_lignePrec, v_ligne, v_ligneSuiv, p_tabDach, p_listeDonneesRupt);
+          END IF;
+        END IF;
+        -- L'occurrence "courante" devient la précédente
+        v_lignePrec := v_ligne;
+        -- L'occurrence suivante devient la "courante"
+        v_ligne := v_ligneSuiv;
+        -- Pas d'occurrence suivante
+        v_ligneSuiv := NULL;
+      END LOOP;
+      IF p_action = 'D' THEN
+        v_cleRechercheSupp := v_listeClesIdxContrat.NEXT(LPAD(v_matric,32,'0')||TO_CHAR(v_lignePrec.DATE_EFF,'yyyymmdd'));
+        WHILE v_cleRechercheSupp IS NOT NULL LOOP
+          -- On a dans v_listeClesIdxContrat une clé qui n'existe plus : on va faire comme si on avait mis à jour la ligne suivante
+          v_ligneSupp.NUMPAC := '_SUPP_';
+          ALIM_IDX_UPDATE_CONTRAT_HISTO(v_lignePrec, v_ligne, v_ligneSupp, p_tabDach, p_listeDonneesRupt);
+          v_cleRechercheSupp := v_listeClesIdxContrat.NEXT(v_cleRechercheSupp);
+        END LOOP;
+      ELSIF v_listeClesIdxContrat.exists(LPAD(v_matric,32,'0')||TO_CHAR(v_ligne.DATE_EFF,'yyyymmdd')) THEN
+        -- La dernière occurrence vient d'être insérée ou modifiée : on appelle la procédure en passant l'occurrence précédente (et l'occurrence suivante, même si elle est vide)
+        IF p_action = 'I' THEN
+          ALIM_IDX_INSERT_CONTRAT_HISTO(v_lignePrec, v_ligne, v_ligneSuiv);
+        ELSIF p_action = 'U' THEN
+          ALIM_IDX_UPDATE_CONTRAT_HISTO(v_lignePrec, v_ligne, v_ligneSuiv, p_tabDach, p_listeDonneesRupt);
+        END IF;
+      END IF;
+      -- Salarié suivant
+      v_matric := v_listeMatricules.NEXT(v_matric);
+    END LOOP;
+  END COMPARE_CONTRAT_HISTO;
+
+  PROCEDURE INSERT_DATA_CONTRAT(
+      p_nomDonnee VARCHAR2, 
+      p_emptyValue VARCHAR2, 
+      p_valueLignePrec CLOB, 
+      p_valueLigne CLOB, 
+      p_ligne T_LIG_DAC) IS
+    v_valueLignePrec CLOB;
+    v_valueLigne CLOB;
+  BEGIN
+    v_valueLignePrec := NVL(p_valueLignePrec, p_emptyValue);
+    v_valueLigne := NVL(p_valueLigne, p_emptyValue);
+    IF NOT v_valueLignePrec = v_valueLigne THEN
+    BEGIN
+      MERGE INTO DIC_IDX_CONTRAT_HISTO USING (SELECT 1 FROM DUAL) ON (NUMPAC=p_ligne.NUMPAC AND PACMAT=p_ligne.PACMAT AND NUMCNT=p_ligne.NUMCNT AND DATE_EFF=p_ligne.DSDCN AND NOM_DONNEE=p_nomDonnee) WHEN MATCHED THEN UPDATE SET DATE_FIN=NVL(p_ligne.DSFCN,TO_DATE('20991231','yyyymmdd')), DATE_DERNIERE_MODIF=SYSDATE WHEN NOT MATCHED THEN INSERT (NUMPAC,PACMAT,NUMCNT,DATE_EFF,NOM_DONNEE,DATE_FIN,DATE_DERNIERE_MODIF) VALUES (p_ligne.NUMPAC,p_ligne.PACMAT,p_ligne.NUMCNT,p_ligne.DSDCN,p_nomDonnee,NVL(p_ligne.DSFCN,TO_DATE('20991231','yyyymmdd')),SYSDATE);
+      EXCEPTION
+      WHEN DUP_VAL_ON_INDEX THEN NULL; 
+      WHEN OTHERS THEN 
+	 -- les merge ne doivent pas tout faire planter, si cela arrive, on trace juste le probleme
+	 TGE_IMPORT_AVANCEMENT_proc('ALIM_IDX','Erreur merge idpacmat ' || p_ligne.NUMPAC || p_ligne.PACMAT);
+	 END;
+    END IF; 
+  END INSERT_DATA_CONTRAT;
+
+  PROCEDURE UPDATE_DATA_CONTRAT(
+      p_nomDonnee VARCHAR2, 
+      p_emptyValue VARCHAR2, 
+      p_valueLignePrec CLOB, 
+      p_valueLigne CLOB, 
+      p_valueLigneSuiv CLOB, 
+      p_valueOldContrat CLOB, 
+      p_lignePrec T_LIG_DAC, 
+      p_ligne T_LIG_DAC, 
+      p_ligneSuiv T_LIG_DAC, 
+      p_listeDonneesIdx T_EXISTE_IDX_DONNEE, 
+      p_listeDonneesRupt T_EXISTE_RUPT_DONNEE) IS
+    v_valueLignePrec CLOB;
+    v_valueLigne CLOB;
+    v_valueLigneSuiv CLOB;
+    v_valueOldContrat CLOB;
+  BEGIN
+    v_valueLignePrec := NVL(p_valueLignePrec, p_emptyValue);
+    v_valueLigne := NVL(p_valueLigne, p_emptyValue);
+    v_valueLigneSuiv := NVL(p_valueLigneSuiv, p_emptyValue);
+    v_valueOldContrat := NVL(p_valueOldContrat, p_emptyValue);
+    IF NOT v_valueOldContrat = v_valueLigne THEN
+      IF p_lignePrec.NUMPAC IS NOT NULL THEN
+        IF NOT v_valueLignePrec = v_valueLigne THEN
+          IF p_listeDonneesIdx.exists(p_nomDonnee) THEN
+            UPDATE DIC_IDX_CONTRAT_HISTO SET DATE_DERNIERE_MODIF=SYSDATE, RUPTURE_CONTRAT=NULL WHERE NUMPAC=p_ligne.NUMPAC AND PACMAT=p_ligne.PACMAT AND NUMCNT=p_ligne.NUMCNT AND DATE_EFF=p_ligne.DSDCN AND NOM_DONNEE=p_nomDonnee;
+          ELSE
+          	BEGIN
+            MERGE INTO DIC_IDX_CONTRAT_HISTO USING (SELECT 1 FROM DUAL) ON (NUMPAC=p_ligne.NUMPAC AND PACMAT=p_ligne.PACMAT AND NUMCNT=p_ligne.NUMCNT AND DATE_EFF=p_ligne.DSDCN AND NOM_DONNEE=p_nomDonnee) WHEN MATCHED THEN UPDATE SET DATE_FIN=NVL(p_ligne.DSFCN,TO_DATE('20991231','yyyymmdd')), DATE_DERNIERE_MODIF=SYSDATE WHEN NOT MATCHED THEN INSERT (NUMPAC,PACMAT,NUMCNT,DATE_EFF,NOM_DONNEE,DATE_FIN,DATE_DERNIERE_MODIF) VALUES (p_ligne.NUMPAC,p_ligne.PACMAT,p_ligne.NUMCNT,p_ligne.DSDCN,p_nomDonnee,NVL(p_ligne.DSFCN,TO_DATE('20991231','yyyymmdd')),SYSDATE);
+             EXCEPTION
+             WHEN DUP_VAL_ON_INDEX THEN NULL;
+              WHEN OTHERS THEN 
+			 -- les merge ne doivent pas tout faire planter, si cela arrive, on trace juste le probleme
+			 TGE_IMPORT_AVANCEMENT_proc('ALIM_IDX','Erreur merge idpacmat ' || p_ligne.NUMPAC || p_ligne.PACMAT);
+			 END;
+          END IF;
+        ELSIF p_listeDonneesIdx.exists(p_nomDonnee) THEN
+          IF p_listeDonneesRupt.exists(p_nomDonnee) THEN
+            UPDATE DIC_IDX_CONTRAT_HISTO SET DATE_DERNIERE_MODIF=SYSDATE, RUPTURE_CONTRAT='O' WHERE NUMPAC=p_ligne.NUMPAC AND PACMAT=p_ligne.PACMAT AND NUMCNT=p_ligne.NUMCNT AND DATE_EFF=p_ligne.DSDCN AND NOM_DONNEE=p_nomDonnee;
+          ELSE
+            DELETE FROM DIC_IDX_CONTRAT_HISTO WHERE NUMPAC=p_ligne.NUMPAC AND PACMAT=p_ligne.PACMAT AND NUMCNT=p_ligne.NUMCNT AND DATE_EFF=p_ligne.DSDCN AND NOM_DONNEE=p_nomDonnee;
+          END IF;
+        END IF;
+      END IF;
+      IF p_ligneSuiv.NUMPAC IS NOT NULL THEN
+        IF NOT v_valueLigne = v_valueLigneSuiv THEN
+          IF NOT p_listeDonneesIdx.exists(p_nomDonnee||'+1') THEN
+          	BEGIN
+            MERGE INTO DIC_IDX_CONTRAT_HISTO USING (SELECT 1 FROM DUAL) ON (NUMPAC=p_ligneSuiv.NUMPAC AND PACMAT=p_ligneSuiv.PACMAT AND NUMCNT=p_ligneSuiv.NUMCNT AND DATE_EFF=p_ligneSuiv.DSDCN AND NOM_DONNEE=p_nomDonnee) WHEN MATCHED THEN UPDATE SET DATE_FIN=NVL(p_ligne.DSFCN,TO_DATE('20991231','yyyymmdd')), DATE_DERNIERE_MODIF=SYSDATE WHEN NOT MATCHED THEN INSERT (NUMPAC,PACMAT,NUMCNT,DATE_EFF,NOM_DONNEE,DATE_FIN,DATE_DERNIERE_MODIF) VALUES (p_ligneSuiv.NUMPAC,p_ligneSuiv.PACMAT,p_ligneSuiv.NUMCNT,p_ligneSuiv.DSDCN,p_nomDonnee,NVL(p_ligne.DSFCN,TO_DATE('20991231','yyyymmdd')),SYSDATE);
+             EXCEPTION 
+             WHEN DUP_VAL_ON_INDEX THEN NULL;
+             WHEN OTHERS THEN 
+			 -- les merge ne doivent pas tout faire planter, si cela arrive, on trace juste le probleme
+			 TGE_IMPORT_AVANCEMENT_proc('ALIM_IDX','Erreur merge idpacmat ' || p_ligneSuiv.NUMPAC || p_ligneSuiv.PACMAT);
+			 END;
+          ELSIF p_listeDonneesRupt.exists(p_nomDonnee) THEN
+            UPDATE DIC_IDX_CONTRAT_HISTO SET DATE_DERNIERE_MODIF=SYSDATE, RUPTURE_CONTRAT=NULL WHERE NUMPAC=p_ligneSuiv.NUMPAC AND PACMAT=p_ligneSuiv.PACMAT AND NUMCNT=p_ligneSuiv.NUMCNT AND DATE_EFF=p_ligneSuiv.DSDCN AND NOM_DONNEE=p_nomDonnee;
+          END IF;
+        ELSIF p_listeDonneesIdx.exists(p_nomDonnee||'+1') THEN
+          IF p_listeDonneesRupt.exists(p_nomDonnee) THEN
+            UPDATE DIC_IDX_CONTRAT_HISTO SET DATE_DERNIERE_MODIF=SYSDATE, RUPTURE_CONTRAT='O' WHERE NUMPAC=p_ligneSuiv.NUMPAC AND PACMAT=p_ligneSuiv.PACMAT AND NUMCNT=p_ligneSuiv.NUMCNT AND DATE_EFF=p_ligneSuiv.DSDCN AND NOM_DONNEE=p_nomDonnee;
+          ELSE
+            DELETE FROM DIC_IDX_CONTRAT_HISTO WHERE NUMPAC=p_ligneSuiv.NUMPAC AND PACMAT=p_ligneSuiv.PACMAT AND NUMCNT=p_ligneSuiv.NUMCNT AND DATE_EFF=p_ligneSuiv.DSDCN AND NOM_DONNEE=p_nomDonnee;
+          END IF;
+        END IF;
+      END IF;
+    END IF; 
+  END UPDATE_DATA_CONTRAT;
+
+  PROCEDURE INSERT_DATA_CONTRAT_HISTO(
+      p_nomDonnee VARCHAR2, 
+      p_emptyValue VARCHAR2, 
+      p_valueLignePrec CLOB, 
+      p_valueLigne CLOB, 
+      p_valueLigneSuiv CLOB, 
+      p_ligne T_LIG_DACH, 
+      p_ligneSuiv T_LIG_DACH, 
+      p_dsfcn DATE, 
+      p_listeDonneesIdx T_IDX_DONNEE, 
+      p_listeDonneesRupt T_EXISTE_RUPT_DONNEE) IS
+    v_valueLignePrec CLOB;
+    v_valueLigne CLOB;
+    v_valueLigneSuiv CLOB;
+    v_idxContratHistoPrec DIC_IDX_CONTRAT_HISTO%ROWTYPE := NULL;
+    v_idxContratHisto DIC_IDX_CONTRAT_HISTO%ROWTYPE := NULL;
+    v_idxContratHistoSuiv DIC_IDX_CONTRAT_HISTO%ROWTYPE := NULL;
+  BEGIN
+    v_valueLignePrec := NVL(p_valueLignePrec, p_emptyValue);
+    v_valueLigne := NVL(p_valueLigne, p_emptyValue);
+    v_valueLigneSuiv := NVL(p_valueLigneSuiv, p_emptyValue);
+    IF p_listeDonneesIdx.exists(p_nomDonnee||'-1') THEN
+      v_idxContratHistoPrec := p_listeDonneesIdx(p_nomDonnee||'-1');
+    END IF;
+    IF p_listeDonneesIdx.exists(p_nomDonnee) THEN
+      v_idxContratHisto := p_listeDonneesIdx(p_nomDonnee);
+    END IF;
+    IF p_listeDonneesIdx.exists(p_nomDonnee||'+1') THEN
+      v_idxContratHistoSuiv := p_listeDonneesIdx(p_nomDonnee||'+1');
+    END IF;
+    IF NOT v_valueLignePrec = v_valueLigne THEN
+      IF v_idxContratHisto.NUMPAC IS NOT NULL THEN
+        UPDATE DIC_IDX_CONTRAT_HISTO SET DATE_DERNIERE_MODIF=SYSDATE, RUPTURE_CONTRAT=NULL WHERE NUMPAC=p_ligne.NUMPAC AND PACMAT=p_ligne.PACMAT AND NUMCNT=p_ligne.NUMCNT AND DATE_EFF=p_ligne.DATE_EFF AND NOM_DONNEE=p_nomDonnee;
+      ELSE
+        v_idxContratHisto.NUMPAC := p_ligne.NUMPAC;
+        IF v_idxContratHistoPrec.NUMPAC IS NOT NULL THEN
+          v_idxContratHisto.DATE_FIN := v_idxContratHistoPrec.DATE_FIN;
+          UPDATE DIC_IDX_CONTRAT_HISTO SET DATE_DERNIERE_MODIF=SYSDATE, DATE_FIN=p_ligne.DATE_EFF-1 WHERE NUMPAC=v_idxContratHistoPrec.NUMPAC AND PACMAT=v_idxContratHistoPrec.PACMAT AND NUMCNT=v_idxContratHistoPrec.NUMCNT AND DATE_EFF=v_idxContratHistoPrec.DATE_EFF AND NOM_DONNEE=p_nomDonnee;
+        ELSIF v_idxContratHistoSuiv.NUMPAC IS NOT NULL AND v_idxContratHistoSuiv.DATE_EFF < p_dsfcn THEN
+          v_idxContratHisto.DATE_FIN := v_idxContratHistoSuiv.DATE_EFF-1;
+        ELSE
+          v_idxContratHisto.DATE_FIN := p_dsfcn;
+        END IF;
+        BEGIN
+        MERGE INTO DIC_IDX_CONTRAT_HISTO USING (SELECT 1 FROM DUAL) ON (NUMPAC=p_ligne.NUMPAC AND PACMAT=p_ligne.PACMAT AND NUMCNT=p_ligne.NUMCNT AND DATE_EFF=p_ligne.DATE_EFF AND NOM_DONNEE=p_nomDonnee) WHEN MATCHED THEN UPDATE SET DATE_FIN=v_idxContratHisto.DATE_FIN, DATE_DERNIERE_MODIF=SYSDATE WHEN NOT MATCHED THEN INSERT (NUMPAC,PACMAT,NUMCNT,DATE_EFF,NOM_DONNEE,DATE_FIN,DATE_DERNIERE_MODIF) VALUES (p_ligne.NUMPAC,p_ligne.PACMAT,p_ligne.NUMCNT,p_ligne.DATE_EFF,p_nomDonnee,v_idxContratHisto.DATE_FIN,SYSDATE);
+         EXCEPTION 
+         WHEN DUP_VAL_ON_INDEX THEN NULL;
+         WHEN OTHERS THEN 
+		 -- les merge ne doivent pas tout faire planter, si cela arrive, on trace juste le probleme
+		 TGE_IMPORT_AVANCEMENT_proc('ALIM_IDX','Erreur merge idpacmat ' || p_ligne.NUMPAC || p_ligne.PACMAT);
+		 END;
+      END IF;
+    END IF;
+    IF p_ligneSuiv.NUMPAC IS NOT NULL THEN
+      IF NOT v_valueLigne = v_valueLigneSuiv THEN
+        IF v_idxContratHistoSuiv.NUMPAC IS NULL OR NOT v_idxContratHistoSuiv.DATE_EFF = p_ligneSuiv.DATE_EFF THEN
+          BEGIN
+          IF v_idxContratHistoSuiv.NUMPAC IS NULL OR p_dsfcn < v_idxContratHistoSuiv.DATE_EFF THEN
+            MERGE INTO DIC_IDX_CONTRAT_HISTO USING (SELECT 1 FROM DUAL) ON (NUMPAC=p_ligneSuiv.NUMPAC AND PACMAT=p_ligneSuiv.PACMAT AND NUMCNT=p_ligneSuiv.NUMCNT AND DATE_EFF=p_ligneSuiv.DATE_EFF AND NOM_DONNEE=p_nomDonnee) WHEN MATCHED THEN UPDATE SET DATE_FIN=p_dsfcn, DATE_DERNIERE_MODIF=SYSDATE WHEN NOT MATCHED THEN INSERT (NUMPAC,PACMAT,NUMCNT,DATE_EFF,NOM_DONNEE,DATE_FIN,DATE_DERNIERE_MODIF) VALUES (p_ligneSuiv.NUMPAC,p_ligneSuiv.PACMAT,p_ligneSuiv.NUMCNT,p_ligneSuiv.DATE_EFF,p_nomDonnee,p_dsfcn,SYSDATE);
+          ELSE
+            MERGE INTO DIC_IDX_CONTRAT_HISTO USING (SELECT 1 FROM DUAL) ON (NUMPAC=p_ligneSuiv.NUMPAC AND PACMAT=p_ligneSuiv.PACMAT AND NUMCNT=p_ligneSuiv.NUMCNT AND DATE_EFF=p_ligneSuiv.DATE_EFF AND NOM_DONNEE=p_nomDonnee) WHEN MATCHED THEN UPDATE SET DATE_FIN=v_idxContratHistoSuiv.DATE_EFF-1, DATE_DERNIERE_MODIF=SYSDATE WHEN NOT MATCHED THEN INSERT (NUMPAC,PACMAT,NUMCNT,DATE_EFF,NOM_DONNEE,DATE_FIN,DATE_DERNIERE_MODIF) VALUES (p_ligneSuiv.NUMPAC,p_ligneSuiv.PACMAT,p_ligneSuiv.NUMCNT,p_ligneSuiv.DATE_EFF,p_nomDonnee,v_idxContratHistoSuiv.DATE_EFF-1,SYSDATE);
+          END IF;
+           EXCEPTION 
+           WHEN DUP_VAL_ON_INDEX THEN NULL;
+           WHEN OTHERS THEN 
+			 -- les merge ne doivent pas tout faire planter, si cela arrive, on trace juste le probleme
+			 TGE_IMPORT_AVANCEMENT_proc('ALIM_IDX','Erreur merge idpacmat ' || p_ligneSuiv.NUMPAC || p_ligneSuiv.PACMAT);
+			 END;
+          IF v_idxContratHisto.NUMPAC IS NOT NULL THEN
+            UPDATE DIC_IDX_CONTRAT_HISTO SET DATE_DERNIERE_MODIF=SYSDATE, DATE_FIN=p_ligneSuiv.DATE_EFF-1 WHERE NUMPAC=p_ligne.NUMPAC AND PACMAT=p_ligne.PACMAT AND NUMCNT=p_ligne.NUMCNT AND DATE_EFF=p_ligne.DATE_EFF AND NOM_DONNEE=p_nomDonnee;
+          ELSIF v_idxContratHistoPrec.NUMPAC IS NOT NULL THEN
+            UPDATE DIC_IDX_CONTRAT_HISTO SET DATE_DERNIERE_MODIF=SYSDATE, DATE_FIN=p_ligneSuiv.DATE_EFF-1 WHERE NUMPAC=v_idxContratHistoPrec.NUMPAC AND PACMAT=v_idxContratHistoPrec.PACMAT AND NUMCNT=v_idxContratHistoPrec.NUMCNT AND DATE_EFF=v_idxContratHistoPrec.DATE_EFF AND NOM_DONNEE=p_nomDonnee;
+          END IF;
+        ELSIF p_listeDonneesRupt.exists(p_nomDonnee) THEN
+          UPDATE DIC_IDX_CONTRAT_HISTO SET DATE_DERNIERE_MODIF=SYSDATE, RUPTURE_CONTRAT=NULL WHERE NUMPAC=p_ligneSuiv.NUMPAC AND PACMAT=p_ligneSuiv.PACMAT AND NUMCNT=p_ligneSuiv.NUMCNT AND DATE_EFF=p_ligneSuiv.DATE_EFF AND NOM_DONNEE=p_nomDonnee;
+        END IF;
+      END IF;
+    END IF; 
+  END INSERT_DATA_CONTRAT_HISTO;
+
+  PROCEDURE UPDATE_DATA_CONTRAT_HISTO(
+      p_nomDonnee VARCHAR2, 
+      p_emptyValue VARCHAR2, 
+      p_valueLignePrec CLOB, 
+      p_valueLigne CLOB, 
+      p_valueLigneSuiv CLOB, 
+      p_valueOldContratHisto CLOB, 
+      p_lignePrec T_LIG_DACH, 
+      p_ligne T_LIG_DACH, 
+      p_ligneSuiv T_LIG_DACH, 
+      p_dsdcn DATE, 
+      p_dsfcn DATE, 
+      p_listeDonneesIdx T_IDX_DONNEE, 
+      p_listeDonneesRupt T_EXISTE_RUPT_DONNEE) IS
+    v_valueLignePrec CLOB;
+    v_valueLigne CLOB;
+    v_valueLigneSuiv CLOB;
+    v_valueOldContratHisto CLOB;
+    v_idxContratHistoPrec DIC_IDX_CONTRAT_HISTO%ROWTYPE := NULL;
+    v_idxContratHisto DIC_IDX_CONTRAT_HISTO%ROWTYPE := NULL;
+    v_idxContratHistoSuiv DIC_IDX_CONTRAT_HISTO%ROWTYPE := NULL;
+  BEGIN
+    v_valueLignePrec := NVL(p_valueLignePrec, p_emptyValue);
+    v_valueLigne := NVL(p_valueLigne, p_emptyValue);
+    v_valueLigneSuiv := NVL(p_valueLigneSuiv, p_emptyValue);
+    v_valueOldContratHisto := NVL(p_valueOldContratHisto, p_emptyValue);
+    IF p_listeDonneesIdx.exists(p_nomDonnee||'-1') THEN
+      v_idxContratHistoPrec := p_listeDonneesIdx(p_nomDonnee||'-1');
+    END IF;
+    IF p_listeDonneesIdx.exists(p_nomDonnee) THEN
+      v_idxContratHisto := p_listeDonneesIdx(p_nomDonnee);
+    END IF;
+    IF p_listeDonneesIdx.exists(p_nomDonnee||'+1') THEN
+      v_idxContratHistoSuiv := p_listeDonneesIdx(p_nomDonnee||'+1');
+    END IF;
+    IF p_ligneSuiv.NUMPAC='_SUPP_' OR NOT v_valueOldContratHisto = v_valueLigne THEN
+      IF p_lignePrec.NUMPAC IS NOT NULL THEN
+        IF NOT v_valueLignePrec = v_valueLigne THEN
+          IF v_idxContratHisto.NUMPAC IS NOT NULL THEN
+            UPDATE DIC_IDX_CONTRAT_HISTO SET DATE_DERNIERE_MODIF=SYSDATE, RUPTURE_CONTRAT=NULL WHERE NUMPAC=p_ligne.NUMPAC AND PACMAT=p_ligne.PACMAT AND NUMCNT=p_ligne.NUMCNT AND DATE_EFF=p_ligne.DATE_EFF AND NOM_DONNEE=p_nomDonnee;
+          ELSE
+            v_idxContratHisto.NUMPAC := p_ligne.NUMPAC;
+            IF v_idxContratHistoPrec.NUMPAC IS NOT NULL THEN
+              v_idxContratHisto.DATE_FIN := v_idxContratHistoPrec.DATE_FIN;
+              UPDATE DIC_IDX_CONTRAT_HISTO SET DATE_DERNIERE_MODIF=SYSDATE, DATE_FIN=p_ligne.DATE_EFF-1 WHERE NUMPAC=v_idxContratHistoPrec.NUMPAC AND PACMAT=v_idxContratHistoPrec.PACMAT AND NUMCNT=v_idxContratHistoPrec.NUMCNT AND DATE_EFF=v_idxContratHistoPrec.DATE_EFF AND NOM_DONNEE=p_nomDonnee;
+            ELSIF v_idxContratHistoSuiv.NUMPAC IS NOT NULL AND v_idxContratHistoSuiv.DATE_EFF < p_dsfcn THEN
+              v_idxContratHisto.DATE_FIN := v_idxContratHistoSuiv.DATE_EFF-1;
+            ELSE
+              v_idxContratHisto.DATE_FIN := p_dsfcn;
+            END IF;
+            BEGIN
+            MERGE INTO DIC_IDX_CONTRAT_HISTO USING (SELECT 1 FROM DUAL) ON (NUMPAC=p_ligne.NUMPAC AND PACMAT=p_ligne.PACMAT AND NUMCNT=p_ligne.NUMCNT AND DATE_EFF=p_ligne.DATE_EFF AND NOM_DONNEE=p_nomDonnee) WHEN MATCHED THEN UPDATE SET DATE_FIN=v_idxContratHisto.DATE_FIN, DATE_DERNIERE_MODIF=SYSDATE WHEN NOT MATCHED THEN INSERT (NUMPAC,PACMAT,NUMCNT,DATE_EFF,NOM_DONNEE,DATE_FIN,DATE_DERNIERE_MODIF) VALUES (p_ligne.NUMPAC,p_ligne.PACMAT,p_ligne.NUMCNT,p_ligne.DATE_EFF,p_nomDonnee,v_idxContratHisto.DATE_FIN,SYSDATE);
+             EXCEPTION 
+             WHEN DUP_VAL_ON_INDEX THEN NULL;
+             WHEN OTHERS THEN 
+			 -- les merge ne doivent pas tout faire planter, si cela arrive, on trace juste le probleme
+			 TGE_IMPORT_AVANCEMENT_proc('ALIM_IDX','Erreur merge idpacmat ' || p_ligne.NUMPAC || p_ligne.PACMAT);
+			 END;
+          END IF;
+        ELSIF v_idxContratHisto.NUMPAC IS NOT NULL THEN
+          IF p_listeDonneesRupt.exists(p_nomDonnee) AND p_ligne.DATE_EFF = p_dsdcn THEN
+            UPDATE DIC_IDX_CONTRAT_HISTO SET DATE_DERNIERE_MODIF=SYSDATE, RUPTURE_CONTRAT='O' WHERE NUMPAC=p_ligne.NUMPAC AND PACMAT=p_ligne.PACMAT AND NUMCNT=p_ligne.NUMCNT AND DATE_EFF=p_ligne.DATE_EFF AND NOM_DONNEE=p_nomDonnee;
+          ELSE
+            IF v_idxContratHistoPrec.NUMPAC IS NOT NULL THEN
+              UPDATE DIC_IDX_CONTRAT_HISTO SET DATE_DERNIERE_MODIF=SYSDATE, DATE_FIN=v_idxContratHisto.DATE_FIN WHERE NUMPAC=v_idxContratHistoPrec.NUMPAC AND PACMAT=v_idxContratHistoPrec.PACMAT AND NUMCNT=v_idxContratHistoPrec.NUMCNT AND DATE_EFF=v_idxContratHistoPrec.DATE_EFF AND NOM_DONNEE=p_nomDonnee;
+            END IF;
+            DELETE FROM DIC_IDX_CONTRAT_HISTO WHERE NUMPAC=v_idxContratHisto.NUMPAC AND PACMAT=v_idxContratHisto.PACMAT AND NUMCNT=v_idxContratHisto.NUMCNT AND DATE_EFF=v_idxContratHisto.DATE_EFF AND NOM_DONNEE=p_nomDonnee;
+          END IF;
+        END IF;
+      ELSIF p_listeDonneesRupt.exists(p_nomDonnee) THEN
+        UPDATE DIC_IDX_CONTRAT_HISTO SET DATE_DERNIERE_MODIF=SYSDATE WHERE NUMPAC=p_ligne.NUMPAC AND PACMAT=p_ligne.PACMAT AND NUMCNT=p_ligne.NUMCNT AND DATE_EFF=p_ligne.DATE_EFF AND NOM_DONNEE=p_nomDonnee;
+      ELSIF p_ligne.NUMPAC IS NOT NULL THEN
+      	BEGIN
+        MERGE INTO DIC_IDX_CONTRAT_HISTO_COMP USING (SELECT 1 FROM DUAL) ON (NUMPAC=p_ligne.NUMPAC AND PACMAT=p_ligne.PACMAT AND NUMCNT=p_ligne.NUMCNT AND DATE_EFF=p_ligne.DATE_EFF AND NOM_DONNEE=p_nomDonnee) WHEN MATCHED THEN UPDATE SET DATE_DERNIERE_MODIF=SYSDATE WHEN NOT MATCHED THEN INSERT (NUMPAC, PACMAT, NUMCNT, DATE_EFF, NOM_DONNEE, DATE_DERNIERE_MODIF) VALUES (p_ligne.NUMPAC, p_ligne.PACMAT, p_ligne.NUMCNT, p_ligne.DATE_EFF, p_nomDonnee, SYSDATE);
+         EXCEPTION 
+         WHEN DUP_VAL_ON_INDEX THEN NULL;
+         WHEN OTHERS THEN 
+		 -- les merge ne doivent pas tout faire planter, si cela arrive, on trace juste le probleme
+		 TGE_IMPORT_AVANCEMENT_proc('ALIM_IDX','Erreur merge idpacmat ' || p_ligne.NUMPAC || p_ligne.PACMAT);
+		 END;
+      END IF;
+      IF p_ligneSuiv.NUMPAC IS NOT NULL AND NOT NVL(p_ligneSuiv.NUMPAC,'_EMPTY_')='_SUPP_' THEN
+        IF NOT v_valueLigne = v_valueLigneSuiv THEN
+          IF v_idxContratHistoSuiv.NUMPAC IS NULL OR NOT v_idxContratHistoSuiv.DATE_EFF = p_ligneSuiv.DATE_EFF THEN
+            BEGIN
+            IF v_idxContratHistoSuiv.NUMPAC IS NULL OR p_dsfcn < v_idxContratHistoSuiv.DATE_EFF THEN
+              MERGE INTO DIC_IDX_CONTRAT_HISTO USING (SELECT 1 FROM DUAL) ON (NUMPAC=p_ligneSuiv.NUMPAC AND PACMAT=p_ligneSuiv.PACMAT AND NUMCNT=p_ligneSuiv.NUMCNT AND DATE_EFF=p_ligneSuiv.DATE_EFF AND NOM_DONNEE=p_nomDonnee) WHEN MATCHED THEN UPDATE SET DATE_FIN=p_dsfcn, DATE_DERNIERE_MODIF=SYSDATE WHEN NOT MATCHED THEN INSERT (NUMPAC,PACMAT,NUMCNT,DATE_EFF,NOM_DONNEE,DATE_FIN,DATE_DERNIERE_MODIF) VALUES (p_ligneSuiv.NUMPAC,p_ligneSuiv.PACMAT,p_ligneSuiv.NUMCNT,p_ligneSuiv.DATE_EFF,p_nomDonnee,p_dsfcn,SYSDATE);
+            ELSE
+              MERGE INTO DIC_IDX_CONTRAT_HISTO USING (SELECT 1 FROM DUAL) ON (NUMPAC=p_ligneSuiv.NUMPAC AND PACMAT=p_ligneSuiv.PACMAT AND NUMCNT=p_ligneSuiv.NUMCNT AND DATE_EFF=p_ligneSuiv.DATE_EFF AND NOM_DONNEE=p_nomDonnee) WHEN MATCHED THEN UPDATE SET DATE_FIN=v_idxContratHistoSuiv.DATE_EFF-1, DATE_DERNIERE_MODIF=SYSDATE WHEN NOT MATCHED THEN INSERT (NUMPAC,PACMAT,NUMCNT,DATE_EFF,NOM_DONNEE,DATE_FIN,DATE_DERNIERE_MODIF) VALUES (p_ligneSuiv.NUMPAC,p_ligneSuiv.PACMAT,p_ligneSuiv.NUMCNT,p_ligneSuiv.DATE_EFF,p_nomDonnee,v_idxContratHistoSuiv.DATE_EFF-1,SYSDATE);
+            END IF;
+             EXCEPTION 
+             WHEN DUP_VAL_ON_INDEX THEN NULL;
+             WHEN OTHERS THEN 
+			 -- les merge ne doivent pas tout faire planter, si cela arrive, on trace juste le probleme
+			 TGE_IMPORT_AVANCEMENT_proc('ALIM_IDX','Erreur merge idpacmat ' || p_ligneSuiv.NUMPAC || p_ligneSuiv.PACMAT);
+			 END;
+            IF v_idxContratHisto.NUMPAC IS NOT NULL THEN
+              UPDATE DIC_IDX_CONTRAT_HISTO SET DATE_DERNIERE_MODIF=SYSDATE, DATE_FIN=p_ligneSuiv.DATE_EFF-1 WHERE NUMPAC=p_ligne.NUMPAC AND PACMAT=p_ligne.PACMAT AND NUMCNT=p_ligne.NUMCNT AND DATE_EFF=p_ligne.DATE_EFF AND NOM_DONNEE=p_nomDonnee;
+            ELSIF v_idxContratHistoPrec.NUMPAC IS NOT NULL THEN
+              UPDATE DIC_IDX_CONTRAT_HISTO SET DATE_DERNIERE_MODIF=SYSDATE, DATE_FIN=p_ligneSuiv.DATE_EFF-1 WHERE NUMPAC=v_idxContratHistoPrec.NUMPAC AND PACMAT=v_idxContratHistoPrec.PACMAT AND NUMCNT=v_idxContratHistoPrec.NUMCNT AND DATE_EFF=v_idxContratHistoPrec.DATE_EFF AND NOM_DONNEE=p_nomDonnee;
+            END IF;
+          ELSIF p_listeDonneesRupt.exists(p_nomDonnee) THEN
+            UPDATE DIC_IDX_CONTRAT_HISTO SET DATE_DERNIERE_MODIF=SYSDATE, RUPTURE_CONTRAT=NULL WHERE NUMPAC=p_ligneSuiv.NUMPAC AND PACMAT=p_ligneSuiv.PACMAT AND NUMCNT=p_ligneSuiv.NUMCNT AND DATE_EFF=p_ligneSuiv.DATE_EFF AND NOM_DONNEE=p_nomDonnee;
+          END IF;
+        ELSIF v_idxContratHistoSuiv.DATE_EFF = p_ligneSuiv.DATE_EFF THEN
+          IF p_listeDonneesRupt.exists(p_nomDonnee) AND NOT p_ligne.NUMCNT = p_ligneSuiv.NUMCNT THEN
+            UPDATE DIC_IDX_CONTRAT_HISTO SET DATE_DERNIERE_MODIF=SYSDATE, RUPTURE_CONTRAT='O' WHERE NUMPAC=p_ligneSuiv.NUMPAC AND PACMAT=p_ligneSuiv.PACMAT AND NUMCNT=p_ligneSuiv.NUMCNT AND DATE_EFF=p_ligneSuiv.DATE_EFF AND NOM_DONNEE=p_nomDonnee;
+          ELSE
+            IF v_idxContratHisto.NUMPAC IS NOT NULL THEN
+              UPDATE DIC_IDX_CONTRAT_HISTO SET DATE_DERNIERE_MODIF=SYSDATE, DATE_FIN=v_idxContratHistoSuiv.DATE_FIN WHERE NUMPAC=v_idxContratHisto.NUMPAC AND PACMAT=v_idxContratHisto.PACMAT AND NUMCNT=v_idxContratHisto.NUMCNT AND DATE_EFF=v_idxContratHisto.DATE_EFF AND NOM_DONNEE=p_nomDonnee;
+            ELSIF v_idxContratHistoPrec.NUMPAC IS NOT NULL THEN
+              UPDATE DIC_IDX_CONTRAT_HISTO SET DATE_DERNIERE_MODIF=SYSDATE, DATE_FIN=v_idxContratHistoSuiv.DATE_FIN WHERE NUMPAC=v_idxContratHistoPrec.NUMPAC AND PACMAT=v_idxContratHistoPrec.PACMAT AND NUMCNT=v_idxContratHistoPrec.NUMCNT AND DATE_EFF=v_idxContratHistoPrec.DATE_EFF AND NOM_DONNEE=p_nomDonnee;
+            END IF;
+            DELETE FROM DIC_IDX_CONTRAT_HISTO WHERE NUMPAC=v_idxContratHistoSuiv.NUMPAC AND PACMAT=v_idxContratHistoSuiv.PACMAT AND NUMCNT=v_idxContratHistoSuiv.NUMCNT AND DATE_EFF=v_idxContratHistoSuiv.DATE_EFF AND NOM_DONNEE=p_nomDonnee;
+          END IF;
+        END IF;
+      END IF;
+    END IF; 
+  END UPDATE_DATA_CONTRAT_HISTO;
+END ALIM_IDX;

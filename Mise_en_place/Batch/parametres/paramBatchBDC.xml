@@ -1,0 +1,62 @@
+<interface idInterface="BDC">
+	<nomInterface>BULLETIN_DE_CONTROLE</nomInterface>
+	<descriptionInterface>Chargement des tables du bulletin de controle et lancement du controle</descriptionInterface>
+	<alerteSiFichierNonDisponible>OUI</alerteSiFichierNonDisponible>
+	<listeDependancesFichiers>
+		<nomFichierDep>BDCTRT.TXT</nomFichierDep>
+		<nomFichierDep>BDCADM.TXT</nomFichierDep>
+		<nomFichierDep>BDCEPS.TXT</nomFichierDep>
+		<nomFichierDep>BDCBUL.TXT</nomFichierDep>
+	</listeDependancesFichiers>
+	<purge>
+		<NbFichierConservationFichier>1</NbFichierConservationFichier>
+	</purge>
+	<traitements>
+		<traitement>
+			<descriptionTraitement>Chargement de la table BDC_TRAITEMENT et purge des anciens traitements</descriptionTraitement>
+			<typeTraitement>BDC_TRAITEMENT</typeTraitement>
+			<nomFichier>BDCTRT.TXT</nomFichier>
+			<continueSiErreur>NON</continueSiErreur>
+		</traitement>
+		<traitement>
+			<descriptionTraitement>Chargement de la table BDC_ADM_TMP</descriptionTraitement>
+			<typeTraitement>CHARGEMENT</typeTraitement>
+			<nomFichier>BDCADM.TXT</nomFichier>
+			<nbcommit>1000</nbcommit>
+			<typeFichier>MAJBASE</typeFichier>
+			<continueSiErreur>OUI</continueSiErreur>
+		</traitement>
+		<traitement>
+			<descriptionTraitement>Chargement de fichiers dans les tables _TEMP</descriptionTraitement>
+			<typeTraitement>SQLLDR</typeTraitement>
+			<fichiers>
+				<fichier>
+					<data>BDCEPS.TXT</data>
+					<ctl>BDC_EPS_TMP.ctl</ctl>
+				</fichier>
+				<fichier>
+					<data>BDCBUL.TXT</data>
+					<ctl>BDC_BUL_TMP.ctl</ctl>
+				</fichier>
+			</fichiers>
+			<continueSiErreur>NON</continueSiErreur>
+		</traitement>
+		<traitement>
+			<descriptionTraitement>Script SQL specifique apres chargement</descriptionTraitement>
+			<typeTraitement>SCRIPT</typeTraitement>
+			<nomFichier>sql_CLI_apres_BDC.sql</nomFichier>
+			<typeFichier>SQL</typeFichier>
+			<continueSiErreur>OUI</continueSiErreur>
+		</traitement>
+		<traitement>
+			<descriptionTraitement>Lancement du controle de la paie</descriptionTraitement>
+			<typeTraitement>BDC_LANCER_CTRL</typeTraitement>
+			<!--
+			0 : controle des alertes et des tableaux de bord
+			1 : controle des alertes
+			2 : controle des tableaux de bord
+			-->
+			<ctrlType>1</ctrlType>
+		</traitement>
+	</traitements>
+</interface>
