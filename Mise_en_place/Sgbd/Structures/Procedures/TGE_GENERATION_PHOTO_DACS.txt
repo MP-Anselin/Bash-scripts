@@ -1,0 +1,360 @@
+##
+TGE_GENERATION_PHOTO_DACS
+=SQL=
+create or replace PROCEDURE TGE_GENERATION_PHOTO_DACS( 
+ p_numpac      IN VARCHAR2,
+ p_periodepaie IN VARCHAR2,
+ p_encours     IN VARCHAR2)
+ /********************************************************************************
+ Version     : V5.05.000
+ *********************************************************************************/
+ AS
+ CURSOR cur_mapta
+ IS
+ SELECT a.*
+ FROM tge_ref_mapta a,
+ (SELECT * FROM user_tables
+ ) b
+ WHERE a.numpac     =p_numpac
+ AND b.table_name   =a.tablephy
+ and a.tablephy ='DIC_ADM_CONTRAT_SITU'
+ AND a.allerretour IN ('A','2')
+ UNION ALL
+ SELECT a.*
+ FROM tge_ref_mapta a,
+ (SELECT * FROM user_tables
+ ) b
+ WHERE a.numpac        ='*'
+ AND b.table_name      =a.tablephy
+ and a.tablephy ='DIC_ADM_CONTRAT_SITU'
+ AND a.allerretour    IN ('A','2')
+ AND (tableparam) NOT IN
+ (SELECT tableparam
+ FROM tge_ref_mapta a,
+ (SELECT * FROM user_tables
+ ) b
+ WHERE a.numpac  =p_numpac
+ AND b.table_name=a.tablephy
+ ) ;
+ lig_mapta cur_mapta%rowtype;
+ v_typeTable VARCHAR(1);
+ clinsert CLOB;
+ clinsertsel CLOB;
+ clinsertcols CLOB;
+ requete CLOB;
+ nbpart NUMBER;
+ cldate VARCHAR2(500):='';
+ p_nb_mois_paie_init number;
+ p_id           NUMBER;
+ w_count_trt number ;
+ v_periode varchar2(6);
+ BEGIN
+ 
+ BEGIN
+ SELECT TO_NUMBER(NVL(VALVAR,'0'))
+ INTO p_nb_mois_paie_init
+ FROM SYS_VARSYS
+ WHERE MODULE = 'GAP'
+ AND CODVAR   = 'NB_MOIS_PAIE_INIT';
+ EXCEPTION
+ WHEN NO_DATA_FOUND THEN
+ p_nb_mois_paie_init :=1;
+ END ;
+ p_nb_mois_paie_init := p_nb_mois_paie_init-1;
+ 
+ select GAP_TRT_SEQ_ID.nextval into p_id from dual;
+ 
+ 
+ select count(*) 
+ INTO w_count_trt 
+ from  (
+ select distinct c.id_trt
+ from TGE_SCHEMA_PRODUCTION a,GAP_TRT b,GAP_TRT_SUIVI c  where a.numpac=p_numpac and a.TYPE_PAIE in ('PRECONTR','CONTROLE','RECYCLAG','PARTICUL','REGLE','REGLEALL','GAPSELMA')
+ and a.numpac=b.numpac and a.modele=b.modele and a.nature=b.nature
+ and b.id_trt=c.id_trt and c.statut in ('PA','EX','DEMSEA') AND NVL(c.code_retour_zpp,'00')='00' and b.PERIODE_PAIE = p_encours  and b.numero_echange<>'0000') a, GAP_TRT_LISTE_MAT b where a.id_trt=b.id_trt
+ and not exists (select c.numpac,c.pacmat from GAP_RECYCL_MATRIC c where c.numpac=b.numpac and c.pacmat=b.pacmat ) ;
+ 
+ if w_count_trt=0 then
+
+ insert into GAP_TRT_LISTE_MAT select distinct  p_id,b.numpac,b.pacmat,null from (
+ select distinct c.id_trt
+ from TGE_SCHEMA_PRODUCTION a,GAP_TRT b,GAP_TRT_SUIVI c  where a.numpac=p_numpac and a.TYPE_PAIE in ('PRECONTR','CONTROLE','RECYCLAG','PARTICUL','REGLE','REGLEALL','GAPSELMA')
+ and a.numpac=b.numpac and a.modele=b.modele and a.nature=b.nature
+ and b.id_trt=c.id_trt and c.statut in ('PA','EX','DEMSEA') AND NVL(c.code_retour_zpp,'00')='00' and b.PERIODE_PAIE = to_char(add_months(to_date(p_encours,'YYYYMM'),-1),'YYYMM')  and b.numero_echange<>'0000') a, GAP_TRT_LISTE_MAT b where a.id_trt=b.id_trt
+ and not exists (select c.numpac,c.pacmat from GAP_RECYCL_MATRIC c where c.numpac=b.numpac and c.pacmat=b.pacmat ) ;
+ 
+ else
+ insert into GAP_TRT_LISTE_MAT select distinct  p_id,b.numpac,b.pacmat,null from (
+ select distinct c.id_trt
+ from TGE_SCHEMA_PRODUCTION a,GAP_TRT b,GAP_TRT_SUIVI c  where a.numpac=p_numpac and a.TYPE_PAIE in ('PRECONTR','CONTROLE','RECYCLAG','PARTICUL','REGLE','REGLEALL','GAPSELMA')
+ and a.numpac=b.numpac and a.modele=b.modele and a.nature=b.nature
+ and b.id_trt=c.id_trt and c.statut in ('PA','EX','DEMSEA') AND NVL(c.code_retour_zpp,'00')='00' and b.PERIODE_PAIE = p_encours  and b.numero_echange<>'0000') a, GAP_TRT_LISTE_MAT b where a.id_trt=b.id_trt
+ and not exists (select c.numpac,c.pacmat from GAP_RECYCL_MATRIC c where c.numpac=b.numpac and c.pacmat=b.pacmat ) ;
+ 
+ end if;
+ 
+ -- Le 25/04/2015 ajout des mal recyclés (colonne "TRAITE"='R')
+ insert into GAP_TRT_LISTE_MAT select distinct  p_id,b.numpac,b.pacmat,'R' from (
+ select distinct c.id_trt
+ from TGE_SCHEMA_PRODUCTION a,GAP_TRT b,GAP_TRT_SUIVI c  where a.numpac=p_numpac and a.TYPE_PAIE in ('PRECONTR','CONTROLE','RECYCLAG','PARTICUL','REGLE','REGLEALL','GAPSELMA')
+ and a.numpac=b.numpac and a.modele=b.modele and a.nature=b.nature and b.id_trt=c.id_trt and c.statut in ('PA','EX','DEMSEA') AND NVL(c.code_retour_zpp,'00')='00' and b.PERIODE_PAIE = p_encours  and b.numero_echange<>'0000') a, GAP_TRT_LISTE_MAT b where a.id_trt=b.id_trt
+ and exists (select c.numpac,c.pacmat from GAP_RECYCL_MATRIC c where c.numpac=b.numpac and c.pacmat=b.pacmat ) ;
+ 
+ OPEN cur_mapta;
+ LOOP
+ BEGIN
+ FETCH cur_mapta
+ INTO lig_mapta ;
+ EXIT
+ WHEN cur_mapta%NOTFOUND ;
+ 
+ 
+ -- on regarde les clés pour savoir si table datée
+ cldate:='';
+ FOR colonne IN
+ (SELECT a.column_name,
+ b.data_type
+ FROM user_cons_columns a,
+ USER_TAB_COLUMNS b
+ WHERE a.table_name   =lig_mapta.tablephy
+ AND a.table_name     =b.table_name
+ AND a.column_name    =b.column_name
+ AND constraint_name IN
+ (SELECT c.constraint_name
+ FROM user_constraints c
+ WHERE c.table_name =a.table_name
+ AND CONSTRAINT_TYPE='P'
+ )
+ )
+ LOOP
+ IF colonne.data_type='DATE'  THEN
+ cldate  :=' AND  a.'||colonne.column_name||'<=last_day(to_date('''||p_periodepaie||''',''yyyymmdd''))';
+ END IF;
+ END LOOP;
+ IF lig_mapta.tablephy='DIC_ADM_CONTRAT' THEN
+ cldate  :=' AND  a.DSDCN <=last_day(to_date('''||p_periodepaie||''',''yyyymmdd''))';
+ END IF;
+ -- requête de sélection des données à faire selon le type de table
+ v_typeTable   :=fsed.getTypeTable(lig_mapta.tablephy);
+ IF v_typeTable ='z' THEN
+ clinsertsel :='';
+ clinsertcols:='NUMPAC,PACMAT';
+ FOR colonne IN
+ (SELECT a.column_name
+ FROM user_tab_columns a,
+ user_tab_columns b
+ WHERE a.table_name = lig_mapta.tablephy
+ AND b.table_name   ='PHOTO_'
+ ||a.table_name
+ AND a.column_name=b.column_name
+ AND a.column_name NOT LIKE '%IDPACMAT%'
+ ORDER BY a.column_id
+ )
+ LOOP
+ IF colonne.column_name <>'NUMPAC' AND colonne.column_name<>'PACMAT' THEN
+ clinsertsel          :=clinsertsel||',a.'||colonne.column_name;
+ clinsertcols         :=clinsertcols||','||colonne.column_name;
+ END IF;
+ END LOOP;
+ 
+ clinsert      :='select distinct '''||p_numpac;
+ clinsert      := clinsert||''',b.pacmat'||clinsertsel;
+ clinsert      := clinsert||' from '||lig_mapta.tablephy;
+ clinsert:= clinsert||' a,DIC_ADM_CONTRAT_SITU b where b.paiezad=a.paiezad and a.numpac=b.numpac and a.numpac= '''||p_numpac;
+ clinsert:= clinsert||'''  and a.pacmat in (select c.pacmat from GAP_TRT_LISTE_MAT c where c.id_trt='||p_id||')';
+ clinsert:= clinsert||' and a.pacmat not in (select f.pacmat from TGE_MODIF_PACMAT_TORESEND f where b.numpac=f.numpac and f.numpac='''||p_numpac||''' and  f.table_to_send='''||lig_mapta.tablephy||''')'||cldate;
+ elsif v_typeTable='p' THEN
+ clinsertsel   :='';
+ clinsertcols  :='';
+ FOR colonne IN
+ (SELECT a.column_name
+ FROM user_tab_columns a,
+ user_tab_columns b
+ WHERE a.table_name = lig_mapta.tablephy
+ AND b.table_name   ='PHOTO_'
+ ||a.table_name
+ AND a.column_name=b.column_name
+ AND a.column_name NOT LIKE '%IDPACMAT%'
+ ORDER BY a.column_id
+ )
+ LOOP
+ IF clinsertsel IS NOT NULL THEN
+ clinsertsel  :=clinsertsel||',';
+ END IF;
+ clinsertsel     :=clinsertsel||'a.'||colonne.column_name;
+ IF clinsertcols IS NOT NULL THEN
+ clinsertcols  :=clinsertcols||',';
+ END IF;
+ clinsertcols:=clinsertcols||colonne.column_name;
+ END LOOP;
+ 
+ clinsert      :='select distinct '||clinsertsel;
+ clinsert      := clinsert||' from '||lig_mapta.tablephy;
+ clinsert      := clinsert||' a  where  a.numpac= '''||p_numpac||''' AND    a.pacmat in (select c.pacmat from GAP_TRT_LISTE_MAT c where c.id_trt='||p_id||')';
+ clinsert      := clinsert||' and a.pacmat not in (select f.pacmat from TGE_MODIF_PACMAT_TORESEND f where f.numpac=a.numpac and f.numpac='''||p_numpac||''' and  f.table_to_send='''||lig_mapta.tablephy||''')'||cldate;
+ elsif v_typeTable='m' THEN
+ clinsertsel   :='';
+ clinsertcols  :='NUMPAC,PACMAT';
+ FOR colonne IN
+ (SELECT a.column_name
+ FROM user_tab_columns a,
+ user_tab_columns b
+ WHERE a.table_name = lig_mapta.tablephy
+ AND b.table_name   ='PHOTO_'
+ ||a.table_name
+ AND a.column_name=b.column_name
+ AND a.column_name NOT LIKE '%IDPACMAT%'
+ ORDER BY a.column_id
+ )
+ LOOP
+ IF colonne.column_name <>'NUMPAC' AND colonne.column_name<>'PACMAT' THEN
+ clinsertsel          :=clinsertsel||',a.'||colonne.column_name;
+ clinsertcols         :=clinsertcols||','||colonne.column_name;
+ END IF;
+ END LOOP;
+ 
+ clinsert:='select distinct '''||p_numpac;
+ clinsert:= clinsert||''',b.pacmat'||clinsertsel;
+ clinsert:= clinsert||' from '||lig_mapta.tablephy;
+ clinsert:= clinsert||' a,SECUPACMAT b, GAP_TRT_LISTE_MAT c where b.matric=a.matric and b.numpac= '''||p_numpac;
+ clinsert:= clinsert||'''  and b.pacmat=c.pacmat and c.numpac='''||p_numpac||''' and c.id_trt='||p_id;
+ clinsert:= clinsert||' and b.pacmat not in (select f.pacmat from TGE_MODIF_PACMAT_TORESEND f where b.numpac=f.numpac and f.numpac='''||p_numpac||''' and  f.table_to_send='''||lig_mapta.tablephy||''')'||cldate;
+ END IF;
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'TGE_GENERATION_PHOTO_DACS *** '||p_numpac||' *** Begin *** '||lig_mapta.tablephy||' (type='||v_typeTable||')',null);
+ 
+ -- 1)	Sauvegarde de PHOTO dans PH_PH des mal recyclés non déjà présents dans PH_PH
+ IF instr(clinsertsel,'a.PACMAT')>0 THEN
+ requete:= 'insert into PH_PH_'||lig_mapta.tablephy||'('||clinsertcols||') (select '||clinsertsel ||' from PHOTO_'||lig_mapta.tablephy||' a, TGE_MODIF_PACMAT_TORESEND b where a.numpac=b.numpac and a.pacmat=b.pacmat and b.table_to_send='''||lig_mapta.tablephy||''' and a.numpac='''||p_numpac||''' AND  b.pacmat not in (select c.pacmat from PH_PH_'||lig_mapta.tablephy||' c where c.numpac='''||p_numpac||'''))';
+ ELSE
+ requete:= 'insert into PH_PH_'||lig_mapta.tablephy||'('||clinsertcols||') (select a.numpac,a.pacmat'||clinsertsel ||' from PHOTO_'||lig_mapta.tablephy||' a, TGE_MODIF_PACMAT_TORESEND b where a.numpac=b.numpac and a.pacmat=b.pacmat and b.table_to_send='''||lig_mapta.tablephy||''' and a.numpac='''||p_numpac||''' AND  b.pacmat not in (select c.pacmat from PH_PH_'||lig_mapta.tablephy||' c where c.numpac='''||p_numpac||'''))';
+ END IF;
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'Copie de PHOTO vers PH_PH des Toresend (mal recyclés) non présents dans PH_PH',requete);
+ EXECUTE_IMMEDIATE_STRING( requete,0);
+ 
+ -- 2)	On efface la PHOTO
+ -- Contrôle de l'existence de partitionnement (son nom sera aussi une garantie de mode LIST)
+ SELECT COUNT(*)
+ INTO nbpart
+ FROM user_tab_partitions
+ WHERE table_name = 'PHOTO_'||lig_mapta.tablephy and partition_name = 'P_'||p_numpac;
+ IF nbpart >0 THEN
+ BEGIN
+ -- Suppression de la partition
+ requete:= 'ALTER TABLE PHOTO_'||lig_mapta.tablephy||' TRUNCATE PARTITION P_'||p_numpac||' DROP STORAGE UPDATE GLOBAL INDEXES';
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'Partition PHOTO détectée : suppression',requete);
+ EXECUTE_IMMEDIATE_STRING( requete,0);
+ -- Création de la partition
+ EXCEPTION
+ WHEN OTHERS THEN
+ BEGIN
+ requete:= 'ALTER TABLE PHOTO_'||lig_mapta.tablephy||' ADD PARTITION P_'||p_numpac||' values ('''||p_numpac||''')';
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'Création de partition PHOTO',requete);
+ EXECUTE_IMMEDIATE_STRING( requete,0);
+ EXCEPTION
+ WHEN OTHERS THEN
+ requete:= 'delete from  PHOTO_'||lig_mapta.tablephy||' where numpac='''||p_numpac||'''';
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'Effacement de PHOTO',requete);
+ EXECUTE_IMMEDIATE_STRING( requete,0);
+ END;
+ END;
+ ELSE
+ -- Cas des tables non partitionnées ou partitionnées en mode HASH
+ requete:= 'delete from PHOTO_'||lig_mapta.tablephy||' where numpac='''||p_numpac||'''';
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'Effacement de PHOTO',requete);
+ EXECUTE_IMMEDIATE_STRING( requete,0);
+ END IF;
+ 
+ -- 3)	On met à jour la PHOTO avec la table DIC sauf pour les mal recyclés de ce dictionnaire
+ requete:= 'insert into PHOTO_'||lig_mapta.tablephy||'('||clinsertcols||') '||clinsert;
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'Copie de DIC vers PHOTO sauf les mal recyclés',requete);
+ EXECUTE_IMMEDIATE_STRING( requete,0);
+ 
+ -- 4)	On copie PH_PH dans PHOTO uniquement pour les mal recyclés
+ requete:= 'insert into PHOTO_'||lig_mapta.tablephy||'('||clinsertcols||')  (select '||clinsertcols||' from PH_PH_'||lig_mapta.tablephy||'  where numpac='''||p_numpac||''' and pacmat in (select pacmat from TGE_MODIF_PACMAT_TORESEND where numpac='''||p_numpac||''' and table_to_send='''||lig_mapta.tablephy||''' ) )';
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'Copie de PH_PH dans PHOTO pour les mal recyclés',requete);
+ EXECUTE_IMMEDIATE_STRING( requete,0);
+ 
+ -- 5)	On efface PH_PH
+ -- Contrôle de l'existence de partitionnement (son nom sera aussi une garantie de mode LIST)
+ SELECT COUNT(*)
+ INTO nbpart
+ FROM user_tab_partitions
+ WHERE table_name = 'PH_PH_'||lig_mapta.tablephy and partition_name = 'P_'||p_numpac;
+ IF nbpart >0 THEN
+ BEGIN
+ requete:= 'ALTER TABLE PH_PH_'||lig_mapta.tablephy||' TRUNCATE PARTITION P_'||p_numpac||' DROP STORAGE UPDATE GLOBAL INDEXES';
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'Partition PH_PH détectée : suppression',requete);
+ EXECUTE_IMMEDIATE_STRING( requete,0);
+ EXCEPTION
+ WHEN OTHERS THEN
+ BEGIN
+ -- Création de la partition
+ requete:= 'ALTER TABLE PH_PH_'||lig_mapta.tablephy||' ADD PARTITION P_'||p_numpac||' values ('''||p_numpac||''')';
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'Création de partition PH_PH',requete);
+ EXECUTE_IMMEDIATE_STRING( requete,0);
+ EXCEPTION
+ WHEN OTHERS THEN
+ requete:= 'delete from PH_PH_'||lig_mapta.tablephy||' where numpac='''||p_numpac||'''';
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'Effacement de PH_PH',requete);
+ EXECUTE_IMMEDIATE_STRING( requete,0);        END;
+ END;
+ ELSE
+ -- Cas des tables non partitionnées ou partitionnées en mode HASH
+ requete:= 'delete from PH_PH_'||lig_mapta.tablephy||' where numpac='''||p_numpac||'''';
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'Effacement de PH_PH',requete);
+ EXECUTE_IMMEDIATE_STRING( requete,0);
+ END IF;
+ 
+ -- 6)	On copie dans PH_PH la table DIC des matricules mal recyclés
+ IF instr(clinsertsel,'a.PACMAT')>0 THEN
+ requete:= 'insert into PH_PH_'||lig_mapta.tablephy||'('||clinsertcols||') (select '||clinsertsel ||' from '||lig_mapta.tablephy||' a, TGE_MODIF_PACMAT_TORESEND b where a.numpac=b.numpac and a.pacmat=b.pacmat and b.table_to_send='''||lig_mapta.tablephy||''' and a.numpac='''||p_numpac||''')';
+ ELSE
+ requete:= 'insert into PH_PH_'||lig_mapta.tablephy||'('||clinsertcols||') (select b.numpac,b.pacmat'||clinsertsel ||' from '||lig_mapta.tablephy||' a, TGE_MODIF_PACMAT_TORESEND b ,SECUPACMAT s where s.numpac=b.numpac  and s.pacmat=b.pacmat and s.MATRIC = a.MATRIC and b.table_to_send='''||lig_mapta.tablephy||''' and b.numpac='''||p_numpac||''')';
+ END IF;
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'Copie de DIC vers PH_PH des Toresend (mal recyclés)',requete);
+ EXECUTE_IMMEDIATE_STRING( requete,0);
+ 
+ -- 7)	On supprime les DRPAIE2='B' de la photo DIT 82467
+ 
+ IF v_typeTable ='z' THEN
+ requete:= 'DELETE from PHOTO_'||lig_mapta.tablephy||' PH where PH.numpac='''||p_numpac||''' AND EXISTS ( select 1 from ( ';
+ requete:=requete||' SELECT DISTINCT DACH2.NUMPAC,DACH2.paiezad, DACH2.NUMCNT ,DACH2.DRPAI2, MAX(DATE_EFF) OVER (PARTITION BY DACH2.paiezad, DACH2.NUMCNT) FROM DIC_ADM_CONTRAT_HISTO DACH2 ';
+ requete:=requete||' WHERE DACH2.NUMPAC = '''||p_numpac||''' and DACH2.DATE_EFF <= LAST_DAY(TO_DATE('''||p_periodepaie||''',''yyyymmdd'')) and DACH2.DATE_SORTIE_SIT_BO >= ADD_MONTHS(TO_DATE('''||p_periodepaie||''',''yyyymmdd''),-'||p_nb_mois_paie_init||') ';
+ if lig_mapta.tablephy in ('DIC_ADM_CONTRAT','DIC_ADM_CONTRAT_HISTO','DIC_ADM_CONTRAT_SITU') THEN
+ requete:=requete||' ) DACH   where  PH.paiezad=DACH.paiezad and NVL(DACH.DRPAI2,''B'')=''B'' AND PH.NUMPAC=DACH.NUMPAC AND PH.NUMCNT = DACH.NUMCNT) ' ;
+ ELSE
+ requete:=requete||' ) DACH   where  PH.paiezad=DACH.paiezad and NVL(DACH.DRPAI2,''B'')=''B'' AND PH.NUMPAC=DACH.NUMPAC ) ' ;
+ END IF;
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'Suppression des DRPAIE2=''B'' de la PHOTO',requete);
+ EXECUTE_IMMEDIATE_STRING( requete,0);
+ ELSIF v_typeTable='p' THEN
+ requete:= 'DELETE from PHOTO_'||lig_mapta.tablephy||' PH where PH.numpac='''||p_numpac||''' AND EXISTS ( select 1 from ( ';
+ requete:=requete||' SELECT DISTINCT DACH2.NUMPAC,DACH2.pacmat, DACH2.NUMCNT ,DACH2.DRPAI2, MAX(DATE_EFF) OVER (PARTITION BY DACH2.pacmat, DACH2.NUMCNT) FROM DIC_ADM_CONTRAT_HISTO DACH2 ';
+ requete:=requete||' WHERE DACH2.NUMPAC = '''||p_numpac||''' and DACH2.DATE_EFF <= LAST_DAY(TO_DATE('''||p_periodepaie||''',''yyyymmdd'')) and DACH2.DATE_SORTIE_SIT_BO >= ADD_MONTHS(TO_DATE('''||p_periodepaie||''',''yyyymmdd''),-'||p_nb_mois_paie_init||') ';
+ if lig_mapta.tablephy in ('DIC_ADM_CONTRAT','DIC_ADM_CONTRAT_HISTO','DIC_ADM_CONTRAT_SITU') THEN
+ requete:=requete||' ) DACH   where PH.pacmat=DACH.pacmat and NVL(DACH.DRPAI2,''B'')=''B'' AND PH.NUMPAC=DACH.NUMPAC AND PH.NUMCNT=DACH.NUMCNT ) ' ;
+ ELSE
+ requete:=requete||' ) DACH   where PH.pacmat=DACH.pacmat and NVL(DACH.DRPAI2,''B'')=''B'' AND PH.NUMPAC=DACH.NUMPAC ) ' ;
+ END IF;
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'Suppression des DRPAIE2=''B'' de la PHOTO',requete);
+ EXECUTE_IMMEDIATE_STRING( requete,0);
+ END IF;
+ -- Fin
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'TGE_GENERATION_PHOTO_DACS *** '||p_numpac||' *** End *** '||lig_mapta.tablephy,null);
+ 
+ 
+ EXCEPTION
+ WHEN OTHERS THEN
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'TGE_GENERATION_PHOTO_DACS : '||lig_mapta.tablephy ||' )' , 'Une erreur est survenue lors de la génération photo de la table '||lig_mapta.tablephy||'. Veuillez consulter la table TGE_FSED_ERREUR.');
+ FSED.FSED_ERREUR(p_id,'TGE_GENERATION_PHOTO_DACS:'||lig_mapta.tablephy,P_NUMPAC,SQLCODE||'-'||SQLERRM);
+ -- pour pouvoir suivre le traitement de génération photo sur le reste des tables après le catch de l'exception
+ -- il suffit de commenter le 'raise'
+ raise;
+ END ;
+ 
+ END LOOP;
+ 
+ CLOSE cur_mapta;
+ 
+ END TGE_GENERATION_PHOTO_DACS;
+ 

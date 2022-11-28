@@ -1,0 +1,78 @@
+##
+TAG_CHARSET=@€éèç
+##
+ORG_CM_ENTITE_OPEN_TO_NIV
+=SQL=
+create or replace
+TRIGGER "ORG_CM_ENTITE_OPEN_TO_NIV" AFTER INSERT OR UPDATE
+ON STD_STRUC_ENTITE_OPEN FOR EACH ROW
+declare 
+-- trigger qui modifie dans la table de niveau appropriée les dates d'ouverture et de fermeture
+derNiv       NUMBER        :=0 ;
+codts  NUMBER        :=0 ;
+LE$trop_long exception ;
+pragma exception_init( LE$trop_long, -12899 ) ;
+BEGIN
+-- recuperation du niveau
+   begin 
+    select Sn.niveau,Sn.CODTS into derNiv,codts from  std_struc_entite se, std_struc_niv sn 
+    where se.type_entite=sn.type_entite 
+     and to_char(SYSDATE,'yyyymmdd') between se.date_eff and se.date_fin 
+    and to_char(SYSDATE,'yyyymmdd') between sn.date_eff and sn.date_fin 
+       and se.code_entite=:new.CODE_ENTITE;
+      --dbms_output.put_line('derNiv : '||derNiv);
+      --FIXME utiliser la procédure trace_dbms_output()
+     exception
+     when no_data_found then
+     --dbms_output.put_line('ici'||derNiv);
+     --FIXME utiliser la procédure trace_dbms_output()
+     NULL;
+     when others then
+     --dbms_output.put_line('pas de niveau');
+     --FIXME utiliser la procédure trace_dbms_output()
+     NULL;
+    end;
+      --dbms_output.put_line('autre begin');
+      --FIXME utiliser la procédure trace_dbms_output()
+   BEGIN
+         if derNiv =1 then 
+  --mise à jour dans NIV1
+           --dbms_output.put_line('avant update niv1 : '||:new.DATE_OUV);
+           --FIXME utiliser la procédure trace_dbms_output()
+           update NIV1 set DATE_OUV=:new.DATE_OUV,DATE_FERM=:new.DATE_FERM where CODTS=codts and CODNIV1=:new.CODE_ENTITE ;
+          end if;
+           if derNiv =2 then 
+  --mise à jour dans NIV2
+            update NIV2 set DATE_OUV=:new.DATE_OUV,DATE_FERM=:new.DATE_FERM where CODTS=codts and CODNIV2=:new.CODE_ENTITE ;
+         end if;
+  --mise à jour dans NIV3
+         if derNiv =3 then 
+            update NIV3 set DATE_OUV=:new.DATE_OUV,DATE_FERM=:new.DATE_FERM where CODTS=codts and CODNIV3=:new.CODE_ENTITE ;
+       end if;
+         --insertion dans NIV4
+    if derNiv =4 then 
+            update NIV4 set DATE_OUV=:new.DATE_OUV,DATE_FERM=:new.DATE_FERM where CODTS=codts and CODNIV4=:new.CODE_ENTITE ;
+        end if;
+  --mise à jour dans NIV5
+    if derNiv =5 then 
+            update NIV5 set DATE_OUV=:new.DATE_OUV,DATE_FERM=:new.DATE_FERM where CODTS=codts and CODNIV5=:new.CODE_ENTITE ;
+      end if;
+  --mise à jour dans NIV6
+           if derNiv =6 then 
+            update NIV6 set DATE_OUV=:new.DATE_OUV,DATE_FERM=:new.DATE_FERM where CODTS=codts and CODNIV6=:new.CODE_ENTITE ;
+     end if;
+      exception
+when LE$trop_long then
+  --dbms_output.put_line('problème de mise à jour lié à non existance probable dans table de niveau');
+  --FIXME utiliser la procédure trace_dbms_output()
+  NULL;
+  When OTHERS then
+   --dbms_output.put_line('problème de mise à jour lié à non existance probable dans table de niveau');
+   --FIXME utiliser la procédure trace_dbms_output()
+   null;
+end ;
+END;
+##
+ORG_CM_ENTITE_OPEN_TO_NIV
+=SQL=
+DROP TRIGGER ORG_CM_ENTITE_OPEN_TO_NIV

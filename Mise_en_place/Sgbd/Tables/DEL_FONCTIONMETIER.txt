@@ -1,0 +1,39 @@
+##
+TAG_CHARSET=@€ιθη
+##
+DEL_FONCTIONMETIER
+==
+DELETE FROM DEL_FONCTIONMETIER WHERE CODE_FCTMETIER =-1
+-1,'Modules/AdpUx/UxTeamMgr.jsp','E'
+-1,'Modules/AdpUx/UxProfileMgr.jsp','E'
+-1,'Modules/AdpUx/UxCertificateMgr.jsp','E'
+-1,'Modules/AdpUx/UxFamilyMgr.jsp','E'
+-1,'Modules/AdpUx/UxPayMgr.jsp','E'
+-1,'Modules/AdpUx/UxPayBankMgr.jsp','E'
+-1,'Modules/AdpUx/UxPayAdvanceMgr.jsp','E'
+##
+DEL_FONCTIONMETIER
+==
+DELETE FROM DEL_FONCTIONMETIER WHERE CODE_FCTMETIER =-2
+-2,'Modules/AdpUx/UxPtoMgr.jsp','E'
+-2,'Modules/AdpUx/UxPlanningMgr.jsp','E'
+-2,'Modules/AdpUx/UxTimeBIMgr.jsp','E'
+##
+DEL_FONCTIONMETIER
+==
+DELETE FROM DEL_FONCTIONMETIER WHERE CODE_FCTMETIER =-2 AND ID_ECRANPROCESSUS in ('Modules/AdpUx/UxTimesheetMgr.jsp','Modules/AdpUx/UxCalendarMgr.jsp')
+-2,'Modules/AdpUx/UxTimesheetMgr.jsp','E'
+-2,'Modules/AdpUx/UxCalendarMgr.jsp','E'
+##
+DEL_FONCTIONMETIER
+==
+DELETE FROM DEL_FONCTIONMETIER WHERE CODE_FCTMETIER in (-1,-3,-4)
+-1,'Modules/AdpUx/UxTeamMgr.jsp','E'
+-1,'Modules/AdpUx/UxProfileMgr.jsp','E'
+-1,'Modules/AdpUx/UxFamilyMgr.jsp','E'
+-1,'Modules/AdpUx/UxPayMgr.jsp','E'
+-1,'Modules/AdpUx/UxPayBankMgr.jsp','E'
+-3,'Modules/AdpUx/UxPayAdvanceMgr.jsp','E'
+-3,'Modules/AdpUx/UxTeamMgr.jsp','E'
+-4,'Modules/AdpUx/UxCertificateMgr.jsp','E'
+-4,'Modules/AdpUx/UxTeamMgr.jsp','E'

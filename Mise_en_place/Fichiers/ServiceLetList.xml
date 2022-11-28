@@ -1,0 +1,3686 @@
+<?xml version="1.0" ?>
+<!DOCTYPE All [ 
+<!ELEMENT All (ServiceLetList+,JSONServiceLetList+,ExterneModulDescriptors*,Jsp_Tag_OK_List+)>
+<!ELEMENT ServiceLetList (ServiceLet+,interpreter+)>
+<!ELEMENT ServiceLet (Synonyme)>
+<!ELEMENT interpreter (Synonyme)>
+<!ELEMENT Synonyme (#PCDATA)>
+
+<!ATTLIST ServiceLet Name CDATA #REQUIRED>
+<!ATTLIST interpreter Name CDATA #REQUIRED>
+
+<!ELEMENT JSONServiceLetList (JSONServiceLet+)>
+<!ELEMENT JSONServiceLet (JSONSynonyme)>
+<!ELEMENT JSONSynonyme (#PCDATA)>
+<!ATTLIST JSONServiceLet Name CDATA #REQUIRED>
+
+<!ELEMENT ExterneModulDescriptors (ExterneModulDescriptor+)>
+<!ATTLIST ExterneModulDescriptor name CDATA #REQUIRED>
+<!ATTLIST ExterneModulDescriptor vesrionWeb CDATA #REQUIRED>
+
+<!ELEMENT WebSERVServiceLetList (WebSERVServiceLet+)>
+<!ELEMENT WebSERVServiceLet (WebSERVSynonyme)>
+<!ELEMENT WebSERVSynonyme (#PCDATA)>
+<!ATTLIST WebSERVServiceLet Name CDATA #REQUIRED>
+
+<!ELEMENT Jsp_Tag_OK_List (Jsp_Tag_OK+)>
+<!ELEMENT Jsp_Tag_OK (#PCDATA)>
+<!ATTLIST Jsp_Tag_OK Name CDATA #REQUIRED>
+<!ATTLIST Jsp_Tag_OK FieldName CDATA #REQUIRED>
+]>
+<All>
+<ServiceLetList>
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.accueil.AccueilDynamiqueServiceLet">
+<Synonyme>AccueilDynamiqueServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.accueil.AccueilDynamiqueSsLiensServiceLet">
+<Synonyme>AccueilDynamiqueSsLiensServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.accueil.PersoAccueilServiceLet">
+<Synonyme>PersoAccueilServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.accueil.PersoAccueilCMSServiceLet">
+<Synonyme>PersoAccueilCMSServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.accueil.AlerteAccueilServiceLet">
+<Synonyme>AlerteAccueilServiceLet</Synonyme>
+</ServiceLet>
+
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.accueil.AdministrationAccueilServiceLet">
+<Synonyme>AdministrationAccueilServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.accueil.AdministrationParametrageAccueilServiceLet">
+<Synonyme>AdministrationParametrageAccueilServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.StdErreurServiceLet">
+<Synonyme>StdErreurServiceLet</Synonyme>
+</ServiceLet>	
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.StdErreurServiceLetCMS">
+<Synonyme>StdErreurServiceLetCMS</Synonyme>
+</ServiceLet>					
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.StatsPagesServiceLet">
+<Synonyme>StatsPagesServiceLet</Synonyme>
+</ServiceLet>	     
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.StatGraphServicelet">
+<Synonyme>StatGraphServicelet</Synonyme>
+</ServiceLet>	     
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.StatsIDatesServiceLet">
+<Synonyme>StatsIDatesServiceLet</Synonyme>
+</ServiceLet>
+	 
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.TracesHostServiceLet">
+<Synonyme>TracesHostServiceLet</Synonyme>
+</ServiceLet>
+	 
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.VosAlertExpertServiceLet">
+<Synonyme>VosAlertExpertServiceLet</Synonyme>
+</ServiceLet>	 
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.GestSchTablServiceLet">
+<Synonyme>GestSchTablServiceLet</Synonyme>
+</ServiceLet>	 
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.GestSchMenuServiceLet">
+<Synonyme>GestSchMenuServiceLet</Synonyme>
+</ServiceLet>	
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.GestSchMenuCMServiceLet">
+<Synonyme>GestSchMenuCMServiceLet</Synonyme>
+</ServiceLet>	
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.GestSchTableCMServiceLet">
+<Synonyme>GestSchTableCMServiceLet</Synonyme>
+</ServiceLet>	
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.TracesDownloadServiceLet">
+<Synonyme>TracesDownloadServiceLet</Synonyme>
+</ServiceLet>	
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.pagesModalServiceLet">
+<Synonyme>pagesModalServiceLet</Synonyme>
+</ServiceLet>	
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.pagesModalServiceLetCMS">
+<Synonyme>pagesModalServiceLetCMS</Synonyme>
+</ServiceLet>	
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.GestElemServiceLet">
+<Synonyme>GestElemServiceLet</Synonyme>
+</ServiceLet>	
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.GestElemCMServiceLet">
+<Synonyme>GestElemCMServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.GestionProfilServiceLet">
+<Synonyme>GestionProfilServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.GestionProfilCMServiceLet">
+<Synonyme>GestionProfilCMServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.GestionProfilRoleServiceLet">
+<Synonyme>GestionProfilRoleServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.visuSchemaServiceLet">
+<Synonyme>visuSchemaServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.VisuExpertServiceLet">
+<Synonyme>VisuExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.GestBandauxServiceLet">
+<Synonyme>GestBandauxServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.GestionBandeauxCMServiceLet">
+<Synonyme>GestionBandeauxCMServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.ConfigUserNSServiceLet">
+<Synonyme>ConfigUserNSServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.DetailUserServiceLet">
+<Synonyme>DetailUserServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.UserInGestilServiceLet">
+<Synonyme>UserInGestilServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.SearchUserServiceLet">
+<Synonyme>SearchUserServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.GestionNivStructServiceLet">
+<Synonyme>GestionNivStructServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.GestionPagesMiServiceLet">
+<Synonyme>GestionPagesMiServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.DeplacElemServiceLet">
+<Synonyme>DeplacElemServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.GestionUser_WDServiceLet">
+<Synonyme>GestionUser_WDServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.GestionUser_WD_CMServiceLet">
+<Synonyme>GestionUser_WD_CMServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.GestionWebDirServiceLet">
+<Synonyme>GestionWebDirServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.GestionWebDirCMServiceLet">
+<Synonyme>GestionWebDirCMServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.ModifLibElemServiceLet">
+<Synonyme>ModifLibElemServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.GestionEcransLogiquesServiceLet">
+<Synonyme>GestionEcransLogiquesServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.EcranLogiqueCMServiceLet">
+<Synonyme>EcranLogiqueCMServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.PublicationAlertExpertServiceLet">
+<Synonyme>PublicationAlertExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.PublicationAlertExpertCMSServiceLet">
+<Synonyme>PublicationAlertExpertCMSServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.GestionAppelsTableServiceLet">
+<Synonyme>GestionAppelsTableServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.SecuDomaineFormationServiceLet">
+<Synonyme>SecuDomaineFormationServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.DemandeRetourReferentielServiceLet">
+<Synonyme>DemandeRetourReferentielServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.ConnexionStatutServiceLet">
+<Synonyme>ConnexionStatutServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.ElementPurgeCMSServiceLet">
+<Synonyme>ElementPurgeCMSServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.objects.Traitement_FichierAPurgerSousRep">
+<Synonyme>Traitement_FichierAPurgerSousRep</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.objects.purge.Traitement_PurgeTableGapTrtDoc">
+<Synonyme>Traitement_PurgeTableGapTrtDoc</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.traitement.Traitement_ETL">
+<Synonyme>Traitement_ETL</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.objects.purge.Traitement_Purge_SYS_DEF_PURGE_TBL">
+<Synonyme>Traitement_Purge_SYS_DEF_PURGE_TBL</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.maj_si.ExportElementServiceLet">
+<Synonyme>ExportElementServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.maj_si.ExportEnsembleServiceLet">
+<Synonyme>ExportEnsembleServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.maj_si.ExportLancementServiceLet">
+<Synonyme>ExportLancementServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.maj_si.ExportElementCMSServiceLet">
+<Synonyme>ExportElementCMSServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.maj_si.ExportEnsembleCMSServiceLet">
+<Synonyme>ExportEnsembleCMSServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.maj_si.ExportEnsembleDetailCMSServiceLet">
+<Synonyme>ExportEnsembleDetailCMSServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.maj_si.ExportCMSServiceLet">
+<Synonyme>ExportCMSServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.maj_si.ExportDossierServiceLet">
+<Synonyme>ExportDossierServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.maj_si.ExportDossierCMSServiceLet">
+<Synonyme>ExportDossierCMSServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.maj_si.ExportParamDynamiqueServiceLet">
+<Synonyme>ExportParamDynamiqueServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.purge.ParametragePurgeTablesServiceLet">
+<Synonyme>ParametragePurgeTablesServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.purge.ParametragePurgeTablesAjoutModifServiceLet">
+<Synonyme>ParametragePurgeTablesAjoutModifServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.purge.ParametragePurgeTablesAjoutModifTableLieeServiceLet">
+<Synonyme>ParametragePurgeTablesAjoutModifTableLieeServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.TestSecuServiceLet">
+<Synonyme>TestSecuServiceLet</Synonyme>
+</ServiceLet>	
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.TestGenerePageServiceLet">
+<Synonyme>TestGenerePageServiceLet</Synonyme>
+</ServiceLet>	
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.CoherenceEnvironnementServiceLet">
+<Synonyme>CoherenceEnvironnementServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.CoherenceEnvironnementCMSServiceLet">
+<Synonyme>CoherenceEnvironnementCMSServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.gestionExcel.XlsDocModelServiceLet">
+<Synonyme>XlsDocModelServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.gestionExcel.ModelDuplicationServiceLet">
+<Synonyme>ModelDuplicationServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.gestionExcel.XlsSheetModelServiceLet">
+<Synonyme>XlsSheetModelServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.gestionExcel.LabelsEditorServiceLet">
+<Synonyme>LabelsEditorServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.docserver.EditionDSLancementServiceLet">
+<Synonyme>EditionDSLancementServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.UserServiceLet">
+<Synonyme>UserServiceLet</Synonyme>
+</ServiceLet>
+
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.ContratCourantProfAjoutServiceLet">
+<Synonyme>ContratCourantProfAjoutStdServiceLet</Synonyme>
+</ServiceLet>
+
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.paramecrandyn.ParametrageReglesGestionServiceLet">
+<Synonyme>ParametrageReglesGestionServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.paramecrandyn.HistoriquesDesProjetsServiceLet">
+<Synonyme>HistoriquesDesProjetsServiceLet</Synonyme>
+</ServiceLet>
+
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.objects.diffusion.Traitement_DiffusionDocument">
+<Synonyme>Traitement_DiffusionDocument</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.structures.importexport.Traitement_ValidationImportStructuresEntite">
+<Synonyme>Traitement_ValidationImportStructuresEntite</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.structures.importexport.Traitement_ValidationImportStructuresArbre">
+<Synonyme>Traitement_ValidationImportStructuresArbre</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.structures.importexport.Traitement_ValidationImportStructuresResponsable">
+<Synonyme>Traitement_ValidationImportStructuresResponsable</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.structures.importexport.Traitement_ValidationImportStructuresAffectation">
+<Synonyme>Traitement_ValidationImportStructuresAffectation</Synonyme>
+</ServiceLet>
+<ServiceLet Name="fr.adp.com.gxp.std.mot_tech.lib.optiSecu.Traitement_OptiSecu">
+<Synonyme>Traitement_OptiSecu</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.alert.batch.Traitement_Alerte">
+<Synonyme>Traitement_Alerte</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.alert.batch.Traitement_AlerteEmail">
+<Synonyme>Traitement_AlerteEmail</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.dpae.batch.Traitement_Dpae">
+<Synonyme>Traitement_Dpae</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.TestMailServiceLet">
+<Synonyme>TestMailServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.delegation.DelegationServiceLet">
+<Synonyme>DelegationServiceLet</Synonyme>
+</ServiceLet>
+
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.edition.ReqEditionsCServiceLet">
+<Synonyme>ReqEditionsCServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.edition.ReqEditionsJKServiceLet">
+<Synonyme>ReqEditionsJKServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.edition.DashboardGrapheServiceLet">
+<Synonyme>DashboardGrapheServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.edition.DashboardGrapheAdminServiceLet">
+<Synonyme>DashboardGrapheAdminServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.edition.ReqEditionsServiceLet">
+<Synonyme>ReqEditionsServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.edition.DashboardToolServiceLet">
+<Synonyme>DashboardToolServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.edition.DashboardToolCMSServiceLet">
+<Synonyme>DashboardToolCMSServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.edition.ReqEditionsTestCServiceLet">
+<Synonyme>ReqEditionsTestCServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.edition.ReqEditionsFCTServiceLet">
+<Synonyme>ReqEditionsFCTServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.edition.TemplatesEditionServiceLet">
+<Synonyme>TemplatesEditionServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.edition.ReqTexteModeleServiceLet">
+<Synonyme>ReqTexteModeleServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.edition.ModelePlanningServiceLet">
+<Synonyme>ModelePlanningServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.edition.ReqResultatServiceLet">
+<Synonyme>ReqResultatServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.edition.EtatsDeSortieServiceLet">
+<Synonyme>EtatsDeSortieServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.edition.FamilleEditionAjoutServiceLet">
+<Synonyme>FamilleEditionAjoutServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.edition.ReqEditionsListePeopleServiceLet">
+<Synonyme>ReqEditionsListePeopleServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.enquete.EnqueteAccServiceLet">
+<Synonyme>EnqueteAccServiceLet</Synonyme>
+</ServiceLet>
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.enquete.PublicationEnqueteServiceLet">
+<Synonyme>PublicationEnqueteServiceLet</Synonyme>
+</ServiceLet>
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.enquete.PublicationEnqueteCMSServiceLet">
+<Synonyme>PublicationEnqueteCMSServiceLet</Synonyme>
+</ServiceLet>
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.enquete.PublicationEnqueteQuestServiceLet">
+<Synonyme>PublicationEnqueteQuestServiceLet</Synonyme>
+</ServiceLet>
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.enquete.RepondreServiceLet">
+<Synonyme>RepondreServiceLet</Synonyme>
+</ServiceLet>
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.enquete.ResultatsEnqServiceLet">
+<Synonyme>ResultatsEnqServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.HelpDesk.HelpDeskCMSServiceLet">
+<Synonyme>HelpDeskCMSServiceLet</Synonyme>
+</ServiceLet>	
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.HelpDesk.HelpDeskServiceLet">
+<Synonyme>HelpDeskServiceLet</Synonyme>
+</ServiceLet>
+
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.images.PersoImageServiceLet">
+<Synonyme>PersoImageServiceLet</Synonyme>
+</ServiceLet>
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.images.PersoImageCMSServiceLet">
+<Synonyme>PersoImageCMSServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.images.ImageDispoServiceLet">
+<Synonyme>ImageDispoServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.images.PhotoMatriculeServiceLet">
+<Synonyme>PhotoMatriculeServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.index.IndexRechercheChainageAdminPopUpPagesServiceLet">
+<Synonyme>IndexRechercheChainageAdminPopUpPagesServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.index.IndexRechercheChainageAdminPopUpChainagesServiceLet">
+<Synonyme>IndexRechercheChainageAdminPopUpChainagesServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.index.IndexRechercheChainageAdminPopUpFiltresServiceLet">
+<Synonyme>IndexRechercheChainageAdminPopUpFiltresServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.index.IndexRechercheChainageAdminServiceLet">
+<Synonyme>IndexRechercheChainageAdminServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.index.IndexRechercheChainageServiceLet">
+<Synonyme>IndexRechercheChainageServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.mailing.DefMailCMSServiceLet">
+<Synonyme>DefMailCMSServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.mailing.MsgGestionCMSServiceLet">
+<Synonyme>MsgGestionCMSServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.mailing.MsgGestionDetailServiceLet">
+<Synonyme>MsgGestionDetailServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.mailing.MsgGestionServiceLet">
+<Synonyme>MsgGestionServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.mailing.DefMailDetailServiceLet">
+<Synonyme>DefMailDetailServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.mailing.DefBranchMailGenServiceLet">
+<Synonyme>DefBranchMailGenServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.mailing.DefBranchMailGenChooseServiceLet">
+<Synonyme>DefBranchMailGenChooseServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.mailing.DefMailParamFctCMSServiceLet">
+<Synonyme>DefMailParamFctCMSServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.mailing.DefMailServiceLet">
+<Synonyme>DefMailServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_tech.lib.mail.Traitement_envoiMail">
+<Synonyme>Traitement_envoiMail</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_tech.lib.mail.Traitement_MailIncoherences">
+<Synonyme>Traitement_MailIncoherences</Synonyme>
+</ServiceLet>
+
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gap.administratif.common.ListeDiffusionServiceLet">
+<Synonyme>ListeDiffusionStdServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gap.administratif.AttestSimpleServiceLet">
+<Synonyme>AttestSimpleStdServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_tech.lib.deploiement.Traitement_deploiement">
+<Synonyme>Traitement_deploiement</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.dpae.DPAEServiceLet">
+<Synonyme>DPAEServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.dpae.DPAEVisuServiceLet">
+<Synonyme>DPAEVisuServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.dpae.DPAEHistoServiceLet">
+<Synonyme>DPAEHistoServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.objects.dpae.traitements.Traitement_DPAE">
+<Synonyme>Traitement_DPAE</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.objects.dpae.traitements.Traitement_DPAE_AR">
+<Synonyme>Traitement_DPAE_AR</Synonyme>
+</ServiceLet>
+
+
+<interpreter Name="fr.adp.com.gxp.std.modules.lib.servicelet.gap.interpreteur.ENFInterpreteur">
+<Synonyme>ENFInterpreteur</Synonyme>
+</interpreter>
+
+<interpreter Name="fr.adp.com.gxp.std.modules.lib.servicelet.gap.interpreteur.EDI_DPAE_Interpreteur">
+<Synonyme>EDI_DPAE_Interpreteur</Synonyme>
+</interpreter>
+
+<interpreter Name="fr.adp.com.gxp.std.modules.lib.servicelet.gap.interpreteur.EDI_GAP_Interpreteur">
+<Synonyme>EDI_GAP_Interpreteur</Synonyme>
+</interpreter>
+
+<interpreter Name="fr.adp.com.gxp.std.modules.lib.servicelet.gap.interpreteur.EMB_EDI_Interpreteur">
+<Synonyme>EMB_EDI_Interpreteur</Synonyme>
+</interpreter>
+
+<interpreter Name="fr.adp.com.gxp.std.modules.lib.servicelet.gap.interpreteur.AttestEdiInterpreter">
+<Synonyme>AttestEdiInterpreter</Synonyme>
+</interpreter>
+
+<interpreter Name="fr.adp.com.gxp.std.modules.lib.servicelet.gap.interpreteur.MAJ_FIN_EMB_Interpreteur">
+<Synonyme>MAJ_FIN_EMB_Interpreteur</Synonyme>
+</interpreter>
+
+<interpreter Name="fr.adp.com.gxp.std.modules.lib.servicelet.gap.interpreteur.MAJ_FIN_ANN_EMB_Interpreteur">
+<Synonyme>MAJ_FIN_ANN_EMB_Interpreteur</Synonyme>
+</interpreter>
+
+<interpreter Name="fr.adp.com.gxp.std.modules.lib.servicelet.gap.interpreteur.CNTCourantInterpreteur">
+<Synonyme>CNTCourantInterpreteur</Synonyme>
+</interpreter>
+
+<interpreter Name="fr.adp.com.gxp.std.modules.lib.servicelet.gap.interpreteur.MAJ_FIN_DEP_Interpreteur">
+<Synonyme>MAJ_FIN_DEP_Interpreteur</Synonyme>
+</interpreter>
+
+<interpreter Name="fr.adp.com.gxp.std.modules.lib.servicelet.gap.interpreteur.MAJ_HISTO_EMPLOI_Interpreteur">
+<Synonyme>MAJ_HISTO_EMPLOI_Interpreteur</Synonyme>
+</interpreter>
+
+<interpreter Name="fr.adp.com.gxp.std.modules.lib.servicelet.gap.interpreteur.ADZInterpreteur">
+<Synonyme>ADZInterpreteur</Synonyme>
+</interpreter>
+
+<interpreter Name="fr.adp.com.gxp.std.modules.lib.servicelet.gap.interpreteur.ZIZInterpreteur">
+<Synonyme>ZIZInterpreteur</Synonyme>
+</interpreter>
+
+<interpreter Name="fr.adp.com.gxp.std.modules.lib.servicelet.gap.interpreteur.PREInterpreteur">
+<Synonyme>PREInterpreteur</Synonyme>
+</interpreter>
+
+<interpreter Name="fr.adp.com.gxp.std.modules.lib.servicelet.gap.interpreteur.WKF_MODIF_CNT_SELECT_Interpreteur">
+<Synonyme>WKF_MODIF_CNT_SELECT_Interpreteur</Synonyme>
+</interpreter>
+
+<interpreter Name="fr.adp.com.gxp.std.modules.lib.servicelet.gap.interpreteur.WKF_SUSP_OP2_REPRISE_CONF_Interpreteur">
+<Synonyme>WKF_SUSP_OP2_REPRISE_CONF_Interpreteur</Synonyme>
+</interpreter>
+
+<interpreter Name="fr.adp.com.gxp.std.modules.lib.servicelet.gap.interpreteur.MAJ_FIN_ACOMPTE_Interpreteur">
+<Synonyme>MAJ_FIN_ACOMPTE_Interpreteur</Synonyme>
+</interpreter>
+
+<interpreter Name="fr.adp.com.gxp.std.modules.lib.servicelet.gap.structures.interpreteur.STEInterpreteur">
+<Synonyme>STEInterpreteur</Synonyme>
+</interpreter>
+
+<interpreter Name="fr.adp.com.gxp.std.modules.lib.servicelet.gap.structures.interpreteur.ETBInterpreteur">
+<Synonyme>ETBInterpreteur</Synonyme>
+</interpreter>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gap.GestionLHWServiceLet">
+<Synonyme>GestionLHWServiceLet</Synonyme>
+</ServiceLet>
+
+
+<interpreter Name="fr.adp.com.gxp.std.modules.lib.servicelet.gap.interpreteur.MassAvantageInterpreter">
+<Synonyme>MassAvantageInterpreter</Synonyme>
+</interpreter>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gap.traitement.SelectionPacMatServiceLet">
+<Synonyme>SelectionPacMatServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gap.traitement.SelectionPacMatCMSServiceLet">
+<Synonyme>SelectionPacMatCMSServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.AffectationEvenementServiceLet">
+<Synonyme>AffectationEvenementServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.AffectationEvenementAdministratifServiceLet">
+<Synonyme>AffectationEvenementAdministratifServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.AffectationEvenementStructureServiceLet">
+<Synonyme>AffectationEvenementStructureServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.AffectationPosteServiceLet">
+<Synonyme>AffectationPosteServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.AffectationPosteAjoutModifServiceLet">
+<Synonyme>AffectationPosteAjoutModifServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.AffectationPosteAjoutModifDerniereSituationServiceLet">
+<Synonyme>AffectationPosteAjoutModifDerniereSituationServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.AffectationSalarieAjoutServiceLet">
+<Synonyme>AffectationSalarieAjoutServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.AffectationSalarieAjoutModifLibreServiceLet">
+<Synonyme>AffectationSalarieAjoutModifLibreServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.AffectationSalarieModifServiceLet">
+<Synonyme>AffectationSalarieModifServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.AffectationSalarieServiceLet">
+<Synonyme>AffectationSalarieServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.AfficheNbEmploisParGrilleServiceLet">
+<Synonyme>AfficheNbEmploisParGrilleServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.AfficheNbPostesParGrilleServiceLet">
+<Synonyme>AfficheNbPostesParGrilleServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.AjoutModifGrilleServicelet">
+<Synonyme>AjoutModifGrilleServicelet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.AjoutModifCompetencesCollabServicelet">
+<Synonyme>AjoutModifCompetencesCollabServicelet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.graph.CompetencesMetierGraphServiceLet">
+<Synonyme>CompetencesMetierGraphServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.graph.CompetencesCollaborateurGraphServiceLet">
+<Synonyme>CompetencesCollaborateurGraphServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.CatalogueReferentielEmploiServiceLet">
+<Synonyme>CatalogueReferentielEmploiServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.CiblageFormationGPECServiceLet">
+<Synonyme>CiblageFormationGPECServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.ComparaisonPosteHommeServiceLet">
+<Synonyme>ComparaisonPosteHommeServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.ComparaisonPostePosteServiceLet">
+<Synonyme>ComparaisonPostePosteServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.graph.ComparaisonPosteHommeGraphServiceLet">
+<Synonyme>ComparaisonPosteHommeGraphServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.CompetencesCollaborateurServiceLet">
+<Synonyme>CompetencesCollaborateurServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.CompetencesMetierServiceLet">
+<Synonyme>CompetencesMetierServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.CompetenceMetierAjoutServiceLet">
+<Synonyme>CompetenceMetierAjoutServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.CompetenceMetierModifServiceLet">
+<Synonyme>CompetenceMetierModifServiceLet</Synonyme>
+</ServiceLet>
+
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.CompetenceActiviteAjoutServiceLet">
+<Synonyme>CompetenceActiviteAjoutServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.CompetenceActiviteModifServiceLet">
+<Synonyme>CompetenceActiviteModifServiceLet</Synonyme>
+</ServiceLet>
+
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.CompetencesReferentielServiceLet">
+<Synonyme>CompetencesReferentielServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.CompetencesProfilTypeServiceLet">
+<Synonyme>CompetencesProfilTypeServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.ReferentielCompetencesCategServiceLet">
+<Synonyme>ReferentielCompetencesCategServiceLet</Synonyme>
+</ServiceLet>
+
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.ReferentielCompetencesCategPopUpServiceLet">
+<Synonyme>ReferentielCompetencesCategPopUpServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.CompetencesServiceLet">
+<Synonyme>CompetencesServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.CompetencesNotationPopUpServiceLet">
+<Synonyme>CompetencesNotationPopUpServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.CompetencesValidationPopUpServiceLet">
+<Synonyme>CompetencesValidationPopUpServiceLet</Synonyme>
+</ServiceLet>
+
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.DiagnosticAnalyseProximiteServiceLet">
+<Synonyme>DiagnosticAnalyseProximiteServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.DiagnosticAuditServiceLet">
+<Synonyme>DiagnosticAuditServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.DiagnosticBudgetaireScenarioServiceLet">
+<Synonyme>DiagnosticBudgetaireScenarioServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.DiagnosticBudgetaireCMServiceLet">
+<Synonyme>DiagnosticBudgetaireCMServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.DiagnosticBudgetaireServiceLet">
+<Synonyme>DiagnosticBudgetaireServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.DiagnosticCompetencesServiceLet">
+<Synonyme>DiagnosticCompetencesServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.DiagnosticHommePosteServiceLet">
+<Synonyme>DiagnosticHommePosteServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.DiagnosticOrganigrammesServiceLet">
+<Synonyme>DiagnosticOrganigrammesServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.DiagnosticPasserellesMobiliteServiceLet">
+<Synonyme>DiagnosticPasserellesMobiliteServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.DiagnosticPosteHommeServiceLet">
+<Synonyme>DiagnosticPosteHommeServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.DiagnosticRatioTypeServiceLet">
+<Synonyme>DiagnosticRatioTypeServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.DiagnosticScenarioEffectifServiceLet">
+<Synonyme>DiagnosticScenarioEffectifServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.DiagnosticProjectionEffectifServiceLet">
+<Synonyme>DiagnosticProjectionEffectifServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.InformationAdresseStructureServiceLet">
+<Synonyme>InformationAdresseStructureServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.InformationPosteServiceLet">
+<Synonyme>InformationPosteServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.InformationCompetenceServiceLet">
+<Synonyme>InformationCompetenceServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.InformationCollabServiceLet">
+<Synonyme>InformationCollabServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.InformationReferentielServiceLet">
+<Synonyme>InformationReferentielServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.EvenementAdministratif_AdministratifServiceLet">
+<Synonyme>EvenementAdministratif_AdministratifServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.EvenementAdministratif_EntreeServiceLet">
+<Synonyme>EvenementAdministratif_EntreeServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.EvenementAdministratif_EntreeInfoServiceLet">
+<Synonyme>EvenementAdministratif_EntreeInfoServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.EvenementAdministratif_MutationServiceLet">
+<Synonyme>EvenementAdministratif_MutationServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.EvenementAdministratif_SortieInfoServiceLet">
+<Synonyme>EvenementAdministratif_SortieInfoServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.EvenementNoteServiceLet">
+<Synonyme>EvenementNoteServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.EvenementStructureInfoServiceLet">
+<Synonyme>EvenementStructureInfoServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.EvenementStructureServiceLet">
+<Synonyme>EvenementStructureServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.InformationHistoriquePosteServiceLet">
+<Synonyme>InformationHistoriquePosteServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.InformationHistoriqueCollabServiceLet">
+<Synonyme>InformationHistoriqueCollabServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.AjoutModifAccessoireServicelet">
+<Synonyme>AjoutModifAccessoireServicelet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.AjoutModifAvantageServicelet">
+<Synonyme>AjoutModifAvantageServicelet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.AjoutModifTacheServicelet">
+<Synonyme>AjoutModifTacheServicelet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.LienCartographieServiceLet">
+<Synonyme>LienCartographieServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.AjoutLienCartographieServicelet">
+<Synonyme>AjoutLienCartographieServicelet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.LienSatelliteCMSServiceLet">
+<Synonyme>LienSatelliteCMSServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.LienSatelliteServiceLet">
+<Synonyme>LienSatelliteServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.RechercheFamilleMetierServiceLet">
+<Synonyme>RechercheFamilleMetierServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.RechercheModelePosteServiceLet">
+<Synonyme>RechercheModelePosteServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.DescriptionServiceLet">
+<Synonyme>DescriptionServicelet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.DescriptionModeleServiceLet">
+<Synonyme>DescriptionModeleServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.RechercheEmploiLocalServiceLet">
+<Synonyme>RechercheEmploiLocalServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.RechercheEmploiTypeServiceLet">
+<Synonyme>RechercheEmploiTypeServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.RechercheFamilleCompetenceServiceLet">
+<Synonyme>RechercheFamilleCompetenceServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.RechercheMetierServiceLet">
+<Synonyme>RechercheMetierServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.RechercheStructServiceLet">
+<Synonyme>RechercheStructServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.ReferentielDocumentationServiceLet">
+<Synonyme>ReferentielDocumentationServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.ReferentielEmploiContraintesServiceLet">
+<Synonyme>ReferentielEmploiContraintesServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.ReferentielEmploiLocalServiceLet">
+<Synonyme>ReferentielEmploiLocalServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.ReferentielEmploiTachesServiceLet">
+<Synonyme>ReferentielEmploiTachesServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.ReferentielEmploiTypeServiceLet">
+<Synonyme>ReferentielEmploiTypeServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.ReferentielFamilleMetierServiceLet">
+<Synonyme>ReferentielFamilleMetierServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.ReferentielGrilleSalaireServiceLet">
+<Synonyme>ReferentielGrilleSalaireServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.ReferentielGrilleSalaireVueAnnuelleServiceLet">
+<Synonyme>ReferentielGrilleSalaireVueAnnuelleServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.ReferentielCompetencesGroupeServiceLet">
+<Synonyme>ReferentielCompetencesGroupeServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.ReferentielMetierServiceLet">
+<Synonyme>ReferentielMetierServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.ReferentielPosteServiceLet">
+<Synonyme>ReferentielPosteServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.ModelePosteServiceLet">
+<Synonyme>ModelePosteServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.NotationServiceLet">
+<Synonyme>NotationServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.PonderationServiceLet">
+<Synonyme>PonderationServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.ProfilCompetenceModifServiceLet">
+<Synonyme>ProfilCompetenceModifServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.ProfilCompetenceAjoutServiceLet">
+<Synonyme>ProfilCompetenceAjoutServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.ValidationServiceLet">
+<Synonyme>ValidationServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.ReferentielStructureGeographieServiceLet">
+<Synonyme>ReferentielStructureGeographieServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.SuiviReferentielServiceLet">
+<Synonyme>SuiviReferentielServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.AffectationEmploiServiceLet">
+<Synonyme>AffectationEmploiServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.SuiviStructureServiceLet">
+<Synonyme>SuiviStructureServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.GestionReferentielServiceLet">
+<Synonyme>GestionReferentielServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.GestionReferentielPopUpServiceLet">
+<Synonyme>GestionReferentielPopUpServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.CiblageFormationGPECPopUpServiceLet">
+<Synonyme>CiblageFormationGPECPopUpServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.CiblageCompetencesGPECServiceLet">
+<Synonyme>CiblageCompetencesGPECServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.BilanFormationServiceLet">
+<Synonyme>BilanFormationServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.BilanCompetencesServiceLet">
+<Synonyme>BilanCompetencesServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.CompetencesCollaborateurAjoutPosteServiceLet">
+<Synonyme>CompetencesCollaborateurAjoutPosteServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.InformationDescCompServiceLet">
+<Synonyme>InformationDescCompServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.TacheCommentaireServiceLet">
+<Synonyme>TacheCommentaireServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gpec.CartographiePasserelleDetailsServiceLet">
+<Synonyme>CartographiePasserelleDetailsServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.objects.gta.cad.traitement.Traitement_PropagationParamCAD_aux_Matricules">
+<Synonyme>Traitement_PropagationParamCAD_aux_Matricules</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gta.cad.param.ListeCompteursExpertServiceLet">
+<Synonyme>ListeCompteursExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gta.cad.param.DefinirCompteurServiceLet">
+<Synonyme>DefinirCompteurServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gta.cad.param.CreationCompteurServiceLet">
+<Synonyme>CreationCompteurServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gta.cad.param.DetailCompteurServiceLet">
+<Synonyme>DetailCompteurServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gta.cad.param.ThemeCompteursSalarieServiceLet">
+<Synonyme>ThemeCompteursSalarieServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gta.cad.param.ThemeCompteursSalarieModServiceLet">
+<Synonyme>ThemeCompteursSalarieModServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gta.cad.SituationCompteurServiceLet">
+<Synonyme>SituationCompteurServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gta.cad.SituationCompteurPlaServiceLet">
+<Synonyme>SituationCompteurPlaServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gta.cad.param.DefinirBasculeServiceLet">
+<Synonyme>DefinirBasculeServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gta.cad.param.ListeBasculesExpertServiceLet">
+<Synonyme>ListeBasculesExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gta.cad.param.CreationBasculeServiceLet">
+<Synonyme>CreationBasculeServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gta.cad.param.CopierCompteurServiceLet">
+<Synonyme>CopierCompteurServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gta.cad.param.CreationThemeServiceLet">
+<Synonyme>CreationThemeServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gta.cad.param.ChangerOrdreServiceLet">
+<Synonyme>ChangerOrdreServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gta.cad.param.ListeTypePeriodeServiceLet">
+<Synonyme>ListeTypePeriodeServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gta.cad.param.CreationModificationTypePeriodeServiceLet">
+<Synonyme>CreationModificationTypePeriodeServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gta.cad.param.VisuTablesFinalesCompteursCADServiceLet">
+<Synonyme>VisuTablesFinalesCompteursCADServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gta.cad.param.DefinirParamPopReglesMajServiceLet">
+<Synonyme>DefinirParamPopReglesMajServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gta.cad.param.DefinirParamPopReglesMajCMSServiceLet">
+<Synonyme>DefinirParamPopReglesMajCMSServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gta.cad.param.CreationEvtDeclenchServiceLet">
+<Synonyme>CreationEvtDeclenchServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gta.cad.param.CreationEvtDeclenchCMSServiceLet">
+<Synonyme>CreationEvtDeclenchCMSServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.objects.gta.mjou.TraitementFinJournee.Traitement_RecalculCompteur">
+<Synonyme>Traitement_RecalculCompteur</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gta.cad.param.ListeTypeUniteServiceLet">
+<Synonyme>ListeTypeUniteServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gta.cad.param.CreationModificationTypeUniteServiceLet">
+<Synonyme>CreationModificationTypeUniteServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.structures.importexport.GestionImportExportStructuresServiceLet">
+	<Synonyme>GestionImportExportStructuresServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.structures.importexport.ExportStructuresServiceLet">
+	<Synonyme>ExportStructuresServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.structures.importexport.ImportStructuresServiceLet">
+	<Synonyme>ImportStructuresServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.structures.importexport.ConsultationFeuilleChargeeArbreServiceLet">
+	<Synonyme>ConsultationFeuilleChargeeArbreServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.structures.importexport.ConsultationFeuilleChargeeEntiteServiceLet">
+	<Synonyme>ConsultationFeuilleChargeeEntiteServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.structures.importexport.ConsultationFeuilleChargeeResponsableServiceLet">
+	<Synonyme>ConsultationFeuilleChargeeResponsableServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.structures.importexport.ConsultationFeuilleChargeeAffectationServiceLet">
+	<Synonyme>ConsultationFeuilleChargeeAffectationServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.structures.importexport.ValidationImportStructuresServiceLet">
+	<Synonyme>ValidationImportStructuresServiceLet</Synonyme>
+</ServiceLet>
+
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.objects.structures.Traitement_MajOrganizationStructuresHeritees">
+	<Synonyme>Traitement_MajOrganizationStructuresHeritees</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.objects.structures.Traitement_DefragmentationStdStrucIndex">
+	<Synonyme>Traitement_DefragmentationStdStrucIndex</Synonyme>
+</ServiceLet><ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.ElementPaieAjoutServiceLet">
+<Synonyme>ElementPaieAjoutServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.ElementPaieModifServiceLet">
+<Synonyme>ElementPaieModifServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.iframe.I_ChargerInfoEltPaieServiceLet">
+<Synonyme>I_ChargerInfoEltPaieServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.ImputationEltAjoutServiceLet">
+<Synonyme>ImputationEltAjoutServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.ImputationEltModifServiceLet">
+<Synonyme>ImputationEltModifServiceLet</Synonyme>
+</ServiceLet>
+
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.GestionFeuillesImportExportServiceLet">
+<Synonyme>GestionFeuillesImportExportServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.ZTGEExportServiceLet">
+<Synonyme>ZTGEExportServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.ZTGEImportServiceLet">
+<Synonyme>ZTGEImportServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.ConsultationFeuilleChargeeEZServiceLet">
+<Synonyme>ConsultationFeuilleChargeeEZServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.GestionFeuillesImportExportPreControleServiceLet">
+<Synonyme>GestionFeuillesImportExportPreControleServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.GestionFeuillesImportExportChargementServiceLet">
+<Synonyme>GestionFeuillesImportExportChargementServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.DonneeElementPaieAjoutServiceLet">
+<Synonyme>DonneeElementPaieAjoutServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.DonneeElementPaieModifServiceLet">
+<Synonyme>DonneeElementPaieModifServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.iframe.I_ContexteRubriqueServiceLet">
+<Synonyme>I_ContexteRubriqueServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.iframe.I_ChargerInfoRubServiceLet">
+<Synonyme>I_ChargerInfoRubServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.ConsultationFeuilleChargeeServiceLet">
+<Synonyme>ConsultationFeuilleChargeeServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.ConsultationFeuilleChargeeGAPServiceLet">
+<Synonyme>ConsultationFeuilleChargeeGAPServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.ImportZadigDataServiceLet">
+<Synonyme>ImportZadigDataServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.IndicateursProductionServiceLet">
+<Synonyme>IndicateursProductionServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.IndicateursProdDetailsServiceLet">
+<Synonyme>IndicateursProdDetailsServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.PilotageOpePaieHistoriqueServiceLet">
+<Synonyme>PilotageOpePaieHistoriqueServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.PilotageOpePaieModalServiceLet">
+<Synonyme>PilotageOpePaieModalServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.PilotageOperationsPaieServiceLet">
+<Synonyme>PilotageOperationsPaieServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.objects.zpaie.mgr.Traitement_LancementPaieZTGE">
+<Synonyme>Traitement_LancementPaieZTGE</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.objects.zpaie.mgr.Traitement_CalculHoraireTheoriqueUnePopulation">
+<Synonyme>Traitement_CalculHoraireTheoriqueUnePopulation</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.objects.zpaie.mgr.Traitement_RecalculAbsences">
+<Synonyme>Traitement_RecalculAbsences</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.ConsultationFeuilleChargeeIncidentsServiceLet">
+<Synonyme>ConsultationFeuilleChargeeIncidentsServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.ZTGEExportIncidentsServiceLet">
+<Synonyme>ZTGEExportIncidentsServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.ZTGEExportAbsencesServiceLet">
+<Synonyme>ZTGEExportAbsencesServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.ConsultationFeuilleChargeeAbsencesServiceLet">
+<Synonyme>ConsultationFeuilleChargeeAbsencesServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.PlanningAbsenceZPaieServiceLet">
+<Synonyme>PlanningAbsenceZPaieServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.PlanningAbsenceZPaieCompServiceLet">
+<Synonyme>PlanningAbsenceZPaieCompServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.PlanningAbsenceZPaieLegendServiceLet">
+<Synonyme>PlanningAbsenceZPaieLegendServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.gta.workflow.WkfAbsZPaie_OpAnnulationValidationRefusServiceLet">
+<Synonyme>WkfAbsZPaie_OpAnnulationValidationRefusServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.objects.zpaie.Traitement_ValidAutoWkfAbsence">
+<Synonyme>Traitement_ValidAutoWkfAbsence</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.absence.ValidationAutomatiqueServiceLet">
+<Synonyme>ValidationAutomatiqueServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.gta.parametrage.ParametrerMotifAbsenceZPaieServiceLet">
+<Synonyme>ParametrerMotifAbsenceZPaieServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.objects.zpaie.mgr.Traitement_ExtractionAbsencesFromGestil">
+<Synonyme>Traitement_ExtractionAbsencesFromGestil</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.objects.zpaie.mgr.Traitement_ExtractionIJEDI">
+<Synonyme>Traitement_ExtractionIJEDI</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.objects.zpaie.mgr.Traitement_BenchPaieZtge">
+<Synonyme>Traitement_BenchPaieZtge</Synonyme>
+</ServiceLet>
+
+<interpreter Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.interpreteur.ZRUInterpreteur">
+<Synonyme>ZRUInterpreteur</Synonyme>
+</interpreter>
+
+<interpreter Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.interpreteur.HistoEmploiInterpreteur">
+<Synonyme>HistoEmploiInterpreteur</Synonyme>
+</interpreter>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.evaluations.KitAssoStageExpertServiceLet">
+<Synonyme>KitAssoStageExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.evaluations.KitAssoStageExpertCMServiceLet">
+<Synonyme>KitAssoStageExpertCMServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.evaluations.KitEvaluationExpertServiceLet">
+<Synonyme>KitEvaluationExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.evaluations.KitEvaluationExpertCServiceLet">
+<Synonyme>KitEvaluationExpertCServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.evaluations.KitExpertServiceLet">
+<Synonyme>KitExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.evaluations.KitExpertCMServiceLet">
+<Synonyme>KitExpertCMServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.evaluations.QuestionsExpertCMSServiceLet">
+<Synonyme>QuestionsExpertCMSServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.evaluations.QuestionsExpertServiceLet">
+<Synonyme>QuestionsExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.evaluations.KitDomainesQuestionsExpertCMSServiceLet">
+<Synonyme>KitDomainesQuestionsExpertCMSServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.evaluations.DomainesQuestionsExpertCMSServiceLet">
+<Synonyme>DomainesQuestionsExpertCMSServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.evaluations.DomainesQuestionsExpertServiceLet">
+<Synonyme>DomainesQuestionsExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.AccumulateurCMSExpertServiceLet">
+<Synonyme>AccumulateurCMSExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.AccumulateurExpertServiceLet">
+<Synonyme>AccumulateurExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.historiques.HistoFormationServiceLet">
+<Synonyme>HistoFormationServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.historiques.HistoEntretienServiceLet">
+<Synonyme>HistoEntretienServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.historiques.HistoriquesDemandesExpertServiceLet">
+<Synonyme>HistoriquesDemandesExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.historiques.HistoriquesDemandesManagerServiceLet">
+<Synonyme>HistoriquesDemandesManagerServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.historiques.HistoriquesDemandesServiceLet">
+<Synonyme>HistoriquesDemandesServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.historiques.HistoriquesEvaluationManagerServiceLet">
+<Synonyme>HistoriquesEvaluationManagerServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.historiques.HistoriquesFormationsExpertServiceLet">
+<Synonyme>HistoriquesFormationsExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.historiques.HistoriquesFormationsManagerServiceLet">
+<Synonyme>HistoriquesFormationsManagerServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.historiques.HistoriquesFormationsServiceLet">
+<Synonyme>HistoriquesFormationsServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.Imputation2483CMSExpertServiceLet">
+<Synonyme>Imputation2483CMSExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.Imputation2483ExpertServiceLet">
+<Synonyme>Imputation2483ExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.LancementDeclaration2483ExpertServiceLet">
+<Synonyme>LancementDeclaration2483ExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.ParametrageVentilationExpertServiceLet">
+<Synonyme>ParametrageVentilationExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.periodedeprof.PeriodeProfCMSExpertServiceLet">
+<Synonyme>PeriodeProfCMSExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.periodedeprof.PeriodeProfDetailServiceLet">
+<Synonyme>PeriodeProfDetailServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.periodedeprof.PeriodeProfFinancementHeureServiceLet">
+<Synonyme>PeriodeProfFinancementHeureServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.periodedeprof.PeriodeProfFinancementHeureCMSServiceLet">
+<Synonyme>PeriodeProfFinancementHeureCMSServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.periodedeprof.PeriodeProfFinancementStagiaireServiceLet">
+<Synonyme>PeriodeProfFinancementStagiaireServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.periodedeprof.PeriodeProfFinancementStagiaireCMSServiceLet">
+<Synonyme>PeriodeProfFinancementStagiaireCMSServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.periodedeprof.PeriodeProfGestionStagiairesServiceLet">
+<Synonyme>PeriodeProfGestionStagiairesServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.periodedeprof.PeriodeProfGestionTuteurServiceLet">
+<Synonyme>PeriodeProfGestionTuteurServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.periodedeprof.PeriodeProfSaisieHeuresExpertServiceLet">
+<Synonyme>PeriodeProfSaisieHeuresExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.periodedeprof.PeriodeProfTuteurCMSServiceLet">
+<Synonyme>PeriodeProfTuteurCMSServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.periodedeprof.RecherchePeriodeProfPersonServiceLet">
+<Synonyme>RecherchePeriodeProfPersonServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.planformationgroupe.CaracteristiqueAnnuelleFormationServiceLet">
+<Synonyme>CaracteristiqueAnnuelleFormationServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.planformationgroupe.AxeServiceLet">
+<Synonyme>AxeServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.planformationgroupe.DetailProjectionServiceLet">
+<Synonyme>DetailProjectionServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.planformationgroupe.FiltrePlanServiceLet">
+<Synonyme>FiltrePlanServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.planformationgroupe.RecapDemandeServiceLet">
+<Synonyme>RecapDemandeServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.planformationgroupe.RecapHypotheseServiceLet">
+<Synonyme>RecapHypotheseServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.planformationgroupe.HypotheseCritereServiceLet">
+<Synonyme>HypotheseCritereServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.planformationgroupe.PlanHypotheseServiceLet">
+<Synonyme>PlanHypotheseServiceLet</Synonyme>
+</ServiceLet>
+
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.SaisiecoutFiltreExterneExpertServiceLet">
+<Synonyme>SaisiecoutFiltreExterneExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.SaisieCoutsExpert_BudgetServiceLet">
+<Synonyme>SaisieCoutsExpert_BudgetServiceLet</Synonyme>
+</ServiceLet>
+
+
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.SaisieCoutsExpert_VersementServiceLet">
+<Synonyme>SaisieCoutsExpert_VersementServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.SaisieCoutsExpert_CommunServiceLet">
+<Synonyme>SaisieCoutsExpert_CommunServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.SaisieCoutsExpert_IngenerieServiceLet">
+<Synonyme>SaisieCoutsExpert_IngenerieServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.SaisieCoutsExpert_ModalPosteChargeServiceLet">
+<Synonyme>SaisieCoutsExpert_ModalPosteChargeServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.SaisieCoutsExpert_ModalTVAServiceLet">
+<Synonyme>SaisieCoutsExpert_ModalTVAServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.SaisieCoutsExpert_ParticipantServiceLet">
+<Synonyme>SaisieCoutsExpert_ParticipantServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.SaisieCoutsExpert_SessionServiceLet">
+<Synonyme>SaisieCoutsExpert_SessionServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.SaisieCoutsExpertServiceLet">
+<Synonyme>SaisieCoutsExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.SaisieCoutsExterneExpert_ParticipantServiceLet">
+<Synonyme>SaisieCoutsExterneExpert_ParticipantServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.SaisieCoutsExterneExpertServiceLet">
+<Synonyme>SaisieCoutsExterneExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.evaluations.SaisieEvaluationParCollaborateurServiceLet">
+<Synonyme>SaisieEvaluationParCollaborateurServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.evaluations.SaisieEvaluationParExpertServiceLet">
+<Synonyme>SaisieEvaluationParExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.evaluations.SaisieEvaluationParFormateurServiceLet">
+<Synonyme>SaisieEvaluationParFormateurServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.evaluations.SaisieEvaluationParManagerServiceLet">
+<Synonyme>SaisieEvaluationParManagerServiceLet</Synonyme>
+</ServiceLet>
+
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.referentiel.InterlocuteursOrganismeExpertCMSServiceLet">
+<Synonyme>InterlocuteursOrganismeExpertCMSServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.referentiel.InterlocuteursOrganismeExpertServiceLet">
+<Synonyme>InterlocuteursOrganismeExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.planning.PlanningMensuelServiceLet">
+<Synonyme>PlanningMensuelServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.SaisiecoutFiltreServiceLet">
+<Synonyme>SaisiecoutFiltreServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.LancementTraitementCoutsExpertServiceLet">
+<Synonyme>LancementTraitementCoutsExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.ModificationCout_ImputableServiceLet">
+<Synonyme>ModificationCout_ImputableServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.TauxHorairesExpertServiceLet">
+<Synonyme>TauxHorairesExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.VisualisationMontantImputableExpertServiceLet">
+<Synonyme>VisualisationMontantImputableExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.SalaireExpertServiceLet">
+<Synonyme>SalaireExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.RegroupementBudgetaireExpertServiceLet">
+<Synonyme>RegroupementBudgetaireExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.RegroupementBudgetaireCMSExpertServiceLet">
+<Synonyme>RegroupementBudgetaireCMSExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.RegleImputationCMSExpertServiceLet">
+<Synonyme>RegleImputationCMSExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.RegleImputationExpertServiceLet">
+<Synonyme>RegleImputationExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.PosteBudgetExpertServiceLet">
+<Synonyme>PosteBudgetExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.PosteBudgetCMSExpertServiceLet">
+<Synonyme>PosteBudgetCMSExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.planning.PlanningEquipeManagerServiceLet">
+<Synonyme>PlanningEquipeManagerServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.planning.PlanningEquipeInfoManagerServiceLet">
+<Synonyme>PlanningEquipeInfoManagerServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.planning.PlanningMaterielMensuelInfoServiceLet">
+<Synonyme>PlanningMaterielMensuelInfoServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.planning.PlanningMaterielMensuelServiceLet">
+<Synonyme>PlanningMaterielMensuelServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.planning.PlanningDesSallesMensuelInfoServiceLet">
+<Synonyme>PlanningDesSallesMensuelInfoServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.planning.PlanningDesSallesMensuelServiceLet">
+<Synonyme>PlanningDesSallesMensuelServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.ParametrageCoutsSalariauxExpertServiceLet">
+<Synonyme>ParametrageCoutsSalariauxExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.planning.PlanningAnnuelServiceLet">
+<Synonyme>PlanningAnnuelServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.planning.PlanningAnnuelInfoServiceLet">
+<Synonyme>PlanningAnnuelInfoServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform._FormationServiceLet">
+<Synonyme>_FormationServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.AlertesParticipantServiceLet">
+<Synonyme>AlertesParticipantServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.referentiel.AnimateurPrivilegieExpertCServiceLet">
+<Synonyme>AnimateurPrivilegieExpertCServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.AnimateurSequenceExpertServiceLet">
+<Synonyme>AnimateurSequenceExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.AnimateurSequenceExpertCServiceLet">
+<Synonyme>AnimateurSequenceExpertCServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.inscriptionenligne.DupliquerPropositionParticipantExpertServiceLet">
+<Synonyme>DupliquerPropositionParticipantExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.inscriptionenligne.DupliquerPropositionParticipantRecapErreursExpertServiceLet">
+<Synonyme>DupliquerPropositionParticipantRecapErreursExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.inscriptionenligne.InscrPropositionsCollabServiceLet">
+<Synonyme>InscrPropositionsCollabServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.inscriptionenligne.InscrPropositionsExpServiceLet">
+<Synonyme>InscrPropositionsExpServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.inscriptionenligne.InscrPropRechSessViaBesIndServiceLet">
+<Synonyme>InscrPropRechSessViaBesIndServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.inscriptionenligne.InscrPropRechSessViaBesColServiceLet">
+<Synonyme>InscrPropRechSessViaBesColServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.inscriptionenligne.InscRelanceServiceLet">
+<Synonyme>InscRelanceServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.referentiel.AnimateurPrivilegieExpertServiceLet">
+<Synonyme>AnimateurPrivilegieExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.AnneeBudgetExpertServiceLet">
+<Synonyme>AnneeBudgetExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.planformationgroupe.AnneePlanServiceLet">
+<Synonyme>AnneePlanServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.planformationgroupe.PlansFormationServiceLet">
+<Synonyme>PlansFormationServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.planformationgroupe.PlansFormationAjoutModifServiceLet">
+<Synonyme>PlansFormationAjoutModifServiceLet</Synonyme>
+</ServiceLet>
+
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.referentiel.AxeFormationExpertCMSServiceLet">
+<Synonyme>AxeFormationExpertCMSServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.referentiel.AxeFormationExpertServiceLet">
+<Synonyme>AxeFormationExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.referentiel.CatalogueFormationExpertServiceLet">
+<Synonyme>CatalogueFormationExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.referentiel.CatalogueFormationCursusExpertAjoutServiceLet">
+<Synonyme>CatalogueFormationCursusExpertAjoutServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.referentiel.CatalogueFormationExpertCServiceLet">
+<Synonyme>CatalogueFormationExpertCServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.CompteurFormationIndividuelServiceLet">
+<Synonyme>CompteurFormationIndividuelServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.CompteurFormationIndividuelManagerServiceLet">
+<Synonyme>CompteurFormationIndividuelManagerServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.CompteurFormationIndividuelExpertServiceLet">
+<Synonyme>CompteurFormationIndividuelExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.referentiel.CiblageFormationExpertServiceLet">
+<Synonyme>CiblageFormationExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.referentiel.ConventionsFormationExpertServiceLet">
+<Synonyme>ConventionsFormationExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.CoutsVentilesExpertServiceLet">
+<Synonyme>CoutsVentilesExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.CoutsVentilesModaleExpertServiceLet">
+<Synonyme>CoutsVentilesModaleExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.referentiel.CursusParcoursExpertServiceLet">
+<Synonyme>CursusParcoursExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.referentiel.CursusExpertServiceLet">
+<Synonyme>CursusExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.referentiel.CursusExpertCServiceLet">
+<Synonyme>CursusExpertCServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.referentiel.CursusExpertMServiceLet">
+<Synonyme>CursusExpertMServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.DetailParticipationFormationServiceLet">
+<Synonyme>DetailParticipationFormationServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.DiplomeCollaborateurServiceLet">
+<Synonyme>DiplomeCollaborateurServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.DiplomeCollaborateurCMSServiceLet">
+<Synonyme>DiplomeCollaborateurCMSServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.referentiel.DomaineFormationExpertServiceLet">
+<Synonyme>DomaineFormationExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.referentiel.DomaineFormationExpertCMSServiceLet">
+<Synonyme>DomaineFormationExpertCMSServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.Edition2483ServiceLet">
+<Synonyme>Edition2483ServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.Edition2483ExpertServiceLet">
+<Synonyme>Edition2483ExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.EditionSessionExpertServiceLet">
+<Synonyme>EditionSessionExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.EmargServiceLet">
+<Synonyme>EmargServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.referentiel.FamilleFormationExpertServiceLet">
+<Synonyme>FamilleFormationExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.referentiel.FamilleFormationExpertCMSServiceLet">
+<Synonyme>FamilleFormationExpertCMSServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.FeuilleDesTempsServiceLet">
+<Synonyme>FeuilleDesTempsServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.referentiel.FicheCursusServiceLet">
+<Synonyme>FicheCursusServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.evaluations.FicheEvaluationServiceLet">
+<Synonyme>FicheEvaluationServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.referentiel.FicheFormationServiceLet">
+<Synonyme>FicheFormationServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.FilialeSalarieExpertServiceLet">
+<Synonyme>FilialeSalarieExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.FilialesExpertServiceLet">
+<Synonyme>FilialesExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.FiltreSituationSalarieServiceLet">
+<Synonyme>FiltreSituationSalarieServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.FormationCoutStandardExpertServiceLet">
+<Synonyme>FormationCoutStandardExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.referentiel.FormationDescriptionServiceLet">
+<Synonyme>FormationDescriptionServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.referentiel.FormationExpertServiceLet">
+<Synonyme>FormationExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.GestionConstantesExpertCMSServiceLet">
+<Synonyme>GestionConstantesExpertCMSServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.GestionAmortissementExpertServiceLet">
+<Synonyme>GestionAmortissementExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.GestionConstantesExpertServiceLet">
+<Synonyme>GestionConstantesExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.evaluations.GestionEvaluationsExpertServiceLet">
+<Synonyme>GestionEvaluationsExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.evaluations.GestionEvaluationsModaleExpertServiceLet">
+<Synonyme>GestionEvaluationsModaleExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.GestionParticipantExpertServiceLet">
+<Synonyme>GestionParticipantExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.GestionParticipantExpertMServiceLet">
+<Synonyme>GestionParticipantExpertMServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.GestionParticipantParcoursExpertMServiceLet">
+<Synonyme>GestionParticipantParcoursExpertMServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.besoins.GestionBesoinsCollExpertServiceLet">
+<Synonyme>GestionBesoinsCollExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.besoins.GestionBesoinsIndivExpertServiceLet">
+<Synonyme>GestionBesoinsIndivExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.besoins.GestionBesoinDetailIndivExpertServiceLet">
+<Synonyme>GestionBesoinDetailIndivExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.besoins.GestionBesoinDetailCollExpertServiceLet">
+<Synonyme>GestionBesoinDetailCollExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.besoins.GestionBesoinsDIFIndivExpertServiceLet">
+<Synonyme>GestionBesoinsDIFIndivExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.besoins.GestionDemandeInformellesExpertServiceLet">
+<Synonyme>GestionDemandeInformellesExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.besoins.GestionDemandeInformellesCMSExpertServiceLet">
+<Synonyme>GestionDemandeInformellesCMSExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.historiques.HistoriqueFormationFilialeExpertServiceLet">
+<Synonyme>HistoriqueFormationFilialeExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.historiques.HistoriquesDemandesEquipeManagerServiceLet">
+<Synonyme>HistoriquesDemandesEquipeManagerServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.historiques.HistoriquesFormationsEquipeManagerServiceLet">
+<Synonyme>HistoriquesFormationsEquipeManagerServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.referentiel.LieuFormationExpertServiceLet">
+<Synonyme>LieuFormationExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.referentiel.MaterielExpertServiceLet">
+<Synonyme>MaterielExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.referentiel.OrganismeFormationExpertServiceLet">
+<Synonyme>OrganismeFormationExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.ParticipantSequenceExpertServiceLet">
+<Synonyme>ParticipantSequenceExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.ParticipantsParSequenceExpertServiceLet">
+<Synonyme>ParticipantsParSequenceExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.PosteChargeExpertServiceLet">
+<Synonyme>PosteChargeExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.PosteChargeCMSExpertServiceLet">
+<Synonyme>PosteChargeCMSExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.RechercheFormationServiceLet">
+<Synonyme>RechercheFormationServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.RecherchePosteChargeServiceLet">
+<Synonyme>RecherchePosteChargeServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.RechercheSessionServiceLet">
+<Synonyme>RechercheSessionServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.ReportParticipantExpertServiceLet">
+<Synonyme>ReportParticipantExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.ReservationMaterielExpertCMSServiceLet">
+<Synonyme>ReservationMaterielExpertCMSServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.ReservationMaterielExpertServiceLet">
+<Synonyme>ReservationMaterielExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.ReservationSalleExpertCMSServiceLet">
+<Synonyme>ReservationSalleExpertCMSServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.ReservationSalleExpertServiceLet">
+<Synonyme>ReservationSalleExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.referentiel.SalleFormationExpertServiceLet">
+<Synonyme>SalleFormationExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.SearchMultiPersonByBescolServiceLet">
+<Synonyme>SearchMultiPersonByBescolServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.SearchMultiPersonByBesindServiceLet">
+<Synonyme>SearchMultiPersonByBesindServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.SearchMultiPersonByBesParcoursServiceLet">
+<Synonyme>SearchMultiPersonByBesParcoursServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.ChercherBesoinsIndividuelsServiceLet">
+<Synonyme>ChercherBesoinsIndividuelsServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.ChercherBesoinsCollectifsServiceLet">
+<Synonyme>ChercherBesoinsCollectifsServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.SequenceFormationExpertCMServiceLet">
+<Synonyme>SequenceFormationExpertCMServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.SessionFormationExpertServiceLet">
+<Synonyme>SessionFormationExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.SuiviInscriptionExpertServiceLet">
+<Synonyme>SuiviInscriptionExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.SuiviVersementExpertServiceLet">
+<Synonyme>SuiviVersementExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.referentiel.SyntheseSalarieCMSServiceLet">
+<Synonyme>SyntheseSalarieCMSServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.referentiel.SyntheseSalarieServiceLet">
+<Synonyme>SyntheseSalarieServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.ValidationParticipantsServiceLet">
+<Synonyme>ValidationParticipantsServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.ValidationParticipantsParcoursServiceLet">
+<Synonyme>ValidationParticipantsParcoursServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.PlanGestionSessionExpertServiceLet">
+<Synonyme>PlanGestionSessionExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.PlanGestionSessionRecapExpertServiceLet">
+<Synonyme>PlanGestionSessionRecapExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.PlanGestionSessionDetailExpertServiceLet">
+<Synonyme>PlanGestionSessionDetailExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.PlanGestionSessionModeleExpertServiceLet">
+<Synonyme>PlanGestionSessionModeleExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.referentiel.VisualiserCatalogueFormationServiceLet">
+<Synonyme>VisualiserCatalogueFormationServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.TauxHorairesOPCAServiceLet">
+<Synonyme>TauxHorairesOPCAServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_AnnulModifCollabServiceLet">
+<Synonyme>WkfForm_AnnulModifCollabServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_AnnulModifExpServiceLet">
+<Synonyme>WkfForm_AnnulModifExpServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_AnnulModifManServiceLet">
+<Synonyme>WkfForm_AnnulModifManServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_DetailDemandeServiceLet">
+<Synonyme>WkfForm_DetailDemandeServiceLet</Synonyme>
+</ServiceLet>
+
+
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op01Cp1_DdeSpecifCollabServiceLet">
+<Synonyme>WkfForm_Op01Cp1_DdeSpecifCollabServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op01Cp2_DdeSpecifRecapCollabServiceLet">
+<Synonyme>WkfForm_Op01Cp2_DdeSpecifRecapCollabServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op01Cp4_DdeOffreCollabServiceLet">
+<Synonyme>WkfForm_Op01Cp4_DdeOffreCollabServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op01Cp5_DdeOffreSelectCollabServiceLet">
+<Synonyme>WkfForm_Op01Cp5_DdeOffreSelectCollabServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op01Cp6_DdeOffreBesIndCollabServiceLet">
+<Synonyme>WkfForm_Op01Cp6_DdeOffreBesIndCollabServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op01Cp7_DdeOffreRecapBesIndCollabServiceLet">
+<Synonyme>WkfForm_Op01Cp7_DdeOffreRecapBesIndCollabServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op02Cp1_DdeSpecifManServiceLet">
+<Synonyme>WkfForm_Op02Cp1_DdeSpecifManServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op02Cp2_1DdeSpecifBesIndManServiceLet">
+<Synonyme>WkfForm_Op02Cp2_1DdeSpecifBesIndManServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op02Cp2_2DdeSpecifBesColManServiceLet">
+<Synonyme>WkfForm_Op02Cp2_2DdeSpecifBesColManServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op02Cp3_1DdeSpecifRecapBesIndManServiceLet">
+<Synonyme>WkfForm_Op02Cp3_1DdeSpecifRecapBesIndManServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op02Cp3_2DdeSpecifRecapBesColManServiceLet">
+<Synonyme>WkfForm_Op02Cp3_2DdeSpecifRecapBesColManServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op02Cp4_DdeOffreManServiceLet">
+<Synonyme>WkfForm_Op02Cp4_DdeOffreManServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op02Cp5_DdeOffreSelectManServiceLet">
+<Synonyme>WkfForm_Op02Cp5_DdeOffreSelectManServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op02Cp6_DdeOffreBenefManServiceLet">
+<Synonyme>WkfForm_Op02Cp6_DdeOffreBenefManServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op02Cp7_1DdeOffreBesIndManServiceLet">
+<Synonyme>WkfForm_Op02Cp7_1DdeOffreBesIndManServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op02Cp7_2DdeOffreBesColManServiceLet">
+<Synonyme>WkfForm_Op02Cp7_2DdeOffreBesColManServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op02Cp8_1DdeOffreRecapBesIndManServiceLet">
+<Synonyme>WkfForm_Op02Cp8_1DdeOffreRecapBesIndManServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op02Cp8_2DdeOffreRecapBesColManServiceLet">
+<Synonyme>WkfForm_Op02Cp8_2DdeOffreRecapBesColManServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op04Cp1_DdeSpecifExpServiceLet">
+<Synonyme>WkfForm_Op04Cp1_DdeSpecifExpServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op04Cp2_1DdeSpecifBesIndExpServiceLet">
+<Synonyme>WkfForm_Op04Cp2_1DdeSpecifBesIndExpServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op04Cp2_2DdeSpecifBesColExpServiceLet">
+<Synonyme>WkfForm_Op04Cp2_2DdeSpecifBesColExpServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op04Cp3_1DdeSpecifRecapBesIndExpServiceLet">
+<Synonyme>WkfForm_Op04Cp3_1DdeSpecifRecapBesIndExpServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op04Cp3_2DdeSpecifRecapBesColExpServiceLet">
+<Synonyme>WkfForm_Op04Cp3_2DdeSpecifRecapBesColExpServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op04Cp4_DdeOffreExpServiceLet">
+<Synonyme>WkfForm_Op04Cp4_DdeOffreExpServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op04Cp5_DdeOffreSelectExpServiceLet">
+<Synonyme>WkfForm_Op04Cp5_DdeOffreSelectExpServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op04Cp6_DdeOffreBenefExpServiceLet">
+<Synonyme>WkfForm_Op04Cp6_DdeOffreBenefExpServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op04Cp7_1DdeOffreBesIndExpServiceLet">
+<Synonyme>WkfForm_Op04Cp7_1DdeOffreBesIndExpServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op04Cp7_2DdeOffreBesColExpServiceLet">
+<Synonyme>WkfForm_Op04Cp7_2DdeOffreBesColExpServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op04Cp8_1DdeOffreRecapBesIndExpServiceLet">
+<Synonyme>WkfForm_Op04Cp8_1DdeOffreRecapBesIndExpServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op04Cp8_2DdeOffreRecapBesColExpServiceLet">
+<Synonyme>WkfForm_Op04Cp8_2DdeOffreRecapBesColExpServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op05Cp1_ViseDdeManServiceLet">
+<Synonyme>WkfForm_Op05Cp1_ViseDdeManServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op05MajCollServiceLet">
+<Synonyme>WkfForm_Op05MajCollServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op06Cp1_ValidDdeExpServiceLet">
+<Synonyme>WkfForm_Op06Cp1_ValidDdeExpServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op06MajCollServiceLet">
+<Synonyme>WkfForm_Op06MajCollServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op08Cp1_AnnulCollabServiceLet">
+<Synonyme>WkfForm_Op08Cp1_AnnulCollabServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op09Cp1_AnnulManServiceLet">
+<Synonyme>WkfForm_Op09Cp1_AnnulManServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op11Cp1_AnnulExpServiceLet">
+<Synonyme>WkfForm_Op11Cp1_AnnulExpServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op12Cp1_ValidAnnulServiceLet">
+<Synonyme>WkfForm_Op12Cp1_ValidAnnulServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op12MajCollServiceLet">
+<Synonyme>WkfForm_Op12MajCollServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op13Cp1_ModifCollabServiceLet">
+<Synonyme>WkfForm_Op13Cp1_ModifCollabServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op13Cp3_1ssModifValuesBeforeServiceLet">
+<Synonyme>WkfForm_Op13Cp3_1ssModifValuesBeforeServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op13Cp2_1ModifSpecifBesIndCollabServiceLet">
+<Synonyme>WkfForm_Op13Cp2_1ModifSpecifBesIndCollabServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op13Cp3_1ModifSpecifRecapBesIndCollabServiceLet">
+<Synonyme>WkfForm_Op13Cp3_1ModifSpecifRecapBesIndCollabServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op13Cp7_1ModifOffreBesIndCollabServiceLet">
+<Synonyme>WkfForm_Op13Cp7_1ModifOffreBesIndCollabServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op13Cp8_1ModifOffreRecapBesIndCollabServiceLet">
+<Synonyme>WkfForm_Op13Cp8_1ModifOffreRecapBesIndCollabServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op13Cp8_1ssModifValuesBeforeServiceLet">
+<Synonyme>WkfForm_Op13Cp8_1ssModifValuesBeforeServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op14Cp1_ModifManServiceLet">
+<Synonyme>WkfForm_Op14Cp1_ModifManServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op14Cp2_1ModifSpecifBesIndManServiceLet">
+<Synonyme>WkfForm_Op14Cp2_1ModifSpecifBesIndManServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op14Cp2_2ModifSpecifBesColManServiceLet">
+<Synonyme>WkfForm_Op14Cp2_2ModifSpecifBesColManServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op14Cp3_1ModifSpecifRecapBesIndManServiceLet">
+<Synonyme>WkfForm_Op14Cp3_1ModifSpecifRecapBesIndManServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op14Cp3_1ssModifValuesBeforeServiceLet">
+<Synonyme>WkfForm_Op14Cp3_1ssModifValuesBeforeServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op14Cp3_2ModifSpecifRecapBesColManServiceLet">
+<Synonyme>WkfForm_Op14Cp3_2ModifSpecifRecapBesColManServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op14Cp3_2ssModifValuesBeforeServiceLet">
+<Synonyme>WkfForm_Op14Cp3_2ssModifValuesBeforeServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op14Cp7_1ModifOffreBesIndManServiceLet">
+<Synonyme>WkfForm_Op14Cp7_1ModifOffreBesIndManServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op14Cp7_2ModifOffreBesColManServiceLet">
+<Synonyme>WkfForm_Op14Cp7_2ModifOffreBesColManServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op14Cp8_1ModifOffreRecapBesIndManServiceLet">
+<Synonyme>WkfForm_Op14Cp8_1ModifOffreRecapBesIndManServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op14Cp8_1ssModifValuesBeforeServiceLet">
+<Synonyme>WkfForm_Op14Cp8_1ssModifValuesBeforeServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op14Cp8_2ModifOffreRecapBesColManServiceLet">
+<Synonyme>WkfForm_Op14Cp8_2ModifOffreRecapBesColManServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op14Cp8_2ssModifValuesBeforeServiceLet">
+<Synonyme>WkfForm_Op14Cp8_2ssModifValuesBeforeServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op16Cp1_ModifExpServiceLet">
+<Synonyme>WkfForm_Op16Cp1_ModifExpServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op16Cp2_1ModifSpecifBesIndExpServiceLet">
+<Synonyme>WkfForm_Op16Cp2_1ModifSpecifBesIndExpServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op16Cp2_2ModifSpecifBesColExpServiceLet">
+<Synonyme>WkfForm_Op16Cp2_2ModifSpecifBesColExpServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op16Cp3_1ModifSpecifRecapBesIndExpServiceLet">
+<Synonyme>WkfForm_Op16Cp3_1ModifSpecifRecapBesIndExpServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op16Cp3_1ssModifValuesBeforeServiceLet">
+<Synonyme>WkfForm_Op16Cp3_1ssModifValuesBeforeServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op16Cp3_2ModifSpecifRecapBesColExpServiceLet">
+<Synonyme>WkfForm_Op16Cp3_2ModifSpecifRecapBesColExpServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op16Cp3_2ssModifValuesBeforeServiceLet">
+<Synonyme>WkfForm_Op16Cp3_2ssModifValuesBeforeServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op16Cp7_1ModifOffreBesIndExpServiceLet">
+<Synonyme>WkfForm_Op16Cp7_1ModifOffreBesIndExpServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op16Cp7_2ModifOffreBesColExpServiceLet">
+<Synonyme>WkfForm_Op16Cp7_2ModifOffreBesColExpServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op16Cp8_1ModifOffreRecapBesIndExpServiceLet">
+<Synonyme>WkfForm_Op16Cp8_1ModifOffreRecapBesIndExpServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op16Cp8_1ssModifValuesBeforeServiceLet">
+<Synonyme>WkfForm_Op16Cp8_1ssModifValuesBeforeServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op16Cp8_2ModifOffreRecapBesColExpServiceLet">
+<Synonyme>WkfForm_Op16Cp8_2ModifOffreRecapBesColExpServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op16Cp8_2ssModifValuesBeforeServiceLet">
+<Synonyme>WkfForm_Op16Cp8_2ssModifValuesBeforeServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op18Cp1_ValidModifServiceLet">
+<Synonyme>WkfForm_Op18Cp1_ValidModifServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfForm_Op18MajCollServiceLet">
+<Synonyme>WkfForm_Op18MajCollServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.WkfFormPostRecapCollectiveServiceLet">
+<Synonyme>WkfFormPostRecapCollectiveServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.planformationgroupe.PlanProjectionServiceLet">
+<Synonyme>PlanProjectionServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.planformationgroupe.PlanSuiviServiceLet">
+<Synonyme>PlanSuiviServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.planformationgroupe.PlanSyntheseServiceLet">
+<Synonyme>PlanSyntheseServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.planformationgroupe.PlanSyntheseAnneeServiceLet">
+<Synonyme>PlanSyntheseAnneeServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.planformationgroupe.RecherchePlanServiceLet">
+<Synonyme>RecherchePlanServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.parametrage.CriterePopulationBesoinServiceLet">
+<Synonyme>CriterePopulationBesoinServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.parametrage.CriterePopulationBesoinPopUpServiceLet">
+<Synonyme>CriterePopulationBesoinPopUpServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.planformationgroupe.InfoAnneePlanServiceLet">
+<Synonyme>InfoAnneePlanServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.besoins.DemandesInformellesExpertServiceLet">
+<Synonyme>DemandesInformellesExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.besoins.GestionDemandesExpertServiceLet">
+<Synonyme>GestionDemandesExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.besoins.FiltreAnPlanServiceLet">
+<Synonyme>FiltreAnPlanServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.besoins.GestionDemandesNonTraiteesExpertServiceLet">
+<Synonyme>GestionDemandesNonTraiteesExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.referentiel.EntiteFormationExpertServiceLet">
+<Synonyme>EntiteFormationExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.referentiel.EntiteFormationExpertCMSServiceLet">
+<Synonyme>EntiteFormationExpertCMSServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.planning.PlanningDesFormationsMensuelServiceLet">
+<Synonyme>PlanningDesFormationsMensuelServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.planning.FiltreFormationServiceLet">
+<Synonyme>FiltreFormationServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.RechercheParcoursServiceLet">
+<Synonyme>RechercheParcoursServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.GestionReglementsInterieursServiceLet">
+<Synonyme>GestionReglementsInterieursServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.GestionReglementsInterieursAjoutModifServiceLet">
+<Synonyme>GestionReglementsInterieursAjoutModifServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.gestion.AlertesParcoursServiceLet">
+<Synonyme>AlertesParcoursServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.objects.webform.traitement.Traitement_RelancePropositionInscription">
+<Synonyme>Traitement_RelancePropositionInscription</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.objects.webform.traitement.Traitement_Couts">
+<Synonyme>Traitement_Couts</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.referentiel.EnveloppeAnalytiqueExpertServiceLet">
+<Synonyme>EnveloppeAnalytiqueExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<interpreter Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.workflow.LIST_MATRICDEM_Interpreteur">
+<Synonyme>LIST_MATRICDEM_Interpreteur</Synonyme>
+</interpreter>
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.SpServiceLet">
+<Synonyme>SpServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.DescriptionStandardServiceLet">
+<Synonyme>DescriptionStandardServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.FichiersRHServiceLet">
+<Synonyme>FichiersRHServiceLet</Synonyme>
+</ServiceLet>
+
+
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.triggers.AdministrationDesTriggersServiceLet">
+<Synonyme>AdministrationDesTriggersServiceLet</Synonyme>
+</ServiceLet>
+
+
+
+
+
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.ContexteServiceLet">
+<Synonyme>ContexteServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.DupliquerServicelet">
+<Synonyme>DupliquerServicelet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.UserActifServiceLet">
+<Synonyme>UserActifServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.FicheSalarieServiceLet">
+<Synonyme>FicheSalarieServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.GenericServiceLet">
+<Synonyme>GenericServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.GenericEphemereServiceLet">
+<Synonyme>GenericEphemereServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.GestionMotDePasseManagerServiceLet">
+<Synonyme>GestionMotDePasseManagerServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.LookAndFeelServiceLet">
+<Synonyme>LookAndFeelServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.PF4WebServiceLet">
+<Synonyme>PF4WebServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.SearchPackServiceLet">
+<Synonyme>SearchPackServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.SecuExpertLoaderServiceLet">
+<Synonyme>SecuExpertLoaderServiceLet</Synonyme>
+</ServiceLet>
+ 
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.TranscodageServicelet">
+<Synonyme>TranscodageServicelet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.delegation.iframe.I_DelegationPiedPageServiceLet">
+<Synonyme>I_DelegationPiedPageServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_tech.lib.security.Traitement_GestionFutur_ResolutionSecurite">
+<Synonyme>Traitement_GestionFutur_ResolutionSecurite</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.traitement.GTA_BDG_LancementRetraitementPointagesServiceLet">
+<Synonyme>GTA_BDG_LancementRetraitementPointagesServiceLet</Synonyme>
+</ServiceLet>
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.orga.ORG_FindSulbaltDisplayModalServiceLet">
+<Synonyme>ORG_FindSulbaltDisplayModalServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.ManagerRoleOrgaServiceLet">
+<Synonyme>ManagerRoleOrgaServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.orga.ORG_GestionTeamOfResponsablesIndirectsServiceLet">
+<Synonyme>ORG_GestionTeamOfResponsablesIndirectsServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.orga.ORG_GestionTeamOfResponsableServiceLet">
+<Synonyme>ORG_GestionTeamOfResponsableServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.orga.ORG_PopulationOfTeamServiceLet">
+<Synonyme>ORG_PopulationOfTeamServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.orga.ORG_SubSelectRespServiceLet">
+<Synonyme>ORG_SubSelectRespServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.orga.ORG_TeamConsultServiceLet">
+<Synonyme>ORG_TeamConsultServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.orga.ORG_OrganigrammeServiceLet">
+<Synonyme>ORG_OrganigrammeServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.objects.orga.Traitement_AlimORG">
+<Synonyme>Traitement_AlimORG</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.planning.PlanningServiceLet">
+<Synonyme>PlanningServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.publication.CadrePublicationServiceLet">
+<Synonyme>CadrePublicationServiceLet</Synonyme>
+</ServiceLet>
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.publication.DocDispoServiceLet">
+<Synonyme>DocDispoServiceLet</Synonyme>
+</ServiceLet>
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.publication.ListePublicationServiceLet">
+<Synonyme>ListePublicationServiceLet</Synonyme>
+</ServiceLet>
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.publication.PublicationDocServiceLet">
+<Synonyme>PublicationDocServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.requeteur.AppliRequeteurServiceLet">
+<Synonyme>AppliRequeteurServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.requeteur.AppliRequeteurCMSServiceLet">
+<Synonyme>AppliRequeteurCMSServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.requeteur.PopulationCreerServiceLet">
+<Synonyme>PopulationCreerServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.requeteur.PopulationVisualiserServiceLet">
+<Synonyme>PopulationVisualiserServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.requeteur.RequetesListeServiceLet">
+<Synonyme>RequetesListeServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.requeteur.RequetesCMSServiceLet">
+<Synonyme>RequetesCMSServiceLet</Synonyme>
+</ServiceLet>
+ 
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.tables.TableChoixTableLocale">
+<Synonyme>TableChoixTableLocale</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.tables.TableGestionDetailServiceLet">
+<Synonyme>TableGestionDetailServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.tables.TableGestionServiceLet">
+<Synonyme>TableGestionServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.tables.TableGestionImportExcelJournalServiceLet">
+<Synonyme>TableGestionImportExcelJournalServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.tables.TableListeServiceLet">
+<Synonyme>TableListeServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.tables.TableParamDetailServiceLet">
+<Synonyme>TableParamDetailServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.tables.TableParamServiceLet">
+<Synonyme>TableParamServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.tables.TableListeCBEServiceLet">
+<Synonyme>TableListeCBEServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.tables.TableGestionVRServiceLet">
+<Synonyme>TableGestionVRServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.tables.TableGestionVRModServiceLet">
+<Synonyme>TableGestionVRModServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.varsys.VarSysReloadServiceLet">
+<Synonyme>VarSysReloadServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.varsys.VarSysServiceLet">
+<Synonyme>VarSysServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.varsys.VarSysUserServiceLet">
+<Synonyme>VarSysUserServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.workflow.WkfCollectiveServiceLet">
+<Synonyme>WkfCollectiveServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.workflow.WkfHistoriqueServiceLet">
+<Synonyme>WkfHistoriqueServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.workflow.WkfPossesseurObsoleteServiceLet">
+<Synonyme>WkfPossesseurObsoleteServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.workflow.WkfPurgeDosEnMasseServiceLet">
+<Synonyme>WkfPurgeDosEnMasseServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.workflow.WkfRechercheDossierServiceLet">
+<Synonyme>WkfRechercheDossierServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.workflow.WkfRechercheDossierExpertServiceLet">
+<Synonyme>WkfRechercheDossierExpertServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.workflow.WkfSortieServiceLet">
+<Synonyme>WkfSortieServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.workflow.WorkflowServiceLet">
+<Synonyme>WorkflowServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.workflow.admin.WkfBrancheServiceLet">
+<Synonyme>WkfBrancheServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.workflow.admin.WkfOperationStatutServiceLet">
+<Synonyme>WkfOperationStatutServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.workflow.admin.WkfOperationServiceLet">
+<Synonyme>WkfOperationServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.workflow.admin.WkfProcessusServiceLet">
+<Synonyme>WkfProcessusServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.workflow.WkfSuperviserActeursServiceLet">
+<Synonyme>WkfSuperviserActeursServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.workflow.WkfSuperviserActeursCMSServiceLet">
+<Synonyme>WkfSuperviserActeursCMSServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.workflow.WkfUnlockDossierServiceLet">
+<Synonyme>WkfUnlockDossierServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.workflow.WkfComplementInfoDemandeServiceLet">
+<Synonyme>WkfComplementInfoDemandeServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.workflow.WkfComplementInfoReponseServiceLet">
+<Synonyme>WkfComplementInfoReponseServiceLet</Synonyme>
+</ServiceLet>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.workflow.WkfComplementInfoVisuServiceLet">
+<Synonyme>WkfComplementInfoVisuServiceLet</Synonyme>
+</ServiceLet>
+
+<interpreter Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.workflow.WkfOptionReportInterpreteur">
+<Synonyme>WkfOptionReportInterpreteur</Synonyme>
+</interpreter>
+
+<ServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.objects.workflow.Traitement_WkfInitAuto">
+<Synonyme>Traitement_WkfInitAuto</Synonyme>
+</ServiceLet>
+</ServiceLetList>
+<JSONServiceLetList>
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.GenericJsonServlet">
+<JSONSynonyme>GenericJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.GestElemJsonServlet">
+<JSONSynonyme>GestElemJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.GestSchemasJsonServlet">
+<JSONSynonyme>GestSchemasJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.RechercheStructureJsonServiceLet">
+<JSONSynonyme>RechercheStructureJsonServiceLet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.RechercheUserJsonServlet">
+<JSONSynonyme>RechercheUserJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.WorkboxJsonServlet_4">
+<JSONSynonyme>WorkboxJsonServlet_4</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.RechercheUserWorkflowJsonServlet">
+<JSONSynonyme>RechercheUserWorkflowJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.ImportUsersFromNSJsonServlet">
+<JSONSynonyme>ImportUsersFromNSJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.DuplicataUsersJsonServlet">
+<JSONSynonyme>DuplicataUsersJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.docserver.GestionModelesDocServerJsonServlet">
+<JSONSynonyme>GestionModelesDocServerJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.docserver.GestionThemesJsonServlet">
+<JSONSynonyme>GestionThemesJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.docserver.TypeEditionConsultationJsonServlet">
+<JSONSynonyme>TypeEditionConsultationJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.docserver.ParagrapheVCMJsonServlet">
+<JSONSynonyme>ParagrapheVCMJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.docserver.LstMaquettesAssocieesParagJsonServlet">
+<JSONSynonyme>LstMaquettesAssocieesParagJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.docserver.GestionMaquettesJsonServlet">
+<JSONSynonyme>GestionMaquettesJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.docserver.GestionNaturesJsonServlet">
+<JSONSynonyme>GestionNaturesJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.docserver.MaquetteVCMJsonServlet">
+<JSONSynonyme>MaquetteVCMJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.docserver.CompositionMaquetteJsonServlet">
+<JSONSynonyme>CompositionMaquetteJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.PagesModalJsonServlet">
+<JSONSynonyme>PagesModalJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.SaisieCoutsExpertJsonServlet">
+<JSONSynonyme>SaisieCoutsExpertJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.couts.SaisieCoutsComplementJsonServlet">
+<JSONSynonyme>SaisieCoutsComplementJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.requeteur.RequetePopulationExpertJsonServlet">
+<JSONSynonyme>RequetePopulationExpertJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.requeteur.RequetePopulationJsonServlet">
+<JSONSynonyme>RequetePopulationJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.planning.PlanningParcoursJsonServlet">
+<JSONSynonyme>PlanningParcoursJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.structures.parametrage.GestionStructuresJsonServlet">
+<JSONSynonyme>GestionStructuresJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.structures.parametrage.StructureCMJsonServlet">
+<JSONSynonyme>StructureCMJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.structures.parametrage.GestionTypesEntiteJsonServlet">
+<JSONSynonyme>GestionTypesEntiteJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.structures.parametrage.TypeEntiteCMJsonServlet">
+<JSONSynonyme>TypeEntiteCMJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.GestTablesDocJsonServlet">
+<JSONSynonyme>GestTablesDocJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.structures.parametrage.GestionNiveauxJsonServlet">
+<JSONSynonyme>GestionNiveauxJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.HelpDesk.HelpDeskIntervenantJsonServlet">
+<JSONSynonyme>HelpDeskIntervenantJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.HelpDesk.HelpDeskHistJsonServlet">
+<JSONSynonyme>HelpDeskHistJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.structures.parametrage.DemandeDateJsonServlet">
+<JSONSynonyme>DemandeDateJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.structures.parametrage.ModifDateEffJsonServlet">
+<JSONSynonyme>ModifDateEffJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.structures.parametrage.GestionEntitesJsonServlet">
+<JSONSynonyme>GestionEntitesJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.structures.parametrage.EntiteCJsonServlet">
+<JSONSynonyme>EntiteCJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.structures.parametrage.EntiteMJsonServlet">
+<JSONSynonyme>EntiteMJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.structures.parametrage.EntiteVJsonServlet">
+<JSONSynonyme>EntiteVJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.structures.parametrage.ModifDateOuvFermJsonServlet">
+<JSONSynonyme>ModifDateOuvFermJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.structures.affectations.CollaborateursEntitesJsonServlet">
+<JSONSynonyme>CollaborateursEntitesJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.structures.parametrage.GestionArbreEntitesJsonServlet">
+<JSONSynonyme>GestionArbreEntitesJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.structures.parametrage.ArbreEntiteCMJsonServlet">
+<JSONSynonyme>ArbreEntiteCMJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.structures.parametrage.ArbreEntiteSuppJsonServlet">
+<JSONSynonyme>ArbreEntiteSuppJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.structures.parametrage.RechercheEntitesArbreJsonServlet">
+<JSONSynonyme>RechercheEntitesArbreJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.valideurs.GestionValideursJsonServlet">
+<JSONSynonyme>GestionValideursJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.workbox.MesDemandesManagerJsonServlet">
+<JSONSynonyme>MesDemandesManagerJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.workbox.MesDemandesExpertJsonServlet">
+<JSONSynonyme>MesDemandesExpertJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.workbox.MesDemandesCollabJsonServlet">
+<JSONSynonyme>MesDemandesCollabJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.workbox.MesDemandesAdminJsonServlet">
+<JSONSynonyme>MesDemandesAdminJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.publication.PublicationDocJsonServlet">
+<JSONSynonyme>PublicationDocJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.publication.GestionThemeRegroupJsonServlet">
+<JSONSynonyme>GestionThemeRegroupJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.publication.GestionDocumentJsonServlet">
+<JSONSynonyme>GestionDocumentJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.publication.BibliothequeDocJsonServlet">
+<JSONSynonyme>BibliothequeDocJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.docserver.GestionJeuxDonneesJsonServlet">
+<JSONSynonyme>GestionJeuxDonneesJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.docserver.JeuDonneesCMJsonServlet">
+<JSONSynonyme>JeuDonneesCMJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.admin.docserver.JeuDonneesImpExpJsonServlet">
+<JSONSynonyme>JeuDonneesImpExpJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+ 
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.SysLockModuleJsonServlet">
+<JSONSynonyme>SysLockModuleJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.comp.PopOuEquipe">
+<JSONSynonyme>PopOuEquipe</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.GestionWebDirJsonServlet">
+<JSONSynonyme>GestionWebDirJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.GestProfilJsonServlet">
+<JSONSynonyme>GestProfilJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.GestionUserWDJsonServlet">
+<JSONSynonyme>GestionUserWDJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.delegation.FonctionsMetiersJsonServlet">
+<JSONSynonyme>FonctionsMetiersJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.delegation.FonctionMetierCMJsonServlet">
+<JSONSynonyme>FonctionMetierCMJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.delegation.AdministrationDelegationJsonServlet">
+<JSONSynonyme>AdministrationDelegationJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.delegation.GestionDelegationManagerJsonServlet">
+<JSONSynonyme>GestionDelegationManagerJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.delegation.GestionDelegationExpertJsonServlet">
+<JSONSynonyme>GestionDelegationExpertJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.delegation.DetailsDelegationJsonServlet">
+<JSONSynonyme>DetailsDelegationJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.Tools_ExtJSJsonServlet">
+<JSONSynonyme>Tools_ExtJSJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.delegation.GestionDelegationAdminJsonServlet">
+<JSONSynonyme>GestionDelegationAdminJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.delegation.CreationDelegationJsonServlet">
+<JSONSynonyme>CreationDelegationJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.InfoMatriculeCourantModulesJsonServlet">
+<JSONSynonyme>InfoMatriculeCourantJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.paramecrandyn.InfoProjetCourantJsonServlet">
+<JSONSynonyme>InfoProjetCourantJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.paramecrandyn.BandeauMajParamsJsonServlet">
+<JSONSynonyme>BandeauMajParamsJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.paramecrandyn.ParametrageDonneesJsonServlet">
+<JSONSynonyme>ParametrageDonneesJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.paramecrandyn.ParametrageGroupesDonneesJsonServlet">
+<JSONSynonyme>ParametrageGroupesDonneesJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.paramecrandyn.AppelTableToolsJsonServlet">
+<JSONSynonyme>AppelTableToolsJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.paramecrandyn.ParametrageDictionnaireJsonServlet">
+<JSONSynonyme>ParametrageDictionnaireJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.paramecrandyn.ParametrageEcransHistorisesJsonServlet">
+<JSONSynonyme>ParametrageEcransHistorisesJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.paramecrandyn.MajParametrageJsonServlet">
+<JSONSynonyme>MajParametrageJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.paramecrandyn.GestionProjetJsonServlet">
+<JSONSynonyme>GestionProjetJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.paramecrandyn.VisuObjetParamDynJsonServlet">
+<JSONSynonyme>VisuObjetParamDynJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.paramecrandyn.ParametrageEcransJsonServlet">
+<JSONSynonyme>ParametrageEcransJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.paramecrandyn.ParametrageDestinationsEcransJsonServlet">
+<JSONSynonyme>ParametrageDestinationsEcransJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.paramecrandyn.ParametrageDonneesUXJsonServlet">
+<JSONSynonyme>ParametrageDonneesUXJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.paramecrandyn.ComparaisonObjetsJsonServlet">
+<JSONSynonyme>ComparaisonObjetsJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.paramecrandyn.WkfOperationEcransJsonServlet">
+<JSONSynonyme>WkfOperationEcransJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.trace.TracesInterpreterJsonServlet">
+<JSONSynonyme>TracesInterpreterJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.acompte.SeuilsAcompteJsonServlet">
+<JSONSynonyme>SeuilsAcompteJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.common.recherche.AppelTableJsonServlet">
+<JSONSynonyme>AppelTableJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.common.recherche.AppelTableWkfJsonServlet">
+<JSONSynonyme>AppelTableWkfJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.common.recherche.AppelTableSpecificJsonServlet">
+<JSONSynonyme>AppelTableSpecificJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.common.recherche.AppelTableRechEmbJsonServlet">
+<JSONSynonyme>AppelTableRechEmbJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.common.recherche.SearchCollabJsonServlet">
+<JSONSynonyme>SearchCollabJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.delegation.ValidationDelegationJsonServlet">
+<JSONSynonyme>ValidationDelegationJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.delegation.ModificationDelegationJsonServlet">
+<JSONSynonyme>ModificationDelegationJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.delegation.DuplicationDelegationJsonServlet">
+<JSONSynonyme>DuplicationDelegationJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.common.recherche.SearchCollabORGJsonServlet">
+<JSONSynonyme>SearchCollabORGJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.edition.ReqEditionsJsonServiceLet">
+<JSONSynonyme>ReqEditionsJsonServiceLet</JSONSynonyme>
+</JSONServiceLet>
+ 
+
+ 
+
+ 
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.ChoisirPopulationJsonServlet">
+<JSONSynonyme>ChoisirPopulationJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.workbox.ParamOrdreProcessusAndOperationJsonServlet">
+<JSONSynonyme>ParamOrdreProcessusAndOperationJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+ 
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.delegation.DelegationSearchCollabORGJsonServlet">
+<JSONSynonyme>DelegationSearchCollabORGJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.common.RechercheFormationJsonServlet">
+<JSONSynonyme>RechercheFormationJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gta.parametrage.ParametrageFonctionnaliteJsonServlet">
+<JSONSynonyme>ParametrageFonctionnaliteJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.structures.expert.HistoriqueAffectationCollabExpertJsonServlet">
+<JSONSynonyme>HistoriqueAffectationCollabExpertJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.BudgetExpertJsonServlet">
+<JSONSynonyme>BudgetExpertJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.TRPJsonServlet">
+<JSONSynonyme>TRPJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.planformationgroupe.PlanFormationJsonServlet">
+<JSONSynonyme>PlanFormationJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.structures.parametrage.GestionDonneesMainframeJsonServlet">
+<JSONSynonyme>GestionDonneesMainframeJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gta.cad.CADJsonServlet">
+<JSONSynonyme>CADJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gta.parametrage.ParametragePopulationJsonServlet">
+<JSONSynonyme>ParametragePopulationJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gta.cad.ForcageCompteursJsonServlet">
+<JSONSynonyme>ForcageCompteursJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.FichiersVisualisablesJsonServiceLet">
+<JSONSynonyme>FichiersVisualisablesJsonServiceLet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.bureau.revolution.DeskJsonServlet">
+<JSONSynonyme>DeskJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.graph.ParametrageGrapheJsonServlet">
+<JSONSynonyme>ParametrageGrapheJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gta.cad.param.TestDatesJsonServlet">
+<JSONSynonyme>TestDatesJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+ 
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.structures.affectations.RechercheEntiteJsonServlet">
+<JSONSynonyme>RechercheEntiteJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.VarSysJsonServlet">
+<JSONSynonyme>VarSysJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.paramecrandyn.HistoriquesDesProjetsJsonServiceLet">
+<JSONSynonyme>HistoriquesDesProjetsJsonServiceLet</JSONSynonyme>
+</JSONServiceLet>
+
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.paramecrandyn.HistoObjetToolsCourantJsonServlet">
+<JSONSynonyme>HistoObjetToolsCourantJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.paramecrandyn.GestionDesLivrablesJsonServlet">
+<JSONSynonyme>GestionDesLivrablesJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.paramecrandyn.GenericSuppJsonServiceLet">
+<JSONSynonyme>GenericSuppJsonServiceLet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.paramecrandyn.CreationSysRequetesJspJsonServlet">
+<JSONSynonyme>CreationSysRequetesJspJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.edition.FamilleEditionJsonServlet">
+<JSONSynonyme>FamilleEditionJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+ 
+ 
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.traitement.GestionDesTypesDeTraitementJsonServlet">
+<JSONSynonyme>GestionDesTypesDeTraitementJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.traitement.GestionDesTraitementsJsonServlet">
+<JSONSynonyme>GestionDesTraitementsJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.ParametrageGroupeBIJsonServlet">
+<JSONSynonyme>ParametrageGroupeBIJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.IncidentImportModifJsonServlet">
+<JSONSynonyme>IncidentImportModifJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.SaisieIncidentZPaieJsonServlet">
+<JSONSynonyme>SaisieIncidentZPaieJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.GestionUserProfilTraitementMasseJsonServlet">
+<JSONSynonyme>GestionUserProfilTraitementMasseJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gap.HistoContratsJsonServlet">
+<JSONSynonyme>HistoContratsJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.edition.ReqEditionsParametrageJsonServiceLet">
+<JSONSynonyme>ReqEditionsParametrageJsonServiceLet</JSONSynonyme>
+</JSONServiceLet>
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.edition.EtatsDeSortieROJsonServiceLet">
+<JSONSynonyme>EtatsDeSortieROJsonServiceLet</JSONSynonyme>
+</JSONServiceLet>
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.edition.EtatsDeSortieRWJsonServiceLet">
+<JSONSynonyme>EtatsDeSortieRWJsonServiceLet</JSONSynonyme>
+</JSONServiceLet>
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.edition.EtatsDeSortieAdmJsonServiceLet">
+<JSONSynonyme>EtatsDeSortieAdmJsonServiceLet</JSONSynonyme>
+</JSONServiceLet>
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.GestionBandeauxManMultiJsonServlet">
+<JSONSynonyme>GestionBandeauxManMultiJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.paramecrandyn.GestionSaisiesEnMasseJsonServlet">
+<JSONSynonyme>GestionSaisiesEnMasseJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.paramecrandyn.ParametrageReglesGestionJsonServicelet">
+<JSONSynonyme>ParametrageReglesGestionJsonServicelet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gap.administratif.extjs_json.WkfAttestationsExtJsJsonServlet">
+<JSONSynonyme>WkfAttestationsExtJsJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.alert.servicelet.AlertViewJsonServlet">
+<JSONSynonyme>AlertViewJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.alert.servicelet.AlertParamJsonServlet">
+<JSONSynonyme>AlertParamJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.alert.servicelet.AlertHomeJsonServlet">
+<JSONSynonyme>AlertHomeJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.alert.servicelet.AlertBatchJsonServlet">
+<JSONSynonyme>AlertBatchJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.traitement.LancementBatchCFTJsonServlet">
+<JSONSynonyme>LancementBatchCFTJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.SaisieAbsencesZPaieManagerJsonServlet">
+<JSONSynonyme>SaisieAbsencesZPaieManagerJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.SaisieAbsencesZPaieCollaborateurJsonServlet">
+<JSONSynonyme>SaisieAbsencesZPaieCollaborateurJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.SaisieAbsencesZPaieExpertJsonServlet">
+<JSONSynonyme>SaisieAbsencesZPaieExpertJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.SaisieAbsencesZPaieIndExpertJsonServlet">
+<JSONSynonyme>SaisieAbsencesZPaieIndExpertJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.workflow.WkfUnlockDossierJsonServlet">
+<JSONSynonyme>WkfUnlockDossierJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.PlanningAbsenceZPaieJsonServlet">
+<JSONSynonyme>PlanningAbsenceZPaieJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.PlanningCollectifAbsenceZPaieExpertJsonServlet">
+<JSONSynonyme>PlanningCollectifAbsenceZPaieExpertJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.PlanningCollectifAbsenceZPaieManagerJsonServlet">
+<JSONSynonyme>PlanningCollectifAbsenceZPaieManagerJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.PlanningCollectifAbsenceZPaieCollaborateurJsonServlet">
+<JSONSynonyme>PlanningCollectifAbsenceZPaieCollaborateurJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.PlanningAbsencesZPaieManagerJsonServlet">
+<JSONSynonyme>PlanningAbsencesZPaieManagerJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.PlanningAbsencesZPaieCollaborateurJsonServlet">
+<JSONSynonyme>PlanningAbsencesZPaieCollaborateurJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.referentiel.CatalogueFormationJsonServlet">
+<JSONSynonyme>CatalogueFormationJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.JspSatstJsonServlet">
+<JSONSynonyme>JspSatstJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.gap.administratif.common.ModeleEmbaucheJsonServlet">
+<JSONSynonyme>ModeleEmbaucheJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.rest.RestJsonServlet">
+<JSONSynonyme>RestJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.sms.SmsJsonServlet">
+<JSONSynonyme>SmsJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.jsonservlet.PilotageOperationsPaieJsonServlet">
+<JSONSynonyme>PilotageOperationsPaieJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.ZTGEImportJsonServlet">
+<JSONSynonyme>ZTGEImportJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.paramecrandyn.DonneesJspJsonServlet">
+<JSONSynonyme>DonneesJspJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.webform.planning.PlanningDesFormationsJsonServlet">
+<JSONSynonyme>PlanningDesFormationsJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.jsonservlet.MatricModifiesInscritRecycJsonServlet">
+<JSONSynonyme>MatricModifiesInscritRecycJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.GestionFeuillesGAPJsonServlet">
+<JSONSynonyme>GestionFeuillesGAPJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.dpae.servicelet.DpaeJsonServlet">
+<JSONSynonyme>DpaeJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.interpreteur.InterpreteurMasseJsonServlet">
+<JSONSynonyme>InterpreteurMasseJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.mot_met.lib.servicelet.extjs_json.interpreteur.InterpreteurRetroJsonServlet">
+<JSONSynonyme>InterpreteurRetroJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.ElementsPaieJsonServLet">
+<JSONSynonyme>ElementsPaieJsonServLet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.DonneesElementPaieJsonServLet">
+<JSONSynonyme>DonneesElementPaieJsonServLet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.ImputationEltJsonServLet">
+<JSONSynonyme>ImputationEltJsonServLet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.ExportFeuillesGAPJsonServlet">
+<JSONSynonyme>ExportFeuillesGAPJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+<JSONServiceLet Name="fr.adp.com.gxp.std.modules.lib.servicelet.zpaie.GestionThemesGAPJsonServlet">
+<JSONSynonyme>GestionThemesGAPJsonServlet</JSONSynonyme>
+</JSONServiceLet>
+
+</JSONServiceLetList>
+<WebSERVServiceLetList>
+<!-- 	<WebSERVServiceLet Name="fr.adp.com.gxp.clt.modules.lib.webservice.Exemple_ReadWSServlet">
+	<WebSERVSynonyme>/rest/collab/read/identite</WebSERVSynonyme>
+	</WebSERVServiceLet>
+	
+	<WebSERVServiceLet Name="fr.adp.com.gxp.clt.modules.lib.webservice.Exemple_UpdateWSServlet">
+	<WebSERVSynonyme>/rest/collab/update/identite</WebSERVSynonyme>
+	</WebSERVServiceLet>
+	
+	<WebSERVServiceLet Name="fr.adp.com.gxp.clt.modules.lib.webservice.Exemple_B2BWSServlet">
+	<WebSERVSynonyme>/rest/b2b</WebSERVSynonyme>
+	</WebSERVServiceLet>
+	-->
+</WebSERVServiceLetList>
+
+<Jsp_Tag_OK_List>
+	<Jsp_Tag_OK Name="Moteur/Comp/AppelTableMultiple.jsp" FieldName="param_Where"/>
+	<Jsp_Tag_OK Name="Moteur/Comp/AppelTable.jsp" FieldName="param_Where"/>
+	<Jsp_Tag_OK Name="Moteur/Aide/AideDynamique2.jsp" FieldName="AIDE"/>
+	<Jsp_Tag_OK Name="Moteur/DescriptionStandard.jsp" FieldName="DESCRIPTION"/>
+	<Jsp_Tag_OK Name="Moteur/Comp/WebAdmin/GestionVarSys/VarSysCMS.jsp" FieldName="VALVAR_W"/>
+	<Jsp_Tag_OK Name="Moteur/Comp/WebAdmin/GestionVarSys/VarSysUserCMS.jsp" FieldName="VALVAR_W"/>
+	<Jsp_Tag_OK Name="Moteur/Comp/WebAdmin/StdErreurCMS.jsp" FieldName="LIBERR_W"/>
+	<Jsp_Tag_OK Name="Moteur/Comp/WebAdmin/GestionAppelsTable.jsp" FieldName="clauseWhere"/>
+	<Jsp_Tag_OK Name="Moteur/Comp/WebAdmin/Purge/ParametragePurgeTablesAjoutModif.jsp" FieldName="WHERE_COMPLEXE"/>
+	<Jsp_Tag_OK Name="Modules/Gpec/modal/Description.jsp" FieldName="DESCRIPTION"/>
+	<Jsp_Tag_OK Name="Modules/Gpec/modal/DescriptionModele.jsp" FieldName="DESCRIPTION"/>
+	<Jsp_Tag_OK Name="Modules/Gpec/modal/Mission.jsp" FieldName="DESCRIPTION"/>
+	<Jsp_Tag_OK Name="Modules/Gpec/modal/MissionModele.jsp" FieldName="DESCRIPTION"/>
+	<Jsp_Tag_OK Name="Modules/Gpec/ReferentielDocumentation.jsp" FieldName="Description"/>
+	<Jsp_Tag_OK Name="Modules/Hub/elements/tabDecision.jsp" FieldName="MSG_BODY"/>
+	<Jsp_Tag_OK Name="Modules/Hub/elements/tabRecall.jsp" FieldName="MSG_BODY"/>
+	<Jsp_Tag_OK Name="Modules/Hub/elements/tabSender.jsp" FieldName="MSG_BODY"/>
+	<Jsp_Tag_OK Name="Modules/Parametrage/TemplatesEdition.jsp" FieldName="DATA_TEMPLATE"/>
+	<Jsp_Tag_OK Name="Modules/Parametrage/TexteModele.jsp" FieldName="T_MODELE"/>
+	<Jsp_Tag_OK Name="Modules/WebForm/InscrEnLigne/InscrRelance.jsp" FieldName="MSG_BODY"/>
+	<Jsp_Tag_OK Name="Modules/WebForm/FormationDescription.jsp" FieldName="Description"/>
+	<Jsp_Tag_OK Name="Modules/WebForm/LieuFormationExpert.jsp" FieldName="PlanAcces"/>
+	<Jsp_Tag_OK Name="Modules/WebForm/MaterielExpert.jsp" FieldName="CommentaireMateriel"/>
+	<Jsp_Tag_OK Name="Modules/WebForm/OrganismeCollecteurParitaire.jsp" FieldName="PlanAcces"/>
+	<Jsp_Tag_OK Name="Modules/WebForm/OrganismeFormationExpert.jsp" FieldName="PlanAcces"/>
+	<Jsp_Tag_OK Name="Modules/Wiki/DescWiki.jsp" FieldName="ARTICLE"/>
+	<Jsp_Tag_OK Name="Modules/Parametrage/ReqEditionsLsprh.jsp" FieldName="FINREQ"/>
+	<Jsp_Tag_OK Name="Modules/Parametrage/modal/ReqEditionsCLsprh.jsp" FieldName="ReqCF"/>
+	<Jsp_Tag_OK Name="Modules/Parametrage/modal/ReqEditionsTestCLsprh.jsp" FieldName="REQUETE"/>
+	<Jsp_Tag_OK Name="Modules/Parametrage/Edition.jsp" FieldName="param"/>
+	<Jsp_Tag_OK Name="Modules/ADP_ONLY/Parametrage/modal/DashboardParamCMS.jsp" FieldName="DASH_REQ"/> 
+	<Jsp_Tag_OK Name="Moteur/ADP_ONLY/Comp/WebAdmin/Publication/PublicationAlertExpertCMS.jsp" FieldName="RequeteAlerte"/> 
+	<Jsp_Tag_OK Name="Moteur/CreateFile.jsp" FieldName="param"/>
+	<Jsp_Tag_OK Name="Modules/Parametrage/TexteModelePlanning.jsp" FieldName="T_MODELE"/> 
+	<Jsp_Tag_OK Name="Modules/Gta/Expert/modal/ParamPeriode.jsp" FieldName="FORMULE"/> 
+	<Jsp_Tag_OK Name="Moteur/Comp/AppliRequeteurVisualiser.jsp" FieldName="JOINTURES"/> 
+	<Jsp_Tag_OK Name="Moteur/Comp/WebAdmin/MajSI/ExportElementCMS.jsp" FieldName="CLAUSE_WHERE"/> 
+	<Jsp_Tag_OK Name="Modules/Gta/Expert/Badge/Badgeuse.jsp" FieldName="BadgASup"/>
+</Jsp_Tag_OK_List>
+</All>

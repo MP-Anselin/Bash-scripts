@@ -1,0 +1,54 @@
+##
+create_view_tge_respaie_histo
+=SQL=
+CREATE OR REPLACE PROCEDURE create_view_tge_respaie_histo AS
+    TYPE TypeColNameCountTable IS RECORD (COLUMN_NAME USER_TAB_COLUMNS.COLUMN_NAME%TYPE, COUNT_TABLE NUMBER,COLUMN_TYPE USER_TAB_COLUMNS.DATA_TYPE%TYPE);
+    TYPE TYP_COL_NAME IS TABLE OF TypeColNameCountTable;
+    v_reqcreate CLOB;
+    TabColRespaie TYP_COL_NAME ;
+BEGIN
+    SELECT column_name,0,data_type BULK COLLECT  INTO TabColRespaie
+    FROM   user_tab_columns
+    WHERE  table_name = 'DIC_TGE_RESPAIE_HISTO'
+    ORDER BY  column_name;
+    
+    v_reqCreate := 'CREATE OR REPLACE FORCE EDITIONABLE VIEW "TGE_RESPAIE_HISTO_IHM" AS ';
+    v_reqCreate := v_reqCreate||' SELECT '; 
+    v_reqCreate := v_reqCreate||' dacs.numcnt, '; 
+    v_reqCreate := v_reqCreate||' dtr.dtdeb_histo AS dtdeb_histo_fmt, '; 
+    v_reqCreate := v_reqCreate||' to_char(dtr.dtdeb_histo, ''DD.MM.YYYY'') AS dtdeb_histo, '; 
+    v_reqCreate := v_reqCreate||' to_char(dtr.dtdeb_histo, ''YYYYMMDD'') AS dtdeb_histo_tri, '; 
+    v_reqCreate := v_reqCreate||' CASE '; 
+    v_reqCreate := v_reqCreate||' WHEN dacs.dsfsc = TO_DATE(''20991231'', ''yyyymmdd'') THEN ''A partir du ''|| to_char(dacs.dsdsc, ''DD.MM.YYYY'') '; 
+    v_reqCreate := v_reqCreate||' ELSE ''Du ''|| to_char(dacs.dsdsc, ''DD.MM.YYYY'')|| '' au ''|| to_char(dacs.dsfsc, ''DD.MM.YYYY'') '; 
+    v_reqCreate := v_reqCreate||' END AS lib_periode_emploi, '; 
+    v_reqCreate := v_reqCreate||' CASE '; 
+    v_reqCreate := v_reqCreate||' WHEN dacs.dsfsc = TO_DATE(''20991231'', ''yyyymmdd'') THEN '; 
+    v_reqCreate := v_reqCreate||' to_char(dacs.dsdsc, ''DD.MM.YYYY'') '; 
+    v_reqCreate := v_reqCreate||' ELSE '; 
+    v_reqCreate := v_reqCreate||' to_char(dacs.dsdsc, ''DD.MM.YYYY'')|| '' au ''||to_char(dacs.dsfsc, ''DD.MM.YYYY'') '; 
+    v_reqCreate := v_reqCreate||'  END AS lib_periode_emploi_2 '; 
+    FOR i IN TabColRespaie.first..TabColRespaie.last
+     LOOP
+     IF TabColRespaie(i).COLUMN_NAME != 'DTDEB_HISTO' THEN
+        v_reqCreate := v_reqCreate||', DTR.'||TabColRespaie(i).COLUMN_NAME;
+     END IF;
+     END LOOP;
+    v_reqCreate := v_reqCreate||' FROM dic_tge_respaie_histo dtr,dic_adm_contrat_situ dacs'; 
+    v_reqCreate := v_reqCreate||' WHERE '; 
+    v_reqCreate := v_reqCreate||' dacs.numpac = dtr.numpac '; 
+    v_reqCreate := v_reqCreate||' AND dacs.paiezad = dtr.paiezad '; 
+    v_reqCreate := v_reqCreate||' AND dacs.numcnt = ( '; 
+    v_reqCreate := v_reqCreate||' SELECT MAX(dach.numcnt) '; 
+    v_reqCreate := v_reqCreate||' FROM dic_adm_contrat_histo dach '; 
+    v_reqCreate := v_reqCreate||' WHERE dach.numpac = dtr.numpac '; 
+    v_reqCreate := v_reqCreate||' AND dach.paiezad = dtr.paiezad '; 
+    v_reqCreate := v_reqCreate||' AND dach.pacmat = dacs.pacmat '; 
+    v_reqCreate := v_reqCreate||' AND dtr.dtdeb_histo BETWEEN trunc(dach.date_eff, ''mm'') AND dach.date_fin_bo )'; 
+    
+    EXECUTE_IMMEDIATE_STRING(v_reqCreate,0);
+END create_view_tge_respaie_histo;
+##
+TGE_RESPAIE_HISTO_IHM
+==
+call CREATE_VIEW_TGE_RESPAIE_HISTO()

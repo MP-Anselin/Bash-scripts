@@ -1,0 +1,7 @@
+##
+TAG_CHARSET=@€ιθη
+##
+SYS_SEC_USR_DOCSERV
+=SQL IFNOTEXIST=SYS_SEC_USR_DOCSERV=
+CREATE TABLE SYS_SEC_USR_DOCSERV(LOGIN VARCHAR2(32) NOT NULL ENABLE, CODEDI VARCHAR2(50), FAMEDI VARCHAR2(50))
+insert into sys_sec_usr_docserv (login, codedi, famedi) select distinct(u.login),'|*ALL*|','|*ALL*|' from sys_usr_connu u where not exists(select v.login from sys_sec_usr_docserv v where u.login = v.login) and (datefinacces is null or to_date(datefinacces,'DD.MM.YYYY')> sysdate)

@@ -1,0 +1,42 @@
+##
+TAG_CHARSET=@€ιθη
+##
+SYS_GRAPH_TYPE
+=SQL IFNOTEXIST=SYS_GRAPH_TYPE=ICON=
+alter table SYS_GRAPH_TYPE add ICON VARCHAR2(255)
+##
+SYS_GRAPH_TYPE
+=SQL IFEXIST=SYS_GRAPH_TYPE=
+delete from SYS_GRAPH_TYPE
+##
+SYS_GRAPH_TYPE
+=SQL IFEXIST=SYS_GRAPH_TYPE=
+insert into SYS_GRAPH_TYPE values (1, 'Donut', 'icon-chart-donut')
+##
+SYS_GRAPH_TYPE
+=SQL IFEXIST=SYS_GRAPH_TYPE=
+insert into SYS_GRAPH_TYPE values (2, 'Camembert', 'fa-pie-chart')
+##
+SYS_GRAPH_TYPE
+=SQL IFEXIST=SYS_GRAPH_TYPE=
+insert into SYS_GRAPH_TYPE values (3, 'HistoBarStacked', 'icon-chart-column')
+##
+SYS_GRAPH_TYPE
+=SQL IFEXIST=SYS_GRAPH_TYPE=
+insert into SYS_GRAPH_TYPE values (4, 'HistoColumnStacked', 'icon-chart-column')
+##
+SYS_GRAPH_TYPE
+=SQL IFEXIST=SYS_GRAPH_TYPE=
+insert into SYS_GRAPH_TYPE values (5, 'HistoBar', 'icon-chart-column')
+##
+SYS_GRAPH_TYPE
+=SQL IFEXIST=SYS_GRAPH_TYPE=
+insert into SYS_GRAPH_TYPE values (6, 'HistoColumn', 'fa-bar-chart')
+##
+SYS_GRAPH_TYPE
+=SQL IFEXIST=SYS_GRAPH_TYPE=
+insert into SYS_GRAPH_TYPE values (7, 'AeraNeg', 'icon-chart-area')
+##
+SYS_GRAPH_TYPE
+=SQL IFEXIST=SYS_GRAPH_TYPE=
+insert into SYS_GRAPH_TYPE values (8, 'LineMarked', 'fa-line-chart')

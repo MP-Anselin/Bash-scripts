@@ -1,0 +1,38 @@
+##
+GET_WKF_DATAS
+=SQL=
+CREATE OR REPLACE FUNCTION GET_WKF_DATAS(p_DOS_NUM NUMBER) RETURN T_WKF_DATAS AS 
+  p_retour T_WKF_DATAS := T_WKF_DATAS();
+	cur_dictionnaire SYS_REFCURSOR;
+  nom_donnee VARCHAR2(50);
+  valeur_donnee CLOB;
+  nb_lignes NUMBER;
+  cpt NUMBER;
+BEGIN
+  FOR un_dictionnaire IN (SELECT NOM_DICTIONNAIRE FROM XMLTABLE('/DATA_DOS/*' PASSING (SELECT XML_DATAS FROM WKF_METIER_GENERIQUE WHERE DOS_NUM = p_DOS_NUM ) COLUMNS NOM_DICTIONNAIRE VARCHAR2(30) PATH 'name(.)') WHERE NOM_DICTIONNAIRE LIKE 'DIC%' OR NOM_DICTIONNAIRE LIKE 'SIMU_TGE%')
+  LOOP
+    OPEN cur_dictionnaire FOR 'SELECT NOM_DONNEE, VALEUR_DONNEE FROM XMLTABLE(''/DATA_DOS/'||un_dictionnaire.NOM_DICTIONNAIRE||'/*'' PASSING (SELECT XML_DATAS FROM WKF_METIER_GENERIQUE WHERE DOS_NUM = '||p_DOS_NUM||' ) COLUMNS NOM_DONNEE VARCHAR2(50) PATH ''name(.)'', VALEUR_DONNEE CLOB PATH ''.'') WHERE NOT NOM_DONNEE=''BIDON'' AND NOT NOM_DONNEE='''||un_dictionnaire.NOM_DICTIONNAIRE||'_NB_LIGNES'' AND NOT REGEXP_REPLACE(NOM_DONNEE,''_[0-9]+$'','''')='''||un_dictionnaire.NOM_DICTIONNAIRE||'_LIGNE''';
+    LOOP FETCH cur_dictionnaire INTO nom_donnee, valeur_donnee;
+      EXIT WHEN cur_dictionnaire%NOTFOUND;
+      p_retour.extend;
+      p_retour(p_retour.count) := T_WKF_DATA(un_dictionnaire.NOM_DICTIONNAIRE, NULL, nom_donnee, SUBSTR(valeur_donnee,1,4000) );
+    END LOOP;
+    CLOSE cur_dictionnaire;
+    SELECT EXTRACTVALUE(XML_DATAS, '/DATA_DOS/'||un_dictionnaire.NOM_DICTIONNAIRE||'/'||un_dictionnaire.NOM_DICTIONNAIRE||'_NB_LIGNES') INTO nb_lignes FROM WKF_METIER_GENERIQUE WHERE DOS_NUM=p_DOS_NUM;
+    IF nb_lignes IS NOT NULL AND NOT nb_lignes='0' THEN
+      cpt := 0;
+      WHILE NOT TO_CHAR(cpt)=nb_lignes
+      LOOP
+        OPEN cur_dictionnaire FOR 'SELECT NOM_DONNEE, VALEUR_DONNEE FROM XMLTABLE(''/DATA_DOS/'||un_dictionnaire.NOM_DICTIONNAIRE||'/'||un_dictionnaire.NOM_DICTIONNAIRE||'_LIGNE_'||cpt||'/*'' PASSING (SELECT XML_DATAS FROM WKF_METIER_GENERIQUE WHERE DOS_NUM = '||p_DOS_NUM||' ) COLUMNS NOM_DONNEE VARCHAR2(50) PATH ''name(.)'', VALEUR_DONNEE CLOB PATH ''.'') WHERE NOM_DONNEE NOT IN (''BIDON'',''CODE_OPERATION_LIGNE'',''NOM_ECRAN_SAISIE'')';
+        LOOP FETCH cur_dictionnaire INTO nom_donnee, valeur_donnee;
+          EXIT WHEN cur_dictionnaire%NOTFOUND;
+          p_retour.extend;
+          p_retour(p_retour.count) := T_WKF_DATA(un_dictionnaire.NOM_DICTIONNAIRE, cpt+1, nom_donnee, SUBSTR(valeur_donnee,1,4000) );
+        END LOOP;
+        CLOSE cur_dictionnaire;
+        cpt := cpt+1;
+      END LOOP;
+    END IF;
+  END LOOP;
+  RETURN p_retour;
+END GET_WKF_DATAS;

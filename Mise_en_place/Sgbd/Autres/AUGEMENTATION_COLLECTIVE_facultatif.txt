@@ -1,0 +1,46 @@
+##
+TAG_CHARSET=@€ιθη
+##
+sys_varsys
+==
+DELETE FROM sys_varsys WHERE CODVAR = 'CODE_THEME_AUGMENTATION_COLLECTIVE' AND MODULE = 'SYS'
+'SYS','CODE_THEME_AUGMENTATION_COLLECTIVE','Theme pour l''augmentation collective','Texte',''	
+##
+WKF_PROCESSUS
+==
+DELETE FROM WKF_PROCESSUS WHERE PROC_NUM=5049
+'5049','Assistant Augmentations','0',null,'false','0','fr.adp.com.gxp.std.mot_met.lib.objects.workflow.WkfMetierGeneriqueObj','true','IA','true',null,'1'
+##
+WKF_OPERATIONS
+==
+DELETE FROM WKF_OPERATIONS WHERE OP_NUM IN (54900,54901,54902)
+'54900','5049','Init Ass Augment','Initialiser Assistant Augmentations','0','0','I','true','true','false',null,'_PARAM_DYN_','false','false','false','20171228113903','false','0','false',null,null,null,null,null,'false',null,'0','true'
+'54902','5049','Fin proc Ass Aug','Fin Processus Assistant Augmentations','0','0','TF','true','true','true','fr.adp.com.gxp.std.mot_met.lib.objects.workflow.WkfMetierGeneriqueObj',null,'false','false','false','20171228144139','false','0','false',null,null,null,null,null,'false',null,'0','false'
+##
+WKF_BRANCH_GEN
+==
+DELETE FROM WKF_BRANCH_GEN WHERE OP_EMET_NUM IN (54900,54901,54902)
+'54900','Annuler','54902','54900','1','false','true','true','false','false','20171228145621','false',null
+'54900','Supprimer','54902','54901','1','false','true','true','false','false','20171228145642','false',null
+'54900','Valider','54902','54902','1','false','true','true','false','false','20171228145705','false',null
+##
+WKF_TRANSITIONS
+==
+DELETE FROM WKF_TRANSITIONS WHERE PROC_NUM=5049
+'54900','5049','T54900 vers (Fin Processus Assistant Augmentations)'
+'54901','5049','T54901 vers (Fin Processus Assistant Augmentations)'
+'54902','5049','T54902 vers (Fin Processus Assistant Augmentations)'
+##
+WKF_GROUP_PROC
+==
+DELETE FROM WKF_GROUP_PROC WHERE DOM_NUM=5000 AND PROC_NUM=5049
+5000,5049
+##
+WKF_OP_ROLE
+==
+DELETE FROM WKF_OP_ROLE WHERE OP_NUM IN (54900,54901,54902)
+54900,3,'*'
+##
+SYS_SCH_ELEMENT
+==
+CALL ADM_CREATE_NOM_PAGE(99,'Assistant Augmentations','Modules/Workflow/WkfRedirectSujet.jsp?Wkf_Id=54900',null,'true') 

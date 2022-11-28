@@ -1,0 +1,28 @@
+##
+TAG_CHARSET=@€ιθη
+##
+SYS_PAGES_MODAL_RESTRICTION
+==
+DELETE FROM SYS_PAGES_MODAL_RESTRICTION WHERE NOM_PAGE_MODALE IN ('Ext.adp.Modules.ZPaie.modal.ExportData','Ext.adp.Modules.ZPaie.modal.ExportElements','Ext.adp.Modules.ZPaie.modal.ExportIncidents','Ext.adp.Modules.ZPaie.modal.ExportAbsences')
+'Ext.adp.Modules.ZPaie.modal.ExportAbsences','Modules/ZPaie/GestionFeuillesImportExportSansGAP.jsp'
+'Ext.adp.Modules.ZPaie.modal.ExportData','Modules/ZPaie/GestionFeuillesImportExportSansGAP.jsp'
+'Ext.adp.Modules.ZPaie.modal.ExportElements','Modules/ZPaie/GestionFeuillesImportExportSansGAP.jsp'
+'Ext.adp.Modules.ZPaie.modal.ExportIncidents','Modules/ZPaie/GestionFeuillesImportExportSansGAP.jsp'
+##
+SYS_PAGES_MODAL_RESTRICTION
+==
+DELETE FROM SYS_PAGES_MODAL_RESTRICTION WHERE NOM_PAGE_MODALE IN ('Modules/HelpDesk/modal/HelpDesk_Fiche.jsp','Modules/HelpDesk/modal/HelpDesk_FicheModif.jsp','Modules/HelpDesk/modal/HelpDesk_FichePrint.jsp','Modules/HelpDesk/modal/HelpDesk_Suivi.jsp')
+'Modules/HelpDesk/modal/HelpDesk_Fiche.jsp','Modules/HelpDesk/HelpDesk_modale.jsp'
+'Modules/HelpDesk/modal/HelpDesk_FicheModif.jsp','Modules/HelpDesk/HelpDesk_modale.jsp'
+'Modules/HelpDesk/modal/HelpDesk_FichePrint.jsp','Modules/HelpDesk/HelpDesk_modale.jsp'
+'Modules/HelpDesk/modal/HelpDesk_Suivi.jsp','Modules/HelpDesk/HelpDesk_modale.jsp'
+##
+SYS_PAGES_MODAL_RESTRICTION
+==
+DELETE FROM SYS_PAGES_MODAL_RESTRICTION WHERE NOM_PAGE_MODALE = 'Modules/ZPaie/modal/PilotageOpePaieStop.jsp' AND NOM_PAGE_BUR_LIEE = 'Modules/ZPaie/PilotageOperationsPaie.jsp'
+'Modules/ZPaie/modal/PilotageOpePaieStop.jsp','Modules/ZPaie/PilotageOperationsPaie.jsp'
+##
+SYS_PAGES_MODAL_RESTRICTION
+==
+DELETE FROM SYS_PAGES_MODAL_RESTRICTION WHERE NOM_PAGE_MODALE IN ('Ext.adp.Modules.ZPaie.modal.ExportImputations')
+'Ext.adp.Modules.ZPaie.modal.ExportImputations','Modules/ZPaie/GestionFeuillesImportExportSansGAP.jsp'

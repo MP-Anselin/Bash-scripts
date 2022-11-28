@@ -1,0 +1,19 @@
+##
+META_LISTE_PREFIX_TABLE
+=SQL=
+CREATE OR REPLACE FUNCTION META_LISTE_PREFIX_TABLE RETURN TAB_VARCHAR
+IS 
+  listePrefix TAB_VARCHAR:=TAB_VARCHAR();
+BEGIN
+  listePrefix.extend();
+  listePrefix(listePrefix.last):='META';
+  listePrefix.extend();
+  listePrefix(listePrefix.last):='REF';
+  listePrefix.extend();
+  listePrefix(listePrefix.last):='LVRD';
+  listePrefix.extend();
+  listePrefix(listePrefix.last):='MARQ';
+  listePrefix.extend();
+  listePrefix(listePrefix.last):='HIS';
+  RETURN listePrefix;
+END META_LISTE_PREFIX_TABLE;

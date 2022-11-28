@@ -1,0 +1,25 @@
+##
+TAG_CHARSET=@€éèç
+##
+TGE_REF_ATA
+=SQL IFNOTEXIST=TGE_REF_ATA=
+CREATE TABLE TGE_REF_ATA(CODE_STATUT VARCHAR2(2 BYTE),LIBELLE1 VARCHAR2(32 BYTE),LIBELLE2 VARCHAR2(32 BYTE),CODE_DSN VARCHAR2(3 BYTE),UTILISE VARCHAR2(1 BYTE), primary key(CODE_STATUT) )
+##
+TGE_REF_ATA
+==
+delete from TGE_REF_ATA WHERE CODE_STATUT IN ('01','02','03','04','05','06','07','09','10','11','12','13','14','15','16')
+'01','Gérant ou collège de gérance','','01','O'
+'02','Administrateur','','02','O'
+'03','Directeur Général','','03','O'
+'04','Président Directeur Général','','04','O'	
+'05','Membre du Directoire','','05','O'	
+'06','Président du Directoire','','06','O'
+'07','Membre du Conseil','de surveillance','07','O'
+'09','Contrôleur de gestion, membre o','u administrateur membre d''un GIE','09','O'
+'10','Associé, actionnaire','','10','O'	
+'11','Salarié en portage ','salarial','11','O'
+'12','ADMINISTRATEUR/PDG/DG','','','N'
+'13','MEMBRE PDT DU DIRECTOIRE','','','N'
+'14','DG NON ADMINISTRATEUR','','','N'
+'15','DIRECTEUR GENERAL UNIQUE','','','N'
+'16','MANDATAIRE SOCIAL','','','N'

@@ -1,0 +1,17 @@
+##
+TAG_CHARSET=@€ιθη
+##
+XLS_SHEET_LIB
+==
+delete from XLS_SHEET_LIB where CODE_SHEET = 'TGE_EXP_ANN'
+'TGE_EXP_ANN', 'fr_fr', 'Export annulations'
+##
+XLS_SHEET_LIB
+==
+delete from XLS_SHEET_LIB where CODE_SHEET = 'TGE_EXP_IMP'
+'TGE_EXP_IMP', 'fr_fr', 'Export imputations'
+##
+XLS_SHEET_LIB
+==
+delete from XLS_SHEET_LIB where CODE_SHEET = 'TGE_EXP_IMP_I'
+'TGE_EXP_IMP_I', 'fr_fr', 'Export imputations'

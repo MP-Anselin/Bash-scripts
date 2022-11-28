@@ -1,0 +1,37 @@
+##
+TAG_CHARSET=@€éèç
+##
+BATCH_DESCRIPTION
+==
+delete from BATCH_DESCRIPTION where FAMILLE = 'BATCH_STC' and CLASSE_NAME in ('fr.adp.com.gxp.std.modules.lib.objects.zpaie.mgr.Traitement_annulerDepartStc.java','fr.adp.com.gxp.std.modules.lib.objects.zpaie.mgr.Traitement_annulerDepartStc','fr.adp.com.gxp.std.modules.lib.objects.zpaie.mgr.Traitement_departOuMutationStc.java','fr.adp.com.gxp.std.modules.lib.objects.zpaie.mgr.Traitement_departOuMutationStc')
+'BATCH_STC','fr.adp.com.gxp.std.modules.lib.objects.zpaie.mgr.Traitement_annulerDepartStc','Annulation d''un départ (avec STC non calculé en paie)',NULL,NULL
+'BATCH_STC','fr.adp.com.gxp.std.modules.lib.objects.zpaie.mgr.Traitement_departOuMutationStc','Départ solde tout compte (STC)',NULL,NULL
+##
+BATCH_DESCRIPTION
+==
+delete from BATCH_DESCRIPTION where FAMILLE = 'BATCH_STC' and CLASSE_NAME in ('fr.adp.com.gxp.std.modules.lib.objects.zpaie.mgr.Traitement_annulerEmbaucheSuppAbsNonStc')
+'BATCH_STC','fr.adp.com.gxp.std.modules.lib.objects.zpaie.mgr.Traitement_annulerEmbaucheSuppAbsNonStc','Annulation d''embauche : suppression des absences non STC',NULL,NULL
+##
+BATCH_DESCRIPTION
+=SQL IFEXIST=BATCH_DESCRIPTION=
+DELETE FROM BATCH_DESCRIPTION WHERE FAMILLE = 'BATCH_PTG' AND CLASSE_NAME = 'fr.adp.com.gxp.std.modules.lib.objects.gta.gestil.traitement.Traitement_Evt_Gestil'
+##
+BATCH_DESCRIPTION
+=SQL IFEXIST=BATCH_DESCRIPTION=
+INSERT INTO BATCH_DESCRIPTION (FAMILLE,CLASSE_NAME,LIBELLE,TYPE_UTILISATEUR,ARRET_TRT) VALUES ('BATCH_PTG','fr.adp.com.gxp.std.modules.lib.objects.gta.gestil.traitement.Traitement_Evt_Gestil','Initialisation d''une donnée dans Gestil','CLIENT','OUI')
+##
+BATCH_DESCRIPTION
+=SQL IFEXIST=BATCH_DESCRIPTION=
+UPDATE BATCH_DESCRIPTION SET LIBELLE = 'Initialisation des embauches dans Gestil', FAMILLE = 'BATCH_GES' WHERE FAMILLE = 'BATCH_PTG' AND CLASSE_NAME = 'fr.adp.com.gxp.std.modules.lib.objects.gta.gestil.traitement.Traitement_Gestil_EMB_Population'
+##
+BATCH_DESCRIPTION
+=SQL IFEXIST=BATCH_DESCRIPTION=
+DELETE FROM BATCH_DESCRIPTION WHERE FAMILLE = 'BATCH_PTG' AND CLASSE_NAME = 'fr.adp.com.gxp.std.modules.lib.objects.gta.gestil.traitement.Traitement_Evt_Gestil'
+##
+BATCH_DESCRIPTION
+=SQL IFEXIST=BATCH_DESCRIPTION=
+DELETE FROM BATCH_DESCRIPTION WHERE FAMILLE = 'BATCH_GES' AND CLASSE_NAME = 'fr.adp.com.gxp.std.modules.lib.objects.gta.gestil.traitement.Traitement_Gestil_MJD'
+##
+BATCH_DESCRIPTION
+=SQL IFEXIST=BATCH_DESCRIPTION=
+INSERT INTO BATCH_DESCRIPTION (FAMILLE,CLASSE_NAME,LIBELLE,TYPE_UTILISATEUR,ARRET_TRT) VALUES ('BATCH_GES','fr.adp.com.gxp.std.modules.lib.objects.gta.gestil.traitement.Traitement_Gestil_MJD','Initialisation d''une donnée dans Gestil','CLIENT','OUI')

@@ -1,0 +1,31 @@
+##
+HREXTR_CODTS_ATPOSIT
+=SQL=
+CREATE OR REPLACE
+  FUNCTION HREXTR_CODTS_ATPOSIT(
+      p_position IN NUMBER )
+    RETURN VARCHAR2
+  IS
+  TYPE tcur
+IS
+  REF
+  CURSOR;
+    cur tcur;
+    retour VARCHAR2(10);
+  BEGIN
+    OPEN cur FOR SELECT TAB.codts FROM
+    (SELECT ROWNUM AS position,
+      codts
+    FROM
+      (SELECT * FROM std_structures ORDER BY ordre
+      )
+    ) TAB WHERE TAB.position=p_position;
+    LOOP
+      FETCH cur INTO retour;
+      EXIT
+    WHEN cur % NOTFOUND;
+    END LOOP ;
+    CLOSE cur;
+    RETURN retour;
+  END HREXTR_CODTS_ATPOSIT;
+  

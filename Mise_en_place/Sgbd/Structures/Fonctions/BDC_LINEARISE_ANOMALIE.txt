@@ -1,0 +1,39 @@
+##
+BDC_LINEARISE_ANOMALIE
+=SQL=
+CREATE OR REPLACE
+  FUNCTION BDC_LINEARISE_ANOMALIE(
+      pmatric        IN VARCHAR2,
+      pnumcontrole   IN NUMBER,
+      pdatetraitplp  IN VARCHAR2,
+      pruped         IN NUMBER ,
+      penvironnement IN VARCHAR2)
+    RETURN VARCHAR2
+  IS
+  type tcur
+IS
+  ref
+  CURSOR;
+    cur tcur;
+    retourselect VARCHAR2(2000);
+    retour CLOB;
+    req VARCHAR2(2500);
+  BEGIN
+    req := 'SELECT (BDC_ANOMALIE.CODE_ALERTE) ';
+    req :=req||'||''-''||'||penvironnement||'.LIB_ALERTE  from BDC_ANOMALIE, ';
+    req :=req||penvironnement||' WHERE BDC_ANOMALIE.CODE_ALERTE = ';
+    req :=req||penvironnement||'.CODE_ALERTE ';
+    req :=req||' AND BDC_ANOMALIE.MATRIC='||pmatric ;
+    req :=req||' AND BDC_ANOMALIE.DATE_TRAIT_PLP ='||pdatetraitplp;
+    req :=req||' AND  BDC_ANOMALIE.NUM_CONTROLE='||pnumcontrole;
+    req :=req||' AND BDC_ANOMALIE.RUPED = '||pruped||' AND ROWNUM <= 10';
+    OPEN cur FOR req ;
+    LOOP
+      FETCH cur INTO retourselect;
+    EXIT
+  WHEN cur % NOTFOUND;
+    retour := retour||retourselect||'<br>';
+  END LOOP ;
+  CLOSE cur;
+  RETURN SUBSTR(retour, 0, LENGTH(retour)-4);
+END;

@@ -1,0 +1,260 @@
+##
+TAG_CHARSET=@€éèç
+##
+TGE_ALIM_PERIODE_INDIV_MAIN
+=SQL=
+create or replace PROCEDURE TGE_ALIM_PERIODE_INDIV_MAIN( p_id            IN NUMBER, p_numpac        IN VARCHAR2, p_periode_paie  IN VARCHAR2,
+ p_pacmat       IN VARCHAR2,
+ p_dosNumForSimu IN NUMBER DEFAULT NULL,
+ recueil_photo IN BOOLEAN DEFAULT FALSE )
+ IS
+ w_err    VARCHAR2(2000);
+ w_audit_alim_periode_tab AUDIT_ALIM_PERIODE_TAB;
+ w_debut_recueil_retro DATE;
+ w_fin_recueil_retro   DATE;
+ id_trt                NUMBER;
+ reqTempInfo		   CLOB;
+ req                   CLOB;
+
+ BEGIN
+ TGE_IMPORT_AVANCEMENT_proc('TGE_ALIM_PER','TGE_ALIM_PERIODE_INDIV_MAIN début (' || p_numpac || ',' || p_periode_paie || ',' || p_pacmat || ')');
+ --Alimentation id procédure
+ IF p_id   = 0 OR p_id IS NULL THEN
+ id_trt := IMP_TRT_SEQ_ID.nextval;
+ ELSE
+ id_trt := p_id;
+ END IF;
+
+ 
+ --Vérification des données à traiter
+ w_audit_alim_periode_tab := AUDIT_ALIM_PERIODE_INDIV(id_trt, p_numpac, p_periode_paie, p_pacmat);
+ IF w_audit_alim_periode_tab.exists(1) THEN
+ FOR i IN w_audit_alim_periode_tab.first..w_audit_alim_periode_tab.last
+ LOOP
+ w_err := w_err || '(' || w_audit_alim_periode_tab(i).paiezad || ',' || w_audit_alim_periode_tab(i).debut_recueil_force || ',' || w_audit_alim_periode_tab(i).fin_recueil_force || ')';
+ END LOOP;
+ TGE_IMPORT_AVANCEMENT_proc('TGE_ALIM_PER','TGE_ALIM_PERIODE_INDIV_MAIN ERR : Erreurs de configuration des periodes de recueil pour les paiezad suivant (paiezad,debut_recueil_force,fin_recueil_force) : ' || w_err);
+ TGE_IMPORT_AVANCEMENT_proc('TGE_ALIM_PER','fin TGE_ALIM_PERIODE_INDIV_MAIN KO');
+ RETURN;
+ END IF;
+ --Récupération de la période de recueil retro issu de la table LTP (TGE_REF_LTP)
+ BEGIN
+ SELECT DEBUT_PERIODE,
+ FIN_PERIODE
+ INTO w_debut_recueil_retro,
+ w_fin_recueil_retro
+ FROM TGE_REF_LTP
+ WHERE NUMPAC  = p_numpac
+ AND MOIS_PAIE = TO_CHAR(ADD_MONTHS(TO_DATE(p_periode_paie,'yyyymm'),-1),'YYYYMM');
+ EXCEPTION
+ WHEN NO_DATA_FOUND THEN
+ TGE_IMPORT_AVANCEMENT_proc('TGE_ALIM_PER','TGE_ALIM_PERIODE_INDIV_MAIN ERR : Erreurs de configuration des periodes de recueil M-1 dans TGE_REF_LTP : NUMPAC = ''' || p_numpac || ''' AND MOIS_PAIE = ' || TO_CHAR(ADD_MONTHS(TO_DATE(p_periode_paie,'yyyymm'),-1),'YYYYMM'));
+ raise;
+ END;
+
+ --Récupération requête des informations
+ TGE_ALIM_PERIODE_INDIV_TEMP(id_trt, p_numpac, p_pacmat, p_periode_paie, reqTempInfo, recueil_photo);
+ 
+ --Nettoyage avant d'insérer dans TGE_PERIODE_RECUEIL_PAIEZAD
+ req := 'DELETE FROM ';
+ IF p_dosNumForSimu IS NOT NULL THEN
+ -- Si un dos_num est passé en paramètre, on alimente la table SIMU
+ req := req||'SIMU_TGE_PERIODE_RECUEIL_PZAD';
+ ELSE
+ req := req||'TGE_PERIODE_RECUEIL_PAIEZAD';
+ END IF;
+ req := req||' WHERE NUMPAC = '''||p_numpac||'''';
+ req := req||' AND MOIS_PAIE >= '''||p_periode_paie||'''';
+ IF p_pacmat IS NOT NULL THEN
+ req := req||' AND PACMAT = '''||p_pacmat||'''';
+ END IF;
+ IF p_dosNumForSimu IS NOT NULL THEN
+ req := req||' AND DOS_NUM = '||p_dosNumForSimu;
+ END IF;
+ EXECUTE_IMMEDIATE_STRING ( req,0);
+ 
+ --Insertion des données dans TGE_PERIODE_RECUEIL_PAIEZAD
+ req := 'INSERT INTO ';
+ IF p_dosNumForSimu IS NOT NULL THEN
+ -- Si un dos_num est passé en paramètre, on alimente la table SIMU
+ req := req||'SIMU_TGE_PERIODE_RECUEIL_PZAD';
+ ELSE
+ req := req||'TGE_PERIODE_RECUEIL_PAIEZAD';
+ END IF;
+ req := req||' (';
+ IF p_dosNumForSimu IS NOT NULL THEN
+ -- Si un dos_num est passé en paramètre, il faut alimenter la colonne DOS_NUM
+ req := req||'    DOS_NUM,';
+ END IF;
+ req := req||'    NUMPAC, 
+ 			      MOIS_PAIE, 
+ 			      PAIEZAD, 
+ 			      PACMAT, 
+ 			      RETRO_GC, 
+ 			      DEBUT_PERIODE_PAIE, 
+ 			      FIN_PERIODE_PAIE, 
+ 			      DEBUT_PERIODE_RECUEIL, 
+ 			      FIN_PERIODE_RECUEIL, 
+ 			      ENTREE, 
+ 			      SORTIE, 
+ 			      DEBUT_PER_RECUEIL_RETRO, 
+ 			      FIN_PER_RECUEIL_RETRO, 
+ 			      DEPART_SUSPENSION, 
+ 			      RETOUR_SUSPENSION, 
+ 			      DEBUT_PER_GENERATION_HP, 
+ 			      FIN_PER_GENERATION_HP,
+ 				  DEBUT_PERIODE_RECUEIL_LTP,
+ 				  FIN_PERIODE_RECUEIL_LTP
+ 			    ) 
+ 			  SELECT * FROM ( SELECT  /*+ opt_param(''_optimizer_push_pred_cost_based'',''false'') */ ';
+ IF p_dosNumForSimu IS NOT NULL THEN
+ -- Si un dos_num est passé en paramètre, il faut alimenter la colonne DOS_NUM
+ req := req||p_dosNumForSimu||',';
+ END IF;
+ req := req||'  NUMPAC, 
+ 			    MOIS_PAIE, 
+ 			    PAIEZAD, 
+ 			    PACMAT, 
+ 			    RETRO_GC, 
+ 			    DATE_DEB_PERIODE, 
+ 			    DATE_FIN_PERIODE, 
+ 			    debut_recueil, 
+ 			    fin_recueil, 
+ 			    debut_situ, 
+ 			    CASE 
+ 			      WHEN fin_situ > DATE_FIN_PERIODE 
+ 			        THEN TO_DATE(''31.12.2099'',''dd.mm.yyyy'') 
+ 			      ELSE fin_situ 
+ 			    END AS fin_situation, 
+ 			    TO_DATE('||TO_CHAR(w_debut_recueil_retro,'yyyymmdd')||',''yyyymmdd''), 
+ 			    TO_DATE('||TO_CHAR(w_fin_recueil_retro,'yyyymmdd')||',''yyyymmdd''), 
+ 			    DEPART_SUSP, 
+ 			    RETOUR_SUSP, 
+ 			    CASE 
+ 			      WHEN SORTIE_PRECEDENTE BETWEEN DATE_DEB_PERIODE AND DATE_FIN_PERIODE 
+ 			      	OR debut_recueil IS NOT NULL 
+ 			        THEN TRUNC(TRUNC(GREATEST(DSDCN, dt_recueil_deb),''MONTH''),''DAY'') 
+ 			      WHEN debut_recueil IS NULL 
+ 			        AND entree       IS NOT NULL 
+ 			        AND entree         <= DATE_FIN_PERIODE 
+ 			        AND sortie        IS NOT NULL 
+ 			        AND sortie         >= dt_recueil_deb 
+ 			        THEN DATE_DEB_PERIODE 
+ 			      WHEN debut_recueil IS NULL
+                  AND ((entree       IS NOT NULL
+                  AND entree          > DATE_FIN_PERIODE)
+                  OR (sortie         IS NOT NULL
+                  AND sortie          < dt_recueil_deb))
+                  THEN NULL 
+ 			    END AS debut_HP , 
+ 			    CASE 
+ 			        WHEN fin_recueil IS NOT NULL
+ 			          AND ENTREE_SUIVANTE IS NULL
+ 			          THEN TRUNC(LAST_DAY(DATE_FIN_PERIODE),''DAY'')+6
+ 			        WHEN fin_recueil IS NOT NULL
+ 			          THEN LEAST(TRUNC(LAST_DAY(DATE_FIN_PERIODE),''DAY'')+6,NVL(DSFCN,TRUNC(LAST_DAY(DATE_FIN_PERIODE),''DAY'')+6)) 
+ 			        WHEN fin_recueil IS NULL 
+ 			          AND entree     IS NOT NULL 
+ 			          AND entree       <= DATE_FIN_PERIODE 
+ 			          AND sortie      IS NOT NULL 
+ 			          AND sortie       >= dt_recueil_deb 
+ 			          THEN DATE_FIN_PERIODE
+ 			           WHEN fin_recueil IS NULL
+                    AND ((entree     IS NOT NULL
+                    AND entree        > DATE_FIN_PERIODE)
+                    OR (sortie       IS NOT NULL
+                    AND sortie        < dt_recueil_deb))
+                    THEN NULL 
+ 			      END AS fin_HP,
+ 			      DT_RECUEIL_DEB,
+ 				  DT_RECUEIL_FIN 
+ 			    FROM 
+ 			      (SELECT lead(ENTREE,1) over(partition BY NUMPAC,PACMAT order by ENTREE)-1 ENTREE_SUIVANTE, 
+ 			        lag(SORTIE,1) over(partition BY NUMPAC,PACMAT order by SORTIE) SORTIE_PRECEDENTE, 
+ 			        NUMPAC, 
+ 			        PACMAT, 
+ 			        PAIEZAD, 
+ 			        RETRO_GC, 
+ 			        MOIS_PAIE,
+ 			        DATE_DEB_PERIODE,
+ 			        DATE_FIN_PERIODE,
+ 			        DEBUT_FORCEE, 
+ 			        FIN_FORCEE, 
+ 			        ENTREE, 
+ 			        SORTIE, 
+ 			        DSFCN, 
+ 			        DSDCN,
+ 			        RETOUR_SUSP, 
+ 			        DEPART_SUSP, 
+ 			        DEBUT_SITU, 
+ 			        FIN_SITU, 
+ 			        debut_recueil, 
+ 			        DT_RECUEIL_DEB, 
+ 			        DT_RECUEIL_FIN, 
+ 			        CASE 
+ 			          WHEN fin_forcee IS NOT NULL 
+ 			            THEN fin_forcee 
+ 			          WHEN debut_recueil IS NULL 
+ 			            THEN NULL 
+ 			          WHEN sortie      IS NULL 
+ 			            OR sortie      > DATE_FIN_PERIODE 
+ 			            THEN dt_recueil_fin 
+ 			          WHEN sortie      >= dt_recueil_deb 
+ 			            THEN sortie  
+ 			          ELSE TO_DATE(''01/01/1900'',''dd/mm/yyyy'')  
+ 			        END AS fin_recueil 
+ 			      FROM 
+ 			        (SELECT NUMPAC, 
+ 			          PACMAT, 
+ 			          PAIEZAD, 
+ 			          RETRO_GC, 
+ 			          MOIS_PAIE,
+ 			          DATE_DEB_PERIODE,
+ 			          DATE_FIN_PERIODE,
+ 			          DEBUT_FORCEE, 
+ 			          FIN_FORCEE, 
+ 			          ENTREE, 
+ 			          SORTIE, 
+ 			          DSFCN, 
+ 			          DSDCN,
+ 			          RETOUR_SUSP, 
+ 			          DEPART_SUSP, 
+ 			          DEBUT_SITU, 
+ 			          FIN_SITU, 
+ 			          DT_RECUEIL_DEB, 
+ 			          DT_RECUEIL_FIN, 
+ 			          CASE 
+ 			            WHEN debut_forcee IS NOT NULL 
+ 			              THEN debut_forcee 
+ 			            WHEN entree IS NULL  
+ 			              THEN null 
+ 			            WHEN entree        <= dt_recueil_fin 
+ 			              AND (sortie IS NULL 
+ 			              OR (sortie        >= dt_recueil_deb 
+ 			              AND (sortie > DATE_FIN_PERIODE  
+ 			              	OR NOT EXISTS (SELECT 1 FROM TGE_PERIODE_RECUEIL_PAIEZAD rec_ind WHERE rec_ind.NUMPAC = rec_temp.numpac AND rec_ind.PAIEZAD = rec_temp.paiezad AND rec_ind.FIN_PERIODE_RECUEIL >= rec_temp.sortie) ) ))  
+ 
+ 			              THEN GREATEST(entree, NVL(dt_recueil_deb, entree)) 
+ 			            WHEN entree        <= dt_recueil_fin	
+						AND (sortie        < dt_recueil_deb  
+							OR ( sortie        >= dt_recueil_deb AND (sortie < DATE_FIN_PERIODE 
+								AND EXISTS (SELECT 1 FROM TGE_PERIODE_RECUEIL_PAIEZAD rec_ind WHERE rec_ind.NUMPAC = rec_temp.numpac AND rec_ind.PAIEZAD = rec_temp.paiezad AND rec_ind.FIN_PERIODE_RECUEIL >= rec_temp.sortie))))
+						THEN TO_DATE(''01/01/1900'',''dd/mm/yyyy'')
+						WHEN (sortie        IS NOT NULL
+                          AND entree         > dt_recueil_fin
+                          AND sortie        <= DATE_FIN_PERIODE)
+                          THEN entree						
+                        ELSE NULL
+ 			          END AS debut_recueil 
+ 			        FROM (' || reqTempInfo || ') rec_temp 
+ 			        ) 
+ 			      ) ) WHERE (debut_recueil IS NULL OR TO_CHAR(debut_recueil,''dd/mm/yyyy'') != ''01/01/1900'') AND (fin_recueil IS NULL OR  TO_CHAR(fin_recueil,''dd/mm/yyyy'')  != ''01/01/1900'') AND debut_HP IS NOT NULL AND fin_HP IS NOT NULL';
+ 			      
+ --DBMS_OUTPUT.PUT_LINE(req);
+ EXECUTE_IMMEDIATE_STRING  (req,0);
+
+ TGE_IMPORT_AVANCEMENT_proc('TGE_ALIM_PER','fin TGE_ALIM_PERIODE_INDIV_MAIN OK');
+ EXCEPTION
+ WHEN OTHERS THEN
+ TGE_IMPORT_AVANCEMENT_proc('TGE_ALIM_PER','fin TGE_ALIM_PERIODE_INDIV_MAIN KO : TGE_ALIM_PERIODE_INDIV_MAIN '||SQLCODE||' '||SQLERRM);
+ END TGE_ALIM_PERIODE_INDIV_MAIN;

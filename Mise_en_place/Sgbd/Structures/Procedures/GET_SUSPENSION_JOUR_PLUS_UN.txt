@@ -1,0 +1,120 @@
+##
+GET_SUSPENSION_JOUR_PLUS_UN
+=SQL=
+create or replace PROCEDURE GET_SUSPENSION_JOUR_PLUS_UN(
+  p_id_trt                  NUMBER)
+AS
+  v_req_insert_dif_fsed     CLOB;                                    -- requête d'insertion de ligne dans DIF_FSED
+
+  TYPE t_valeur             IS TABLE OF dif_fsed.valeur%TYPE;
+  tab_req_valeur            t_valeur := t_valeur();                  -- tableau de requêtes pour DIF_FSED.VALEUR
+
+  TYPE t_type_element       IS TABLE OF tge_ref_mapdo.element%TYPE;
+  tab_element               t_type_element := t_type_element();      -- table de valeur TGE_REF_MAPDO.ELEMENT
+
+  v_periodeencours          tge_ref_pac.periodeencours%TYPE;         -- valeur de TGE_REF_PAC.PERIODEENCOURS
+  v_cle                     dif_fsed.cle%TYPE;                       -- valeur de DIF_FSED.CLE
+  v_numcnt                  dic_adm_contrat_histo.numcnt%TYPE;       -- valeur de DIF_FSED.NUMCNT
+  v_date_eff                dic_adm_contrat_histo.date_eff%TYPE;     -- valeur de DIF_FSED.DATE_EFF
+  v_paiezad				   	dic_adm_contrat_histo.paiezad%TYPE;      -- valeur de DIF_FSED.PAIEZAD
+  v_date_fin_mois           tge_ref_per.date_fin_mois%TYPE;          -- valeur de TGE_REF_PER.DATE_FIN_MOIS
+
+  v_first                   BOOLEAN := TRUE;
+  v_indice                  INTEGER := 0;
+
+  v_donneegxp_A301          tge_ref_mapdo.donneegxp%TYPE;
+  v_indice_A301             INTEGER := 0;
+
+  TYPE t_type_donnee        IS TABLE OF VARCHAR(1000);
+  tab_type_donnee           t_type_donnee := t_type_donnee();
+  v_type_donnee             dif_fsed.type_donnee%TYPE;
+BEGIN
+  FOR i IN (SELECT numpac, pacmat FROM gap_trt_liste_mat WHERE id_trt = p_id_trt)
+  LOOP
+    IF (v_first) THEN
+      v_indice := 0;
+      tab_req_valeur.EXTEND(3);
+      tab_element.EXTEND(3);
+      tab_type_donnee.EXTEND(3);
+
+      FOR j IN (SELECT numpac, element, donneegxp, tablegxp, REPLACE(REPLACE(trtparticulier, '$DONNEEGXP', donneegxp), '$TABLE', tablegxp) AS trtparticulier FROM tge_ref_mapdo WHERE element IN ('A301','A302','A962') AND (numpac = i.numpac)
+                 UNION ALL
+                SELECT numpac, element, donneegxp, tablegxp, REPLACE(REPLACE(trtparticulier, '$DONNEEGXP', donneegxp), '$TABLE', tablegxp) AS trtparticulier FROM tge_ref_mapdo WHERE element IN ('A301','A302','A962') AND (numpac = '*') 
+                 AND (numpac, element) NOT IN (SELECT '*', element FROM tge_ref_mapdo WHERE element IN ('A301','A302','A962') AND (numpac = i.numpac))
+               )
+      LOOP
+        v_indice := v_indice + 1;
+        -- DIF_FSED.VALEUR et DIF_FSED_TYPE_DONNEE
+        IF (j.trtparticulier IS NOT NULL) THEN
+          tab_req_valeur(v_indice) := 'SELECT ' || j.trtparticulier || ' AS VALEUR FROM ' || j.tablegxp;
+          tab_type_donnee(v_indice) := 'SELECT CASE  WHEN tge_ref_dicoz.type = ''A'' THEN (''A'') '
+                                                 || 'WHEN tge_ref_dicoz.type = ''P'' THEN (''N'') '
+                                                 || 'WHEN tge_ref_dicoz.type = ''N'' AND masque IN(1, 2, 3, 4, 5, 6, 7) THEN (''D'') '
+                                                 || 'WHEN tge_ref_dicoz.type = ''N'' AND masque NOT IN(1, 2, 3, 4, 5, 6, 7) THEN (''N'') '
+                                            || 'ELSE NULL END AS TYPE_DONNEE ' 
+                                    || 'FROM tge_ref_dicoz WHERE element = ''' || j.element || ''' AND numpac = ''' || i.numpac || '''';
+        ELSE
+          tab_req_valeur(v_indice) := 'SELECT ' || j.donneegxp || ' AS VALEUR FROM ' || j.tablegxp;
+          tab_type_donnee(v_indice) := 'SELECT CASE WHEN data_type = ''DATE'' THEN (''D'') '
+                                                || 'WHEN data_type = ''NUMBER'' THEN (''N'') '
+                                            || 'ELSE ''A'' END AS TYPE_DONNEE '
+                                    || 'FROM user_tab_cols where table_name = ''' || j.tablegxp || ''' AND column_name = ''' || j.donneegxp || '''';
+
+          SELECT CASE WHEN data_type = 'DATE' THEN ('D') WHEN data_type = 'NUMBER' THEN ('N') ELSE 'A' END AS TYPE_DONNEE INTO v_type_donnee FROM user_tab_cols where table_name = j.tablegxp AND column_name = j.donneegxp;
+          IF (v_type_donnee = 'D') THEN
+            tab_req_valeur(v_indice) := 'SELECT TO_CHAR(' || j.donneegxp || ', ''YYYYMMDDHH24MISS'') AS VALEUR FROM ' || j.tablegxp;
+          END IF;
+        END IF;
+        tab_element(v_indice) := j.element;
+
+        IF (j.element = 'A301') THEN
+          v_indice_A301 := v_indice;
+          v_donneegxp_A301 := j.donneegxp;
+        END IF;
+      END LOOP;
+
+      -- TGE_REF_PER.DATE_FIN_MOIS
+      SELECT periodeencours INTO v_periodeencours FROM tge_ref_pac WHERE numpac = i.numpac;
+      SELECT date_fin_mois INTO v_date_fin_mois FROM tge_ref_per WHERE numpac = i.numpac AND periodeencours = v_periodeencours;
+
+      v_first := FALSE;
+    END IF;
+
+    -- DIC_ADM_CONTRAT_HISTO.NUMCNT
+    SELECT MAX(numcnt) INTO v_numcnt FROM dic_adm_contrat_histo WHERE numpac = i.numpac AND pacmat = i.pacmat ORDER BY numcnt, date_eff DESC;
+
+    -- DIC_ADM_CONTRAT_HISTO.DATE_EFF
+    SELECT MAX(date_eff) INTO v_date_eff FROM dic_adm_contrat_histo WHERE numpac = i.numpac AND pacmat = i.pacmat AND numcnt = v_numcnt ORDER BY numcnt, date_eff DESC;
+
+	-- DIC_ADM_CONTRAT_HISTO.PAIEZAD
+	SELECT PAIEZAD INTO v_paiezad FROM dic_adm_contrat_histo WHERE numpac = i.numpac AND pacmat = i.pacmat AND numcnt = v_numcnt AND date_eff = v_date_eff;
+  
+    -- DIF_FSED.CLE
+    v_cle := i.numpac || '#' || i.pacmat || '#' || v_numcnt || '#' || TO_CHAR(v_date_eff, 'YYYYMMDD');
+
+    -- DIF_FSED
+    FOR n IN tab_req_valeur.first..tab_req_valeur.last
+    LOOP
+        v_req_insert_dif_fsed := 'INSERT INTO dif_fsed (id_trt, numpac, cle, pacmat, elem, valeur, codeop, type_donnee, dteffet,paiezad) (SELECT '
+                       || p_id_trt || ', '''                                                                                                             -- DIF_FSED.ID_TRT
+                       || i.numpac || ''', '''                                                                                                           -- DIF_FSED.NUMPAC
+                       || REPLACE(v_cle, chr(39), chr(39) || chr(39)) || ''', '''                                                                        -- DIF_FSED.CLE
+                       || i.pacmat  || ''', '''                                                                                                          -- DIF_FSED.PACMAT
+                       || tab_element(n) || ''',  '                                                                                                      -- DIF_FSED.ELEM
+                       || '(' || tab_req_valeur(n) || ' WHERE numpac = ''' || i.numpac || ''' AND pacmat = ''' || i.pacmat
+                                                                                       || ''' AND numcnt = ''' || v_numcnt
+                                                                                       || ''' AND date_eff = ''' || v_date_eff || '''), '                -- DIF_FSED.VALEUR
+                       || '''C'', '                                                                                                                      -- DIF_FSED.CODEOP
+                       || '(' || tab_type_donnee(n) || '), '                                                                                             -- DIF_FSED.TYPE_DONNEE
+					   || 'TO_DATE(' || v_date_fin_mois || ', ''YYYYMMDD'') , '''                                                                          -- DIF_FSED.DTEFFET
+					   || v_paiezad ||   ''''                                                                     								   -- DIF_FSED.PAIEZAD
+                       || ' FROM dual WHERE EXISTS (' ||  tab_req_valeur(v_indice_A301) || ' WHERE numpac = ''' || i.numpac || ''' AND pacmat = ''' || i.pacmat
+                                                                                                                           || ''' AND numcnt = ''' || v_numcnt
+                                                                                                                           || ''' AND date_eff = ''' || v_date_eff
+                                                                                                                           || ''' AND '|| v_donneegxp_A301 ||' IS NOT NULL AND ' || v_donneegxp_A301 || ' = TO_DATE(' || v_date_fin_mois || ', ''YYYYMMDD'') + INTERVAL ''1'' DAY))';
+      EXECUTE_IMMEDIATE_STRING ( v_req_insert_dif_fsed,0);
+    END LOOP;
+  END LOOP;
+  EXCEPTION WHEN OTHERS THEN
+  raise_application_error(-20000, 'Problème(s) durant l''opération d''insertion dans DIF_FSED: ' || v_req_insert_dif_fsed || ',' || SQLCODE || '-' || sqlerrm);
+END GET_SUSPENSION_JOUR_PLUS_UN;

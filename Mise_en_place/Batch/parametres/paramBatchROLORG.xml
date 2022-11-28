@@ -1,0 +1,33 @@
+<interface idInterface="ROLORG">
+	<nomInterface>Chargement de Role et Orga</nomInterface>
+	<descriptionInterface>Chargement des tables Role et Orga</descriptionInterface>
+	<alerteSiFichierNonDisponible>NON</alerteSiFichierNonDisponible>
+	<listeDependancesFichiers></listeDependancesFichiers>
+	<traitements>
+		<traitement>
+			<descriptionTraitement>Script SQL standard avant chargement Role et Organisation</descriptionTraitement>
+			<typeTraitement>SCRIPT</typeTraitement>
+			<nomFichier>sql_RD_avant_ROLORG.sql</nomFichier>
+			<typeFichier>SQL</typeFichier>
+			<continueSiErreur>NON</continueSiErreur>
+		</traitement>
+		<traitement>
+			<descriptionTraitement>Script SQL specifique avant chargement Role et Organisation</descriptionTraitement>
+			<typeTraitement>SCRIPT</typeTraitement>
+			<nomFichier>sql_CLI_avant_ROLORG.sql</nomFichier>
+			<typeFichier>SQL</typeFichier>
+			<continueSiErreur>NON</continueSiErreur>
+		</traitement>
+		<traitement>
+			<descriptionTraitement>Interface ORG</descriptionTraitement>
+			<typeTraitement>InterfaceORG</typeTraitement>
+			<synchronisationGXP>OUI</synchronisationGXP>
+			<continueSiErreur>NON</continueSiErreur>
+		</traitement>
+		<traitement>
+			<descriptionTraitement>Audit</descriptionTraitement>
+			<typeTraitement>AuditRoleEtOrga</typeTraitement>
+			<continueSiErreur>NON</continueSiErreur>
+		</traitement>
+	</traitements>
+</interface>

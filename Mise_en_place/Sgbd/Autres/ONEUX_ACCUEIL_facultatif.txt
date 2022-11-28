@@ -1,0 +1,43 @@
+##
+TAG_CHARSET=@€éèç
+##
+SYS_ACCUEIL_UPDATE
+=SQL=
+update SYS_ACCUEIL set code_cadre = code_cadre+2 where login = '*' AND code_regroup = '-5'
+##
+SYS_ACCUEIL_GRAPH_UPDATE
+=SQL=
+update SYS_ACCUEIL_GRAPH set code_cadre = code_cadre+2 where login = '*' AND code_regroup = '-5'
+##
+SYS_ACCUEIL_LIENS_UPDATE
+=SQL=
+update SYS_ACCUEIL_LIENS set code_cadre = code_cadre+2 where login = '*' AND code_regroup = '-5'
+##
+SYS_ACCUEIL (LOGIN,CODE_REGROUP,CODE_CADRE,ACTIF,LIBELLE,TYPE_CADRE,ETENDU,COLUMN_FLEX)
+'*','-5','0','O','Bienvenue sur la recette ONE UX !','-4','N','1'
+'*','-5','1','N','Liens rapides','-14','N','2'
+##
+SYS_ACCUEIL_LIENS (LOGIN,CODE_REGROUP,CODE_CADRE,ORDRE,TYPE,LIEN,LIBELLE,DESCRIPTIF,MESSAGE_ACCUEIL,ICON)
+'*','-5','0','1','I','ACC_ONEUX','Bandeau accueil Expert OLD JSP','FFFFFF,100%','<div style="font-size: 16px;"><b><font face="arial" style="font-size: x-large; color: rgb(0, 0, 128);">Bienvenue </font></b><br></div>','fa-link'
+'*','-5','1','1','E','http://www.google.com','Google','google',NULL,'fa-google'
+'*','-5','1','2','E','https://apps.adp.com/fr-FR/home','Shop marketplace','Shop marketplace',NULL,'shopping-marketplace'
+'*','-5','1','3','I','Ext.adp.Modules.RD.STD.EXP.CNT_COURANT.CNT_COURANT','Contrat courant',NULL,NULL,'fa-handshake-o'
+'*','-5','1','4','I','Ext.adp.Modules.RD.STD.EXP.ETC.ETC','Etat civil',NULL,NULL,'fa-id-badge'
+'*','-5','1','5','I','Ext.adp.Modules.RD.STD.EXP.ENF_TAB.ENF_TAB','Enfants',NULL,NULL,'fa-odnoklassniki'
+'*','-5','1','6','I','Modules/Workflow/WkfRedirectSujet.jsp?Wkf_Id=50000','Embauche',NULL,NULL,'icon-add-new-hire'
+'*','-5','1','7','I','Modules/Workflow/WkfRedirectSujet.jsp?Wkf_Id=50100','Départ',NULL,NULL,'fa-external-link-square'
+'*','-5','1','8','I','Modules/Workflow/WkfRedirectSujet.jsp?Wkf_Id=50200','Modifications contractuelles',NULL,NULL,'icon-enter-emp-changes'
+'*','-5','1','9','I','Ext.adp.Modules.ZPaie.DonneesElementPaie','Données variables et rappels',NULL,NULL,'icon-adp-payments-euro'
+'*','-5','1','10','I','Modules/Structures/Parametrage/GestionStructures.jsp','Gestion des structures',NULL,NULL,'fa-building-o'
+'*','-5','1','11','I','Ext.adp.Modules.Structures.Parametrage.GestionArbreEntites.ArbreEntites','Gestion de l''arbre des entités',NULL,NULL,'icon-chart-tree'
+'*','-5','1','12','I','Ext.adp.ZPaie.ImportGap','Import GAP',NULL,NULL,'icon-import'
+'*','-5','1','13','I','Modules/ZPaie/PilotageOperationsPaie.jsp','Pilotage des opérations de paie',NULL,NULL,'icon-run'
+'*','-5','1','14','I','Ext.adp.Moteur.FichiersVisualisables.FichiersVisualisablesExpert','Fichiers disponibles',NULL,NULL,'icon-file-def'
+'*','-5','1','15','I','Moteur/Trace/TracesInterpreterExpert.jsp','Traces',NULL,NULL,'icon-translations'
+##
+SYS_IMG_BIBLIOTHEQUE (NOM,CHEMIN,TYPE,ORDRE,EXTERNE)
+'ACC_ONEUX','ONEUX/oneux_growth.png','PUB','2','N'
+##
+SYS_ACCUEIL_LIENS
+=SQL=
+UPDATE SYS_ACCUEIL_LIENS SET ICON = 'fo fo-shopping-marketplace' where ICON = 'shopping-marketplace'

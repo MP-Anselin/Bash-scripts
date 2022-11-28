@@ -1,0 +1,7 @@
+##
+TAG_CHARSET=@€éèç
+##
+EDI_REQ_SQL_FCT
+==
+DELETE FROM EDI_REQ_SQL_FCT WHERE NOMREQ = 'Historique des connexions pour un utilisateur' AND CODE ='1'
+'Historique des connexions pour un utilisateur','1','2','Login utilisateur','LOGIN',null,'SYS_USR_CONFIG SUC,SECUMATRIC S','Login,Nom,Prénom','SUC.LOGIN,S.NOM,S.PRENOM','LOGIN,NOM,PRENOM','LOGIN,NOM,PRENOM',null,'SUC.REQUETEMATRIC = S.MATRIC(+)',null,null,null,null,null,null,null,null,null,null,'0'

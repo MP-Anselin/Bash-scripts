@@ -1,0 +1,30 @@
+##
+MAJ_RETRO_MAX_LISTE_MAT_HISTO
+=SQL=
+create or replace PROCEDURE MAJ_RETRO_MAX_LISTE_MAT_HISTO IS
+
+
+w_DEB_HISTO_RETRO TGE_REF_PAC.DEB_HISTO_RETRO%TYPE;
+w_DEB_RETRO TGE_REF_PAC.DEB_RETRO%TYPE;
+
+ BEGIN
+   FOR C in (select distinct H.numpac,H.pacmat from GAP_TRT_LISTE_MAT_HISTO H where H.retro_max is null ) loop
+    
+     select GREATEST(T.DEB_HISTO_RETRO,NVL( S.PREMIERE_PAIE, '190101'))  AS DEB_HISTO_RETRO , T.DEB_RETRO
+     INTO   w_DEB_HISTO_RETRO ,w_DEB_RETRO
+     FROM TGE_REF_PAC T LEFT JOIN SECUPACMAT S ON T.NUMPAC = S.NUMPAC  where T.numpac =C.numpac and S.pacmat = C.pacmat ;
+     
+       update GAP_TRT_LISTE_MAT_HISTO g set retro_max = (
+       select min(greatest(to_char(dteffet,'yyyymm'),w_DEB_HISTO_RETRO)) as retro_max from dif_fsed_histo h
+       where greatest(to_char(dteffet,'yyyymm'),w_DEB_HISTO_RETRO) < h.periode 
+       and elem in (select element from tge_ref_dicoz dz where dz.numpac=C.numpac and calcul_retro=1)
+       and g.numpac=h.numpac and g.pacmat=h.pacmat and g.periode_paie=h.periode)
+       where g.numpac=C.numpac and g.periode_paie >=w_DEB_RETRO and retro_max is null ;
+    
+       commit; 
+     
+   END LOOP;
+   
+ COMMIT;
+ END MAJ_RETRO_MAX_LISTE_MAT_HISTO;
+

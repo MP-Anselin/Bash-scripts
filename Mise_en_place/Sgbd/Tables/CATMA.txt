@@ -1,0 +1,13 @@
+##
+TAG_CHARSET=@€ιθη
+##
+CATMA
+=SQL IFNOTEXIST=CATMA=
+CREATE TABLE "CATMA" (	"CODE" VARCHAR2(1) NOT NULL ENABLE, "LIBELLE" VARCHAR2(32) NOT NULL ENABLE, PRIMARY KEY(CODE))		 
+##
+CATMA
+==
+DELETE FROM CATMA WHERE CODE IN ('1', '2', '3')
+'1','Ressources annuelles >= 1PASS'
+'2','Ress.ann < 1PASS et >= 2/3 PASS'
+'3','Ressources annuelles < 2/3 PASS'

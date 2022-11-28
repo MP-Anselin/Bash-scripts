@@ -1,0 +1,689 @@
+##
+TAG_CHARSET=@€éèç
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'UX - Demande d''attestation Manager','Modules/AdpUx/UxCertificateMgr.jsp',null,'false')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'UX - Famille Manager','Modules/AdpUx/UxFamilyMgr.jsp',null,'false')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'UX - Demande d''acompte Manager','Modules/AdpUx/UxPayAdvanceMgr.jsp',null,'false')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'UX - Gestion des  modes de paiement Manager','Modules/AdpUx/UxPayBankMgr.jsp',null,'false')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'UX - Paie Manager','Modules/AdpUx/UxPayMgr.jsp',null,'false')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'UX - Gestion du Profil Manager','Modules/AdpUx/UxProfileMgr.jsp',null,'false')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'UX - Equipe','Modules/AdpUx/UxTeamMgr.jsp',null,'false')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'Inscription manuelle en rétroactivité','Ext.adp.ZPaie.RETRO.INSCRIRETRO',null,'false')
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Ext.adp.ZPaie.RETRO.INSCRIRETRO','Ext.adp.ZPaie.IndicateursProduction')
+##
+ADM_CHANGE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'UX - Solde compteurs équipe','Modules/AdpUx/UxTimeBIMgr.jsp',null,'false')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'Matricules modifiés ou inscrits en rétroactivité ','Ext.adp.ZPaie.RETRO.MatricInscritRetro',null,'false')
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Ext.adp.ZPaie.RETRO.MatricInscritRetro','Ext.adp.ZPaie.RETRO.INSCRIRETRO')
+##
+SYS_SCH_ELEMENT
+==
+UPDATE SYS_SCH_ELEMENT SET TAGS='_PAS_VISIBLE_' WHERE niveau = '99' and nom_page='Modules/AdpUx/UxTimeBIMgr.jsp'
+##
+ADM_CHANGE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'UX - Délégation','Modules/AdpUx/UxDelegationMgr.jsp',null,'false')
+##
+SYS_SCH_ELEMENT
+==
+UPDATE SYS_SCH_ELEMENT SET TAGS='_PAS_VISIBLE_' WHERE niveau = '99' and nom_page='Modules/AdpUx/UxDelegationMgr.jsp'
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'Assistant augmentation','Ext.adp.Modules.RD.STD.EXP.ASS_AUGMENTATION.ASS_AUGMENTATION',null,'false')
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Ext.adp.Modules.RD.STD.EXP.ASS_AUGMENTATION.ASS_AUGMENTATION','Ext.adp.Modules.RD.STD.EXP.CNT_COURANT.CNT_COURANT')
+##
+SYS_SCH_ELEMENT
+==
+update SYS_SCH_ELEMENT set TAGS ='_PAS_VISIBLE_' where niveau = '99' and NOM_PAGE ='Ext.adp.Modules.RD.STD.EXP.ASS_AUGMENTATION.ASS_AUGMENTATION'
+##
+ADM_CHANGE_NOM_PAGE
+==
+call ADM_CHANGE_NOM_PAGE('Modules/ZPaie/DonneesElementPaieExtJs.jsp', 'Ext.adp.Modules.ZPaie.DonneesElementPaie')
+##
+ADM_CHANGE_NOM_PAGE
+==
+call ADM_CHANGE_NOM_PAGE('Modules/ZPaie/ElementsPaieExtjs.jsp', 'Ext.adp.Modules.ZPaie.ElementsPaie')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'UX - Activation du Onboarding','Modules/AdpUx/UxOnBoard.jsp',null,'false')
+##
+SYS_SCH_ELEMENT
+==
+UPDATE SYS_SCH_ELEMENT SET TAGS='_PAS_VISIBLE_' WHERE niveau = '99' and nom_page='Modules/AdpUx/UxOnBoard.jsp'
+##
+ADM_CHANGE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'UX - Multi-Branding','Modules/AdpUx/UxBrandGroup.jsp',null,'false')
+##
+SYS_SCH_ELEMENT
+==
+UPDATE SYS_SCH_ELEMENT SET TAGS='_PAS_VISIBLE_' WHERE niveau = '99' and nom_page='Modules/AdpUx/UxBrandGroup.jsp'
+##
+ADM_CHANGE_NOM_PAGE
+==
+CALL ADM_CHANGE_NOM_PAGE('Moteur/Comp/WebAdmin/Image/GestionPhotoMatricule.jsp', 'Ext.adp.Moteur.Comp.WebAdmin.Image.GestionPhotoMatricule')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'Gestion Partenaires API','Ext.adp.Modules.DEX.GestionPartenairesAPI',null,'true')
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Ext.adp.Modules.DEX.GestionPartenairesAPI','Moteur/ADP_ONLY/ParamEcranDyn/ParametrageDonneesUX.jsp')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'UX - Refus de la dématérialisation','Modules/AdpUx/UxPayPrefs.jsp',null,'false')
+##
+SYS_SCH_ELEMENT
+==
+UPDATE SYS_SCH_ELEMENT SET TAGS='_PAS_VISIBLE_' WHERE niveau = '99' and nom_page='Modules/AdpUx/UxPayPrefs.jsp'
+##
+ADM_CHANGE_NOM_PAGE
+==
+CALL ADM_CHANGE_NOM_PAGE('Moteur/ADP_ONLY/Comp/WebAdmin/GestionVarSys/VarSys.jsp', 'Ext.adp.Moteur.ADP_ONLY.varSys.VarSys')
+##
+SYS_SCH_ELEMENT
+=SQL=
+DECLARE
+     existOld NUMBER;
+     existNew NUMBER;
+BEGIN
+     SELECT COUNT(*) INTO existOld FROM SYS_SCH_ELEMENT WHERE NOM_PAGE = 'Moteur/Std/GestionMotDePasseExpertLsprh.jsp';
+     SELECT COUNT(*) INTO existNew FROM SYS_SCH_ELEMENT WHERE NOM_PAGE = 'Ext.adp.Moteur.Std.GestionMotDePasseExpertLsprh';
+     IF existOld > 0 AND existNew = 0 THEN
+          ADM_CHANGE_NOM_PAGE('Moteur/Std/GestionMotDePasseExpertLsprh.jsp','Ext.adp.Moteur.Std.GestionMotDePasseExpertLsprh');
+     ELSIF existNew = 0 THEN
+          ADM_CREATE_NOM_PAGE(99,'Réinitialiser un mot de passe','Ext.adp.Moteur.Std.GestionMotDePasseExpertLsprh',NULL,NULL);
+     END IF;
+END;
+##
+ADM_CHANGE_NOM_PAGE
+==
+CALL ADM_CHANGE_NOM_PAGE('Moteur/Comp/WebAdmin/GestionUser_WDExtJS.jsp', 'Ext.adp.Moteur.Comp.WebAdmin.GestionWebDir.GestionUserWebDir')
+##
+ADM_CHANGE_NOM_PAGE
+==
+CALL ADM_CHANGE_NOM_PAGE('Moteur/ADP_ONLY/Comp/WebAdmin/GestionWebDirExtJS.jsp', 'Ext.adp.Moteur.Comp.WebAdmin.GestionWebDir.GestionWebDir')
+##
+ADM_CREATE_NOM_PAGE 
+==
+CALL ADM_CREATE_NOM_PAGE(99,'Affectation de répertoires web','Ext.adp.Moteur.Comp.WebAdmin.GestionWebDir.GestionUserWebDirCDF',null,'false')
+##
+ADM_CHANGE_NOM_PAGE
+==
+CALL ADM_CHANGE_NOM_PAGE('Modules/ADP_ONLY/Workflow/Admin/WkfProcessus.jsp', 'Ext.adp.Modules.ADP_ONLY.Workflow.admin.WkfProcessus')
+##
+ADM_CHANGE_NOM_PAGE
+==
+CALL ADM_CHANGE_NOM_PAGE('Modules/ADP_ONLY/Workflow/Admin/WkfOperation.jsp', 'Ext.adp.Modules.ADP_ONLY.Workflow.admin.WkfOperations')
+##
+ADM_CHANGE_NOM_PAGE
+==
+CALL ADM_CHANGE_NOM_PAGE('Modules/ADP_ONLY/Messagerie/DefBranchMailGen.jsp', 'Ext.adp.Modules.ADP_ONLY.Messagerie.DefBranchMailGen')
+##
+ADM_CHANGE_NOM_PAGE
+==
+CALL ADM_CHANGE_NOM_PAGE('Modules/ADP_ONLY/Workflow/Admin/WkfBranche.jsp', 'Ext.adp.Modules.ADP_ONLY.Workflow.admin.WkfBranches')
+##
+ADM_CHANGE_NOM_PAGE
+==
+CALL ADM_CHANGE_NOM_PAGE('Modules/ZPaie/GestionThemesGAP.jsp', 'Ext.adp.ZPaie.GestionThemeGap')
+##
+ADM_CHANGE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'Gestion des traitements Gestil','Ext.adp.Moteur.Comp.WebAdmin.Gestil.GestionTraitementGestil',null,'false')
+##
+ADM_CHANGE_NOM_PAGE
+==
+CALL ADM_CHANGE_NOM_PAGE('Modules/ZPaie/modal/ExportData.jsp','Ext.adp.Modules.ZPaie.modal.ExportData')
+##
+ADM_CHANGE_NOM_PAGE
+==
+CALL ADM_CHANGE_NOM_PAGE('Modules/ZPaie/modal/ExportAbsences.jsp','Ext.adp.Modules.ZPaie.modal.ExportAbsences')
+##
+ADM_CHANGE_NOM_PAGE
+==
+CALL ADM_CHANGE_NOM_PAGE('Modules/ZPaie/modal/ExportElements.jsp','Ext.adp.Modules.ZPaie.modal.ExportElements')
+##
+ADM_CHANGE_NOM_PAGE
+==
+CALL ADM_CHANGE_NOM_PAGE('Modules/ZPaie/modal/ExportIncidents.jsp','Ext.adp.Modules.ZPaie.modal.ExportIncidents')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'Insertion période d''emploi','Modules/Workflow/WkfRedirectSujet.jsp?Wkf_Id=55200',null,'false')
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Modules/Workflow/WkfRedirectSujet.jsp?Wkf_Id=55200','Modules/Workflow/WkfRedirectSujet.jsp?Wkf_Id=54800')
+##
+ADM_CHANGE_NOM_PAGE
+==
+CALL ADM_CHANGE_NOM_PAGE('Moteur/Aide/AideDynamique2.jsp','Ext.adp.Moteur.Aide.GestionAideEnLigne')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'Gestion de l''arbre des entités avec sécurité', 'Ext.adp.Modules.Structures.Parametrage.GestionArbreEntites.ArbreEntitesAvecSecuStructure',null, 'true')
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Ext.adp.Modules.Structures.Parametrage.GestionArbreEntites.ArbreEntitesAvecSecuStructure', 'Ext.adp.Modules.Structures.Parametrage.GestionArbreEntites.ArbreEntites')
+##
+ADM_CHANGE_NOM_PAGE
+==
+CALL ADM_CHANGE_NOM_PAGE('Moteur/Comp/WebAdmin/ImportUsersNS.jsp','Ext.adp.Administration.ImportUsersNS')
+##
+ADM_CHANGE_NOM_PAGE
+==
+CALL ADM_CHANGE_NOM_PAGE('Moteur/Traitement/GestionDesTypesDeTraitementExtjs.jsp','Ext.adp.Moteur.Comp.WebAdmin.Traitement.GestionDesTypesDeTraitements')
+##
+ADM_CHANGE_NOM_PAGE
+=SQL=
+CALL ADM_CHANGE_NOM_PAGE('Modules/Gta/Expert/EvenementsGTA_Detail.jsp','Ext.adp.Modules.GTA.Expert.EvenementsGTADetail')
+##
+ADM_CHANGE_NOM_PAGE
+=SQL=
+CALL ADM_CHANGE_NOM_PAGE('Modules/Gta/Expert/EvenementsGTA.jsp','Ext.adp.Modules.GTA.Expert.EvenementsGTA')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'Feuille de pointage Manager','Modules/AdpUx/UxTimesheetMgr.jsp',null,'false')
+##
+SYS_SCH_ELEMENT
+==
+UPDATE SYS_SCH_ELEMENT SET TAGS='_PAS_VISIBLE_' WHERE niveau = '99' and nom_page='Modules/AdpUx/UxTimesheetMgr.jsp'
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'Horaires Manager','Modules/AdpUx/UxCalendarMgr.jsp',null,'false')
+##
+SYS_SCH_ELEMENT
+==
+UPDATE SYS_SCH_ELEMENT SET TAGS='_PAS_VISIBLE_' WHERE niveau = '99' and nom_page='Modules/AdpUx/UxCalendarMgr.jsp'
+##
+ADM_CHANGE_NOM_PAGE
+=SQL=
+CALL ADM_CHANGE_NOM_PAGE('Ext.adp.Modules.DEX.GestionPartenairesAPI','Ext.adp.Modules.DEX.GestionApplicationConsommatricesAPI')
+##
+SYS_SCH_ELEMENT
+==
+UPDATE SYS_SCH_ELEMENT SET LIBELLE='Gestion des applications consommatrices API' WHERE niveau = '99' and nom_page='Ext.adp.Modules.DEX.GestionApplicationConsommatricesAPI'
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'Gestion des applications consommatrices API','Ext.adp.Modules.DEX.GestionApplicationConsommatricesAPI_CDF',null,'false')
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Ext.adp.Modules.DEX.GestionApplicationConsommatricesAPI_CDF','Moteur/Comp/WebAdmin/GestionRequetes/RequetesPopulationExpert.jsp')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'UX - Couverture santé - Mutuelle','Modules/AdpUx/UxBenefitsCoverage.jsp',null,'false')
+##
+SYS_SCH_ELEMENT
+==
+UPDATE SYS_SCH_ELEMENT SET TAGS='_PAS_VISIBLE_' WHERE niveau = '99' and nom_page='Modules/AdpUx/UxBenefitsCoverage.jsp'
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CHANGE_NOM_PAGE('Modules/Gap/GestionLHW.jsp','Ext.adp.Modules.Gap.GestionLHW')
+##
+ADM_CHANGE_NOM_PAGE
+=SQL=
+CALL ADM_CHANGE_NOM_PAGE('Moteur/ADP_ONLY/Comp/WebAdmin/GestionProfil.jsp','Ext.adp.Moteur.ADP_ONLY.GestionProfil')
+##
+ADM_CHANGE_NOM_PAGE
+==
+CALL ADM_CHANGE_NOM_PAGE('Moteur/Traitement/GestionDesTraitementsExtjs.jsp','Ext.adp.Moteur.Comp.WebAdmin.Traitement.GestionDesTraitementsMVVMExtJS')
+##
+ADM_CHANGE_NOM_PAGE
+==
+CALL ADM_CHANGE_NOM_PAGE('Moteur/Comp/WebAdmin/Traitement/EditionTraitement.js','Ext.adp.Moteur.Comp.WebAdmin.Traitement.EditionTraitementMVVMExtJS')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'UX - Placement fin de période (PFP)','Modules/AdpUx/UxPfp.jsp',null,'false')
+##
+SYS_SCH_ELEMENT
+==
+UPDATE SYS_SCH_ELEMENT SET TAGS='_PAS_VISIBLE_' WHERE niveau = '99' and nom_page='Modules/AdpUx/UxPfp.jsp'
+##
+ADM_CHANGE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'UX - Helpdesk','Modules/AdpUx/UxHelpdesk.jsp',null,'false')
+##
+SYS_SCH_ELEMENT
+==
+UPDATE SYS_SCH_ELEMENT SET TAGS='_PAS_VISIBLE_' WHERE niveau = '99' and nom_page='Modules/AdpUx/UxHelpdesk.jsp'
+##
+ADM_CHANGE_NOM_PAGE
+==
+CALL ADM_CHANGE_NOM_PAGE('Moteur/Comp/WebAdmin/TracesDownload.jsp','Ext.adp.Moteur.Comp.WebAdmin.Telechargements')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'Paramétrage des graphes','Ext.adp.Moteur.Charts.GestionCharts',null,'false')
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Ext.adp.Moteur.Charts.GestionCharts','Modules/ADP_ONLY/Parametrage/DashboardParam.jsp')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'Traces','Moteur/Trace/TracesInterpreterExpert.jsp',null,'false')
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Moteur/Trace/TracesInterpreterExpert.jsp','Modules/Gap/traitement/Selection.jsp?NOMTRAITEMENT=RECYCLAG')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'Gestion des groupes de signataires','Ext.adp.Modules.Signature.GroupeSignataires',null,'true')
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Ext.adp.Modules.Signature.GroupeSignataires','Ext.adp.Modules.Signature.SignataireMVVM')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'UX - Organigramme','Modules/AdpUx/UxOrganigramme.jsp',null,'false')
+##
+SYS_SCH_ELEMENT
+==
+UPDATE SYS_SCH_ELEMENT SET TAGS='_PAS_VISIBLE_' WHERE niveau = '99' and nom_page='Modules/AdpUx/UxOrganigramme.jsp'
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Modules/AdpUx/UxOrganigramme.jsp','Modules/AdpUx/UxProfile.jsp')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'Déclaratif médical histo','Ext.adp.Modules.RD.STD.EXP.CHS.RD_CHS_H',null,'true')
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Ext.adp.Modules.RD.STD.EXP.CHS.RD_CHS_H','Ext.adp.Modules.RD.STD.EXP.CHS.CHS')
+##
+ADM_SUPPRIME_NOM_PAGE
+==
+CALL ADM_SUPPRIME_NOM_PAGE('Ext.adp.Modules.RD.STD.EXP.CHS.RD_CHS_H')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'Déclaratif médical histo','Ext.adp.Modules.RD.STD.EXP.RD_CHS_H.RD_CHS_H',null,'true')
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Ext.adp.Modules.RD.STD.EXP.RD_CHS_H.RD_CHS_H','Ext.adp.Modules.RD.STD.EXP.CHS.CHS')
+##
+ADM_CHANGE_NOM_PAGE
+=SQL=
+CALL ADM_CHANGE_NOM_PAGE('Modules/ADP_ONLY/Parametrage/DashboardParam.jsp', 'Ext.adp.Moteur.Charts.GestionCharts')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'Superviser les demandes','Modules/Workflow/MesDemandesWkfExpert.jsp',null,'true')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'Test bandeau projet','Ext.adp.Modules.ZPaie.gta.TestBandeauProjet',null,'true')
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Ext.adp.Modules.ZPaie.gta.TestBandeauProjet','Moteur/ADP_ONLY/ParamEcranDyn/GestionDesLivrables.jsp')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'Appel table Tools MVVM','Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.AppelsTableTools',null,'true')
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.AppelsTableTools','Moteur/ADP_ONLY/ParamEcranDyn/AppelTableTools.jsp')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'Appels Table MVVM','Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.AppelsTableAdmin',null,'true')
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.AppelsTableAdmin','Moteur/ADP_ONLY/Comp/WebAdmin/GestionAppelsTable.jsp')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'Paramétrage des dictionnaires Extjs','Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageDictionnairesExtjs',null,'true')
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageDictionnairesExtjs','Moteur/ADP_ONLY/ParamEcranDyn/ParametrageDictionnaires.jsp')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'Historique des projets MVVM','Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.HistoriquesDesProjetsMVVM',null,'true')
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.HistoriquesDesProjetsMVVM','Moteur/ADP_ONLY/ParamEcranDyn/HistoriquesDesProjets.jsp')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'Gestion des projets MVVM','Ext.adp.Moteur.ParamEcranDyn.GestionDesProjetsMVVM',null,'true')
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Ext.adp.Moteur.ParamEcranDyn.GestionDesProjetsMVVM','Moteur/ADP_ONLY/ParamEcranDyn/GestionDesprojets.jsp')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'Paramétrage des écrans Extjs','Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageEcransExtjs',null,'true')
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageEcransExtjs','Moteur/ADP_ONLY/ParamEcranDyn/ParametrageEcrans.jsp')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'Gestion des livrables MVVM','Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.GestionDesLivrablesMVVM',null,'true')
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.GestionDesLivrablesMVVM','Moteur/ADP_ONLY/ParamEcranDyn/GestionDesLivrables.jsp')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'Paramétrage des groupes de données Extjs','Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageGroupesDonneesExtjs',null,'true')
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageGroupesDonneesExtjs','Moteur/ADP_ONLY/ParamEcranDyn/ParametrageEcrans.jsp')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'Paramétrage des données Extjs','Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageDonneesExtjs',null,'true')
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageDonneesExtjs','Moteur/ADP_ONLY/ParamEcranDyn/ParametrageDonnees.jsp')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'Trace des appels API','Ext.adp.Modules.TraceApi.TraceAppelsAPI',null,'true')
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Ext.adp.Modules.TraceApi.TraceAppelsAPI','Ext.adp.Modules.DEX.GestionApplicationConsommatricesAPI')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'UX - Don CSE','Modules/AdpUx/UxDonCSE.jsp',null,'false')
+##
+SYS_SCH_ELEMENT
+==
+UPDATE SYS_SCH_ELEMENT SET TAGS='_PAS_VISIBLE_' WHERE niveau = '99' and nom_page='Modules/AdpUx/UxDonCSE.jsp'
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'UX - Bridging','Modules/AdpUx/UxBridging.jsp',null,'false')
+##
+SYS_SCH_ELEMENT
+==
+UPDATE SYS_SCH_ELEMENT SET TAGS='_PAS_VISIBLE_' WHERE niveau = '99' and nom_page='Modules/AdpUx/UxBridging.jsp'
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'UX - Bridging Manager','Modules/AdpUx/UxOTFReportsMgr.jsp',null,'false')
+##
+SYS_SCH_ELEMENT
+==
+UPDATE SYS_SCH_ELEMENT SET TAGS='_PAS_VISIBLE_' WHERE niveau = '99' and nom_page='Modules/AdpUx/UxOTFReportsMgr.jsp'
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Modules/AdpUx/UxOTFReportsMgr.jsp','Modules/AdpUx/UxTeamMgr.jsp')
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Modules/AdpUx/UxBridging.jsp','Modules/AdpUx/UxProfile.jsp')
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Modules/AdpUx/UxDonCSE.jsp','Modules/AdpUx/UxProfile.jsp')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'API MP - Personnalisation référentiel données paie','Ext.adp.Modules.DEX.PersonnalisationUsesCase',null,'true')
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Ext.adp.Modules.DEX.PersonnalisationUsesCase','Ext.adp.Modules.DEX.GestionApplicationConsommatricesAPI_CDF')
+##
+SYS_SCH_ELEMENT
+==
+delete from SYS_SCH_ELEMENT where code_element in (select code_element from SYS_SCH_ELEMENT where code_element <> (select max(code_element) from SYS_SCH_ELEMENT where nom_page = 'Ext.adp.Modules.DEX.GestionApplicationConsommatricesAPI') and nom_page = 'Ext.adp.Modules.DEX.GestionApplicationConsommatricesAPI') and code_element < 0
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'Superviser les processus documents et signatures','Ext.adp.Modules.Signature.SuiviDocumentsEtSignaturesAdmin',null,'true')
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Ext.adp.Modules.Signature.SuiviDocumentsEtSignaturesAdmin','Ext.adp.Modules.Signature.OptionSignatureExtjs')
+##
+ADM_CHANGE_NOM_PAGE
+==
+CALL ADM_CHANGE_NOM_PAGE('Modules/ZPaie/modal/ExportImputations.jsp','Ext.adp.Modules.ZPaie.modal.ExportImputations')
+##
+SYS_SCH_ELEMENT
+==
+CALL ADM_CREATE_NOM_PAGE(99,'What''s new','Ext.adp.MainDesk.view.eastregion.news.News',null,'false')
+##
+SYS_SCH_ELEMENT
+=SQL IFEXIST=SYS_SCH_ELEMENT=
+UPDATE SYS_SCH_ELEMENT SET TAGS = '_PAS_VISIBLE_' where nom_page = 'Ext.adp.MainDesk.view.eastregion.news.News'
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Ext.adp.MainDesk.view.eastregion.news.News', 'Ext.adp.Moteur.ADP_ONLY.GestionProfil')
+##
+SYS_SCH_ELEMENT
+==
+update sys_sch_element set libelle = 'Historique des projets' where nom_page = 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.HistoriquesDesProjetsMVVM'
+##
+SYS_SCH_ELEMENT
+==
+update sys_sch_element set libelle = 'Paramétrage des écrans'	where nom_page = 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageEcransExtjs'
+##
+SYS_SCH_ELEMENT
+==
+update sys_sch_element set libelle = 'Paramétrage des données'	where nom_page = 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageDonneesExtjs'
+##
+SYS_SCH_ELEMENT
+==
+update sys_sch_element set libelle = 'Paramétrage des groupes de données'	where nom_page = 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageGroupesDonneesExtjs'
+##
+SYS_SCH_ELEMENT
+==
+update sys_sch_element set libelle = 'Gestion des livrables'	where nom_page = 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.GestionDesLivrablesMVVM'
+##
+SYS_SCH_ELEMENT
+==
+update sys_sch_element set libelle = 'Gestion des projets'	where nom_page = 'Ext.adp.Moteur.ParamEcranDyn.GestionDesProjetsMVVM'
+##
+SYS_SCH_ELEMENT
+==
+update sys_sch_element set libelle = 'Appels Table'	where nom_page = 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.AppelsTableAdmin'
+##
+SYS_SCH_ELEMENT
+==
+update sys_sch_element set libelle = 'Appel table Tools'	where nom_page = 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.AppelsTableTools'
+##
+SYS_SCH_ELEMENT
+==
+update sys_sch_element set libelle = 'Paramétrage des dictionnaires'	where nom_page = 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageDictionnairesExtjs'
+##
+SYS_SCH_ELEMENT
+==
+update sys_sch_element set libelle = 'Organisation des écrans Workflow' 	where nom_page = 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.WkfOperationEcransMVVM'
+##
+SYS_SCH_ELEMENT
+==
+update sys_sch_element set libelle = 'Historique des projets old'	where nom_page = 'Moteur/ADP_ONLY/ParamEcranDyn/HistoriquesDesProjets.jsp'
+##
+SYS_SCH_ELEMENT
+==
+update sys_sch_element set libelle = 'Paramétrage des écrans old'	where nom_page = 'Moteur/ADP_ONLY/ParamEcranDyn/ParametrageEcrans.jsp'
+##
+SYS_SCH_ELEMENT
+==
+update sys_sch_element set libelle = 'Paramétrage des données old'	where nom_page = 'Moteur/ADP_ONLY/ParamEcranDyn/ParametrageDonnees.jsp'
+##
+SYS_SCH_ELEMENT
+==
+update sys_sch_element set libelle = 'Paramétrage des groupes de données old'	where nom_page = 'Moteur/ADP_ONLY/ParamEcranDyn/ParametrageGroupesDonnees.jsp'
+##
+SYS_SCH_ELEMENT
+==
+update sys_sch_element set libelle = 'Gestion des livrables old'	where nom_page = 'Moteur/ADP_ONLY/ParamEcranDyn/GestionDesLivrables.jsp'
+##
+SYS_SCH_ELEMENT
+==
+update sys_sch_element set libelle = 'Gestion des projets old'	where nom_page = 'Moteur/ADP_ONLY/ParamEcranDyn/GestionDesprojets.jsp'
+##
+SYS_SCH_ELEMENT
+==
+update sys_sch_element set libelle = 'Appels Table tools old' where nom_page = 'Moteur/ADP_ONLY/ParamEcranDyn/AppelTableTools.jsp'
+##
+SYS_SCH_ELEMENT
+==
+update sys_sch_element set libelle = 'Appels Table old'	where nom_page = 'Moteur/ADP_ONLY/Comp/WebAdmin/GestionAppelsTable.jsp'
+##
+SYS_SCH_ELEMENT
+==
+update sys_sch_element set libelle = 'Paramétrage des dictionnaires old'	where nom_page = 'Moteur/ADP_ONLY/ParamEcranDyn/ParametrageDictionnaires.jsp'
+##
+SYS_SCH_ELEMENT
+==
+update sys_sch_element set libelle = 'Organisation des écrans workflow old'	where nom_page = 'Moteur/ADP_ONLY/ParamEcranDyn/WkfOperationEcrans.jsp'
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'Test Exemple Accessibilite','Ext.adp.Tests.Accessibilite.AccessibiliteExemple',null,'true')
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Ext.adp.Tests.Accessibilite.AccessibiliteExemple','Ext.adp.Modules.Structures.Parametrage.GestionDonneesHROSalarie.GestionDonneesHROSalarie')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'Conditions DOCSERV','Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionConditions.ConditionsDocserver',null,'true')
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionConditions.ConditionsDocserver','Moteur/Comp/WebAdmin/DocServer/GestionModelesDocServer.jsp')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'Champs de fusion DOCSERV','Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionChampsFusion.ExportChampsFusionDocserver',null,'true')
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionChampsFusion.ExportChampsFusionDocserver','Moteur/Comp/WebAdmin/DocServer/GestionModelesDocServer.jsp')
+##
+ADM_SUPPRIME_NOM_PAGE
+==
+CALL ADM_SUPPRIME_NOM_PAGE('Moteur/Comp/WebAdmin/GestionNivStruct.jsp')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'Conditions DOCSERV','Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionConditions.ConditionsDocserver',null,'true')
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionConditions.ConditionsDocserver','Moteur/Comp/WebAdmin/DocServer/GestionModelesDocServer.jsp')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'Champs de fusion DOCSERV','Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionChampsFusion.ExportChampsFusionDocserver',null,'true')
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionChampsFusion.ExportChampsFusionDocserver','Moteur/Comp/WebAdmin/DocServer/GestionModelesDocServer.jsp')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'Organisation des écrans Workflow','Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.WkfOperationEcransMVVM',null,'true')
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.WkfOperationEcransMVVM','Ext.adp.Modules.TraceApi.TraceAppelsAPI')
+##
+SYS_SCH_ELEMENT
+==
+update sys_sch_element set libelle = 'Paramétrage des règles de gestion old'	where nom_page = 'Moteur/ADP_ONLY/ParamEcranDyn/ParametrageReglesGestion_v2.jsp'
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'Paramétrage des règles de gestion','Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageReglesGestionExtjs',null,'true')
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageReglesGestionExtjs','Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.WkfOperationEcransMVVM')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'Exporter les données d''un écran','Ext.adp.ZPaie.ExportDonneesEcran',null,'true')
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Ext.adp.ZPaie.ExportDonneesEcran','Ext.adp.ZPaie.GestionThemeGap')
+##
+ADM_CREATE_NOM_PAGE
+==
+CALL ADM_CREATE_NOM_PAGE(99,'UX - Demande Avenant Télétravail','Modules/AdpUx/UxTAD.jsp',null,'false')
+##
+SYS_SCH_ELEMENT
+==
+UPDATE SYS_SCH_ELEMENT SET TAGS='_PAS_VISIBLE_' WHERE niveau = '99' and nom_page='Modules/AdpUx/UxTAD.jsp'
+##
+ADM_NEWPAGE_SYS_SCHEMAS
+==
+CALL ADM_NEWPAGE_SYS_SCHEMAS('Modules/AdpUx/UxDonCSE.jsp','Modules/AdpUx/UxTAD.jsp')

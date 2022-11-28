@@ -1,0 +1,93 @@
+##
+TAG_CHARSET=@€éèç
+##
+TESTAUTO_COMMAND
+=SQL IFNOTEXIST=TESTAUTO_COMMAND=
+CREATE TABLE TESTAUTO_COMMAND( COMMAND VARCHAR2(30), LIBELLE VARCHAR2(250), PARAM1 VARCHAR2(50), PARAM2 VARCHAR2(50), PARAM3 VARCHAR2(50), PARAM4 VARCHAR2(50), PRIMARY KEY(COMMAND) )
+##
+TESTAUTO_COMMAND
+==
+DELETE FROM TESTAUTO_COMMAND  
+'APT','Changer la valeur d''un champ Appel Table','Nom du champ','Valeur',NULL,NULL
+'BTN','Cliquer sur un bouton','Texte',NULL,NULL,NULL
+'BTN_TAB','Cliquer sur un bouton d''entête de tableau','Texte',NULL,NULL,NULL
+'CLICK_LINE','Cliquer sur une cellule dans un tableau en précisant un filtre','Numéro ou titre de la colonne','Colonne à filtrer','Valeur à tester',NULL
+'CLICK_NUMLINE','Cliquer sur une cellule dans un tableau en précisant le numéro de la ligne','Numéro ou titre de la colonne','Numéro de la ligne',NULL,NULL
+'IN_CKB','Changer la valeur d''une case à cocher','Nom du champ','O/N',NULL,NULL
+'IN_DATE','Changer la valeur d''un champ de saisie Date','Nom du champ','Valeur',NULL,NULL
+'IN_LIST','Changer la valeur dans une liste déroulante','Nom du champ','Valeur',NULL,NULL
+'IN_NUM','Changer la valeur d''un champ de saisie Numérique','Nom du champ','Valeur',NULL,NULL
+'IN_RAD','Changer la valeur d''un bouton Radio','Nom du champ','Valeur à choisir',NULL,NULL
+'IN_TXT','Changer la valeur d''un champ de saisie Texte','Nom du champ','Valeur',NULL,NULL
+'LOAD_COL','Charger un matricule dans le bandeau','Matricule','Numpac','Pacmat',NULL
+'NEXT_COL','Passer au matricule suivant dans le bandeau',NULL,NULL,NULL,NULL
+'NEXT_SCREEN','Passer à l''écran suivant',NULL,NULL,NULL,NULL
+'PREV_COL','Passer au matricule précédent dans le bandeau',NULL,NULL,NULL,NULL
+'PREV_SCREEN','Revenir à l''écran précédent',NULL,NULL,NULL,NULL
+'SCH_STRUC','Changer la valeur d''un champ Recherche Structure','Nom du champ','Valeur',NULL,NULL
+'SCREEN','Naviguer sur un écran','Titre de l''écran','Regroupement',NULL,NULL
+'TAB','Changer d''onglet','Titre de l''onglet',NULL,NULL,NULL
+'TAB_FILTER','Filtrer sur une colonne d''un tableau','Numéro ou titre de la colonne','Valeur à tester',NULL,NULL
+'TAB_RAZ','Retirer tous les filtres positionnés sur un tableau',NULL,NULL,NULL,NULL
+##
+TESTAUTO_COMMAND
+==
+DELETE FROM TESTAUTO_COMMAND WHERE COMMAND = 'SCREENSHOT'
+'SCREENSHOT','Effectuer une capture d''écran si le mode de capture est manuel',NULL,NULL,NULL,NULL
+##
+TESTAUTO_COMMAND
+==
+DELETE FROM TESTAUTO_COMMAND WHERE COMMAND = 'OPEN_APT'
+'OPEN_APT','Ouvrir un appel table','Nom du champ',NULL,NULL,NULL
+##
+TESTAUTO_COMMAND
+==
+DELETE FROM TESTAUTO_COMMAND WHERE COMMAND = 'CLOSE'
+'CLOSE','Fermer une fenêtre, une popup ou un slide',NULL,NULL,NULL,NULL
+##
+TESTAUTO_COMMAND
+==
+DELETE FROM TESTAUTO_COMMAND WHERE COMMAND = 'SCENARIO'
+'SCENARIO','Lancer un scénario','Numéro du scénario',NULL,NULL,NULL
+##
+TESTAUTO_COMMAND
+==
+DELETE FROM TESTAUTO_COMMAND WHERE COMMAND = 'CTRL'
+'CTRL','Contrôler la valeur d''une donnée','Nom de la donnée','Opérateur (= , >, <, <>)','Valeur à tester','Message d''erreur personnalisé'
+##
+TESTAUTO_COMMAND
+==
+DELETE FROM TESTAUTO_COMMAND WHERE COMMAND = 'CTRL'
+'CTRL','Contrôler la valeur d''une donnée','Nom du champ','Opérateur (= , >, <, <>)','Valeur à tester','Message d''erreur personnalisé'
+##
+TESTAUTO_COMMAND
+==
+DELETE FROM TESTAUTO_COMMAND WHERE COMMAND IN ('IN_CKB','LOAD_COL')
+'IN_CKB','Changer la valeur d''une case à cocher','Nom du champ','O/N ou Oui/Non',NULL,NULL
+'LOAD_COL','Charger un matricule dans le bandeau','Identifiant RH','Numéro de PAC','Matricule de paie',NULL
+##
+TESTAUTO_COMMAND
+==
+DELETE FROM TESTAUTO_COMMAND WHERE COMMAND IN ('VAR','PROC_DOS','PROC_NOM')
+'PROC_DOS','Reprendre ou continuer un processus','Numéro de dossier',NULL,NULL,NULL
+'PROC_NOM','Reprendre ou continuer un processus','Nom du processus','Nom du bénéficiaire',NULL,NULL
+'VAR','Créer une variable','Nom de la variable','Valeur',NULL,NULL
+##
+TESTAUTO_COMMAND
+==
+DELETE FROM TESTAUTO_COMMAND WHERE COMMAND = 'FIND_COL'
+'FIND_COL','Rechercher et charger un collaborateur dans le bandeau à partir de son nom','Nom de famille',NULL,NULL,NULL
+##
+TESTAUTO_COMMAND
+==
+DELETE FROM TESTAUTO_COMMAND WHERE COMMAND = 'ADD_DAY'
+'ADD_DAY','Ajouter ou retirer des jours à une date','Nom de la variable','Date','Nombre de jour à ajouter ou retirer',NULL
+##
+TESTAUTO_COMMAND
+=SQL IFEXIST=TESTAUTO_COMMAND=
+UPDATE TESTAUTO_COMMAND SET LIBELLE = 'Rechercher et charger un collaborateur dans le bandeau à partir de son nom ou de son identifiant RH', PARAM1 = 'Nom de famille ou Id RH' WHERE COMMAND = 'FIND_COL'
+##
+TESTAUTO_COMMAND
+==
+DELETE FROM TESTAUTO_COMMAND WHERE COMMAND = 'VALID_DATE_EFF'
+'VALID_DATE_EFF','Valide le composant avec la date d''effet passée en paramètre sinon à la date d''effet en cours','Date d''effet',NULL,NULL,NULL

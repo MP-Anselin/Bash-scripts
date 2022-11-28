@@ -1,0 +1,14 @@
+##
+TAG_CHARSET=@€ιθη
+##
+TGE_REF_TDR
+=SQL=
+update  TGE_REF_TDR set CODE_NATURCNT = 'CAP', CODE_DEPART = '26'  where TYPE_REEMBAUCHE in ('08','09') and NUMPAC='*'
+##
+TGE_REF_TDR
+=SQL=
+update  TGE_REF_TDR set CODE_NATURCNT = null  where TYPE_REEMBAUCHE in ('08','09')
+##
+TGE_REF_TDR
+=SQL=
+update  TGE_REF_TDR set CODE_DEPART = null  where TYPE_REEMBAUCHE in ('14','13','12')

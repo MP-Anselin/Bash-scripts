@@ -1,0 +1,48 @@
+##
+HRORG_MAJ_DOSSIERS_PERDUS
+=SQL=
+CREATE OR REPLACE
+PROCEDURE HRORG_MAJ_DOSSIERS_PERDUS
+AS
+  CURSOR c_dos
+  IS
+    SELECT * FROM HRORG_DOSSIERS_PERDUS WHERE gv_valide IS NOT NULL;
+  lig HRORG_DOSSIERS_PERDUS % rowtype;
+  exit_function EXCEPTION;
+BEGIN
+  OPEN c_dos;
+  LOOP
+    BEGIN
+      FETCH c_dos INTO lig;
+      EXIT
+    WHEN c_dos % NOTFOUND;
+      UPDATE WKF_POSSESSION
+      SET CODE_USER   = lig.gv_valide
+      WHERE TRACE_NUM = lig.trace_num;
+      IF lig.type_ko  = 'PERDU' THEN
+        UPDATE WKF_TRACABILITE SET ETAT = 'D' WHERE TRACE_NUM = lig.trace_num;
+        UPDATE WKF_POSSESSION SET ROLE_USER = 'GV' WHERE TRACE_NUM = lig.trace_num;
+      END IF;
+      IF lig.type_ko = 'OBSOLETE' THEN
+        UPDATE WKF_TRACABILITE
+        SET ETAT        ='D',
+          DOS_DESC      =DOS_DESCIN,
+          DATE_DEB_REEL =NULL,
+          DATE_FIN_REEL =NULL
+        WHERE TRACE_NUM = lig.trace_num;
+      END IF;
+      INSERT
+      INTO WKF_TRACES_MAJ_GV VALUES
+        (
+          lig.trace_num,
+          lig.gv_valide,
+          lig.type_ko,
+          TO_CHAR(sysdate,'yyyymmddhh24miss')
+        );
+    EXCEPTION
+    WHEN OTHERS THEN
+      RAISE exit_function;
+    END;
+  END LOOP;
+  CLOSE c_dos;
+END HRORG_MAJ_DOSSIERS_PERDUS;

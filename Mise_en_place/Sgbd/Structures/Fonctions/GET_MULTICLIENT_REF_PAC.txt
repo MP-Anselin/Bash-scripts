@@ -1,0 +1,38 @@
+##
+TAG_CHARSET=@€éèç
+##
+GET_MULTICLIENT_REF_PAC
+=SQL=
+CREATE OR REPLACE FUNCTION GET_MULTICLIENT_REF_PAC 
+	RETURN T_MULTICLIENT_REF_PAC 
+AS 
+	v_retour T_MULTICLIENT_REF_PAC := T_MULTICLIENT_REF_PAC();
+	-- Une valeur si la table SYS_USR_CID existe, null sinon
+	v_existTable VARCHAR2(40);
+	v_clientId_varsys VARCHAR2(32);
+BEGIN
+	/**
+	 * Dans le cadre du multiclient, la table MULTICLIENT_REF_PAC permet d'associer un NUMPAC avec un COMPANY_ID (CID).
+	 * Le problème, c'est que cette table n'existe pas dans ADP Link car on est monoclient.
+	 * Cette fonction va permettre de faire des requêtes sans avoir à s'interroger sur l'existence ou non de la table.
+	 * Si la table existe, on retourne les données de MULTICLIENT_REF_PAC, 
+	 * sinon on les créé en utilisant la table TGE_REF_PAC et la valeur du CID contenue dans la varsys "NS_CLIENT_ID"
+	*/
+	BEGIN
+	    select TABLE_NAME into v_existTable from USER_TABLES where TABLE_NAME = 'MULTICLIENT_REF_PAC';
+  	EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+    	-- La table n'exite pas  	
+    	v_existTable := NULL;
+  	END;
+	
+	IF v_existTable IS NOT NULL THEN 
+		-- Execute immediate car la table peut ne pas existée (pb de statement ignored)
+		execute immediate 'select T_MULTICLIENT_REF_PAC_OBJ(NUMPAC, COMPANY_ID) from MULTICLIENT_REF_PAC' bulk collect into v_retour;
+  	ELSE
+  		select VALVAR into v_clientId_varsys from SYS_VARSYS where CODVAR = 'NS_CLIENT_ID';
+  		-- On ne veut pas récupérer les utilisateurs techniques
+  		select T_MULTICLIENT_REF_PAC_OBJ(NUMPAC, v_clientId_varsys) bulk collect into v_retour from TGE_REF_PAC;
+  	END IF;
+  	RETURN v_retour;
+END GET_MULTICLIENT_REF_PAC;

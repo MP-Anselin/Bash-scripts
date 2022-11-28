@@ -1,0 +1,20 @@
+##
+TAG_CHARSET=@€ιθη
+##
+SYS_TRC_API_SEQUENCE
+=SQL=
+DECLARE
+    lastSeq number;
+    exist_seq number;
+BEGIN
+    SELECT COUNT(*) INTO exist_seq FROM USER_SEQUENCES WHERE SEQUENCE_NAME = 'SYS_TRC_API_SEQUENCE';
+    IF exist_seq = 1 then
+        RETURN;
+    END IF;
+
+    SELECT MAX(ID_TRACE) + 1 INTO lastSeq FROM SYS_STATS_REST_API_DELAY;
+    if lastSeq IS NULL then
+      lastSeq := 1;
+    end if;
+    execute immediate 'CREATE SEQUENCE SYS_TRC_API_SEQUENCE INCREMENT BY 1 START WITH ' || lastSeq || ' MINVALUE 1 NOCACHE';
+END;

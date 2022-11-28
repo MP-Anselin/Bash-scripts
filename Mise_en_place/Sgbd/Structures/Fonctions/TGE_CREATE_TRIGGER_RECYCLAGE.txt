@@ -1,0 +1,331 @@
+##
+TAG_CHARSET=@€éèç
+##
+TGE_CREATE_TRIGGER_RECYCLAGE
+=SQL=
+CREATE OR REPLACE FUNCTION TGE_CREATE_TRIGGER_RECYCLAGE(NOM_TABLE IN VARCHAR2)
+RETURN CLOB
+AS
+  v_retour CLOB;
+
+  v_typeTable VARCHAR(1);
+  date_eff_exists NUMBER;
+  nom_col_date_test_recycl VARCHAR2(30);
+  condition CLOB;
+
+  CURSOR cur_mapdo IS
+    SELECT LISTAGG(numpac,',') WITHIN GROUP (ORDER BY numpac) as numpacs, donneegxp, data_type from (
+      with donnees_paie (numpac, donneegxp, tablegxp, data_type) as (
+        SELECT numpac, donneegxp, tablegxp, data_type
+        FROM TGE_REF_MAPDO_RESOLVED,user_tab_cols
+        WHERE 
+          column_name=donneegxp and table_name=nom_table and
+          TABLEGXP IN (
+            SELECT tableparam
+            FROM tge_ref_mapta
+            WHERE 
+              tablephy = nom_table
+              --RSI DIT 39298 MPE : Fonction d'envoi inconditionnel pour la table TGE_REF_MAPDO
+              --Ajout du type 'I'
+              AND allerretour IN ('A','2','I')
+              -- les occurences !! sont désactivés 
+              AND tge_ref_mapdo_resolved.occurence != '!!'
+          )
+        UNION 
+        SELECT numpac,donneegxp,(select min(tableparam) from tge_ref_mapta where tablephy = nom_table) as tablegxp,data_type 
+        FROM TABLE(GET_GXP_TRT_PARTICULIER_DATAS(nom_table)),user_tab_cols
+        WHERE 
+          column_name=donneegxp and table_name=nom_table
+      )
+      SELECT distinct 
+        case when not exists (select 1 from tge_ref_pac where numpac not in (select numpac from donnees_paie m where donneegxp=t.donneegxp and TABLEGXP=t.TABLEGXP)) then '*' else numpac end as numpac
+        , donneegxp, data_type
+      from donnees_paie t
+    )
+    GROUP BY donneegxp, data_type
+    ORDER BY donneegxp;
+  lig_mapdo cur_mapdo%rowtype;
+  vFunctionCompare VARCHAR2(10);
+  vFunctionCompareParam3 VARCHAR2(50);
+
+BEGIN
+
+  BEGIN EXECUTE_IMMEDIATE_STRING( 'DROP PROCEDURE CHECK_RECYCLAGE_'||NOM_TABLE,0); EXCEPTION WHEN OTHERS THEN NULL; END;
+
+  v_retour := NULL;
+  v_typeTable := fsed.getTypeTable(NOM_TABLE);
+
+  date_eff_exists := 0;
+  nom_col_date_test_recycl := NULL;
+  IF nom_table='DIC_ADM_CONTRAT' THEN
+    -- Pour DIC_ADM_CONTRAT c'est DSDCN qui fera office de DATE_EFF pour tester s'il faut mettre en recyclage
+    nom_col_date_test_recycl := 'DSDCN';
+  ELSE
+    SELECT COUNT(*)
+    INTO date_eff_exists
+    FROM user_tab_cols
+    WHERE column_name     = 'DATE_EFF'
+    AND table_name        = NOM_TABLE;
+    IF date_eff_exists>0 THEN
+      nom_col_date_test_recycl := 'DATE_EFF';
+    END IF;
+  END IF;
+
+  v_retour := 'CREATE OR REPLACE PROCEDURE CHECK_RECYCLAGE_'||NOM_TABLE||'(v_ligOld '||NOM_TABLE||'%ROWTYPE, v_ligNew IN OUT '||NOM_TABLE||'%ROWTYPE, v_numpac IN OUT VARCHAR2, v_pacmat IN OUT VARCHAR2, v_paiezad IN OUT VARCHAR2, tabRefPacByNumpac IN OUT ALIM_IDX.T_REF_PAC_BY_NUMPAC) IS 
+ v_matric VARCHAR2(32);
+type pacmats IS record (R_numpac VARCHAR2(6), R_pacmat VARCHAR2(8), R_periode_recycl number); 
+TYPE TAB_pacmats IS TABLE OF pacmats INDEX BY binary_integer; 
+tab TAB_pacmats; 
+v_recycl varchar2(1); 
+v_periode_recycl number; 
+v_error_periode_recycl_3 number; 
+v_retro VARCHAR2(1); 
+v_nbOccForCnt number;
+';
+
+  IF nom_col_date_test_recycl IS NOT NULL THEN
+    v_retour := v_retour||'
+date_test_recycl DATE;
+';
+  END IF;
+
+    v_retour := v_retour||'
+BEGIN
+ v_matric := NVL(v_ligNew.MATRIC,v_ligOld.MATRIC); ';
+
+  -- Récupération du numpac si besoin
+  IF v_typeTable = 'z' THEN
+    v_retour := v_retour||' 
+SELECT DISTINCT D.numpac as R_numpac, 
+D.pacmat as R_pacmat, 
+T.PERIODE_RECYCLAGE as R_periode_recycl bulk collect 
+INTO tab 
+FROM DIC_ADM_CONTRAT_SITU D ,SECUPACMAT T 
+WHERE D.NUMPAC=v_numpac AND D.PAIEZAD=v_paiezad AND D.NUMPAC=T.NUMPAC AND D.PACMAT=T.PACMAT;';
+  elsif v_typeTable = 'm' THEN
+    v_retour := v_retour||' 
+SELECT numpac as R_numpac, 
+pacmat as R_pacmat , 
+PERIODE_RECYCLAGE as R_periode_recycl bulk collect 
+INTO tab 
+FROM SECUPACMAT 
+WHERE matric=v_matric;';
+  elsif v_typeTable = 'p' THEN
+    v_retour := v_retour||' 
+SELECT numpac as R_numpac, 
+pacmat as R_pacmat , 
+PERIODE_RECYCLAGE as R_periode_recycl bulk collect 
+INTO tab 
+FROM SECUPACMAT 
+WHERE NUMPAC=v_numpac AND PACMAT=v_pacmat;';
+  END IF;
+
+  v_retour := v_retour||'
+if not tab.exists(1) then
+ return;
+end if;
+
+v_retro := ''N'';
+ FOR i IN 1..tab.last LOOP
+  v_numpac:=tab(i).r_numpac;
+   IF NOT v_numpac = ''TMPPAC'' THEN
+    v_pacmat:=tab(i).r_pacmat;
+    v_periode_recycl:=nvl(tab(i).R_periode_recycl,1);
+';
+
+  IF NOT nom_table ='DIC_ADM_CONTRAT_HISTO' THEN
+    -- une valeur '3' dans PERIODE_RECYCLAGE retourne une erreur
+    -- sauf en cas de réembauche (insertion dans DIC_ADM_CONTRAT et DIC_ADM_CONTRAT_HISTO)
+    v_retour := v_retour||' IF v_periode_recycl = 3 THEN';
+    IF nom_table ='DIC_ADM_CONTRAT' THEN
+      v_retour := v_retour||'     IF UPDATING OR DELETING THEN';
+    END IF;
+    v_retour := v_retour||'     RAISE_APPLICATION_ERROR(-20001,''CODERR=GENREC02'');';
+    IF nom_table ='DIC_ADM_CONTRAT' THEN
+      v_retour := v_retour||'     END IF;';
+    END IF;
+    v_retour := v_retour||' END IF;';
+  ELSE
+    -- on positionne PERIODE_RECYCLAGE à '1' en cas de réembauche d'un salarié ayant une valeur '0' ou '3' dans PERIODE_RECYCLAGE et répondant aux critères suivants :
+    -- - DRPAI2 est non-vide et différent de 'B'
+    -- - NATCOL vaut 'SAL' ou 'STA'
+    -- - DSDCN est antérieure ou égale à la période en cours
+    v_retour := v_retour||'
+IF v_periode_recycl IN (0,3) THEN
+ IF v_periode_recycl = 3 THEN
+  -- si PERIODE_RECYCLAGE vaut ''3'', on prévoit qu''il va falloir retourner une erreur (modification d''un contrat existant)
+  v_error_periode_recycl_3 := 1;
+ ELSE
+  v_error_periode_recycl_3 := 0;
+ END IF;
+ IF INSERTING THEN
+  -- insertion d''un historique de contrat : on vérifie s''il s''agit de la première occurrence du contrat (réembauche)
+  v_nbOccForCnt := GET_NB_LIGNES(''DIC_ADM_CONTRAT_HISTO'', ''NUMPAC=''''''||v_ligNew.NUMPAC||'''''' AND PACMAT=''''''||v_ligNew.PACMAT||'''''' AND NUMCNT=''||v_ligNew.NUMCNT);
+  IF v_nbOccForCnt = 0 THEN
+   -- première occurrence du contrat (réembauche) : on ne retourne pas d''erreur, et, si PERIODE_RECYCLAGE = ''3'', on va réactiver le dossier
+   IF v_periode_recycl = 3 THEN
+    v_error_periode_recycl_3 := 0;
+    v_ligNew.ZREACT := TO_DATE(TO_CHAR(v_ligNew.DATE_EFF,''yyyy'')||''0101'',''yyyymmdd'');
+   END IF; -- FIN v_periode_recycl = ''3''
+   -- vérification des critères pour positionner PERIODE_RECYCLAGE à ''1''
+   IF CHECK_FORCAGE_RECYCLAGE(v_ligNew.NUMPAC, v_ligNew.PACMAT, v_ligNew.NUMCNT, v_ligNew.DRPAI2, NULL) = 1 THEN
+    -- OK pour PERIODE_RECYCLAGE = ''1''
+    v_periode_recycl := 1;
+   END IF; -- FIN CHECK_FORCAGE_RECYCLAGE
+  END IF; -- FIN v_nbOccForCnt = 0
+ ELSIF UPDATING THEN
+  -- un update : on va vérifier si on doit réactiver le dossier
+  IF UPDATING(''DRPAI2'') AND (NVL(v_ligOld.DRPAI2, ''B'') <> NVL(v_ligNew.DRPAI2, ''B'') AND (NVL(v_ligOld.DRPAI2, ''B'') =''B'' OR NVL(v_ligNew.DRPAI2, ''B'')=''B'')) THEN
+   -- update de DRPAI2 pour déblocage paie : on ne retourne pas d''erreur, et on va réactiver le dossier
+   v_error_periode_recycl_3 := 0;
+   IF CHECK_FORCAGE_RECYCLAGE(v_ligNew.NUMPAC, v_ligNew.PACMAT, v_ligNew.NUMCNT, v_ligNew.DRPAI2, NULL) = 1 THEN
+    -- OK pour PERIODE_RECYCLAGE = ''1''
+    v_periode_recycl := 1;
+   END IF; -- FIN CHECK_FORCAGE_RECYCLAGE
+  ELSIF UPDATING(''ZREACT'') AND v_ligOld.ZREACT IS NULL AND v_ligNew.ZREACT IS NOT NULL THEN
+   -- update de ZREACT pour réactivation : si l''année de ZREACT est inférieure ou égale à l''année de la période en cours, on ne retourne pas d''erreur
+   BEGIN
+    IF NOT tabRefPacByNumpac.exists(v_ligNew.NUMPAC) THEN
+     select * into tabRefPacByNumpac(v_ligNew.NUMPAC) from tge_ref_pac where numpac = v_ligNew.NUMPAC;
+    END IF;
+    IF TO_CHAR(v_ligNew.ZREACT,''yyyy'') <= SUBSTR(tabRefPacByNumpac(v_ligNew.NUMPAC).PERIODEENCOURS,1,4) THEN
+     v_error_periode_recycl_3 := 0;
+     IF CHECK_FORCAGE_RECYCLAGE(v_ligNew.NUMPAC, v_ligNew.PACMAT, v_ligNew.NUMCNT, v_ligNew.DRPAI2, tabRefPacByNumpac(v_ligNew.NUMPAC).PERIODEENCOURS) = 1 THEN
+      -- OK pour PERIODE_RECYCLAGE = ''1''
+      v_periode_recycl := 1;
+     END IF; -- FIN CHECK_FORCAGE_RECYCLAGE
+    END IF; -- FIN ZREACT <= PERIODEENCOURS
+   EXCEPTION WHEN OTHERS THEN NULL; END;
+  END IF; -- FIN UPDATING DRPAI2 ou ZREACT
+ END IF; -- FIN INSERTING/UPDATING
+ IF v_error_periode_recycl_3 = 1 THEN
+  RAISE_APPLICATION_ERROR(-20001,''CODERR=GENREC02'');
+ END IF;
+END IF; -- FIN v_periode_recycl = 0 ou 3
+';
+  END IF;
+
+  v_retour := v_retour||'
+IF v_periode_recycl >= 10 THEN
+ RAISE_APPLICATION_ERROR(-20001,''CODERR=GENREC01'');
+ELSIF v_periode_recycl = 1 THEN
+';
+
+  -- on vérifie si des colonnes paies ont été modifié
+  v_retour := v_retour||' v_recycl:=''N'';';
+  IF nom_col_date_test_recycl IS NOT NULL THEN
+    v_retour := v_retour||'
+IF NOT tabRefPacByNumpac.exists(v_numpac) THEN
+ select * into tabRefPacByNumpac(v_numpac) from tge_ref_pac where numpac = v_numpac;
+END IF;
+IF DELETING THEN
+ date_test_recycl := v_ligOld.'||nom_col_date_test_recycl||';
+ELSE
+ date_test_recycl := v_ligNew.'||nom_col_date_test_recycl||';
+END IF;
+IF (NVL(TO_CHAR(date_test_recycl,''yyyymm''),''000000'') <= tabRefPacByNumpac(v_numpac).PERIODEENCOURS) THEN
+';
+  END IF;
+
+  v_retour := v_retour||'
+IF (INSERTING and v_ligOld.MATRIC IS NULL) OR (DELETING and v_ligNew.MATRIC IS NULL) THEN 
+ -- En insertion, si on n''a pas récupéré de ''OLD'' (seulement dans le cas de DIC_ADM_CONTRAT_HISTO), on inscrit forcément en recyclage
+ -- En suppression, si on n''a pas récupéré de ''NEW'' (seulement dans le cas de DIC_ADM_CONTRAT_HISTO), on inscrit forcément en recyclage
+ v_recycl:=''O'';
+ELSE 
+  -- Sinon, on compare ''OLD'' et ''NEW''
+';
+  condition := NULL;
+  OPEN cur_mapdo;
+  LOOP FETCH cur_mapdo INTO lig_mapdo ;
+
+    IF cur_mapdo%NOTFOUND AND condition IS NOT NULL THEN
+      condition := condition||' 
+END IF;';
+    END IF;
+
+    EXIT WHEN cur_mapdo%NOTFOUND;
+
+    IF lig_mapdo.donneegxp IS NOT NULL THEN
+      IF condition IS NOT NULL THEN
+        condition := condition||' 
+ELSIF ';
+      ELSE
+        condition := ' IF ';
+        IF NOM_TABLE ='DIC_ADM_CONTRAT_HISTO' THEN
+          condition := condition||' NVL(v_ligOld.DRPAI2, ''B'') <> NVL(v_ligNew.DRPAI2, ''B'') AND (NVL(v_ligOld.DRPAI2, ''B'') =''B'' OR NVL(v_ligNew.DRPAI2, ''B'')=''B'') THEN 
+ v_recycl:=''O'';
+ELSIF ';
+        END IF;
+      END IF;
+
+      IF NOT lig_mapdo.numpacs = '*' THEN
+        condition := condition||'INSTR('''||lig_mapdo.numpacs||''',v_numpac)>0 AND ';
+      END IF;
+
+      vFunctionCompare := 'IS_EQ';
+      vFunctionCompareParam3 := NULL;
+      IF lig_mapdo.data_type = 'DATE' THEN
+        vFunctionCompare := 'IS_EQ_DATE';
+        vFunctionCompareParam3 := ',''yyyymmddhh24miss''';
+      END IF;
+      condition := condition||' NOT '||vFunctionCompare||'(v_ligNew.'||lig_mapdo.donneegxp||',v_ligOld.'||lig_mapdo.donneegxp||vFunctionCompareParam3||') THEN
+ v_recycl:=''O''; ';
+    END IF;
+
+  END LOOP;
+  CLOSE cur_mapdo;
+
+  IF condition IS NULL THEN
+    RETURN NULL;
+  END IF;
+
+  v_retour := v_retour||condition;
+  
+  -- traitement du matricule pour recyclage
+  v_retour := v_retour||'
+END IF; -- FIN updating
+IF v_recycl=''O'' THEN 
+ MERGE INTO GAP_RECYCL_MATRIC a
+  USING (SELECT v_numpac AS numpac,v_pacmat AS pacmat FROM dual) b
+  ON (a.pacmat=b.pacmat AND a.numpac=b.numpac)
+  WHEN NOT MATCHED THEN INSERT (a.numpac,a.pacmat) VALUES (b.numpac,b.pacmat);
+
+ MERGE INTO TGE_MODIF_PACMAT_TORESEND a
+  USING (SELECT v_numpac AS numpac,v_pacmat AS pacmat, '''||NOM_TABLE||''' as TABLE_TO_SEND FROM dual) b
+  ON (a.pacmat=b.pacmat AND a.numpac=b.numpac and a.TABLE_TO_SEND=b.TABLE_TO_SEND)
+  WHEN MATCHED THEN update set a.DATE_MAJ=sysdate 
+  WHEN NOT MATCHED THEN INSERT (a.numpac,a.pacmat,a.TABLE_TO_SEND,a.DATE_MAJ) VALUES (b.numpac,b.pacmat,b.TABLE_TO_SEND, sysdate);
+END IF; -- FIN v_recycl
+';
+
+  IF nom_col_date_test_recycl IS NOT NULL THEN
+    v_retour := v_retour||' END IF; -- FIN test date recycl';
+  END IF;
+  v_retour := v_retour||'
+END IF; -- FIN v_periode_recycl IN (''0'',''3'')
+'|| TGE_CREATE_TRIGGER_RETRO(NOM_TABLE) ||'
+END IF; -- FIN NOT v_numpac = ''TMPPAC''
+END LOOP; -- FIN tab
+END CHECK_RECYCLAGE_'||NOM_TABLE||';
+';
+
+  EXECUTE_IMMEDIATE_STRING( v_retour,0);
+
+  v_retour := '
+-- DEBUT TRAITEMENT RECYCLAGE
+if v_type_writer<>''N'' AND v_type_writer<>''M'' THEN 
+ CHECK_RECYCLAGE_'||NOM_TABLE||'(v_ligOld, v_ligNew, v_numpac, v_pacmat, v_paiezad, tabRefPacByNumpac); ';
+  IF nom_table ='DIC_ADM_CONTRAT_HISTO' THEN
+    v_retour := v_retour || '
+ IF INSERTING THEN 
+  -- On récupère la valeur de ZREACT potentiellement mise à jour
+  :NEW.ZREACT := v_ligNew.ZREACT; 
+ END IF; ';
+  END IF;
+  v_retour := v_retour || '
+end if;
+-- FIN TRAITEMENT RECYCLAGE';
+ 
+  return v_retour;
+END TGE_CREATE_TRIGGER_RECYCLAGE;

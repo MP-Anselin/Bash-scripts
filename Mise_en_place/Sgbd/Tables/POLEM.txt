@@ -1,0 +1,13 @@
+##
+TAG_CHARSET=@€éèç
+##
+POLEM
+=SQL IFNOTEXIST=POLEM=
+CREATE TABLE "POLEM" (	"CODE" VARCHAR2(1) NOT NULL ENABLE, "LIBELLE" VARCHAR2(32), PRIMARY KEY(CODE))		 
+##
+POLEM
+==
+DELETE FROM POLEM WHERE CODE IN ('O', 'N', 'F')
+'O','Interdiction cotisation'
+'N','Adhésion obligatoire'
+'F','Adhésion facultative'

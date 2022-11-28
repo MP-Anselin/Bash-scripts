@@ -1,0 +1,25 @@
+##
+ADM_PAGE_EXIST_IN_SCHEMA
+=SQL=
+create or replace FUNCTION ADM_PAGE_EXIST_IN_SCHEMA (
+  p_nom_page               IN VARCHAR2,
+  p_code_schema            IN NUMBER
+) RETURN NUMBER
+
+IS
+  p_page                   NUMBER :=0;
+
+BEGIN
+  BEGIN
+    SELECT COUNT(DISTINCT s.code_elt) INTO p_page FROM sys_schemas s, sys_sch_element e
+     WHERE (s.code_schema = p_code_schema AND s.code_elt = e.code_element AND e.nom_page = p_nom_page AND e.niveau = 99);
+
+    IF (p_page > 0) THEN
+      RETURN 1; -- la page est présente dans ce schéma
+    END IF;
+
+    EXCEPTION WHEN NO_DATA_FOUND THEN
+      RETURN 0;
+  END; 
+  RETURN 0; -- la page n'est pas présente dans ce schéma
+END ADM_PAGE_EXIST_IN_SCHEMA;

@@ -1,0 +1,10 @@
+<interface idInterface="IMPORT_MASSE_GAP_RETRO">
+	<nomInterface>Import feuille GAP</nomInterface>
+	<descriptionInterface>Import feuille GAP</descriptionInterface>
+	<traitements>
+		<traitement>
+			<descriptionTraitement>Appel a l'interface</descriptionTraitement>
+			<typeTraitement>IMPORT_MASSE_GAP_RETRO</typeTraitement>
+		</traitement>
+	</traitements>
+</interface>

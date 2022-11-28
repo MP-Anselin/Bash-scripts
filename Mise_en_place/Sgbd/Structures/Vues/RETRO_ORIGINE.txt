@@ -1,0 +1,6 @@
+##
+TAG_CHARSET=@€éèç
+##
+RETRO_ORIGINE
+==
+CREATE OR REPLACE FORCE VIEW RETRO_ORIGINE ("NUMPAC","PACMAT","PERIODE_RETRO","ORIGINE_MAJ","DATE_MAJ") AS SELECT numpac, pacmat, periode_retro, CASE WHEN table_maj = 'TGE_DONNEES_PAIE' THEN 'Données variables et rappels' WHEN table_maj = 'TGE_ELEMENTS_PAIE' THEN 'Eléments de paie' WHEN table_maj = 'TGE_INCIDENTS_PAIE' THEN 'Absences et Incidents' ELSE (select LIBELLE_DICTIONNAIRE from meta_dictionnaire_ihm where COMPANY_ID = '*' and NOM_DICTIONNAIRE = table_maj) END origine_maj, date_maj FROM tge_modif_pacmat_retro UNION ALL SELECT  numpac, pacmat, periode_retro, 'Manuelle ('  || aoid  || ')' origine_maj, date_maj FROM  gap_selection_retro

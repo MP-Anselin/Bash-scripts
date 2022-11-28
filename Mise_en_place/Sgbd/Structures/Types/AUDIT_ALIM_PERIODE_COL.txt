@@ -1,0 +1,4 @@
+##
+AUDIT_ALIM_PERIODE_COL
+=SQL IF_TYPE_NOTEXIST=AUDIT_ALIM_PERIODE_COL=
+create or replace TYPE AUDIT_ALIM_PERIODE_COL AS OBJECT (paiezad varchar2(8), debut_recueil_force DATE, fin_recueil_force DATE)

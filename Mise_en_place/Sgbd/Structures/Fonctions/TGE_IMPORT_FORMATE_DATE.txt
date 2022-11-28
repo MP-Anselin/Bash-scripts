@@ -1,0 +1,25 @@
+##
+TGE_IMPORT_FORMATE_DATE
+=SQL=
+create or replace FUNCTION TGE_IMPORT_FORMATE_DATE (
+ P_DATE IN VARCHAR2,
+ P_LOGIN_IMPORT IN VARCHAR2,
+ P_IN_TEMPLATE_DATE IN VARCHAR2,
+ P_OUT_TEMPLATE IN VARCHAR2
+ ) RETURN VARCHAR2 AS
+ /**
+   Fonction permettant de formater une date dans les imports TGE.
+   Lorsque l'import n'est pas un import 'BATCH' (déterminé à partir du paramètre P_LOGIN_IMPORT), la date 
+   va être formatée spécialement sinon en mode 'BATCH', la date est retournée dans le format d'entrée.
+   Dans le cas où la date à formater serait dans un format incorrect, on ne retourne pas d'exception mais une valeur vide.
+ **/
+ BEGIN
+   IF P_LOGIN_IMPORT = 'BATCH' THEN
+     RETURN P_DATE;
+   ELSE
+     RETURN FORMATE_DATE(P_DATE, P_IN_TEMPLATE_DATE, P_OUT_TEMPLATE);
+   END IF;
+ EXCEPTION
+   WHEN OTHERS THEN
+     RETURN '';
+ END TGE_IMPORT_FORMATE_DATE;

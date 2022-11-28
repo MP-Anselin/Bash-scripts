@@ -1,0 +1,2225 @@
+##
+TAG_CHARSET=@€éèç
+TAG_IMPORT=5.05.004.R023
+##
+CODE_CHRONO_PREC
+=SQL=
+CREATE OR REPLACE FUNCTION CODE_CHRONO_PREC(p_numpac VARCHAR2, p_pacmat VARCHAR2, p_dsdsc DATE) RETURN NUMBER IS 
+PRAGMA AUTONOMOUS_TRANSACTION; 
+retour VARCHAR2(6); 
+BEGIN 
+  SELECT MAX(CODE_CHRONO) INTO retour FROM DIC_ADM_CONTRAT_SITU 
+  WHERE NUMPAC = p_numpac AND PACMAT = p_pacmat AND DSDSC <= p_dsdsc;
+  RETURN retour;
+EXCEPTION
+  WHEN OTHERS THEN RETURN 0;
+END CODE_CHRONO_PREC;
+##
+ORDRE_CODE_CHRONO_ERREUR
+=SQL=
+CREATE OR REPLACE FUNCTION ORDRE_CODE_CHRONO_ERREUR(p_numpac VARCHAR2, p_pacmat VARCHAR2, p_codeChrono VARCHAR2, p_dsdsc DATE) RETURN NUMBER IS 
+PRAGMA AUTONOMOUS_TRANSACTION; 
+retour NUMBER; 
+BEGIN 
+  SELECT COUNT(*) INTO retour FROM DIC_ADM_CONTRAT_SITU 
+  WHERE NUMPAC = p_numpac AND PACMAT = p_pacmat 
+  AND ((DSDSC < p_dsdsc AND CODE_CHRONO > p_codeChrono) 
+  OR (DSDSC > p_dsdsc AND CODE_CHRONO < p_codeChrono));
+  RETURN retour;
+EXCEPTION
+  WHEN OTHERS THEN RETURN 0;
+END ORDRE_CODE_CHRONO_ERREUR;
+##
+TAG_CHARSET=@€éèç
+##
+TGE_CREATE_TRIGGER
+=SQL=
+create or replace PROCEDURE TGE_CREATE_TRIGGER(
+    NOM_TABLE IN VARCHAR2)
+AS
+  PROC CLOB;
+  PROC_DEX_UPDATING CLOB;
+  condition CLOB;
+  v_typeTable VARCHAR(1);
+  CURSOR cur_mapdo
+  IS
+    SELECT numpac,
+      donneegxp
+    FROM tge_ref_mapdo
+    WHERE TABLEGXP IN
+      (SELECT tableparam
+      FROM tge_ref_mapta
+      WHERE tablephy = nom_table
+        --RSI DIT 39298 MPE : Fonction d'envoi inconditionnel pour la table TGE_OPTION_REPORT
+        --Ajout du type 'I'
+      AND allerretour IN ('A','2','I')
+      )
+  AND (donneegxp, tablegxp) IN
+    (SELECT column_name, table_name FROM user_tab_cols
+    )
+  UNION
+    (SELECT numpac,donneegxp FROM TABLE(GET_GXP_TRT_PARTICULIER_DATAS(nom_table))
+    )
+  ORDER BY donneegxp,
+    numpac;
+  lig_mapdo cur_mapdo%rowtype;
+  is_aller_ou_allerretour_mapta NUMBER;
+  table_exist                   NUMBER;
+  type_writer_exists            NUMBER;
+  date_eff_exists               NUMBER;
+  nom_col_date_test_recycl      VARCHAR2(30);
+  CURSOR cur_numpac
+  IS
+    SELECT DISTINCT numpac
+    FROM tge_ref_mapdo
+    WHERE TABLEGXP IN
+      (SELECT tableparam
+      FROM tge_ref_mapta
+      WHERE tablephy = nom_table
+        --RSI DIT 39298 MPE : Fonction d'envoi inconditionnel pour la table TGE_OPTION_REPORT
+        --Ajout du type 'I'
+      AND allerretour IN ('A', '2','I')
+      )
+  AND (donneegxp, tablegxp) IN
+    (SELECT column_name, table_name FROM user_tab_cols
+    )
+  ORDER BY numpac;
+  lig_numpac cur_numpac%rowtype;
+  sscondition CLOB;
+  existeMappingEtoile NUMBER;
+  donneeprec          VARCHAR(100);
+  -- variables retro  ---
+  -----------------------
+  champDateEffetRetro VARCHAR2(50);
+  conditionRetro CLOB;
+  ssconditionRetro CLOB;
+  procRetroPaiezadCodeChrono VARCHAR(4000);
+  CURSOR cur_mapdoRetro
+  IS
+    SELECT DISTINCT dz.numpac,
+      md.donneegxp, 
+      mddr.clause_date_eff_retro
+    FROM tge_ref_dicoz dz INNER JOIN tge_ref_mapdo md
+    	ON md.element        = dz.element
+    	AND (md.numpac        = dz.numpac
+    	OR (md.numpac         = '*'
+    	AND NOT EXISTS
+	      (SELECT 1
+	      FROM tge_ref_mapdo z
+	      WHERE z.numpac= dz.numpac
+	      AND z.element = dz.element
+	      )) )
+      	LEFT JOIN tge_ref_mapdo_dteff_retro mddr 
+      	ON mddr.element        = dz.element
+	    AND (mddr.numpac        = dz.numpac
+	    OR (mddr.numpac         = '*'
+	    AND NOT EXISTS
+	      (SELECT 1
+	      FROM tge_ref_mapdo_dteff_retro zdr
+	      WHERE zdr.numpac= dz.numpac
+	      AND zdr.element = dz.element
+	      )) )
+    WHERE dz.calcul_retro = '1'
+    AND TABLEGXP IN
+      (SELECT tableparam FROM tge_ref_mapta WHERE tablephy = NOM_TABLE
+      )
+    ORDER BY donneegxp,
+      clause_date_eff_retro;
+    lig_mapdoRetro cur_mapdoRetro%rowtype;
+    ligPrec_mapdoRetro cur_mapdoRetro%rowtype;
+    CURSOR cur_numpacRetro
+    IS
+      SELECT DISTINCT dz.numpac
+      FROM tge_ref_dicoz dz,
+        tge_ref_mapdo md
+      WHERE dz.calcul_retro = '1'
+      AND md.element        = dz.element
+      AND (md.numpac        = dz.numpac
+      OR (md.numpac         = '*'
+      AND NOT EXISTS
+        (SELECT 1
+        FROM tge_ref_mapdo z
+        WHERE z.numpac= dz.numpac
+        AND z.element = dz.element
+        )) )
+      AND TABLEGXP IN
+        (SELECT tableparam FROM tge_ref_mapta WHERE tablephy = NOM_TABLE
+        )
+      ORDER BY numpac;
+      lig_numpacRetro cur_numpacRetro%rowtype;
+  -- variables dex  ---
+  -----------------------
+      CURSOR cur_donneesDex
+      IS
+        SELECT DISTINCT DMED.EVENT,
+          RDMU.NOM_DONNEE,
+          RDMU.CONDITION,
+          DMED.NOM_DONNEE_DEX_OU_EVENT 
+        FROM DEX_MAPPING_EVENT_DATA DMED,
+          REF_DONNEE_MAPPING_UX RDMU,
+          REF_DONNEE_GEN_MODEL RDGM
+        WHERE DMED.NOM_DONNEE_DEX_OU_EVENT=RDMU.NOM_DONNEE_UX
+        AND RDMU.NOM_DONNEE               =RDGM.NOM_DONNEE
+        AND DMED.UTILISE_TRIGGER          ='O'
+        AND DMED.TYPE                     ='D'
+        AND RDGM.NOM_DICTIONNAIRE         =NOM_TABLE
+        ORDER BY DMED.EVENT,
+          RDMU.NOM_DONNEE;
+      lig_donneeDex cur_donneesDex%rowtype;
+      v_existeDonneeDex BOOLEAN;
+      v_eventDexPrec    VARCHAR(100);
+      v_cleSecondaireDex VARCHAR(200);
+      
+      CURSOR cur_eventsDex
+      IS
+        SELECT DISTINCT DMED.EVENT,
+          RDMU.CONDITION
+        FROM DEX_MAPPING_EVENT_DATA DMED,
+          REF_DONNEE_MAPPING_UX RDMU,
+          REF_DONNEE_GEN_MODEL RDGM
+        WHERE DMED.NOM_DONNEE_DEX_OU_EVENT=RDMU.NOM_DONNEE_UX
+        AND RDMU.NOM_DONNEE               =RDGM.NOM_DONNEE
+        AND DMED.UTILISE_TRIGGER          ='O'
+        AND DMED.TYPE                     ='D'
+        AND RDGM.NOM_DICTIONNAIRE         =NOM_TABLE;
+      lig_eventDex cur_eventsDex%rowtype;
+    BEGIN
+      -- On teste si la table existe bien
+      SELECT COUNT(*)
+      INTO table_exist
+      FROM user_tables
+      WHERE table_name = nom_table;
+      IF table_exist   > 0 THEN
+        SELECT COUNT(*)
+        INTO is_aller_ou_allerretour_mapta
+        FROM tge_ref_mapta
+        WHERE tablephy = nom_table
+          --RSI DIT 39298 MPE : Fonction d'envoi inconditionnel pour la table TGE_OPTION_REPORT
+          --Ajout du type 'I'
+        AND allerretour                                   IN ('A', '2','I');
+        IF is_aller_ou_allerretour_mapta > 0 OR nom_table IN ('DIC_ADM_PERSO','DIC_ADM_PERSO_HISTO','DIC_ADM_CONTRAT','DIC_ADM_CONTRAT_HISTO') THEN
+          -- Si la colonne TYPE_WRITER n'existe pas, on la crée
+          SELECT COUNT(*)
+          INTO type_writer_exists
+          FROM user_tab_cols
+          WHERE column_name     = 'TYPE_WRITER'
+          AND table_name        = NOM_TABLE;
+          IF type_writer_exists = 0 THEN
+            EXECUTE_IMMEDIATE_STRING( 'ALTER TABLE ' || NOM_TABLE || ' ADD (TYPE_WRITER VARCHAR2(1 BYTE))',0);
+          END IF;
+          v_typeTable := fsed.getTypeTable(NOM_TABLE);
+          PROC        := 'create or replace 
+TRIGGER TRG_' || NOM_TABLE || ' FOR INSERT or UPDATE or delete  ON '||NOM_TABLE||
+          ' COMPOUND TRIGGER 
+type pacmats 
+IS 
+record 
+( 
+R_numpac VARCHAR2(6), 
+R_pacmat VARCHAR2(8), 
+R_periode_recycl VARCHAR2(1) 
+); 
+TYPE TAB_pacmats 
+IS 
+TABLE OF pacmats INDEX BY binary_integer; 
+tab TAB_pacmats; 
+v_recycl varchar2(1); 
+v_periode_recycl varchar2(1); 
+v_error_periode_recycl_3 number; 
+v_numpac varchar2(6); 
+v_pacmat varchar2(8); 
+v_periode varchar2(6); 
+
+existNumpacPaizad NUMBER; 
+v_type_writer varchar2(1); 
+v_bypass_trigger number; 
+v_bypass_DACH number; 
+v_date_debut_periode_paie DATE :=NULL;  
+
+V_DE_SSAAMM               VARCHAR2(6); 
+V_DE_SSAAMM_TMP           VARCHAR2(6); 
+V_DE_SSAAMM_DEFAULT		  VARCHAR2(6); 
+V_DATE_LIMITE_RETRO       VARCHAR2(6); 
+V_DEB_RETRO               VARCHAR2(6); 
+V_DEB_HISTO_RETRO         VARCHAR2(6); 
+V_PERIODEENCOURS          VARCHAR2(6); 
+V_CODE_CHRONO             VARCHAR2(6); 
+V_PAIEZAD                 VARCHAR2(8); 
+V_MATRIC                  VARCHAR2(32); 
+v_nb_mois_retro           NUMBER; 
+v_retro                   VARCHAR2(1); 
+V_DATE_EFF                VARCHAR2(6); 
+'
+          ;
+          -- On vérifie si la table va générer des évènements pour DEX (au moins une donnée mappée, ou dictionnaire DIC_ADM_CONTRAT qui gère l'embauche et le départ)
+          v_existeDonneeDex := (nom_table='DIC_ADM_CONTRAT');
+          IF NOT v_existeDonneeDex THEN
+            OPEN cur_donneesDex;
+            LOOP
+              FETCH cur_donneesDex INTO lig_donneeDex ;
+              EXIT
+            WHEN cur_donneesDex%NOTFOUND OR v_existeDonneeDex;
+              v_existeDonneeDex := true;
+            END LOOP;
+            CLOSE cur_donneesDex;
+          END IF;
+          OPEN cur_numpac;
+          LOOP
+            FETCH cur_numpac INTO lig_numpac ;
+            EXIT
+          WHEN cur_numpac%NOTFOUND ;
+            IF lig_numpac.numpac<>'*' THEN
+              PROC              :=PROC||' b'||lig_numpac.numpac||' boolean ;';
+            END IF;
+          END LOOP;
+          CLOSE cur_numpac;
+          OPEN cur_numpacRetro;
+          LOOP
+            FETCH cur_numpacRetro INTO lig_numpacRetro ;
+            EXIT
+          WHEN cur_numpacRetro%NOTFOUND ;
+            IF lig_numpacRetro.numpac<>'*' THEN
+              PROC                   :=PROC||' bRet'||lig_numpacRetro.numpac||' boolean ;';
+            END IF;
+          END LOOP;
+          CLOSE cur_numpacRetro;
+          IF nom_table IN ('DIC_ADM_PERSO','DIC_ADM_PERSO_HISTO','DIC_ADM_CONTRAT','DIC_ADM_CONTRAT_HISTO') THEN
+            PROC           :=PROC||' v_listMatricToUpdate CLOB := NULL; 
+v_nbMatricToUpdate NUMBER := 0; 
+v_countSecNav NUMBER := -1;';
+            IF nom_table    ='DIC_ADM_PERSO' THEN
+              PROC         :=PROC||'v_listMatricToDelete CLOB := NULL; 
+v_nbMatricToDelete NUMBER := 0;';
+            ELSIF nom_table ='DIC_ADM_CONTRAT' THEN
+              PROC         :=PROC||'v_nbLig NUMBER; 
+v_doMajPerso NUMBER := 0; 
+TYPE NUMPAC_PACMAT_TO_DELETE IS RECORD (MATRIC DIC_ADM_CONTRAT.MATRIC%TYPE, NUMPAC DIC_ADM_CONTRAT.NUMPAC%TYPE, PACMAT DIC_ADM_CONTRAT.PACMAT%TYPE); 
+TYPE TAB_NUMPAC_PACMAT_TO_DELETE IS TABLE OF NUMPAC_PACMAT_TO_DELETE; 
+v_NUMPAC_PACMAT NUMPAC_PACMAT_TO_DELETE; 
+v_TAB_NUMPAC_PACMAT TAB_NUMPAC_PACMAT_TO_DELETE; 
+v_listNumpacPacmatToDelete CLOB := '','';
+v_actionIdx VARCHAR2(1);
+v_jobIdx NUMBER;
+
+';
+            ELSIF nom_table = 'DIC_ADM_CONTRAT_HISTO' THEN
+              PROC         :=PROC||
+              ' v_nbOccForCnt number; 
+v_dsdcn DIC_ADM_CONTRAT.DSDCN%TYPE; 
+v_natcol DIC_ADM_CONTRAT.NATCOL%TYPE;  
+
+TYPE paiezadTabType is table of DIC_ADM_CONTRAT_HISTO.PAIEZAD%TYPE ; 
+TYPE numpacTabType is  table of DIC_ADM_CONTRAT_HISTO.NUMPAC%TYPE ; 
+TYPE periodeTabType is  table of TGE_REF_PAC.PERIODEENCOURS%TYPE ; 
+paiezadTab paiezadTabType := paiezadTabType(); 
+numpacTab numpacTabType := numpacTabType(); 
+periodeTab periodeTabType := periodeTabType();  
+
+TYPE T_TRAITEMENT_PERIODES_INDIV IS TABLE OF VARCHAR2(100) INDEX BY VARCHAR2(100); 
+-- Ce tableau indexé contient plusieurs chose : 
+-- + Une entrée avec un code PAC + un PAIEZAD --> Un flag permettant de savoir si le couple NUMPAC/PAIEZAD a déjà été traité 
+-- + Une entrée avec un code PAC --> La période en cours du PAC 
+tabTrtPeriodesIndividuelles T_TRAITEMENT_PERIODES_INDIV;  
+in_calc_hp T_TRAITEMENT_PERIODES_INDIV;
+
+TYPE T_COMPARAISON_VAL_OLD_NEW IS TABLE OF VARCHAR2(100) INDEX BY VARCHAR2(20); 
+tabValToCompare T_COMPARAISON_VAL_OLD_NEW;  
+
+alimPeriodesIndiv boolean;  
+v_actionIdx VARCHAR2(1);
+v_jobIdx NUMBER;
+
+'
+              ;
+            END IF;
+            IF nom_table='DIC_ADM_CONTRAT' OR nom_table='DIC_ADM_CONTRAT_HISTO' THEN
+              PROC     :=PROC||' v_cle_idx_contrat T_CLE_IDX_CONTRAT_HISTO; 
+v_cles_idx_contrat T_CLES_IDX_CONTRAT_HISTO := T_CLES_IDX_CONTRAT_HISTO();';
+            END IF;
+            IF nom_table='DIC_ADM_PERSO' OR nom_table='DIC_ADM_CONTRAT' THEN
+              PROC     :=PROC||' 
+v_matricForPacmat VARCHAR2(32); 
+v_matricForLock VARCHAR2(32); 
+TYPE T_LOCKED_MATRIC IS TABLE OF VARCHAR2(1) INDEX BY VARCHAR2(32); 
+tabLockedMatric T_LOCKED_MATRIC; 
+';
+            END IF;
+          END IF;
+          date_eff_exists          := 0;
+          nom_col_date_test_recycl := NULL;
+          IF nom_table              ='DIC_ADM_CONTRAT' THEN
+            -- Pour DIC_ADM_CONTRAT c'est DSDCN qui fera office de DATE_EFF pour tester s'il faut mettre en recyclage
+            nom_col_date_test_recycl := 'DSDCN';
+          ELSE
+            SELECT COUNT(*)
+            INTO date_eff_exists
+            FROM user_tab_cols
+            WHERE column_name           = 'DATE_EFF'
+            AND table_name              = NOM_TABLE;
+            IF date_eff_exists          >0 THEN
+              nom_col_date_test_recycl := 'DATE_EFF';
+            END IF;
+          END IF;
+          IF nom_col_date_test_recycl IS NOT NULL THEN
+            PROC                      :=PROC||'TYPE T_PERIODE_BY_NUMPAC IS TABLE OF TGE_REF_PAC.PERIODEENCOURS%TYPE INDEX BY TGE_REF_PAC.NUMPAC%TYPE; 
+tabPeriodeByNumpac T_PERIODE_BY_NUMPAC; 
+date_test_recycl DATE;';
+          END IF;
+          IF nom_table='DIC_PERIODES_RECUEIL_HIS' THEN
+		  
+			PROC     :=PROC||'TYPE paiezadPacPeriodModifedType IS  TABLE OF TGE_PAC_PAIEZAD_PERIOD_RETRO  INDEX BY VARCHAR2(15);  ';
+  
+			PROC     :=PROC||'paiezadPacPeriodModifed paiezadPacPeriodModifedType ;';
+           
+            PROC     :=PROC||' idx  VARCHAR2(15);';
+		ELSE 
+			PROC     :=PROC||'idx NUMBER; ';
+          END IF;
+          IF v_existeDonneeDex THEN
+            PROC := PROC||'v_dexaction varchar2(1); 
+			v_dexCleSecondaire VARCHAR2(100);		
+			TYPE eventsTabType is  table of DEX_MAPPING_EVENT_DATA.EVENT%TYPE ; 
+			eventsTab eventsTabType := eventsTabType(); 
+			v_processEventDex boolean; 
+';
+          END IF;
+          IF nom_table ='DIC_ADM_CONTRAT_HISTO' THEN
+            PROC      :=PROC||' 
+BEFORE STATEMENT IS BEGIN  ';
+            PROC      := PROC || 'select count(*) into v_bypass_DACH from bypass_trg_DACH_on_session; 
+END BEFORE STATEMENT; ';
+          END IF;
+          PROC        := PROC || '  
+
+BEFORE EACH ROW IS BEGIN ' ;
+          IF nom_table ='DIC_ADM_CONTRAT_HISTO' THEN
+            PROC      := PROC || ' IF (v_bypass_DACH > 0) THEN null; else ';
+          END IF;
+          PROC := PROC || ' 
+if (v_bypass_trigger > 0)  then 
+v_type_writer := ''N''; 
+else 
+IF DELETING THEN 
+v_type_writer :=NVL(:old.type_writer,''O''); 
+ELSE 
+v_type_writer :=NVL(:NEW.type_writer,''O''); 
+-- On remet TYPE_WRITER à NULL pour qu''il ne soit pas considéré comme ''N'' lors des futurs update n''incluant pas cette colonne 
+:NEW.type_writer := NULL; 
+END IF; 
+end if; 
+';
+          IF nom_table IN ('DIC_ADM_PERSO','DIC_ADM_PERSO_HISTO','DIC_ADM_CONTRAT','DIC_ADM_CONTRAT_HISTO') THEN
+            PROC := PROC || ' 
+IF v_type_writer<>''N'' AND v_countSecNav=-1 THEN 
+SELECT COUNT(*) INTO v_countSecNav FROM SECUPACMAT_TMP WHERE MATRIC=''SECNAV''; 
+IF v_countSecNav>0 THEN 
+RAISE_APPLICATION_ERROR(-20000,''CODERR=GENREC03''); 
+END IF; 
+END IF; 
+';
+          END IF;
+          IF nom_table ='DIC_ADM_PERSO' OR nom_table ='DIC_ADM_CONTRAT' THEN
+            -- On récupère le MATRIC et on teste si on l'a déjà traité
+            PROC := PROC || ' 
+v_matricForLock := NVL(:NEW.MATRIC,:OLD.MATRIC); 
+IF v_type_writer<>''N'' AND NOT tabLockedMatric.exists(v_matricForLock) THEN';
+            -- En cas de modification de DAP, on lock les tables qui la mette à jour par trigger (DAPH, DAC, DACS et DACH)
+            -- En cas de modification de DAC, on lock les tables qui la mette à jour par trigger (DACS et DACH)
+            IF nom_table ='DIC_ADM_PERSO' THEN
+              -- DAPH et DAC uniquement pour DAP
+              PROC := PROC || ' 
+BEGIN 
+UPDATE DIC_ADM_PERSO_HISTO SET MATRIC=MATRIC, DATE_DERNIERE_MODIF=TO_DATE(''19010101'',''yyyymmdd''), TYPE_WRITER=''N'' WHERE MATRIC=v_matricForLock; 
+EXCEPTION WHEN OTHERS THEN NULL; END; 
+BEGIN 
+UPDATE DIC_ADM_CONTRAT SET NUMPAC=NUMPAC, DATE_DERNIERE_MODIF=TO_DATE(''19010101'',''yyyymmdd''), TYPE_WRITER=''N'' WHERE MATRIC=v_matricForLock; 
+EXCEPTION WHEN OTHERS THEN NULL; END;';
+            END IF;
+            -- DACs et DACH uniquement pour les 2 (DAP et DAC)
+            PROC := PROC || ' 
+BEGIN 
+UPDATE DIC_ADM_CONTRAT_SITU SET NUMPAC=NUMPAC, DATE_DERNIERE_MODIF=TO_DATE(''19010101'',''yyyymmdd'') WHERE MATRIC=v_matricForLock; 
+EXCEPTION WHEN OTHERS THEN NULL; END; 
+BEGIN 
+UPDATE DIC_ADM_CONTRAT_HISTO SET NUMPAC=NUMPAC, DATE_DERNIERE_MODIF=TO_DATE(''19010101'',''yyyymmdd''), TYPE_WRITER=''N'' WHERE MATRIC=v_matricForLock; 
+EXCEPTION WHEN OTHERS THEN NULL; END;';
+            -- On stocke le MATRIC pour indiquer qu'on l'a déjà traité
+            PROC := PROC || ' 
+tabLockedMatric(v_matricForLock) := ''O''; 
+END IF;';
+          END IF;
+          IF nom_table   ='DIC_ADM_PERSO' THEN
+            PROC        :=PROC||TRG_PERSO_BEFORE_ROW();
+          ELSIF nom_table='DIC_ADM_PERSO_HISTO' THEN
+            PROC        :=PROC||TRG_PERSO_HISTO_BEFORE_ROW();
+          ELSIF nom_table='DIC_ADM_CONTRAT' THEN
+            PROC        :=PROC||TRG_CONTRAT_BEFORE_ROW();
+          ELSIF nom_table='DIC_ADM_CONTRAT_HISTO' THEN
+            PROC        :=PROC||TRG_CONTRAT_HISTO_BEFORE_ROW();
+          END IF;
+          IF is_aller_ou_allerretour_mapta > 0 THEN
+              PROC                        :=PROC||' 
+v_matric:=nvl(:NEW.matric,:OLD.matric); ';
+            IF v_typeTable                 ='z' THEN
+              PROC                        :=PROC||' 
+v_numpac:=nvl(:NEW.numpac,:OLD.numpac); 
+v_paiezad:=nvl(:NEW.paiezad,:OLD.paiezad); ';
+            elsif v_typeTable              ='p' THEN
+              PROC                        :=PROC||' 
+v_numpac:=nvl(:NEW.numpac,:OLD.numpac); 
+v_pacmat:=nvl(:NEW.pacmat,:OLD.pacmat); ';
+            END IF;
+            PROC :=PROC||'  if v_type_writer<>''N'' THEN ';
+            -- Récupération du numpac si besoin
+            IF v_typeTable   ='z' THEN
+              PROC          :=PROC||' 
+SELECT DISTINCT D.numpac as R_numpac, 
+D.pacmat as R_pacmat, 
+T.PERIODE_RECYCLAGE as R_periode_recycl bulk collect 
+INTO tab 
+FROM DIC_ADM_CONTRAT_SITU D ,SECUPACMAT T 
+WHERE D.NUMPAC=v_numpac AND D.PAIEZAD=v_paiezad AND D.NUMPAC=T.NUMPAC AND D.PACMAT=T.PACMAT;';
+            elsif v_typeTable='m' THEN
+              PROC          :=PROC||' 
+SELECT numpac as R_numpac, 
+pacmat as R_pacmat , 
+PERIODE_RECYCLAGE as R_periode_recycl bulk collect 
+INTO tab 
+FROM SECUPACMAT 
+WHERE matric=v_matric;';
+            elsif v_typeTable='p' THEN
+              PROC          :=PROC||' 
+SELECT numpac as R_numpac, 
+pacmat as R_pacmat , 
+PERIODE_RECYCLAGE as R_periode_recycl bulk collect 
+INTO tab 
+FROM SECUPACMAT 
+WHERE NUMPAC=v_numpac AND PACMAT=v_pacmat;';
+            END IF;
+            PROC            :=PROC||' v_retro := ''N'';';
+            PROC            :=PROC||' if tab.exists(1) then';
+            PROC            :=PROC||'  FOR i IN 1..tab.last  LOOP';
+            PROC            :=PROC||'   v_numpac:=tab(i).r_numpac;';
+            PROC            :=PROC||'   IF NOT v_numpac = ''TMPPAC'' THEN';
+            PROC            :=PROC||'   v_pacmat:=tab(i).r_pacmat;';
+            PROC            :=PROC||'   v_periode_recycl:=nvl(tab(i).R_periode_recycl,''1'');';
+            IF NOT nom_table ='DIC_ADM_CONTRAT_HISTO' THEN
+              -- une valeur '3' dans PERIODE_RECYCLAGE retourne une erreur
+              -- sauf en cas de réembauche (insertion dans DIC_ADM_CONTRAT et DIC_ADM_CONTRAT_HISTO)
+              PROC        :=PROC||'    IF v_periode_recycl = ''3'' THEN';
+              IF nom_table ='DIC_ADM_CONTRAT' THEN
+                PROC      :=PROC||'     IF UPDATING OR DELETING THEN';
+              END IF;
+              PROC        :=PROC||'     RAISE_APPLICATION_ERROR(-20001,''CODERR=GENREC02'');';
+              IF nom_table ='DIC_ADM_CONTRAT' THEN
+                PROC      :=PROC||'     END IF;';
+              END IF;
+              PROC:=PROC||'    END IF;';
+            ELSE
+              -- on positionne PERIODE_RECYCLAGE à '1' en cas de réembauche d'un salarié ayant une valeur '0' ou '3' dans PERIODE_RECYCLAGE et répondant aux critères suivants :
+              -- - DRPAI2 est non-vide et différent de 'B'
+              -- - NATCOL vaut 'SAL' ou 'STA'
+              -- - DSDCN est antérieure ou égale à la période en cours
+              PROC:=PROC||'    IF v_periode_recycl IN (''0'',''3'') THEN';
+              PROC:=PROC||'     IF v_periode_recycl = ''3'' THEN';
+              -- si PERIODE_RECYCLAGE vaut '3', on prévoit qu'il va falloir retourner une erreur (modification d'un contrat existant)
+              PROC:=PROC||'      v_error_periode_recycl_3 := 1;';
+              PROC:=PROC||'     ELSE';
+              PROC:=PROC||'      v_error_periode_recycl_3 := 0;';
+              PROC:=PROC||'     END IF;';
+              PROC:=PROC||'     IF INSERTING THEN';
+              -- insertion d'un historique de contrat : on vérifie s'il s'agit de la première occurrence du contrat (réembauche)
+              PROC:=PROC||'      v_nbOccForCnt := GET_NB_LIGNES(''DIC_ADM_CONTRAT_HISTO'', ''NUMPAC=''''''||:NEW.NUMPAC||'''''' AND PACMAT=''''''||:NEW.PACMAT||'''''' AND NUMCNT=''||:NEW.NUMCNT);';
+              PROC:=PROC||'      IF v_nbOccForCnt = 0 THEN';
+              -- première occurrence du contrat (réembauche) : on ne retourne pas d'erreur, et, si PERIODE_RECYCLAGE = '3', on va réactiver le dossier
+              PROC:=PROC||'       IF v_periode_recycl = ''3'' THEN';
+              PROC:=PROC||'        v_error_periode_recycl_3 := 0;';
+              PROC:=PROC||'        :NEW.ZREACT := TO_DATE(TO_CHAR(:NEW.DATE_EFF,''yyyy'')||''0101'',''yyyymmdd'');';
+              PROC:=PROC||'       END IF;';
+              -- vérification des critères pour positionner PERIODE_RECYCLAGE à '1'
+              PROC:=PROC||'       IF CHECK_FORCAGE_RECYCLAGE(:NEW.NUMPAC, :NEW.PACMAT, :NEW.NUMCNT, :NEW.DRPAI2, NULL) = 1 THEN';
+              -- OK pour PERIODE_RECYCLAGE = '1'
+              PROC:=PROC||'        v_periode_recycl := ''1'';';
+              PROC:=PROC||'       END IF;';--fin CHECK_FORCAGE_RECYCLAGE
+              PROC:=PROC||'      END IF;'; --fin v_nbOccForCnt = 0
+              PROC:=PROC||'     ELSIF UPDATING THEN';
+              -- un update : on va vérifier si on doit réactiver le dossier
+              PROC:=PROC||'      IF UPDATING(''DRPAI2'') AND ((NVL(:OLD.DRPAI2, ''B'') = ''B'' AND NVL(:NEW.DRPAI2, ''B'') <> ''B'') OR(NVL(:OLD.DRPAI2, ''B'')<> ''B'' AND NVL(:NEW.DRPAI2, ''B'') = ''B'')) THEN';
+              -- update de DRPAI2 pour déblocage paie : on ne retourne pas d'erreur, et on va réactiver le dossier
+              PROC:=PROC||'       v_error_periode_recycl_3 := 0;';
+              PROC:=PROC||'       IF CHECK_FORCAGE_RECYCLAGE(:NEW.NUMPAC, :NEW.PACMAT, :NEW.NUMCNT, :NEW.DRPAI2, NULL) = 1 THEN';
+              -- OK pour PERIODE_RECYCLAGE = '1'
+              PROC:=PROC||'        v_periode_recycl := ''1'';';
+              PROC:=PROC||'       END IF;';--fin CHECK_FORCAGE_RECYCLAGE
+              PROC:=PROC||'      ELSIF UPDATING(''ZREACT'') AND :OLD.ZREACT IS NULL AND :NEW.ZREACT IS NOT NULL THEN';
+              -- update de ZREACT pour réactivation : si l'année de ZREACT est inférieure ou égale à l'année de la période en cours, on ne retourne pas d'erreur
+              PROC:=PROC||'       BEGIN';
+              PROC:=PROC||'        IF NOT tabPeriodeByNumpac.exists(:NEW.NUMPAC) THEN';
+              PROC:=PROC||'         select periodeencours into tabPeriodeByNumpac(:NEW.NUMPAC) from tge_ref_pac where numpac = :NEW.NUMPAC;';
+              PROC:=PROC||'        END IF;';
+              PROC:=PROC||'        IF TO_CHAR(:NEW.ZREACT,''yyyy'') <= SUBSTR(tabPeriodeByNumpac(:NEW.NUMPAC),1,4) THEN';
+              PROC:=PROC||'         v_error_periode_recycl_3 := 0;';
+              PROC:=PROC||'         IF CHECK_FORCAGE_RECYCLAGE(:NEW.NUMPAC, :NEW.PACMAT, :NEW.NUMCNT, :NEW.DRPAI2, tabPeriodeByNumpac(:NEW.NUMPAC)) = 1 THEN';
+              -- OK pour PERIODE_RECYCLAGE = '1'
+              PROC:=PROC||'          v_periode_recycl := ''1'';';
+              PROC:=PROC||'         END IF;';--fin CHECK_FORCAGE_RECYCLAGE
+              PROC:=PROC||'        END IF;'; --fin ZREACT <= PERIODEENCOURS
+              PROC:=PROC||'       EXCEPTION WHEN OTHERS THEN NULL; END;';
+              PROC:=PROC||'      END IF;';--fin UPDATING DRPAI2 ou ZREACT
+              PROC:=PROC||'     END IF;'; --fin INSERTING/UPDATING
+              PROC:=PROC||'     IF v_error_periode_recycl_3 = 1 THEN';
+              PROC:=PROC||'      RAISE_APPLICATION_ERROR(-20001,''CODERR=GENREC02'');';
+              PROC:=PROC||'     END IF;';
+              PROC:=PROC||'    END IF;';--fin v_periode_recycl = 0 ou 3
+            END IF;
+            PROC:=PROC||'    IF v_periode_recycl = ''2'' THEN';
+            PROC:=PROC||'     RAISE_APPLICATION_ERROR(-20001,''CODERR=GENREC01'');';
+            PROC:=PROC||'    ELSIF v_periode_recycl = ''1'' THEN';
+            OPEN cur_numpac;
+            LOOP
+              FETCH cur_numpac INTO lig_numpac ;
+              EXIT
+            WHEN cur_numpac%NOTFOUND ;
+              IF lig_numpac.numpac<>'*' THEN
+                PROC              :=PROC||' b'||lig_numpac.numpac||':=(v_numpac='''||lig_numpac.numpac||''') ;';
+              END IF;
+            END LOOP;
+            CLOSE cur_numpac;
+            -- on vérifie si des colonnes paies ont été modifié
+            PROC                        :=PROC||'     v_recycl:=''N'';';
+            IF nom_col_date_test_recycl IS NOT NULL THEN
+              PROC                      :=PROC||'     IF NOT tabPeriodeByNumpac.exists(v_numpac) THEN';
+              PROC                      :=PROC||'      select periodeencours into tabPeriodeByNumpac(v_numpac) from tge_ref_pac where numpac = v_numpac;';
+              PROC                      :=PROC||'     END IF;';
+              PROC                      :=PROC||'     IF DELETING THEN';
+              PROC                      :=PROC||'      date_test_recycl := :old.'||nom_col_date_test_recycl||';';
+              PROC                      :=PROC||'     ELSE';
+              PROC                      :=PROC||'      date_test_recycl := :new.'||nom_col_date_test_recycl||';';
+              PROC                      :=PROC||'     END IF;';
+              PROC                      :=PROC||'     IF (NVL(TO_CHAR(date_test_recycl,''yyyymm''),''000000'') <= tabPeriodeByNumpac(v_numpac)) THEN';
+            END IF;
+            PROC     :=PROC||'     IF INSERTING OR DELETING THEN ';
+            PROC     :=PROC||'      v_recycl:=''O''; ';
+            PROC     :=PROC||'     ELSIF UPDATING THEN ';
+            condition:=NULL;
+            OPEN cur_mapdo;
+            LOOP
+              FETCH cur_mapdo INTO lig_mapdo ;
+              IF donneeprec    IS NOT NULL AND (cur_mapdo%NOTFOUND OR lig_mapdo.donneegxp<>donneeprec ) THEN
+                IF sscondition IS NOT NULL THEN
+                  sscondition  :='('||sscondition||') and ';
+                END IF;
+                IF condition IS NULL AND NOM_TABLE ='DIC_ADM_CONTRAT_HISTO' THEN
+                  condition  := ' IF NVL(:OLD.DRPAI2, ''B'') <> NVL(:NEW.DRPAI2, ''B'') AND (NVL(:OLD.DRPAI2, ''B'') =''B'' OR NVL(:NEW.DRPAI2, ''B'')=''B'') THEN v_recycl:=''O'';';
+                END IF;
+                IF condition IS NULL THEN
+                  condition  :=' if ';
+                ELSE
+                  condition:=condition||' elsif ';
+                END IF;
+                condition:=condition||sscondition||' (:NEW.'||donneeprec||'<>:OLD.'||donneeprec||' OR  (:NEW.'||donneeprec||' IS NOT NULL AND :OLD.'||donneeprec||' IS NULL) OR  (:NEW.'||donneeprec||' IS NULL AND :OLD.'||donneeprec||' IS NOT NULL)) THEN ';
+                condition:=condition||' v_recycl:=''O''; ';
+              END IF;
+              EXIT
+            WHEN cur_mapdo%NOTFOUND;
+              IF lig_mapdo.donneegxp IS NOT NULL THEN
+                IF donneeprec        IS NULL OR lig_mapdo.donneegxp<>donneeprec THEN
+                  sscondition        :='';
+                  existeMappingEtoile:=0;
+                END IF;
+                IF lig_mapdo.numpac      ='*' THEN
+                  sscondition           :='';
+                  existeMappingEtoile   :=1;
+                ELSIF existeMappingEtoile=0 THEN
+                  IF sscondition        IS NOT NULL THEN
+                    sscondition         :=sscondition||' or ';
+                  END IF;
+                  sscondition :=sscondition||' b'||lig_mapdo.numpac||'  ';
+                END IF;
+                donneeprec:=lig_mapdo.donneegxp;
+              END IF;
+            END LOOP;
+            CLOSE cur_mapdo;
+            IF condition IS NOT NULL THEN
+              condition  :=condition||' end if;';
+            END IF;
+            IF condition IS NULL THEN
+              PROC       :=PROC||' NULL; ';
+            ELSE
+              PROC:=PROC||condition;
+            END IF;
+            -- traitement du matricule pour recyclage
+            PROC                        :=PROC||'    END IF; ';--fin updating
+            PROC                        :=PROC||' 
+IF v_recycl=''O'' THEN 
+merge INTO GAP_RECYCL_MATRIC a USING 
+(SELECT v_numpac AS numpac,v_pacmat AS pacmat FROM dual 
+) b ON (a.pacmat=b.pacmat AND a.numpac=b.numpac) 
+WHEN NOT MATCHED THEN 
+INSERT 
+(a.numpac,a.pacmat 
+) VALUES 
+(b.numpac,b.pacmat 
+);  
+
+merge INTO TGE_MODIF_PACMAT_TORESEND a USING 
+(SELECT v_numpac AS numpac,v_pacmat AS pacmat, '''||NOM_TABLE||''' as TABLE_TO_SEND FROM dual 
+) b ON (a.pacmat=b.pacmat AND a.numpac=b.numpac and a.TABLE_TO_SEND=b.TABLE_TO_SEND) 
+WHEN MATCHED THEN 
+update set a.DATE_MAJ=sysdate 
+WHEN NOT MATCHED THEN 
+INSERT 
+(a.numpac,a.pacmat,a.TABLE_TO_SEND,a.DATE_MAJ 
+) VALUES 
+(b.numpac,b.pacmat,b.TABLE_TO_SEND, sysdate 
+);   ';
+            PROC                        :=PROC||' END IF; ';--fin v_recycl
+            IF nom_col_date_test_recycl IS NOT NULL THEN
+              PROC                      :=PROC||' END IF; ';--fin test date recycl
+            END IF;
+            PROC :=PROC||' END IF; ';--fin v_periode_recycl
+            -- AJOUT CODE RETRO
+            -- Recupération du champs DATE de la table
+            IF NOM_TABLE           = 'DIC_ADM_CONTRAT' THEN
+              champDateEffetRetro := 'DSDCN' ;
+            ELSE
+              BEGIN
+                SELECT a.column_name
+                INTO champDateEffetRetro
+                FROM SYS.USER_CONS_COLUMNS a,
+                  USER_TAB_COLUMNS b
+                WHERE a.table_name   = NOM_TABLE
+                AND a.table_name     =b.table_name
+                AND a.column_name    =b.column_name
+                AND b.data_type      = 'DATE'
+                AND constraint_name IN
+                  (SELECT c.constraint_name
+                  FROM user_constraints c
+                  WHERE c.table_name =a.table_name
+                  AND CONSTRAINT_TYPE='P'
+                  );
+              EXCEPTION
+              WHEN OTHERS THEN
+                champDateEffetRetro := NULL;
+              END;
+            END IF;
+            IF champDateEffetRetro IS NOT NULL THEN
+              
+                procRetroPaiezadCodeChrono := NULL;
+                IF nom_table='DIC_ADM_CONTRAT_HISTO' THEN
+                  -- Traitement spécifique pour DIC_ADM_CONTRAT_HISTO : dans un trigger, il n'est pas possible de lire la table en cours de modification
+                  -- De toute façon il n'y a pas besoin : on a le paiezad dans le :NEW/:OLD, il faut juste lire DIC_ADM_CONTRAT_SITU pour récupérer le CODE_CHRONO
+                  procRetroPaiezadCodeChrono := ' 
+BEGIN 
+V_PAIEZAD := NVL(:NEW.PAIEZAD,:OLD.PAIEZAD); 
+SELECT dacs.code_chrono 
+INTO V_CODE_CHRONO 
+FROM dic_adm_contrat_situ dacs 
+WHERE dacs.numpac = V_NUMPAC AND dacs.pacmat = V_PACMAT AND dacs.numcnt = NVL(:NEW.NUMCNT,:OLD.NUMCNT) AND dacs.paiezad = V_PAIEZAD; 
+EXCEPTION 
+WHEN OTHERS THEN v_retro := ''N''; 
+END; ';
+                ELSE
+                  procRetroPaiezadCodeChrono := ' 
+BEGIN 
+SELECT dacs.code_chrono, dach.paiezad, TO_CHAR(dach.DATE_EFF, ''YYYYMM'') 
+INTO V_CODE_CHRONO, V_PAIEZAD, V_DATE_EFF 
+FROM dic_adm_contrat_histo dach , dic_adm_contrat_situ dacs 
+WHERE dach.numpac = V_NUMPAC AND dach.pacmat = V_PACMAT AND dach.matric = v_matric AND 
+dacs.numpac = dach.numpac AND dacs.pacmat = dach.pacmat AND dacs.numcnt = dach.numcnt AND dacs.paiezad = dach.paiezad AND 
+dach.date_eff = (select min(z.date_eff) 
+from dic_adm_contrat_histo z 
+where z.matric = dach.matric AND z.date_sortie_sit_bo >= NVL(:NEW.' || champDateEffetRetro ||',:OLD.' || champDateEffetRetro || ') );  
+
+-- La période rétro doit être >= à la 1ère date d''effet du salarié
+IF (V_DE_SSAAMM < V_DATE_EFF) THEN
+V_DE_SSAAMM := V_DATE_EFF; 
+END IF;
+EXCEPTION 
+WHEN OTHERS THEN v_retro := ''N''; 
+END; ';
+                END IF;
+
+              conditionRetro  :=NULL;
+              OPEN cur_mapdoRetro;
+              LOOP
+                FETCH cur_mapdoRetro INTO lig_mapdoRetro ;
+                IF ligPrec_mapdoRetro.donneegxp    IS NOT NULL AND (cur_mapdoRetro%NOTFOUND OR lig_mapdoRetro.donneegxp<>ligPrec_mapdoRetro.donneegxp OR (lig_mapdoRetro.clause_date_eff_retro IS NULL and ligPrec_mapdoRetro.clause_date_eff_retro IS NOT NULL) OR (lig_mapdoRetro.clause_date_eff_retro IS NOT NULL and ligPrec_mapdoRetro.clause_date_eff_retro IS NULL) OR lig_mapdoRetro.clause_date_eff_retro<>ligPrec_mapdoRetro.clause_date_eff_retro) THEN
+                  IF ssconditionRetro IS NOT NULL THEN
+                    ssconditionRetro  :='('||ssconditionRetro||') and ';
+                  END IF;
+                  conditionRetro  :=conditionRetro||' IF '||ssconditionRetro||' (:NEW.'||ligPrec_mapdoRetro.donneegxp||'<>:OLD.'||ligPrec_mapdoRetro.donneegxp ||' OR  (:NEW.'||ligPrec_mapdoRetro.donneegxp||' IS NOT NULL AND :OLD.'||ligPrec_mapdoRetro.donneegxp||' IS NULL) OR  (:NEW.'||ligPrec_mapdoRetro.donneegxp||' IS NULL AND :OLD.'||ligPrec_mapdoRetro.donneegxp||' IS NOT NULL)) THEN ';
+                  conditionRetro  :=conditionRetro||' 
+                  	v_retro :=''O''; ';
+                  IF ligPrec_mapdoRetro.clause_date_eff_retro IS NULL THEN
+                  	conditionRetro :=conditionRetro||' 	
+                  		V_DE_SSAAMM := LEAST(NVL(V_DE_SSAAMM_DEFAULT, V_DE_SSAAMM), NVL(V_DE_SSAAMM, V_DE_SSAAMM_DEFAULT)); ';
+                  ELSE
+                  	conditionRetro := conditionRetro || ' 
+						' || ligPrec_mapdoRetro.clause_date_eff_retro || '; 
+                  		V_DE_SSAAMM := LEAST(NVL(V_DE_SSAAMM_TMP, V_DE_SSAAMM), NVL(V_DE_SSAAMM, V_DE_SSAAMM_TMP));	';
+                  END IF;
+	              conditionRetro := conditionRetro || ' 
+                  	END IF;
+                  ';
+                END IF;
+                EXIT
+              WHEN cur_mapdoRetro%NOTFOUND;
+                IF lig_mapdoRetro.donneegxp IS NOT NULL THEN
+                  IF ligPrec_mapdoRetro.donneegxp        IS NULL OR lig_mapdoRetro.donneegxp<>ligPrec_mapdoRetro.donneegxp OR (lig_mapdoRetro.clause_date_eff_retro IS NULL and ligPrec_mapdoRetro.clause_date_eff_retro IS NOT NULL) OR (lig_mapdoRetro.clause_date_eff_retro IS NOT NULL and ligPrec_mapdoRetro.clause_date_eff_retro IS NULL) OR lig_mapdoRetro.clause_date_eff_retro<>ligPrec_mapdoRetro.clause_date_eff_retro THEN
+                    ssconditionRetro        :='';
+                    existeMappingEtoile     :=0;
+                  END IF;
+                  IF lig_mapdoRetro.numpac ='*' THEN
+                    ssconditionRetro      :='';
+                    existeMappingEtoile   :=1;
+                  ELSIF existeMappingEtoile=0 THEN
+                    IF ssconditionRetro   IS NOT NULL THEN
+                      ssconditionRetro    :=ssconditionRetro||' or ';
+                    END IF;
+                    ssconditionRetro :=ssconditionRetro||' bRet'||lig_mapdoRetro.numpac||'  ';
+                  END IF;
+                  ligPrec_mapdoRetro:=lig_mapdoRetro;
+                END IF;
+              END LOOP;
+              CLOSE cur_mapdoRetro;
+
+              IF conditionRetro IS NOT NULL THEN
+                PROC            := PROC||' 
+-- traitement de la retro 
+IF NVL(v_retro,''N'') = ''Z'' THEN 
+V_DEB_RETRO := NULL; 
+ELSE 
+SELECT PERIODEENCOURS, 
+DEB_RETRO, 
+DEB_HISTO_RETRO, 
+NVL(NB_MOIS_RETRO, 0) 
+INTO V_PERIODEENCOURS, 
+V_DEB_RETRO, 
+V_DEB_HISTO_RETRO, 
+V_NB_MOIS_RETRO 
+FROM TGE_REF_PAC 
+WHERE NUMPAC = V_NUMPAC; 
+END IF;  
+
+IF(V_PERIODEENCOURS >= V_DEB_RETRO AND V_DEB_RETRO IS NOT NULL) THEN 
+';
+                OPEN cur_numpacRetro;
+                LOOP
+                  FETCH cur_numpacRetro INTO lig_numpacRetro ;
+                  EXIT
+                WHEN cur_numpacRetro%NOTFOUND ;
+                  IF lig_numpacRetro.numpac<>'*' THEN
+                    PROC              :=PROC||' bRet'||lig_numpacRetro.numpac||':=(v_numpac='''||lig_numpacRetro.numpac||''') ;';
+                  END IF;
+                END LOOP;
+                CLOSE cur_numpacRetro;
+              END IF;
+              IF conditionRetro IS NOT NULL THEN
+                PROC              := PROC || '
+-- La période rétro doit être >= à : 
+-- - La date de début des histos de rétro 
+-- - La période en cours - le nombre de mois de rétro 
+-- On prend donc la plus grande de ces 2 dates + la date d''effet
+V_DE_SSAAMM_DEFAULT       := GREATEST(TO_CHAR(NVL(:NEW.'||champDateEffetRetro||',:OLD.'||champDateEffetRetro||') ,''YYYYMM''),V_DEB_HISTO_RETRO,TO_CHAR(ADD_MONTHS(to_date(V_PERIODEENCOURS,''YYYYMM''),-V_NB_MOIS_RETRO),''YYYYMM''));
+V_DE_SSAAMM := NULL;
+';
+
+PROC            := PROC || ' 
+IF(V_DE_SSAAMM_DEFAULT < V_PERIODEENCOURS) THEN 
+v_retro :=''N''; 
+IF INSERTING OR DELETING THEN 
+v_retro:=''O''; 
+V_DE_SSAAMM := V_DE_SSAAMM_DEFAULT;
+ELSIF UPDATING THEN 
+';
+                PROC:=PROC||conditionRetro;
+                -- traitement du matricule pour recyclage
+                PROC       :=PROC||'    END IF; ';--fin updating
+                PROC       :=PROC||' 
+IF (v_retro = ''O'') THEN ';
+                PROC :=PROC||procRetroPaiezadCodeChrono;
+                PROC :=PROC||'  
+
+IF(V_DE_SSAAMM < V_PERIODEENCOURS AND v_retro = ''O'') THEN 
+-- On positionne une valeur reconnaissable pour savoir qu''on a déjà trouvé notre bonheur 
+-- Pas la peine de refaire tous les select pour les autres couples NUMPAC/PACMAT 
+v_retro := ''Z''; 
+TGE_RETRO_INSCRIPTION(V_NUMPAC,
+  V_PACMAT,
+  V_DE_SSAAMM,
+  V_CODE_CHRONO,
+  V_PAIEZAD,
+  ''' || NOM_TABLE ||'''); 
+END IF; -- Fin V_DE_SSAAMM < V_PERIODEENCOURS AND v_retro = ''O'' 
+END IF; -- Fin v_retro = ''O'' 
+END IF; -- Fin V_DE_SSAAMM < V_PERIODEENCOURS 
+';
+              END IF;
+              IF conditionRetro IS NOT NULL THEN
+                PROC :=PROC||'
+END IF; -- Fin V_PERIODEENCOURS >= V_DEB_RETRO 
+';
+              END IF;
+            END IF;                  -- end if traitementRetro
+            PROC :=PROC||' END IF; --fin v_numpac<>TMPPAC
+            ';
+            PROC :=PROC||' END LOOP;  ';
+            PROC :=PROC||' END IF; ';--fin table exist
+            PROC :=PROC||' END IF;'; --fin type_writer
+          END IF;
+          IF nom_table ='DIC_ADM_CONTRAT_HISTO' THEN
+            PROC      := PROC || ' END IF ; ';
+          END IF;
+          -- DEBUT TRAITEMENT DEX
+          IF v_existeDonneeDex THEN
+          	PROC :=PROC||' 
+			-- DEBUT DEX'; 
+            -- Au moins une donnée DEX = on va vérifier si le traitement pour DEX doit être effectué
+            IF date_eff_exists>0 THEN
+              -- Date d'effet = traitement DEX seulement si modification à date du jour (à revoir pour DACH ?)
+              PROC :=PROC||' 
+			  IF SYSDATE BETWEEN nvl(:NEW.DATE_EFF,:OLD.DATE_EFF) AND nvl(:NEW.DATE_FIN,:OLD.DATE_FIN) THEN ';
+            END IF;
+            -- Si traitement DEX sur une table de type PAIEZAD ou PACMAT, on récupère le MATRIC
+            IF v_typeTable    ='z' THEN
+              PROC           :=PROC||' 
+			  SELECT MAX(MATRIC) INTO v_matric FROM DIC_ADM_CONTRAT_SITU WHERE NUMPAC=v_numpac AND PAIEZAD=v_paiezad; 
+			  IF v_matric IS NULL THEN v_matric:=NVL(:NEW.MATRIC,:OLD.MATRIC); END IF; ';
+            ELSIF v_typeTable ='p' THEN
+              PROC           :=PROC||' 
+			  SELECT MATRIC INTO v_matric FROM SECUPACMAT WHERE NUMPAC=v_numpac AND PACMAT=v_pacmat; ';
+            END IF;
+            
+            -- Le traitement en lui-même : certains évènements nécessitent d'avoir une clé secondaire spécifique, sinon on positionne '*'
+	        v_cleSecondaireDex := '''*''';
+	            
+	        -- On boucle sur les données de l'évènement afin de calculer la CLE_SECONDAIRE si besoin 
+	        -- On en profite pour construire une partir du code de la partie UPDATING
+	        OPEN cur_donneesDex;
+	   		LOOP FETCH cur_donneesDex INTO lig_donneeDex ;
+				IF cur_donneesDex%NOTFOUND OR (v_eventDexPrec IS NOT NULL AND NOT v_eventDexPrec=lig_donneeDex.EVENT) THEN
+	    	        -- Dernière donnée pour l'event
+	            	PROC_DEX_UPDATING := PROC_DEX_UPDATING||' 
+					END IF; -- FIN :NEW<>:OLD
+					IF v_processEventDex THEN
+					eventsTab.EXTEND ;
+					eventsTab(eventsTab.LAST) :='''||v_eventDexPrec||''';
+					END IF; -- FIN v_processEventDex
+					';
+	      		END IF;
+	      		IF v_eventDexPrec IS NULL OR (NOT cur_donneesDex%NOTFOUND AND NOT v_eventDexPrec=lig_donneeDex.EVENT) THEN
+	        		-- Première donnée pour l'event
+	        		PROC_DEX_UPDATING := PROC_DEX_UPDATING||' 
+					v_processEventDex := FALSE; 
+					IF FALSE THEN NULL; ';
+	      		END IF;
+	      		
+	      	EXIT WHEN cur_donneesDex%NOTFOUND;
+	  			-- Traitement spécifique à certains évènements qui stocke une CLE_SECONDAIRE
+	      		IF lig_donneeDex.NOM_DONNEE_DEX_OU_EVENT = 'precedenceOrdCompteBancaire' THEN
+	  				-- BANQUE : On parcourt les données de l'event et trouver celle qui correspond à la cle dont on a besoin
+	          		v_cleSecondaireDex := 'nvl(:NEW.'||lig_donneeDex.NOM_DONNEE||', :OLD.'||lig_donneeDex.NOM_DONNEE||')';
+	          		
+	          	ELSIF lig_donneeDex.NOM_DONNEE_DEX_OU_EVENT = 'dependentConjointBirthOrder' THEN
+	          		-- CONJOINT : Dans le cas où une donnée 'dependentConjointBirthOrder' a été paramétrée, 
+	          		-- c'est cette valeur qui va être prise
+	          		v_cleSecondaireDex := '''C;''||nvl(:NEW.'||lig_donneeDex.NOM_DONNEE||', :OLD.'||lig_donneeDex.NOM_DONNEE||')';
+	          	
+	          	ELSIF INSTR(lig_donneeDex.NOM_DONNEE_DEX_OU_EVENT, 'dependentConjoint') = 1 AND INSTR(v_cleSecondaireDex, 'C;') = 0 THEN
+	  				-- CONJOINT : La première fois que l'on trouve une donnée commençant par 'dependentConjoint', on positionne la clé secondaire
+	  				-- avec comme valeur "01" pour le "BirthOrder"
+	  				v_cleSecondaireDex := '''C;01''';
+	  				
+	  			ELSIF lig_donneeDex.NOM_DONNEE_DEX_OU_EVENT = 'dependentEnfantBirthOrder' OR lig_donneeDex.NOM_DONNEE_DEX_OU_EVENT = 'dependentEnfantBirthDate' THEN
+	  				-- ENFANT : La clé secondaire pour les enfants est composée de 2 éléments à mettre dans un certain ordre : E;BirthOrder;BirthDate
+	  				IF v_cleSecondaireDex = '''*''' THEN
+	  					IF lig_donneeDex.NOM_DONNEE_DEX_OU_EVENT = 'dependentEnfantBirthOrder' THEN
+	  						v_cleSecondaireDex := '''E;''||nvl(:NEW.'||lig_donneeDex.NOM_DONNEE||', :OLD.'||lig_donneeDex.NOM_DONNEE||')';
+	  					ELSE
+	  						v_cleSecondaireDex := '||TO_CHAR(nvl(:NEW.'||lig_donneeDex.NOM_DONNEE||', :OLD.'||lig_donneeDex.NOM_DONNEE||'), ''YYYY-MM-DD'')';
+	  					END IF;
+	  					--v_cleSecondaireDex := v_cleSecondaireDex || '||nvl(:NEW.'||lig_donneeDex.NOM_DONNEE||', :OLD.'||lig_donneeDex.NOM_DONNEE||')';
+	  				ELSE
+	  					IF lig_donneeDex.NOM_DONNEE_DEX_OU_EVENT = 'dependentEnfantBirthOrder' THEN
+	  						v_cleSecondaireDex := '''E;''||nvl(:NEW.'||lig_donneeDex.NOM_DONNEE||', :OLD.'||lig_donneeDex.NOM_DONNEE||')||'';''' || v_cleSecondaireDex;
+	  					ELSE
+	  						v_cleSecondaireDex := v_cleSecondaireDex || '||'';''||TO_CHAR(nvl(:NEW.'||lig_donneeDex.NOM_DONNEE||', :OLD.'||lig_donneeDex.NOM_DONNEE||'), ''YYYY-MM-DD'')';
+	  					END IF;
+	  				END IF;
+	  			END IF;
+	  			
+	      		PROC_DEX_UPDATING :=PROC_DEX_UPDATING||'
+		  		ELSIF (:NEW.'||lig_donneeDex.NOM_DONNEE||'<>:OLD.'||lig_donneeDex.NOM_DONNEE||' OR (:NEW.'||lig_donneeDex.NOM_DONNEE||' IS NOT NULL AND :OLD.'||lig_donneeDex.NOM_DONNEE||' IS NULL) OR (:NEW.'||lig_donneeDex.NOM_DONNEE||' IS NULL AND :OLD.'||lig_donneeDex.NOM_DONNEE||' IS NOT NULL)) ';
+	      
+		  		IF lig_donneeDex.CONDITION IS NOT NULL THEN
+	        		PROC_DEX_UPDATING := PROC_DEX_UPDATING||' AND '||regexp_replace(regexp_replace(lig_donneeDex.CONDITION, '([^ ]+)[ ]*=[ ]*(''[^ ]+'')', 'nvl(:new.\1,:old.\1)=\2'), '(''[^ ]+'')[ ]*=[ ]*([^ ]+)', 'nvl(:new.\2,:old.\2)=\1');
+	      		END IF;
+	      		PROC_DEX_UPDATING := PROC_DEX_UPDATING||'  
+	 		  		THEN v_processEventDex := TRUE; ';
+	      		v_eventDexPrec:=lig_donneeDex.EVENT;
+	    	END LOOP;
+	    	CLOSE cur_donneesDex;        
+	        
+	    	PROC          :=PROC||' 
+			v_dexCleSecondaire := '||v_cleSecondaireDex||';';
+    	
+            IF nom_table ='DIC_ADM_PERSO' THEN
+              -- Pour DIC_ADM_PERSO, on ne gère que la modification
+              PROC         :=PROC||' 
+			  IF UPDATING THEN ';
+            ELSIF nom_table ='DIC_ADM_CONTRAT' THEN
+              -- Pour DIC_ADM_CONTRAT, on gère en spécifique
+              -- - La création --> Evènement worker.hire
+              -- - La suppression --> Evènement worker.terminate ???
+              -- - La mise à jour de DSFCN --> Evènement worker.terminate (ou autre pour la modification ou l'annulation de départ ???)
+              PROC :=PROC||' 
+				IF INSERTING THEN
+				 MERGE INTO DEX_EVENTS DE USING (SELECT v_matric AS MATRIC,''worker.hire'' AS EVENT, v_dexCleSecondaire AS CLE_SECONDAIRE FROM DUAL) Z ON (Z.MATRIC=DE.MATRIC AND Z.EVENT=DE.EVENT AND Z.CLE_SECONDAIRE=DE.CLE_SECONDAIRE)
+				 WHEN MATCHED THEN UPDATE SET ACTION=''C'',DATE_MODIF=CURRENT_TIMESTAMP,DATE_ENVOI_MIN=:NEW.DSDCN
+				 WHEN NOT MATCHED THEN INSERT (MATRIC,EVENT,CLE_SECONDAIRE,ACTION,DATE_MODIF,DATE_ENVOI_MIN) VALUES (v_matric,''worker.hire'',v_dexCleSecondaire,''Z'',CURRENT_TIMESTAMP,:NEW.DSDCN);
+				ELSIF DELETING THEN
+				 MERGE INTO DEX_EVENTS DE USING (SELECT v_matric AS MATRIC,''worker.terminate'' AS EVENT, v_dexCleSecondaire AS CLE_SECONDAIRE FROM DUAL) Z ON (Z.MATRIC=DE.MATRIC AND Z.EVENT=DE.EVENT AND Z.CLE_SECONDAIRE=DE.CLE_SECONDAIRE)
+				 WHEN MATCHED THEN UPDATE SET ACTION=''S'',DATE_MODIF=CURRENT_TIMESTAMP,DATE_ENVOI_MIN=:OLD.DSDCN
+				 WHEN NOT MATCHED THEN INSERT (MATRIC,EVENT,CLE_SECONDAIRE,ACTION,DATE_MODIF,DATE_ENVOI_MIN) VALUES (v_matric,''worker.terminate'',v_dexCleSecondaire,''S'',CURRENT_TIMESTAMP,:OLD.DSDCN);
+				ELSIF :NEW.DSFCN<>:OLD.DSFCN OR (:NEW.DSFCN IS NOT NULL AND :OLD.DSFCN IS NULL) OR (:NEW.DSFCN IS NULL AND :OLD.DSFCN IS NOT NULL) THEN
+				 IF :NEW.DSFCN IS NOT NULL AND :OLD.DSFCN IS NULL THEN
+				  MERGE INTO DEX_EVENTS DE USING (SELECT v_matric AS MATRIC,''worker.terminate'' AS EVENT, v_dexCleSecondaire AS CLE_SECONDAIRE FROM DUAL) Z ON (Z.MATRIC=DE.MATRIC AND Z.EVENT=DE.EVENT AND Z.CLE_SECONDAIRE=DE.CLE_SECONDAIRE)
+				  WHEN MATCHED THEN UPDATE SET ACTION=''S'',DATE_MODIF=CURRENT_TIMESTAMP,DATE_ENVOI_MIN=:NEW.DSFCN
+				  WHEN NOT MATCHED THEN INSERT (MATRIC,EVENT,CLE_SECONDAIRE,ACTION,DATE_MODIF,DATE_ENVOI_MIN) VALUES (v_matric,''worker.terminate'',v_dexCleSecondaire,''M'',CURRENT_TIMESTAMP,:NEW.DSFCN);
+				 ELSE
+				  NULL; -- On fait quoi si on modifie une date de départ, ou qu''on annule un départ ???
+				 END IF;
+				ELSE ';
+            ELSE
+            	-- Partie insert pour les autres tables
+            	-- Pour les autres tables, en création et suppression, on insère une ligne par évènement potentiellement généré par la table, avec le bon code action
+              	PROC :=PROC||' 
+				-- DEBUT INSERTING / DELETING
+				IF INSERTING OR DELETING THEN 
+				IF INSERTING THEN 
+				v_dexaction := ''C''; 
+				ELSE 
+				v_dexaction := ''S''; 
+				END IF;';
+				
+              OPEN cur_eventsDex;
+              LOOP
+                FETCH cur_eventsDex INTO lig_eventDex ;
+                EXIT
+              WHEN cur_eventsDex%NOTFOUND;
+                IF lig_eventDex.CONDITION IS NOT NULL THEN
+                  PROC                    :=PROC||' 
+				  IF '||regexp_replace(regexp_replace(lig_eventDex.CONDITION, '([^ ]+)[ ]*=[ ]*(''[^ ]+'')', 'nvl(:new.\1,:old.\1)=\2'), '(''[^ ]+'')[ ]*=[ ]*([^ ]+)', 'nvl(:new.\2,:old.\2)=\1')||' THEN ';
+                END IF;
+                PROC                      :=PROC||' 
+				MERGE INTO DEX_EVENTS DE USING (SELECT v_matric AS MATRIC,'''||lig_eventDex.EVENT||''' AS EVENT, v_dexCleSecondaire AS CLE_SECONDAIRE FROM DUAL) Z ON (Z.MATRIC=DE.MATRIC AND Z.EVENT=DE.EVENT AND Z.CLE_SECONDAIRE=DE.CLE_SECONDAIRE)
+				WHEN MATCHED THEN UPDATE SET ACTION=v_dexaction,DATE_MODIF=CURRENT_TIMESTAMP
+				WHEN NOT MATCHED THEN INSERT (MATRIC,EVENT,CLE_SECONDAIRE,ACTION,DATE_MODIF) VALUES (v_matric,'''||lig_eventDex.EVENT||''',v_dexCleSecondaire, v_dexaction,CURRENT_TIMESTAMP); ';
+                IF lig_eventDex.CONDITION IS NOT NULL THEN
+                  PROC                    :=PROC||' 
+				  	END IF; ';
+                END IF;
+              END LOOP;
+              CLOSE cur_eventsDex;
+              PROC          :=PROC||'-- FIN INSERTING / DELETING ';
+              PROC :=PROC||' 
+			  ELSE -- DEBUT UPDATING';
+            END IF;
+            -- Début de l'updating commun à toutes les tables
+            PROC           :=PROC||' 
+			eventsTab.delete; ';
+			
+            v_eventDexPrec := NULL;
+            -- On rajoute ce qui a été calculé plus haut
+        	PROC          :=PROC||PROC_DEX_UPDATING;
+        	
+            PROC             :=PROC||' 
+			IF eventsTab.count>0 THEN
+			for i in 1..eventsTab.count loop
+			MERGE INTO DEX_EVENTS DE USING (SELECT v_matric AS MATRIC,eventsTab(i) AS EVENT, v_dexCleSecondaire AS CLE_SECONDAIRE FROM DUAL) Z ON (Z.MATRIC=DE.MATRIC AND Z.EVENT=DE.EVENT AND Z.CLE_SECONDAIRE=DE.CLE_SECONDAIRE)
+			WHEN MATCHED THEN UPDATE SET ACTION=''M'',DATE_MODIF=CURRENT_TIMESTAMP
+			WHEN NOT MATCHED THEN INSERT (MATRIC,EVENT,CLE_SECONDAIRE,ACTION,DATE_MODIF) VALUES (v_matric,eventsTab(i),v_dexCleSecondaire,''M'',CURRENT_TIMESTAMP);
+			end loop;
+			END IF; -- FIN eventsTab.count>0
+			END IF; -- FIN UPDATING
+			';
+            IF date_eff_exists>0 THEN
+              PROC           :=PROC||' 
+			  END IF; -- FIN SYSDATE BETWEEN DATE_EFF AND DATE_FIN 
+			  ';
+            END IF;
+            PROC :=PROC||' -- FIN TRAITEMENT DEX'; 
+          END IF;
+          -- FIN TRAITEMENT DEX
+          
+          PROC :=PROC||' 
+		  END BEFORE EACH ROW;';
+          IF nom_table IN ('DIC_ADM_CONTRAT_HISTO','DIC_PERIODES_RECUEIL_HIS') THEN
+            PROC          :=PROC||' AFTER EACH ROW IS BEGIN ';
+            IF nom_table   = 'DIC_ADM_CONTRAT_HISTO' THEN
+              PROC        := PROC|| TRG_CONTRAT_HISTO_AFTER_ROW();
+            ELSIF nom_table='DIC_PERIODES_RECUEIL_HIS' THEN
+              PROC        := PROC|| DIC_PERIOD_REC_HISTO_AFTER_ROW();
+            END IF;
+            PROC :=PROC||' END AFTER EACH ROW;';
+          END IF;
+          IF nom_table IN ('DIC_ADM_PERSO','DIC_ADM_PERSO_HISTO','DIC_ADM_CONTRAT','DIC_ADM_CONTRAT_HISTO','DIC_PERIODES_RECUEIL_HIS') THEN
+            PROC          :=PROC||' AFTER STATEMENT IS BEGIN';
+            IF nom_table   ='DIC_ADM_PERSO' THEN
+              PROC        :=PROC||TRG_PERSO_AFTER_STMNT();
+            ELSIF nom_table='DIC_ADM_PERSO_HISTO' THEN
+              PROC        :=PROC||TRG_PERSO_HISTO_AFTER_STMNT();
+            ELSIF nom_table='DIC_ADM_CONTRAT' THEN
+              PROC        :=PROC||TRG_CONTRAT_AFTER_STMNT();
+            ELSIF nom_table='DIC_ADM_CONTRAT_HISTO' THEN
+              PROC        :=PROC||TRG_CONTRAT_HISTO_AFTER_STMNT();
+            ELSIF nom_table='DIC_PERIODES_RECUEIL_HIS' THEN
+              PROC        :=PROC||DIC_PERIODES_REC_H_AFTER_STMNT();
+            END IF;
+            PROC:=PROC||'END AFTER STATEMENT;';
+          END IF;
+          PROC :=PROC||' END TRG_'||NOM_TABLE||';';
+          EXECUTE_IMMEDIATE_STRING( PROC,0);
+        END IF;
+      END IF;
+    END TGE_CREATE_TRIGGER;
+##
+TAG_CHARSET=@€éèç
+##
+TGE_IMPORT_3040
+=SQL=
+create or replace PROCEDURE TGE_IMPORT_3040( P_LOGIN       IN VARCHAR2 , P_DATE_IMPORT IN VARCHAR2 , P_ROLE        IN VARCHAR2 ,
+ P_ORIGINE     IN VARCHAR2 ,
+ P_VALIDATION  IN NUMBER ,
+ P_WITH30      IN NUMBER ,
+ P_WITH40      IN NUMBER ,
+ P_WITH60      IN NUMBER ,
+ P_WITH70      IN NUMBER ,
+ P_CODLANG     IN VARCHAR2 )
+ AS
+ /********************************************************************************
+ Version     : V5.05.004
+ *********************************************************************************/
+ w_err   VARCHAR2(2000);
+ v_start NUMBER;
+ v_stop  NUMBER;
+ id_trt number ;
+ dateMaj SYS_TRC_MODIF.datemaj%type;
+ BEGIN
+ v_start := DBMS_UTILITY.GET_TIME;
+ id_trt := IMP_TRT_SEQ_ID.nextval;
+ -- FVI on peut lire le pac une seule fois
+ TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'TGE_IMPORT_3040 début');
+ -- Mise à jour des donnees ID collab
+ select CURRENT_TIMESTAMP into dateMaj from dual;
+ -- Cartes d'annulation
+ TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'début delete pour gérer annulation  ');
+ DELETE
+ FROM TGE_ABSENCES ABS
+ WHERE EXISTS
+ (SELECT 1
+ FROM TGE_INCIDENTS_PAIE  P,
+ TGE_REF_TYPES_GTA   GTA,
+ TGE_REF_ORIGINE_GTA  ori,
+ TGE_IMPORT_ANNULATION A,DIC_ADM_CONTRAT_SITU C
+ WHERE ABS.NUMPAC = A.NUMPAC
+ AND   P.NUMPAC   = A.NUMPAC
+ AND   C.NUMPAC   = A.NUMPAC
+ AND   GTA.NUMPAC = A.NUMPAC
+ AND   ori.NUMPAC = A.NUMPAC
+ AND A.LOGIN       =P_LOGIN
+ AND A.DATE_IMPORT =P_DATE_IMPORT
+ AND NVL(GTA.MATRIC_GTA,'PAIEZAD')='PACMAT'
+ AND GTA.CODE_GTA    = ori.CODE_GTA
+ AND ori.CODE_ORIGINE =P.ORIGINE
+ AND ABS.MATRIC                  =A.MATRICULE
+ AND C.PACMAT   = A.PACMAT
+ AND C.MATRIC = A.MATRICULE
+ AND P.PAIEZAD = C.PAIEZAD
+ AND A.ORIGINE                    =P.ORIGINE
+ AND TO_DATE(A.PERIODE,'yyyymm')  =P.PERIODE
+ AND P.CLE_ABSENCE               IS NOT NULL
+ AND ABS.ID = P.CLE_ABSENCE
+ );
+ 
+ DELETE
+ FROM TGE_ABSENCES ABS
+ WHERE EXISTS
+ (SELECT 1
+ FROM TGE_INCIDENTS_PAIE p,TGE_REF_TYPES_GTA gta
+ WHERE p.numpac = abs.numpac
+ AND p.cle_absence IS NOT NULL
+ AND p.cle_absence = abs.id
+ and p.numpac = gta.numpac
+ and gta.code_gta =(select code_gta from TGE_REF_ORIGINE_GTA where numpac =p.numpac and code_origine =p.origine )
+ AND EXISTS
+ (SELECT *
+ FROM TGE_IMPORT_ANNULATION a
+ WHERE a.LOGIN                   =P_LOGIN
+ AND a.DATE_IMPORT               =P_DATE_IMPORT
+ AND a.numpac                    =p.numpac
+ AND a.matricule                 = abs.matric
+ AND ( NVL(gta.matric_gta,'PAIEZAD') ='PAIEZAD' AND a.paiezad = p.paiezad )
+ AND a.origine                   =p.origine
+ AND to_date(a.periode,'yyyymm') =p.periode
+ )
+ );
+ 
+ DELETE
+ FROM TGE_INCIDENTS_PAIE p
+ WHERE EXISTS
+ (SELECT 1
+ FROM TGE_IMPORT_ANNULATION a,TGE_REF_TYPES_GTA gta
+ WHERE a.LOGIN                   =P_LOGIN
+ AND a.DATE_IMPORT               =P_DATE_IMPORT
+ AND a.numpac                    =p.numpac
+ and gta.numpac   = p.numpac
+ and gta.code_gta =(select code_gta from TGE_REF_ORIGINE_GTA where numpac =a.numpac and code_origine = a.origine )
+ AND  NVL(gta.matric_gta,'PAIEZAD')='PACMAT'
+ AND( EXISTS (
+ SELECT c.paiezad
+ FROM DIC_ADM_CONTRAT_SITU C
+ WHERE C.NUMPAC  =a.NUMPAC
+ AND   C.NUMPAC    = p.numpac
+ AND   C.paiezad   = p.paiezad
+ AND   c.PACMAT    = a.PACMAT
+ ) )
+ AND a.origine                   =p.origine
+ AND to_date(a.periode,'yyyymm') =p.periode
+ );
+ 
+ DELETE
+ FROM TGE_INCIDENTS_PAIE p
+ WHERE EXISTS
+ (SELECT 1
+ FROM TGE_IMPORT_ANNULATION a,TGE_REF_TYPES_GTA gta
+ WHERE a.LOGIN                   =P_LOGIN
+ AND a.DATE_IMPORT               =P_DATE_IMPORT
+ AND a.numpac                    =p.numpac
+ and gta.numpac   = p.numpac
+ and gta.code_gta =(select code_gta from TGE_REF_ORIGINE_GTA where numpac =a.numpac and code_origine = a.origine )
+ AND   NVL(gta.matric_gta,'PAIEZAD') ='PAIEZAD'
+ AND a.paiezad = p.paiezad
+ AND a.origine                   =p.origine
+ AND to_date(a.periode,'yyyymm') =p.periode
+ );
+ 
+ DELETE
+ FROM TGE_ELEMENTS_PAIE p
+ WHERE EXISTS
+ (SELECT 1
+ FROM TGE_IMPORT_ANNULATION a,TGE_REF_TYPES_GTA gta
+ WHERE a.LOGIN    =P_LOGIN
+ AND a.DATE_IMPORT=P_DATE_IMPORT
+ AND a.numpac     =p.numpac
+ and gta.numpac   = p.numpac
+ and gta.code_gta =(select code_gta from TGE_REF_ORIGINE_GTA where numpac =a.numpac and code_origine = a.origine )
+ AND NVL(gta.matric_gta,'PAIEZAD')='PACMAT'
+ AND( EXISTS (
+ SELECT c.paiezad
+ FROM DIC_ADM_CONTRAT_SITU C
+ WHERE C.NUMPAC  =a.NUMPAC
+ AND   C.NUMPAC    = p.numpac
+ AND   C.paiezad   = p.paiezad
+ AND   c.PACMAT    = a.PACMAT
+ ) )
+ AND a.origine    =p.origine
+ AND a.periode    =p.periode
+ )
+ AND (( p.origine in (select code_origine
+ from tge_ref_origine_gta
+ where numpac=p.numpac
+ and code_origine=p.origine
+ and  mode_3060 !='F')AND p.code_remplacement ='R')
+ OR p.code_remplacement ='*');
+ 
+ DELETE
+ FROM TGE_ELEMENTS_PAIE p
+ WHERE EXISTS
+ (SELECT *
+ FROM TGE_IMPORT_ANNULATION a,TGE_REF_TYPES_GTA gta
+ WHERE a.LOGIN    =P_LOGIN
+ AND a.DATE_IMPORT=P_DATE_IMPORT
+ AND a.numpac     =p.numpac
+ and gta.numpac   = p.numpac
+ and gta.code_gta =(select code_gta from TGE_REF_ORIGINE_GTA where numpac =a.numpac and code_origine = a.origine )
+ AND  NVL(gta.matric_gta,'PAIEZAD') ='PAIEZAD'
+ AND a.paiezad = p.paiezad
+ AND a.origine    =p.origine
+ AND a.periode    =p.periode
+ )
+ AND (( p.origine in (select code_origine
+ from tge_ref_origine_gta
+ where numpac=p.numpac
+ and code_origine=p.origine
+ and  mode_3060 !='F')AND p.code_remplacement ='R')
+ OR p.code_remplacement ='*');
+ 
+ DELETE
+ FROM TGE_DONNEES_PAIE p
+ WHERE EXISTS
+ (SELECT 1
+ FROM TGE_IMPORT_ANNULATION a,TGE_REF_TYPES_GTA gta
+ WHERE a.LOGIN    =P_LOGIN
+ AND a.DATE_IMPORT=P_DATE_IMPORT
+ AND a.numpac     =p.numpac
+ and gta.numpac   = p.numpac
+ and gta.code_gta =(select code_gta from TGE_REF_ORIGINE_GTA where numpac =a.numpac and code_origine = a.origine )
+ AND  NVL(gta.matric_gta,'PAIEZAD')='PACMAT'
+ AND( EXISTS (
+ SELECT c.paiezad
+ FROM DIC_ADM_CONTRAT_SITU C
+ WHERE C.NUMPAC  =a.NUMPAC
+ AND   C.NUMPAC    = p.numpac
+ AND   C.paiezad   = p.paiezad
+ AND   c.PACMAT    = a.PACMAT
+ ) )
+ AND a.origine    =p.origine
+ AND a.periode    =p.periode
+ )
+ AND (( p.origine in (select code_origine
+ from tge_ref_origine_gta
+ where numpac=p.numpac
+ and code_origine=p.origine
+ and  mode_3060 !='F')AND p.code_remplacement ='R')
+ OR p.code_remplacement is null);
+ 
+ DELETE
+ FROM TGE_DONNEES_PAIE p
+ WHERE EXISTS
+ (SELECT 1
+ FROM TGE_IMPORT_ANNULATION a,TGE_REF_TYPES_GTA gta
+ WHERE a.LOGIN    =P_LOGIN
+ AND a.DATE_IMPORT=P_DATE_IMPORT
+ AND a.numpac     =p.numpac
+ and gta.numpac   = p.numpac
+ and gta.code_gta =(select code_gta from TGE_REF_ORIGINE_GTA where numpac =a.numpac and code_origine = a.origine )
+ AND  NVL(gta.matric_gta,'PAIEZAD') ='PAIEZAD' AND a.paiezad = p.paiezad
+ AND a.origine    =p.origine
+ AND a.periode    =p.periode
+ )
+ AND (( p.origine in (select code_origine
+ from tge_ref_origine_gta
+ where numpac=p.numpac
+ and code_origine=p.origine
+ and  mode_3060 !='F')AND p.code_remplacement ='R')
+ OR p.code_remplacement is null);
+ 
+ IF P_WITH30 =1 THEN
+ BEGIN
+ TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'début controle carte 30');
+ TGE_IMPORT_30 (P_LOGIN , P_DATE_IMPORT , P_ROLE , P_ORIGINE , P_VALIDATION , P_WITH30 , P_CODLANG, 'VI', datemaj );
+ EXCEPTION
+ WHEN OTHERS THEN
+ w_err := SQLCODE;
+ w_err := w_err||'  '||sqlerrm;
+ FSED.FSED_ERREUR( id_trt , ' imp:TGE_IMPORT_30 ' , P_LOGIN ||','|| P_DATE_IMPORT ||','|| P_ROLE ||','|| P_ORIGINE ||','|| P_VALIDATION||','|| P_WITH30, w_err );
+ IF (P_LOGIN != 'BATCH') THEN
+ -- On remonte l'erreur à l'application
+ raise;
+ END IF;
+ END ;
+ END IF;
+ IF P_WITH40 =1 THEN
+ 
+ 
+ --Supprimer les absences sur le mois de paie M-1 si le flag Retro GC = 'O'
+ DELETE from
+ TGE_ABSENCES A
+ WHERE exists
+ (
+ SELECT ABS.ID FROM TGE_ABSENCES ABS
+ INNER JOIN TGE_IMPORT_INCIDENTS t on ( ABS.MATRIC = T.MATRICULE and T.numpac=ABS.NUMPAC)
+ INNER JOIN TGE_INCIDENTS_PAIE INC ON ABS.ID = INC.CLE_ABSENCE
+ INNER JOIN TGE_REF_PAC PAC ON INC.NUMPAC = PAC.NUMPAC
+ INNER JOIN TGE_REF_PER PER ON PER.NUMPAC = INC.NUMPAC AND PER.PERIODEENCOURS = TO_CHAR(ADD_MONTHS(TO_DATE(PAC.PERIODEENCOURS,'yyyymm'),-1),'YYYYMM')
+ INNER JOIN TGE_PERIODE_RECUEIL_PAIEZAD REC ON INC.NUMPAC = REC.NUMPAC AND INC.PAIEZAD = REC.PAIEZAD AND REC.MOIS_PAIE = PAC.PERIODEENCOURS
+ WHERE INC.DATE_EFFET BETWEEN DEBUT_PER_RECUEIL_RETRO AND FIN_PER_RECUEIL_RETRO
+ AND REC.RETRO_GC = '1'
+ AND A.ID=ABS.ID
+ AND T.LOGIN=P_LOGIN
+ AND T.DATE_IMPORT=P_DATE_IMPORT
+ );
+ 
+ BEGIN
+ TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'début controle carte 40');
+ TGE_CONTROLE_40 (p_login,p_date_import,NULL,p_codlang);
+ 
+ --controle chevauchement
+ TGE_CONTROLE_40_CHEVAUCHEMENT(P_LOGIN, P_DATE_IMPORT ,null , P_CODLANG );
+ 
+ EXCEPTION
+ WHEN OTHERS THEN
+ w_err := SQLCODE;
+ w_err := w_err||'  ' ||sqlerrm;
+ FSED.FSED_ERREUR( id_trt , 'imp:TGE_CONTROLE_40' , P_LOGIN ||','|| P_DATE_IMPORT ||','|| P_ROLE ||','|| P_ORIGINE ||','|| P_VALIDATION||','|| P_WITH30 ||','|| P_WITH40 , w_err );
+ IF (P_LOGIN != 'BATCH') THEN
+ -- On remonte l'erreur à l'application
+ raise;
+ END IF;
+ END ;
+ BEGIN
+ --Controle Abscence
+ TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'début Controle Abscence');
+ 
+ TGE_CONTROLE_ABSENCES (p_login,p_date_import,NULL,p_codlang);
+ EXCEPTION
+ WHEN OTHERS THEN
+ w_err := w_err||'  ' ||sqlerrm;
+ FSED.FSED_ERREUR( id_trt , 'imp:TGE_CONTROLE_ABSENCES' , P_LOGIN ||','|| P_DATE_IMPORT ||','|| P_ROLE ||','|| P_ORIGINE ||','|| P_VALIDATION||','|| P_WITH30 ||','|| P_WITH40 , w_err );
+ IF (P_LOGIN != 'BATCH') THEN
+ -- On remonte l'erreur à l'application
+ raise;
+ END IF;
+ END ;
+ IF P_VALIDATION = 1 THEN
+ --Creation Abscence
+ BEGIN
+ TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'début validation : Creation Abscence');
+ 
+ INSERT
+ INTO TGE_ABSENCES
+ (
+ ID,
+ MATRIC ,
+ MOTIF ,
+ NUMPAC ,
+ DATE_DEBUT ,
+ DEBUT_MA ,
+ DATE_FIN ,
+ FIN_MA ,
+ DUREE ,
+ DATE_IJEDI ,
+ LOGIN_CREATE ,
+ DATE_CREATE ,
+ ROLE_CREATE ,
+ ORIGINE_CREATE ,
+ LOGIN_MAJ ,
+ DATE_MAJ ,
+ ROLE_MAJ ,
+ ORIGINE_MAJ ,
+ CLE_IMPORT,
+ STATUT
+ )
+ SELECT SEQ_TGE_ABSENCES.NEXTVAL ,
+ ABSENCES.MATRIC ,
+ ABSENCES.MOTIF ,
+ ABSENCES.NUMPAC ,
+ ABSENCES.DATE_DEBUT ,
+ ABSENCES.DEBUT_MA ,
+ ABSENCES.DATE_FIN ,
+ ABSENCES.FIN_MA ,
+ ABSENCES.DUREE ,
+ ABSENCES.DATE_IJEDI ,
+ ABSENCES.LOGIN_CREATE ,
+ ABSENCES.DATE_CREATE ,
+ ABSENCES.ROLE_CREATE ,
+ ABSENCES.ORIGINE_CREATE ,
+ ABSENCES.LOGIN_MAJ ,
+ ABSENCES.DATE_MAJ ,
+ ABSENCES.ROLE_MAJ ,
+ ABSENCES.ORIGINE_MAJ ,
+ ABSENCES.CLE_IMPORT,
+ ABSENCES.STATUT
+ FROM
+ (SELECT
+ (SELECT C.MATRIC
+ FROM DIC_ADM_CONTRAT_SITU C
+ WHERE C.NUMPAC = INCI.NUMPAC
+ AND C.PAIEZAD  =INCI.PAIEZAD
+ AND rownum     = 1
+ )                                   AS MATRIC,--matricule
+ INCI.CODE_IP                        AS MOTIF, --motif
+ INCI.NUMPAC                         AS NUMPAC,
+ to_date(INCI.DATE_DEBUT,'yyyyMMdd') AS DATE_DEBUT, --date debut
+ CASE
+ WHEN UPPER(
+ (SELECT pre.unite
+ FROM tge_ref_pre pre
+ WHERE pre.CODE_INCIDENT = INCI.CODE_IP
+ AND pre.numpac          = inci.NUMPAC
+ ))                      = 'J'
+ THEN DECODE (INCI.HEURES_IP,'1.00','J',DECODE(IS_NUMBER(INCI.HEURES_IP),0.5,'M','J'))
+ WHEN UPPER(
+ (SELECT pre.unite
+ FROM tge_ref_pre pre
+ WHERE pre.CODE_INCIDENT = INCI.CODE_IP
+ AND pre.numpac          = inci.NUMPAC
+ ))                      = 'H'
+ THEN DECODE (INCI.HEURES_IP ,NULL,'J','D')
+ END                               AS DEBUT_MA , --debutma
+ to_date(INCI.DATE_FIN,'yyyyMMdd') AS DATE_FIN,  --date fin
+ CASE
+ WHEN UPPER(
+ (SELECT pre.unite
+ FROM tge_ref_pre pre
+ WHERE pre.CODE_INCIDENT = INCI.CODE_IP
+ AND pre.numpac          = inci.NUMPAC
+ ))                      = 'J'
+ THEN DECODE (INCI.HEURES_IP,'1.00','J',DECODE(IS_NUMBER(INCI.HEURES_IP),0.5,'M','J'))
+ WHEN UPPER(
+ (SELECT pre.unite
+ FROM tge_ref_pre pre
+ WHERE pre.CODE_INCIDENT = INCI.CODE_IP
+ AND pre.numpac          = inci.NUMPAC
+ ))                      = 'H'
+ THEN DECODE (INCI.HEURES_IP ,NULL,'J','D')
+ END AS FIN_MA, --Fin ma
+ CASE
+ WHEN UPPER(
+ (SELECT pre.unite
+ FROM tge_ref_pre pre
+ WHERE pre.CODE_INCIDENT = INCI.CODE_IP
+ AND pre.numpac          = inci.NUMPAC
+ ))                      = 'J'
+ AND ((SELECT pre.demi_journee
+ FROM tge_ref_pre pre
+ WHERE pre.CODE_INCIDENT = INCI.CODE_IP
+ AND pre.numpac          = inci.NUMPAC
+ )                       = 1 
+ OR IS_NUMBER(INCI.HEURES_IP) = 0.5
+)
+ THEN NVL(is_number(REPLACE(INCI.HEURES_IP,'.',',')) *8*3600,NULL) 
+ WHEN UPPER(
+ (SELECT pre.unite
+ FROM tge_ref_pre pre
+ WHERE pre.CODE_INCIDENT = INCI.CODE_IP
+ AND pre.numpac          = inci.NUMPAC
+ ))                      = 'H'
+THEN NVL(is_number(REPLACE(INCI.HEURES_IP,'.',',')) *3600,NULL) 
+ELSE NULL
+ END        AS DUREE,        --duree
+ NULL       AS DATE_IJEDI,   --date_ijedi
+ INCI.LOGIN AS LOGIN_CREATE, --login create
+ sysdate    AS DATE_CREATE,  --date_create
+ P_ROLE     AS ROLE_CREATE,
+ P_ORIGINE  AS ORIGINE_CREATE, --'IMPORT_INCIDENT',--origine_create :ToolsTge.ORI_ECRAN_IMPORT_INCIDENT
+ INCI.LOGIN AS LOGIN_MAJ,      --login maj
+ sysdate    AS DATE_MAJ,       -- date_maj
+ P_ROLE     AS ROLE_MAJ,
+ P_ORIGINE  AS ORIGINE_MAJ,--'IMPORT_INCIDENT',--origine_maj   :ToolsTge.ORI_ECRAN_IMPORT_INCIDENT
+ P_LOGIN
+ || '#'
+ ||INCI.DATE_IMPORT
+ || '#'
+ ||INCI.NUMLIGNE AS CLE_IMPORT,--cle_import
+ 'Q' AS STATUT
+ FROM TGE_IMPORT_INCIDENTS INCI
+ WHERE EXISTS (
+ (SELECT ri.CODE_INCIDENT
+ FROM TGE_REF_PRE ri
+ WHERE ri.numpac             = INCI.numpac
+ AND ri.code_incident        =inci.code_ip
+ AND ri.OPTION_CONSERV_HISTO = 'A'
+ )
+ UNION
+ (SELECT ri.CODE_INCIDENT
+ FROM TGE_REF_PRE ri
+ WHERE ri.numpac             ='*'
+ AND ri.code_incident        =inci.code_ip
+ AND ri.OPTION_CONSERV_HISTO = 'A'
+ AND NOT EXISTS
+ (SELECT *
+ FROM TGE_REF_PRE rt2
+ WHERE rt2.numpac      =iNCI.numpac
+ AND rt2.code_incident =ri.code_incident
+ )
+ ))
+ AND INCI.LOGIN       = P_LOGIN
+ AND INCI.DATE_IMPORT = P_DATE_IMPORT
+ AND ((INCI.ERREURS  IS NULL
+ AND INCI.STATUT      = 'TRAIT')
+ OR (INCI.ERREURS    IS NOT NULL
+ AND INCI.STATUT      = 'TRANS'))
+ ) ABSENCES ;
+ EXCEPTION
+ WHEN OTHERS THEN
+ w_err := SQLCODE;
+ w_err := w_err||'  ' ||sqlerrm;
+ FSED.FSED_ERREUR( id_trt , 'ValidAbsences' , P_LOGIN ||','|| P_DATE_IMPORT ||','|| P_ROLE ||','|| P_ORIGINE ||','|| P_VALIDATION||','|| P_WITH30 ||','|| P_WITH40 , w_err );
+ IF (P_LOGIN != 'BATCH') THEN
+ -- On remonte l'erreur à l'application
+ raise;
+ END IF;
+ END ;
+ --insertion des incidents
+ BEGIN
+ TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'début validation : insertion des incidents');
+ 
+ INSERT
+ INTO TGE_INCIDENTS_PAIE
+ (
+ ID ,
+ NUMPAC,
+ PAIEZAD,
+ PERIODE,
+ TYPE_TRAITEMENT,
+ TYPE_IP,
+ CODE_IP,
+ DATE_EFFET,
+ CODE_IMPUTATION,
+ HEURES,
+ ORIGINE,
+ LOGIN_CREATE,
+ DATE_CREATE,
+ ROLE_CREATE,
+ ORIGINE_CREATE,
+ LOGIN_MAJ,
+ DATE_MAJ,
+ ROLE_MAJ,
+ ORIGINE_MAJ,
+ CLE_IMPORT,
+ CLE_ABSENCE,
+ IDPACMAT,
+ ENVOYE,
+ type_writer,
+ ACTION_RETRO,
+ ACTION_RETRO_DATE,
+ DERNIER_CODE_OPE 
+ )
+ SELECT SEQ_TGE_INCIDENTS_PAIE.NEXTVAL ,
+ INCIDENTS.NUMPAC,
+ INCIDENTS.PAIEZAD,
+ INCIDENTS.PERIODE,
+ INCIDENTS.TYPE_TRAITEMENT,
+ INCIDENTS.TYPE_IP,
+ INCIDENTS.CODE_IP,
+ INCIDENTS.DATE_EFFET,
+ INCIDENTS.CODE_IMPUTATION,
+ INCIDENTS.HEURES,
+ INCIDENTS.ORIGINE,
+ INCIDENTS.LOGIN_CREATE,
+ INCIDENTS.DATE_CREATE,
+ INCIDENTS.ROLE_CREATE,
+ INCIDENTS.ORIGINE_CREATE,
+ INCIDENTS.LOGIN_MAJ,
+ INCIDENTS.DATE_MAJ,
+ INCIDENTS.ROLE_MAJ,
+ INCIDENTS.ORIGINE_MAJ,
+ INCIDENTS.CLE_IMPORT,
+ INCIDENTS.CLE_ABSENCE,
+ INCIDENTS.IDPACMAT,
+ INCIDENTS.ENVOYE,
+ CASE
+ WHEN TGE_REF_ORIGINE_GTA.MODE_T2    ='R'
+ AND TGE_REF_ORIGINE_GTA.ENVOI_MODE_R='N'
+ THEN 'N'
+ ELSE NULL
+ END AS TYPE_writer,
+  CASE WHEN pac.DEB_RETRO IS NOT NULL AND TO_char(incidents.periode,'YYYYMM') < pac.PERIODEENCOURS
+ THEN 'C' ELSE NULL
+ END as ACTION_RETRO,
+ CASE WHEN pac.DEB_RETRO IS NOT NULL AND TO_char(incidents.periode,'YYYYMM') < pac.PERIODEENCOURS
+ THEN sysdate ELSE NULL
+ END as ACTION_RETRO_DATE,
+ 'C' as DERNIER_CODE_OPE
+ FROM
+ (SELECT INCI.numpac              AS NUMPAC,          --numpac
+ INCI.paiezad                   AS PAIEZAD,         --paiezad
+ to_date(INCI.periode,'YYYYMM') AS PERIODE,         --periode
+ INCI.type_traitement           AS TYPE_TRAITEMENT, --type_traitement
+ CASE
+ WHEN (INCI.heures_ip IS NOT NULL
+ OR INCI.code_ip      IS NOT NULL )
+ THEN DECODE (INCI.code_ip,'HP','T',
+ (SELECT p.option_conserv_histo
+ FROM TGE_REF_PRE p
+ WHERE p.numpac     =inci.numpac
+ AND p.code_incident=inci.code_ip
+ ))
+ WHEN INCI.type_heure IN ('T','R')
+ THEN INCI.type_heure
+ END AS type_ip ,--DIT 37186 type_ip
+ CASE
+ WHEN INCI.heures_ip IS NOT NULL
+ OR INCI.CODE_IP     IS NOT NULL
+ THEN INCI.CODE_IP
+ WHEN INCI.type_heure IN ('T','R')
+ THEN DECODE ( INCI.TYPE_HEURE,'R','HT','HP')
+ END                                           AS CODE_IP,  ---code_ip DIT 37186
+ to_date(INCI.date_debut,'yyyymmdd')-1 +a.jour AS DATE_EFFET,--date effet
+ CASE
+ WHEN INCI.heures_ip IS NOT NULL
+ OR INCI.code_ip     IS NOT NULL
+ AND INCI.domaine_imp ='1'
+ THEN INCI.code_imputation
+ WHEN INCI.type_heure IN ('T','R')
+ AND INCI.domaine_imp  ='H'
+ THEN INCI.code_imputation
+ END AS code_imputation,-- code_imputation DIT 37186
+ CASE
+ WHEN INCI.heures_ip IS NOT NULL
+ OR INCI.CODE_IP     IS NOT NULL
+ THEN is_number(INCI.heures_ip)
+ WHEN INCI.type_heure IN ('T','R')
+ THEN is_number(INCI.heures_trav)
+ END          AS heures,       -- heures DIT 37186
+ INCI.origine AS ORIGINE,      --origine
+ INCI.LOGIN   AS LOGIN_CREATE, --login create
+ sysdate      AS DATE_CREATE,  --date_create
+ P_ROLE       AS ROLE_CREATE,
+ P_ORIGINE    AS ORIGINE_CREATE, --'IMPORT_INCIDENT',--origine_create
+ INCI.LOGIN   AS LOGIN_MAJ,      --login maj
+ sysdate      AS DATE_MAJ,       -- date_maj
+ P_ROLE       AS ROLE_MAJ,
+ P_ORIGINE    AS ORIGINE_MAJ,--'IMPORT_INCIDENT',--origine_maj
+ P_LOGIN
+ || '#'
+ ||INCI.DATE_IMPORT
+ || '#'
+ ||INCI.NUMLIGNE AS CLE_IMPORT,--cle_import
+ CASE
+ WHEN INCI.heures_ip IS NOT NULL
+ OR INCI.CODE_IP     IS NOT NULL
+ THEN
+ (SELECT id
+ FROM tge_absences
+ WHERE cle_import =P_LOGIN
+ ||'#'
+ ||INCI.DATE_IMPORT
+ ||'#'
+ ||INCI.NUMLIGNE
+ )
+ WHEN INCI.type_heure IN ('T','R')
+ THEN NULL
+ END AS CLE_ABSENCE ,--cleAbsence
+ CASE
+ WHEN INCI.NUMPAC IS NOT NULL
+ AND INCI.PACMAT  IS NOT NULL
+ THEN RPAD(INCI.NUMPAC,6)
+ || INCI.PACMAT
+ ELSE ' '
+ END  AS IDPACMAT, --idpacmat
+ NULL AS ENVOYE    --envoye
+ FROM TGE_IMPORT_INCIDENTS INCI,
+ -- FVI modif GTA_PAR_ANNEE
+ (
+ SELECT LEVEL "JOUR" FROM dual CONNECT BY LEVEL <=
+ (SELECT MAX(to_number(to_date(date_fin,'YYYYMMDD') - to_date(date_debut,'YYYYMMDD') )) + 1
+ FROM TGE_IMPORT_INCIDENTS
+ WHERE LOGIN    =P_LOGIN
+ AND DATE_IMPORT=P_DATE_IMPORT
+ AND ((ERREURS IS NULL
+ AND STATUT     = 'TRAIT')
+ OR (ERREURS   IS NULL
+ AND STATUT     = 'TRANS'))
+ )
+ ) a
+ WHERE INCI.LOGIN                                      =P_LOGIN
+ AND INCI.DATE_IMPORT                                  =P_DATE_IMPORT
+ AND IS_DATE(INCI.date_debut,'yyyymmdd')               =1
+ AND IS_DATE(INCI.date_fin,'yyyymmdd')                 =1
+ AND (to_date(INCI.date_debut,'yyyymmdd')-1 + a.jour )<=to_date(INCI.date_fin,'yyyymmdd')
+ AND ((INCI.ERREURS                                   IS NULL
+ AND INCI.STATUT                                       = 'TRAIT')
+ OR (INCI.ERREURS                                     IS NULL
+ AND INCI.STATUT                                       = 'TRANS'))
+ UNION ALL
+ SELECT INCI.numpac               AS NUMPAC,          --numpac
+ INCI.paiezad                   AS PAIEZAD,         --paiezad
+ to_date(INCI.periode,'YYYYMM') AS PERIODE,         --periode
+ INCI.type_traitement           AS TYPE_TRAITEMENT, --type_traitement
+ CASE
+ WHEN INCI.type_heure IN ('T','R')
+ THEN INCI.type_heure
+ WHEN (INCI.heures_ip IS NOT NULL
+ OR INCI.code_ip      IS NOT NULL )
+ THEN DECODE (INCI.code_ip,'HP','T',
+ (SELECT p.option_conserv_histo
+ FROM TGE_REF_PRE p
+ WHERE p.numpac     =inci.numpac
+ AND p.code_incident=inci.code_ip
+ ))
+ END AS type_ip ,--DIT 37186 type_ip
+ CASE
+ WHEN INCI.type_heure IN ('T','R')
+ THEN DECODE ( INCI.TYPE_HEURE,'R','HT','HP')
+ WHEN INCI.heures_ip IS NOT NULL
+ OR INCI.CODE_IP     IS NOT NULL
+ THEN INCI.CODE_IP
+ END                                           AS CODE_IP,  ---code_ip DIT 37186
+ to_date(INCI.date_debut,'yyyymmdd')-1 +a.jour AS DATE_EFFET,--date effet
+ CASE
+ WHEN INCI.type_heure IN ('T','R')
+ AND INCI.domaine_imp  ='H'
+ THEN INCI.code_imputation
+ WHEN INCI.heures_ip IS NOT NULL
+ OR INCI.code_ip     IS NOT NULL
+ AND INCI.domaine_imp ='1'
+ THEN INCI.code_imputation
+ END AS code_imputation,-- code_imputation DIT 37186
+ CASE
+ WHEN INCI.type_heure IN ('T','R')
+ THEN is_number(INCI.heures_trav)
+ WHEN INCI.heures_ip IS NOT NULL
+ OR INCI.CODE_IP     IS NOT NULL
+ THEN is_number(INCI.heures_ip)
+ END          AS heures,       -- heures DIT 37186
+ INCI.origine AS ORIGINE,      --origine
+ INCI.LOGIN   AS LOGIN_CREATE, --login create
+ sysdate      AS DATE_CREATE,  --date_create
+ P_ROLE       AS ROLE_CREATE,
+ P_ORIGINE    AS ORIGINE_CREATE, --'IMPORT_INCIDENT',--origine_create
+ INCI.LOGIN   AS LOGIN_MAJ,      --login maj
+ sysdate      AS DATE_MAJ,       -- date_maj
+ P_ROLE       AS ROLE_MAJ,
+ P_ORIGINE    AS ORIGINE_MAJ,--'IMPORT_INCIDENT',--origine_maj
+ P_LOGIN
+ || '#'
+ ||INCI.DATE_IMPORT
+ || '#'
+ ||INCI.NUMLIGNE AS CLE_IMPORT,--cle_import
+ CASE
+ WHEN INCI.type_heure IN ('T','R')
+ THEN NULL
+ WHEN INCI.heures_ip IS NOT NULL
+ OR INCI.CODE_IP     IS NOT NULL
+ THEN
+ (SELECT id
+ FROM tge_absences
+ WHERE cle_import =P_LOGIN
+ ||'#'
+ ||INCI.DATE_IMPORT
+ ||'#'
+ ||INCI.NUMLIGNE
+ )
+ END AS CLE_ABSENCE ,--cleAbsence
+ CASE
+ WHEN INCI.NUMPAC IS NOT NULL
+ AND INCI.PACMAT  IS NOT NULL
+ THEN RPAD(INCI.NUMPAC,6)
+ || INCI.PACMAT
+ ELSE ' '
+ END  AS IDPACMAT, --idpacmat
+ NULL AS ENVOYE    --envoye
+ FROM TGE_IMPORT_INCIDENTS INCI,
+ -- FVI modif GTA_PAR_ANNEE
+ (
+ SELECT LEVEL "JOUR" FROM dual CONNECT BY LEVEL <=
+ (SELECT MAX(to_number(to_date(date_fin,'YYYYMMDD') - to_date(date_debut,'YYYYMMDD') )) + 1
+ FROM TGE_IMPORT_INCIDENTS
+ WHERE LOGIN    =P_LOGIN
+ AND DATE_IMPORT=P_DATE_IMPORT
+ AND ((ERREURS IS NULL
+ AND STATUT     = 'TRAIT')
+ OR (ERREURS   IS NULL
+ AND STATUT     = 'TRANS'))
+ )
+ ) a
+ WHERE INCI.LOGIN                                      =P_LOGIN
+ AND INCI.DATE_IMPORT                                  =P_DATE_IMPORT
+ AND IS_DATE(INCI.date_debut,'yyyymmdd')               =1
+ AND IS_DATE(INCI.date_fin,'yyyymmdd')                 =1
+ AND (to_date(INCI.date_debut,'yyyymmdd')-1 + a.jour )<=to_date(INCI.date_fin,'yyyymmdd')
+ AND ( (INCI.heures_ip                                IS NOT NULL
+ OR INCI.code_ip                                      IS NOT NULL)
+ AND INCI.type_heure                                  IS NOT NULL)
+ AND ((INCI.ERREURS                                   IS NULL
+ AND INCI.STATUT                                       = 'TRAIT')
+ OR (INCI.ERREURS                                     IS NULL
+ AND INCI.STATUT                                       = 'TRANS'))
+ )INCIDENTS,
+ TGE_REF_PAC pac,
+ TGE_REF_ORIGINE_GTA
+ WHERE INCIDENTS.numpac=TGE_REF_ORIGINE_GTA.numpac
+ AND INCIDENTS.ORIGINE =TGE_REF_ORIGINE_GTA.CODE_ORIGINE
+ AND pac.numpac = incidents.numpac;
+ EXCEPTION
+ WHEN OTHERS THEN
+ w_err := SQLCODE;
+ w_err := w_err||'  ' ||sqlerrm;
+ FSED.FSED_ERREUR( id_trt , 'ValidIncidents' , P_LOGIN ||','|| P_DATE_IMPORT ||','|| P_ROLE ||','|| P_ORIGINE ||','|| P_VALIDATION||','|| P_WITH30 ||','|| P_WITH40 , w_err );
+ IF (P_LOGIN != 'BATCH') THEN
+ -- On remonte l'erreur à l'application
+ raise;
+ END IF;
+ END ;
+ TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'Trace SYS_TRC_MODIF : insertion TGE_INCIDENTS_PAIE');
+ SYS_TRACE_MODIF(P_LOGIN,dateMaj,'3','SAISIE_IND_INCIDENT',
+ 'CARTE=40&LOGIN='||P_LOGIN||'&DATE_IMPORT='||P_DATE_IMPORT||'&ROLE=3'||'&ORIGINE='||P_ORIGINE,
+ 'Import Batch 40','C',null,null,null,null);
+ -- Mise à jour des lignes d'import qui sont encore en erreur après validation, statut prend TRANS
+ TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,' UPDATE TGE_IMPORT_INCIDENTS');
+ UPDATE TGE_IMPORT_INCIDENTS
+ SET STATUT      ='TRANS'
+ WHERE LOGIN     = P_LOGIN
+ AND DATE_IMPORT = p_date_import
+ AND (ERREURS   IS NOT NULL
+ AND STATUT      = 'TRAIT');
+ -- Regroupement des absences importé
+ TGE_REGROUPE_ABS(P_LOGIN||'#'||P_DATE_IMPORT);
+ -- Mise à jour des lignes d'import qui ne sont plus en erreur après validation, statut prend FIN
+ UPDATE TGE_IMPORT_INCIDENTS
+ SET ERREURS     ='',
+ STATUT        ='FIN'
+ WHERE LOGIN     = P_LOGIN
+ AND DATE_IMPORT = p_date_import
+ AND ((ERREURS  IS NULL
+ AND STATUT      = 'TRAIT')
+ OR (ERREURS    IS NULL
+ AND STATUT      = 'TRANS'));
+ UPDATE TGE_IMPORT_LISTE
+ SET NBLIGNES_ERR =
+ (SELECT COUNT(*)
+ FROM TGE_IMPORT_ELEMENTS
+ WHERE LOGIN     = P_LOGIN
+ AND DATE_IMPORT = p_date_import
+ AND ERREURS    IS NOT NULL
+ ),
+ NBLIGNES_IMP =
+ (SELECT COUNT(*)
+ FROM TGE_IMPORT_ELEMENTS
+ WHERE LOGIN     = P_LOGIN
+ AND DATE_IMPORT = p_date_import
+ ),
+ STATUT        ='TRANS'
+ WHERE LOGIN     = P_LOGIN
+ AND DATE_IMPORT = p_date_import
+ AND TYPE        = 5;
+ END IF;
+ END IF ;
+ 
+ IF P_WITH60 =1 OR P_WITH70 =1 THEN
+ BEGIN
+ TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'début controle carte 60');
+ TGE_IMPORT_6070 (P_LOGIN , P_DATE_IMPORT , P_ROLE , P_ORIGINE , P_VALIDATION , P_WITH60 , P_WITH70 , P_CODLANG, 'VI' );
+ EXCEPTION
+ WHEN OTHERS THEN
+ w_err := SQLCODE;
+ w_err := w_err||'  '||sqlerrm;
+ FSED.FSED_ERREUR( id_trt , ' imp:TGE_IMPORT_6070 ' , P_LOGIN ||','|| P_DATE_IMPORT ||','|| P_ROLE ||','|| P_ORIGINE ||','|| P_VALIDATION||','|| P_WITH60 ||','|| P_WITH70 , w_err );
+ IF (P_LOGIN != 'BATCH') THEN
+ -- On remonte l'erreur à l'application
+ raise;
+ END IF;
+ END ;
+ END IF;
+ v_stop := DBMS_UTILITY.GET_TIME;
+ --DBMS_OUTPUT.PUT_LINE(((v_stop-v_start)*10) || ' ms');
+ --FIXME utiliser la procédure trace_dbms_output()
+ TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'fin TGE_IMPORT_3040 OK');
+ EXCEPTION
+ WHEN OTHERS THEN
+ w_err := SQLCODE;
+ w_err := 'TGE3040 '||w_err|| sqlerrm;
+ TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'fin TGE_IMPORT_3040 KO : '||w_err);
+ FSED.FSED_ERREUR( id_trt , 'TGE3040' , P_LOGIN ||','|| P_DATE_IMPORT ||','|| P_ROLE ||','|| P_ORIGINE ||','|| P_VALIDATION||','|| P_WITH30 ||','|| P_WITH40 , w_err );
+ raise;
+ END TGE_IMPORT_3040;
+##
+TRG_DIC_ADM_CONTRAT_SITU
+=SQL=
+CREATE OR REPLACE TRIGGER TRG_DIC_ADM_CONTRAT_SITU FOR INSERT OR UPDATE OR DELETE ON DIC_ADM_CONTRAT_SITU COMPOUND TRIGGER 
+  codeChrono NUMBER;
+  TYPE T_MPE_BY_NUMPAC IS TABLE OF TGE_REF_PAC.MPE%TYPE INDEX BY TGE_REF_PAC.NUMPAC%TYPE;
+  tabMpeByNumpac T_MPE_BY_NUMPAC;
+  
+  TYPE T_TRAITEMENT_PERIODES_INDIV IS TABLE OF VARCHAR2(100) INDEX BY VARCHAR2(100);
+  -- Ce tableau indexé contient plusieurs chose :
+  -- + Une entrée avec un code PAC + un PAIEZAD --> Un flag permettant de savoir si le couple NUMPAC/PAIEZAD a déjà été traité
+  -- + Une entrée avec un code PAC --> La période en cours du PAC
+  tabTrtPeriodesIndividuelles T_TRAITEMENT_PERIODES_INDIV;
+  
+  v_numpac DIC_ADM_CONTRAT_SITU.NUMPAC%TYPE;
+  v_pacmat DIC_ADM_CONTRAT_SITU.PACMAT%TYPE;
+  v_numcnt DIC_ADM_CONTRAT_SITU.NUMCNT%TYPE;
+  v_paiezad DIC_ADM_CONTRAT_SITU.PAIEZAD%TYPE;
+  periode_deb_histo_retro VARCHAR2(6);
+  periode_paie_en_cours   VARCHAR2(6);
+  TYPE paiezadTabType is table of DIC_ADM_CONTRAT_SITU.PAIEZAD%TYPE ;
+  TYPE numpacTabType is  table of DIC_ADM_CONTRAT_SITU.NUMPAC%TYPE ;
+  paiezadTab paiezadTabType := paiezadTabType();
+  numpacTab numpacTabType := numpacTabType();
+  mpe TGE_REF_PAC.MPE%TYPE;
+  auMoinsUnPacMpe BOOLEAN;
+  v_countSecNav    NUMBER := -1;
+  prefixeCodeChrono VARCHAR2(5);
+  suffixeCodeChrono NUMBER;
+  existeCodeChrono NUMBER;
+   v_jobIdx          NUMBER;
+  BEFORE STATEMENT IS BEGIN
+    SELECT COUNT(*) INTO v_countSecNav FROM SECUPACMAT_TMP WHERE MATRIC='SECNAV';
+    IF v_countSecNav>0 THEN
+      RAISE_APPLICATION_ERROR(-20000,'CODERR=GENREC03');
+    END IF;
+  END BEFORE STATEMENT;
+  BEFORE EACH ROW IS BEGIN
+    v_numpac := NVL(:NEW.NUMPAC,:OLD.NUMPAC);
+    v_pacmat := NVL(:NEW.PACMAT,:OLD.PACMAT);
+    v_numcnt := NVL(:NEW.NUMCNT,:OLD.NUMCNT);
+    IF NOT tabMpeByNumpac.exists(v_numpac) THEN
+      BEGIN
+        SELECT NVL(MPE,'N') INTO mpe FROM TGE_REF_PAC WHERE NUMPAC=v_numpac;
+      EXCEPTION WHEN OTHERS THEN mpe := 'N'; END;
+      tabMpeByNumpac(v_numpac) := mpe;
+    END IF; 
+    -- On vérifie qu'on ne modifie ni le NUMPAC, ni le PACMAT, ni le NUMCNT, ni le PAIEZAD
+    IF UPDATING AND (NOT :OLD.NUMPAC=:NEW.NUMPAC OR NOT :OLD.PACMAT=:NEW.PACMAT OR NOT :OLD.NUMCNT=:NEW.NUMCNT OR NOT :OLD.PAIEZAD=:NEW.PAIEZAD) THEN
+      -- Message d'erreur --> On interdit la mise à jour du NUMPAC, du PACMAT, du NUMCNT et du PAIEZAD : il faut faire un delete puis un insert
+      RAISE_APPLICATION_ERROR(-20000,'La mise à jour des colonnes NUMPAC, PACMAT, NUMCNT et PAIEZAD n''est pas autorisée : vous devez supprimer puis recréer la situation');
+    END IF;
+    -- On vérifie qu'on ne modifie pas le RHID et qu'il n'est pas vide
+    IF (INSERTING OR UPDATING) AND :NEW.MATRIC IS NULL THEN
+      RAISE_APPLICATION_ERROR(-20000,'La colonne MATRIC doit être renseignée dans DIC_ADM_CONTRAT_SITU');
+    END IF;
+    IF UPDATING AND NOT :OLD.MATRIC=:NEW.MATRIC THEN
+      RAISE_APPLICATION_ERROR(-20000,'La mise à jour de la colonne MATRIC n''est pas autorisée');
+    END IF;
+    -- On vérifie qu'on ne modifie pas le RHID et qu'il n'est pas vide
+    IF (INSERTING OR UPDATING) AND :NEW.DSDSC IS NULL THEN
+      RAISE_APPLICATION_ERROR(-20000,'La colonne DSDSC doit être renseignée dans DIC_ADM_CONTRAT_SITU');
+    END IF;
+    IF UPDATING AND NOT :OLD.DSDSC=:NEW.DSDSC THEN
+      RAISE_APPLICATION_ERROR(-20000,'La mise à jour de la colonne DSDSC n''est pas autorisée');
+    END IF;
+    
+    IF INSERTING AND :NEW.CODE_CHRONO IS NULL THEN
+      IF tabMpeByNumpac(v_numpac)='N' THEN
+        -- CODE CHRONO à 000000 si pac non mpe
+        :NEW.CODE_CHRONO := '000000';
+      ELSE
+        -- si pac en MPE CODE_CHRONO calculée à partir de la date de début de situation : Année (sans le siècle) + quantième de jour + '0'
+        prefixeCodeChrono := SUBSTR(TO_CHAR(:NEW.DSDSC,'yyyy'),3) || LPAD(:NEW.DSDSC-TO_DATE(TO_CHAR(:NEW.DSDSC,'yyyy')||'0101','yyyymmdd')+1,3,'0');
+        suffixeCodeChrono := 0;
+        -- On va vérifier que le code chrono n'existe pas pour le PACMAT (cas d'une modification de date d'embauche qui aurait gardé le même code chrono)
+        LOOP
+          :NEW.CODE_CHRONO := prefixeCodeChrono || suffixeCodeChrono;
+          existeCodeChrono := EXISTS_CODE_CHRONO(:NEW.NUMPAC, :NEW.PACMAT, :NEW.CODE_CHRONO);
+          EXIT WHEN existeCodeChrono=0;
+          suffixeCodeChrono := suffixeCodeChrono + 1;
+          EXIT WHEN suffixeCodeChrono=10;
+        END LOOP;
+
+        IF suffixeCodeChrono != 10 AND ORDRE_CODE_CHRONO_ERREUR(:NEW.NUMPAC, :NEW.PACMAT, :NEW.CODE_CHRONO, :NEW.DSDSC)!=0 THEN
+ 			:NEW.CODE_CHRONO := CODE_CHRONO_PREC(:NEW.NUMPAC, :NEW.PACMAT, :NEW.DSDSC);
+ 			prefixeCodeChrono := SUBSTR(:NEW.CODE_CHRONO, 0, 5);
+ 			suffixeCodeChrono := SUBSTR(:NEW.CODE_CHRONO, 6, 1) + 1;
+ 			:NEW.CODE_CHRONO := prefixeCodeChrono || suffixeCodeChrono;
+ 			IF EXISTS_CODE_CHRONO(:NEW.NUMPAC, :NEW.PACMAT, :NEW.CODE_CHRONO) != 0 THEN
+ 				-- On ne peut pas créer de CODE_CHRONO pour cette date de début de situation : on lance une erreur
+ 				RAISE_APPLICATION_ERROR(-20000,'Calcul du code chrono impossible pour une situation de contrat débutant le '||TO_CHAR(:NEW.DSDSC,'dd.mm.yyyy')||' pour le matricule paie '||:NEW.PACMAT||' du PAC '||:NEW.NUMPAC);
+ 			END IF;
+ 		END IF;
+        
+        IF suffixeCodeChrono=10 THEN
+          -- On ne peut plus créer de CODE_CHRONO pour cette date de début de situation : on lance une erreur
+          RAISE_APPLICATION_ERROR(-20000,'Nombre maximum de codes chrono atteint pour une situation de contrat débutant le '||TO_CHAR(:NEW.DSDSC,'dd.mm.yyyy')||' pour le matricule paie '||:NEW.PACMAT||' du PAC '||:NEW.NUMPAC);
+        END IF;
+        auMoinsUnPacMpe := TRUE;
+      END IF;
+    ELSE
+      IF UPDATING AND NOT :OLD.CODE_CHRONO=:NEW.CODE_CHRONO THEN
+        RAISE_APPLICATION_ERROR(-20000,'La mise à jour de la colonne CODE_CHRONO n''est pas autorisée');
+      END IF;
+      IF DELETING AND NOT tabMpeByNumpac(v_numpac)='N' THEN
+        auMoinsUnPacMpe := TRUE;
+        MERGE INTO DELETED_PAIEZAD C USING (SELECT :OLD.NUMPAC AS NUMPAC, :OLD.PACMAT AS PACMAT, :OLD.NUMCNT AS NUMCNT, :OLD.PAIEZAD AS PAIEZAD, :OLD.CODE_CHRONO as CODE_CHRONO FROM DUAL) Z ON (C.NUMPAC=Z.NUMPAC AND C.PACMAT=Z.PACMAT AND C.NUMCNT=Z.NUMCNT AND C.PAIEZAD=Z.PAIEZAD)
+        WHEN NOT MATCHED THEN INSERT (NUMPAC, PACMAT, NUMCNT, MATRIC, PAIEZAD, DATE_SUPPRESSION, CODE_CHRONO) VALUES (:OLD.NUMPAC, :OLD.PACMAT, :OLD.NUMCNT, :OLD.MATRIC, :OLD.PAIEZAD, SYSDATE, :OLD.CODE_CHRONO);
+      END IF;
+    END IF;
+    UPDATE DIC_ADM_CONTRAT SET TYPE_WRITER='N', CURRENT_PAIEZAD=(SELECT PAIEZAD FROM DIC_ADM_CONTRAT_HISTO WHERE DIC_ADM_CONTRAT_HISTO.NUMPAC=DIC_ADM_CONTRAT.NUMPAC AND DIC_ADM_CONTRAT_HISTO.PACMAT=DIC_ADM_CONTRAT.PACMAT AND DIC_ADM_CONTRAT_HISTO.NUMCNT=DIC_ADM_CONTRAT.NUMCNT AND DIC_ADM_CONTRAT_HISTO.DATE_EFF=DIC_ADM_CONTRAT.DATE_EFF_CONTRAT) WHERE NUMPAC=v_numpac AND PACMAT=v_pacmat AND NUMCNT=v_numcnt;
+  END BEFORE EACH ROW;
+  
+  AFTER EACH ROW IS BEGIN
+    v_numpac := NVL(:NEW.NUMPAC,:OLD.NUMPAC);
+    v_paiezad :=NVL(:NEW.paiezad,:OLD.paiezad);
+    -- On ne traite chaque couple NUMPAC/PAIEZAD qu'une seule fois
+    IF (INSERTING OR DELETING OR (UPDATING('DSFSC') AND NOT :NEW.DSFSC=:OLD.DSFSC)) AND NOT tabTrtPeriodesIndividuelles.exists(v_numpac||v_paiezad) THEN
+        SELECT DEB_HISTO_RETRO,
+	      PERIODEENCOURS
+	    INTO periode_deb_histo_retro,
+	      periode_paie_en_cours
+	    FROM TGE_REF_PAC
+	    WHERE NUMPAC = v_numpac;
+	    tabTrtPeriodesIndividuelles(v_numpac||v_paiezad) := periode_paie_en_cours;
+	    IF(periode_deb_histo_retro IS NOT NULL AND periode_paie_en_cours >= periode_deb_histo_retro) THEN
+	      tabTrtPeriodesIndividuelles(v_numpac||v_paiezad) := TO_CHAR(NVL(:NEW.dsdsc,:OLD.dsdsc), 'YYYYMM');
+	    END IF;
+      IF DELETING THEN
+        -- Suppression : on supprime de la table des périodes individuelles
+        DELETE FROM TGE_PERIODE_RECUEIL_PAIEZAD WHERE NUMPAC = v_numpac AND PAIEZAD = v_paiezad;
+      ELSE
+        -- Création ou modification de la date de fin : on met à jour la table des périodes individuelles
+        paiezadTab.EXTEND ;
+        paiezadTab(paiezadTab.LAST) := v_paiezad;
+        numpacTab.EXTEND ;
+        numpacTab(numpacTab.LAST) :=v_numpac;
+      END IF;
+    END IF;
+  END AFTER EACH ROW;
+
+  AFTER STATEMENT IS BEGIN
+    IF (INSERTING OR DELETING) AND auMoinsUnPacMpe THEN
+      -- On supprime de la table DELETED_PAIEZAD les situations qui n'ont pas lieu d'y être (situations recréés avec le même PAIEZAD)
+      DELETE FROM DELETED_PAIEZAD WHERE (NUMPAC,PACMAT,CODE_CHRONO) IN (SELECT NUMPAC,PACMAT,CODE_CHRONO FROM DIC_ADM_CONTRAT_SITU);
+    END IF;
+    FOR i IN 1..numpacTab.count LOOP
+    	DBMS_JOB.SUBMIT(v_jobIdx , 'TGE_ALIM_PERIODE_INDIV(0, '''||numpacTab(i)||''', '''|| tabTrtPeriodesIndividuelles(numpacTab(i)||paiezadTab(i)) ||''', '''|| paiezadTab(i) ||''');');
+   END LOOP ;
+  END AFTER STATEMENT;
+END;
+##
+EDI_VISU_VIA_REQ
+==
+DELETE FROM EDI_VISU_VIA_REQ WHERE CODEDI = '23' AND NOMEDI ='Utilisateurs avec droits BI' AND FAMEDI = 'REQ_SEC'
+'23','Utilisateurs avec droits BI','REQ_SEC','RD_REQ_USR_DROITS_BI','Utilisateurs avec droits BI',null,'Ensemble des utilisateurs avec leurs droits BI.','XLS','O','20191029','20191029','20191029','L',null,null,null);
+##
+SYS_DEF_ERREURS
+=SQL IFEXIST=SYS_DEF_ERREURS=
+DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'TGE00348' AND CODLANG = 'fr_fr' AND CODMOD ='TGE' AND NIV_DEFINITION = 0
+##
+SYS_DEF_ERREURS
+=SQL IFEXIST=SYS_DEF_ERREURS=
+INSERT INTO SYS_DEF_ERREURS ( CODERR, CODMOD, CODLANG, NIV_DEFINITION, LIBERR, TYPERR ) VALUES ( 'TGE00348','TGE','fr_fr','0','La période de l''élément est antérieure à la profondeur maximale (MM.YYYY) # = GREATEST(DEB_HISTO_RETRO, PERIODEENCOURS - NB_MOIS_RETRO)','1' )
+##
+SYS_DEF_ERREURS
+==
+DELETE FROM SYS_DEF_ERREURS WHERE CODERR IN ('ADMPD160','ADMPD161', 'ADMPD162') AND CODLANG = 'fr_fr' AND CODMOD ='STD' and niv_definition=0
+'ADMPD160','STD','fr_fr','0','La date de suspension ne doit pas être antérieure à la limite de la rétroactivité.','1'
+'ADMPD161','STD','fr_fr','0','La situation historique modifiée est partiellement antérieure à la limite de la rétroactivité. Il est peut-être nécessaire de saisir des données de rappel pour une prise en compte en paie.','1'
+'ADMPD162','STD','fr_fr','0','La situation historique modifiée est entièrement antérieure à la limite de la rétroactivité. Il est peut-être nécessaire de saisir des données de rappel pour une prise en compte en paie.','1'
+##
+SYS_DEF_ERREURS
+==
+DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'ADMPD155' AND CODLANG = 'fr_fr' AND CODMOD ='STD'
+'ADMPD155','STD','fr_fr','0','Annulation impossible car la date de départ est antérieure à la limite de la rétroactivité.','1'
+##
+SYS_DEF_ERREURS
+==
+DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'ADMPD156' AND CODLANG = 'fr_fr' AND CODMOD ='STD'
+'ADMPD156','STD','fr_fr','0','Modification impossible car la date de départ est antérieure à la limite de la rétroactivité.','1'
+##
+SYS_DEF_ERREURS
+==
+DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'ADMPD157' AND CODLANG = 'fr_fr' AND CODMOD ='STD'
+'ADMPD157','STD','fr_fr','0','Modification impossible car la date de départ est antérieure à la date de début de contrat.','1'
+##
+SYS_DEF_ERREURS
+==
+DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'ADMPD158' AND CODLANG = 'fr_fr' AND CODMOD ='STD'
+'ADMPD158','STD','fr_fr','0','Modification impossible car la date de départ est postérieure à la date de début de la situation suivante.','1'
+##
+SYS_DEF_ERREURS
+==
+DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'ADMPD159' AND CODLANG = 'fr_fr' AND CODMOD ='STD'
+'ADMPD159','STD','fr_fr','0','Modification impossible car la date de départ est antérieure à la date d’effet de la dernière modif de contrat. ','1'
+##
+SYS_DEF_ERREURS
+==
+DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'ADMPD164' AND CODLANG = 'fr_fr' AND CODMOD ='STD'
+'ADMPD164','STD','fr_fr','0','Modification impossible car la date d''embauche est antérieure à la limite de la rétroactivité.','1'
+##
+SYS_DEF_ERREURS
+==
+DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'ADMPD165' AND CODLANG = 'fr_fr' AND CODMOD ='STD'
+'ADMPD165','STD','fr_fr','0','Modification impossible car la date d''embauche est égale à la date d''embauche initiale.','1'
+##
+SYS_DEF_ERREURS
+==
+DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'ADMPD166' AND CODLANG = 'fr_fr' AND CODMOD ='STD'
+'ADMPD166','STD','fr_fr','0','Modification impossible car la date d''embauche est postérieure à la date de début de la situation suivante.','1'
+##
+SYS_DEF_ERREURS
+==
+DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'ADMPD167' AND CODLANG = 'fr_fr' AND CODMOD ='STD'
+'ADMPD167','STD','fr_fr','0','Modification impossible car la date d''embauche est antérieure à la date de fin de la situation précédente.','1'
+##
+SYS_DEF_ERREURS
+==
+DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'ADMPD168' AND CODLANG = 'fr_fr' AND CODMOD ='STD'
+'ADMPD168','STD','fr_fr','0','Modification impossible. Merci de supprimer d''abord toutes les occurrences comprises entre le # et le #.','1'
+##
+SYS_DEF_ERREURS
+==
+DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'ADMPD169' AND CODLANG = 'fr_fr' AND CODMOD ='STD'
+'ADMPD169','STD','fr_fr','0','Modification impossible car la date d''embauche est postérieure à la date d''embauche initiale et n''est pas sur le même mois.','1'
+##
+SYS_REQUETES_JSP
+==
+delete from SYS_REQUETES_JSP where NOMPAGE='TAB_RD_NATCNT_ZAD_NPA' and IDREQUETE = '2'
+'TAB_RD_NATCNT_ZAD_NPA','2','Utilisateur','GA_ZWNATURCNT','CODE_NATURCNT,LIBELLE_LONG','CODE_NATURCNT,LIBELLE_LONG,NATCOL','NATCOL=''STA'' and UTILISE=''O''','0','false','CODE_NATURCNT',null,'Nature de contrat pour STA','Nature,Libellé'
+##
+SYS_REQUETES_JSP
+==
+DELETE SYS_REQUETES_JSP WHERE  IDREQUETE='1' AND NOMPAGE in ('REG_RD_PAC_RETRO','TAB_RD_WKF_PERIODE_EMPLOI_RETRO_FIN','TAB_RD_HOMONYMIE_TOUS_CONTRATS_AVEC_SECU_RETRO','REG_RD_WKF_PERIODE_EMPLOI_PREC', 'REG_RD_WKF_PERIODE_EMPLOI_SUIV', 'REG_RD_WKF_PERIODE_EMPLOI_EXCEPTION', 'REG_RD_WKF_LIMITE_RETRO_AUTORISE', 'REG_RD_WKF_PERIODE_EMPLOI_RETRO', 'REG_RD_WKF_PERIODE_EMPLOI_NON_PHOTO', 'REG_RD_WKF_NB_HISTO_PERIODE_EMPLOI', 'REG_RD_WKF_TEST_A001_FSED_HISTO')
+##
+SYS_REQUETES_JSP (NOMPAGE,IDREQUETE,NOMBASE,NOMTABLE,LISTCOLAFF,LISTCOLSET,CLAUSEWHERE,CLAUSEMAX,CLAUSEDISTINCT,CLAUSEORDRE,DESCREQ,LIBREQ,LISTLIBCOLAFF)
+'REG_RD_WKF_PERIODE_EMPLOI_PREC','1','Administrateur','DIC_ADM_CONTRAT_HISTO H,DIC_ADM_CONTRAT C','C.NUMCNT, TO_CHAR(C.DSDCN^''dd.MM.yyyy''), TO_CHAR(C.DSFCN^''dd.MM.yyyy''), H.ZT061, C.TYPE_REEMBAUCHE_PREV','C.NUMCNT, TO_CHAR(C.DSDCN^''dd.MM.yyyy''), TO_CHAR(C.DSFCN^''dd.MM.yyyy''), H.ZT061, C.TYPE_REEMBAUCHE_PREV','C.NUMPAC=H.NUMPAC AND H.PACMAT=C.PACMAT AND C.NUMCNT = H.NUMCNT AND NVL(C.DSFCN,TO_DATE(''31.12.2099'',''dd.MM.yyyy'')) = NVL(H.DATE_FIN,TO_DATE(''31.12.2099'',''dd.MM.yyyy''))¿AND H.MATRIC =  ''%1'' AND C.DSDCN < TO_DATE(''%2'',''dd.MM.yyyy'')','1',NULL,'C.DSFCN DESC',NULL,'Période d''emploi précédente','numéro de contrat, date début contrat, date fin contrat, nature de contrat, type de réembauche prévisionnel'
+'REG_RD_WKF_PERIODE_EMPLOI_NON_PHOTO','1','Administrateur','DIC_ADM_CONTRAT_HISTO H,DIC_ADM_CONTRAT C left join PHOTO_DIC_ADM_CONTRAT PH ON C.NUMPAC  = PH.NUMPAC¿    AND C.PACMAT = PH.PACMAT¿    AND C.NUMCNT = PH.NUMCNT','C.NUMCNT, TO_CHAR(C.DSDCN^''dd.MM.yyyy''), TO_CHAR(C.DSFCN^''dd.MM.yyyy''), H.ZT061, C.TYPE_REEMBAUCHE_PREV','C.NUMCNT, TO_CHAR(C.DSDCN^''dd.MM.yyyy''), TO_CHAR(C.DSFCN^''dd.MM.yyyy''), H.ZT061, C.TYPE_REEMBAUCHE_PREV','C.NUMPAC=H.NUMPAC AND H.PACMAT=C.PACMAT AND C.NUMCNT = H.NUMCNT AND ¿NVL(C.DSFCN,TO_DATE(''31.12.2099'',''dd.MM.yyyy'')) = NVL(H.DATE_FIN,TO_DATE(''31.12.2099'',''dd.MM.yyyy''))  AND PH.NUMPAC IS NULL AND H.MATRIC =  ''%1''','0',NULL,'C.DSDCN ASC',NULL,'Périodes d''emploi non présentes dans la photo','numéro de contrat, date début contrat, date fin contrat, nature de contrat, type de réembauche prévisionnel'
+'REG_RD_WKF_PERIODE_EMPLOI_RETRO','1','Administrateur','DIC_ADM_CONTRAT_HISTO H,DIC_ADM_CONTRAT C, TGE_REF_PAC P','C.NUMCNT, TO_CHAR(C.DSDCN^''dd.MM.yyyy''), TO_CHAR(C.DSFCN^''dd.MM.yyyy''), H.ZT061, C.TYPE_REEMBAUCHE_PREV','C.NUMCNT, TO_CHAR(C.DSDCN^''dd.MM.yyyy''), TO_CHAR(C.DSFCN^''dd.MM.yyyy''), H.ZT061, C.TYPE_REEMBAUCHE_PREV','C.NUMPAC=H.NUMPAC AND H.PACMAT=C.PACMAT AND C.NUMCNT = H.NUMCNT AND ¿NVL(C.DSFCN,TO_DATE(''31.12.2099'',''dd.MM.yyyy'')) = NVL(H.DATE_FIN,TO_DATE(''31.12.2099'',''dd.MM.yyyy'')) AND P.NUMPAC = C.NUMPAC AND  P.DEB_HISTO_RETRO IS NOT NULL AND P.NB_MOIS_RETRO IS NOT NULL AND C.DSDCN >= TO_DATE(GREATEST(DEB_HISTO_RETRO, TO_CHAR(ADD_MONTHS(TO_DATE(PERIODEENCOURS, ''YYYYMM''), -NB_MOIS_RETRO), ''YYYYMM'')) || ''01'', ''YYYYMMDD'') AND H.MATRIC =  ''%1''','0',NULL,'C.DSDCN ASC',NULL,'Périodes d''emploi dont la date d''embauche est incluse dans la profondeur de rétro','numéro de contrat, date début contrat, date fin contrat, nature de contrat, type de réembauche prévisionnel'
+'REG_RD_WKF_LIMITE_RETRO_AUTORISE','1','Administrateur','TGE_REF_PAC','GREATEST(DEB_HISTO_RETRO^ TO_CHAR(ADD_MONTHS(TO_DATE(PERIODEENCOURS^ ''YYYYMM'')^ -NB_MOIS_RETRO)^ ''YYYYMM''))','GREATEST(DEB_HISTO_RETRO^ TO_CHAR(ADD_MONTHS(TO_DATE(PERIODEENCOURS^ ''YYYYMM'')^ -NB_MOIS_RETRO)^ ''YYYYMM''))','DEB_HISTO_RETRO IS NOT NULL AND NB_MOIS_RETRO IS NOT NULL AND NUMPAC = ''%1''','1',NULL,NULL,NULL,'Rechercher la limite de la rétro autorisée','Début rétro autorisée'
+'REG_RD_WKF_PERIODE_EMPLOI_SUIV','1','Administrateur','DIC_ADM_CONTRAT_HISTO H,DIC_ADM_CONTRAT C','C.NUMCNT, TO_CHAR(C.DSDCN^''dd.MM.yyyy''), TO_CHAR(C.DSFCN^''dd.MM.yyyy''), H.ZT061, C.TYPE_REEMBAUCHE_PREV','C.NUMCNT, TO_CHAR(C.DSDCN^''dd.MM.yyyy''), TO_CHAR(C.DSFCN^''dd.MM.yyyy''), H.ZT061, C.TYPE_REEMBAUCHE_PREV','C.NUMPAC=H.NUMPAC AND H.PACMAT=C.PACMAT AND C.NUMCNT = H.NUMCNT AND NVL(C.DSFCN,TO_DATE(''31.12.2099'',''dd.MM.yyyy'')) = NVL(H.DATE_FIN,TO_DATE(''31.12.2099'',''dd.MM.yyyy''))¿AND H.MATRIC =  ''%1'' AND C.DSDCN > TO_DATE(''%2'',''dd.MM.yyyy'')','1',NULL,'C.DSDCN ASC',NULL,'Période d''emploi suivante','numéro de contrat, date début contrat, date fin contrat, nature de contrat, type de réembauche prévisionnel'
+'REG_RD_WKF_NB_HISTO_PERIODE_EMPLOI','1','Administrateur','DIC_ADM_CONTRAT_HISTO','COUNT(*)','COUNT(*)','NUMPAC = ''%1'' AND PACMAT = ''%2'' AND NUMCNT = ''%3''','1',NULL,NULL,NULL,'Compte les historiques de contrat','nombre historique'
+'REG_RD_WKF_TEST_A001_FSED_HISTO','1','Administrateur','DIF_FSED_HISTO','ELEM','ELEM','ELEM = ''A001'' AND CODEOP = ''C'' AND NUMPAC = ''%1'' AND PACMAT = ''%2'' AND PAIEZAD = ''%3'' AND PERIODE < ''%4''','1',NULL,NULL,NULL,'Test la présence de A001 dans DIF_FSED_HISTO','element'
+'REG_RD_WKF_PERIODE_EMPLOI_EXCEPTION','1','Administrateur','DIC_ADM_CONTRAT_HISTO H,DIC_ADM_CONTRAT C','C.NUMCNT, TO_CHAR(C.DSDCN^''dd.MM.yyyy''), TO_CHAR(C.DSFCN^''dd.MM.yyyy''), H.ZT061, C.TYPE_REEMBAUCHE_PREV','C.NUMCNT, TO_CHAR(C.DSDCN^''dd.MM.yyyy''), TO_CHAR(C.DSFCN^''dd.MM.yyyy''), H.ZT061, C.TYPE_REEMBAUCHE_PREV','C.NUMPAC=H.NUMPAC AND H.PACMAT=C.PACMAT AND C.NUMCNT = H.NUMCNT AND H.MATRIC =  ''%1''  AND NVL(C.DSFCN,TO_DATE(''31.12.2099'',''dd.MM.yyyy'')) = NVL(H.DATE_FIN,TO_DATE(''31.12.2099'',''dd.MM.yyyy'')) AND ((C.DSDCN < TO_DATE(''%2'',''dd.MM.yyyy'') AND NVL(C.DSFCN, TO_DATE(''31.12.2099'',''dd.MM.yyyy'')) > TO_DATE(''%3'',''dd.MM.yyyy'')) OR (C.DSDCN >= TO_DATE(''%2'',''dd.MM.yyyy'') AND NVL(C.DSFCN, TO_DATE(''31.12.2099'',''dd.MM.yyyy'')) <= TO_DATE(''%3'',''dd.MM.yyyy'')))','1',NULL,'C.DSDCN ASC',NULL,'Wkf insertion période d''emploi exception','numéro de contrat, date début contrat, date fin contrat, nature de contrat, type de réembauche prévisionnel'
+'TAB_RD_HOMONYMIE_TOUS_CONTRATS_AVEC_SECU_RETRO','1','Utilisateur','DIC_ADM_PERSO P LEFT OUTER JOIN DIC_ADM_CONTRAT C ON C.MATRIC=P.MATRIC inner join DIC_ADM_CONTRAT_HISTO H on C.NUMPAC=H.NUMPAC AND H.PACMAT=C.PACMAT AND C.NUMCNT = H.NUMCNT AND H.DATE_EFF =  (select max(date_eff) from dic_adm_contrat_histo where NUMPAC= h.NUMPAC and PACMAT= h.PACMAT and NUMCNT= h.NUMCNT) inner join TGE_REF_PAC PAC on PAC.NUMPAC = C.NUMPAC left join PHOTO_DIC_ADM_CONTRAT PH ON C.NUMPAC  = PH.NUMPAC¿    AND C.PACMAT = PH.PACMAT¿    AND C.NUMCNT = PH.NUMCNT','C.NUMCNT, TO_CHAR(C.DSDCN^''dd.MM.yyyy''), TO_CHAR(C.DSFCN^''dd.MM.yyyy''), H.ZT061, C.TYPE_REEMBAUCHE_PREV','C.NUMCNT,C.DSDCN,C.DSFCN,H.ZT061,C.TYPE_REEMBAUCHE_PREV','(C.NUMCNT IS NULL OR (C.NUMCNT IS NOT NULL AND (C.NUMPAC,C.PACMAT) IN (SELECT NUMPAC,PACMAT FROM SECUPACMAT WHERE @SECUPACMAT_SANSQUOTE@)))  AND P.MATRIC = ''@GEN_MATRIC@'' AND  (¿(PH.NUMPAC IS NULL AND (PAC.DEB_RETRO IS NULL OR PAC.PERIODEENCOURS < PAC.DEB_RETRO)) ¿OR C.DSDCN >= TO_DATE(GREATEST(NVL(PAC.DEB_HISTO_RETRO,''209912''), TO_CHAR(ADD_MONTHS(TO_DATE(NVL(PAC.PERIODEENCOURS,''209912''), ''YYYYMM''), -NVL(PAC.NB_MOIS_RETRO,0)), ''YYYYMM''))|| ''01'', ''YYYYMMDD'') ¿)','0',NULL,'C.DSDCN',NULL,'Périodes d''emploi dont la date d''embauche est incluse dans la profondeur de rétro.','numéro de contrat, date début contrat, date fin contrat, nature de contrat, type de réembauche prévisionnel'
+'TAB_RD_WKF_PERIODE_EMPLOI_RETRO_FIN','1','Administrateur','DIC_ADM_CONTRAT_HISTO H,DIC_ADM_CONTRAT C, TGE_REF_PAC P, TGE_REF_TDR T','C.NUMCNT, TO_CHAR(C.DSDCN^''dd.MM.yyyy''), TO_CHAR(C.DSFCN^''dd.MM.yyyy''), H.ZT061, C.TYPE_REEMBAUCHE_PREV','C.NUMCNT, TO_CHAR(C.DSDCN^''dd.MM.yyyy''), TO_CHAR(C.DSFCN^''dd.MM.yyyy''), H.ZT061, C.TYPE_REEMBAUCHE_PREV','C.DSFCN IS NOT NULL AND C.NUMPAC=H.NUMPAC AND H.PACMAT=C.PACMAT AND C.NUMCNT = H.NUMCNT AND ¿NVL(C.DSFCN,TO_DATE(''31.12.2099'',''dd.MM.yyyy'')) = NVL(H.DATE_FIN,TO_DATE(''31.12.2099'',''dd.MM.yyyy'')) AND P.NUMPAC = C.NUMPAC AND  P.DEB_HISTO_RETRO IS NOT NULL AND P.NB_MOIS_RETRO IS NOT NULL AND NVL(C.DSFCN,TO_DATE(''31.12.2099'',''dd.MM.yyyy'')) >= TO_DATE(GREATEST(DEB_HISTO_RETRO, TO_CHAR(ADD_MONTHS(TO_DATE(PERIODEENCOURS, ''YYYYMM''), -NB_MOIS_RETRO), ''YYYYMM'')) || ''01'', ''YYYYMMDD'') AND C.TYPE_REEMBAUCHE_PREV = T.TYPE_REEMBAUCHE AND C.NUMPAC = T.NUMPAC AND T.CONSECUTIVE = ''N'' AND H.MATRIC =  ''@GEN_MATRIC@''','0','false','C.DSDCN ASC',NULL,'Périodes d''emploi dont la date de départ est incluse dans la profondeur de rétro ','numéro de contrat, date début contrat, date fin contrat, nature de contrat, type de réembauche prévisionnel'
+'REG_RD_PAC_RETRO','1','Administrateur','TGE_REF_PAC','DEB_HISTO_RETRO,NB_MOIS_RETRO','DEB_HISTO_RETRO,NB_MOIS_RETRO','DEB_HISTO_RETRO IS NOT NULL AND NB_MOIS_RETRO IS NOT NULL AND NUMPAC = ''%1''','0',NULL,NULL,NULL,'Récupération PAC rétro',NULL
+##
+TGE_DONNEES_PAIE
+=SQL IFEXIST=TGE_DONNEES_PAIE=NO_SEQUENCE=
+ALTER TABLE TGE_DONNEES_PAIE MODIFY NO_SEQUENCE NUMBER(4,0)
+##
+TGE_REF_BOE
+=SQL IFNOTEXIST=TGE_REF_BOE=
+CREATE TABLE TGE_REF_BOE (CODE_STATUT_BOETH VARCHAR2(2) NOT NULL ENABLE, LIBELLE_STATUT_BOETH_1 VARCHAR2(32), LIBELLE_STATUT_BOETH_2 VARCHAR2(32),PRIMARY KEY(CODE_STATUT_BOETH))
+##
+TGE_REF_CCN
+=SQL IFNOTEXIST=TGE_REF_CCN=
+CREATE TABLE TGE_REF_CCN (CODE_COLLEGE_CNIEG VARCHAR2(2) NOT NULL ENABLE, LIBELLE_COLLEGE_CNIEG VARCHAR2(32), PRIMARY KEY(CODE_COLLEGE_CNIEG) ) 
+##
+TGE_REF_DIS
+=SQL IFNOTEXIST=TGE_REF_DIS=
+CREATE TABLE TGE_REF_DIS (CODE_CPLT_DISPOSITIF VARCHAR2(2) NOT NULL ENABLE, LIBELLE_CPLT_DISPOSITIF VARCHAR2(32), PRIMARY KEY(CODE_CPLT_DISPOSITIF) )
+##
+TGE_REF_FOR
+=SQL IFNOTEXIST=TGE_REF_FOR=
+CREATE TABLE TGE_REF_FOR (CODE_NIV_FORM VARCHAR2(2) NOT NULL ENABLE, LIBELLE_NIV_FORM VARCHAR2(32) , PRIMARY KEY ( CODE_NIV_FORM ) )
+##
+TAG_CHARSET=@€éèç
+##
+TGE_REF_MAPDO_DTEFF_RETRO
+=SQL IFNOTEXIST=TGE_REF_MAPDO_DTEFF_RETRO=
+CREATE TABLE TGE_REF_MAPDO_DTEFF_RETRO (NUMPAC VARCHAR2(6),ELEMENT VARCHAR2(4),CLAUSE_DATE_EFF_RETRO VARCHAR2(1000),PRIMARY KEY(NUMPAC,ELEMENT))		 
+##
+TGE_REF_MAPDO_DTEFF_RETRO
+==
+DELETE TGE_REF_MAPDO_DTEFF_RETRO WHERE NUMPAC = '*' AND ELEMENT in ('A301','A302','A962','A309','A701','AA82','Q188','WL57','Q974','Q184','Q185','Q269','B071','Q283','A305','S379','Q199','S381','Q277','Q693','S380','S382','Q278','Q279','B168','B092','B093')
+##
+TGE_REF_MAPDO_DTEFF_RETRO (NUMPAC,ELEMENT,CLAUSE_DATE_EFF_RETRO)
+'*','A301','V_DE_SSAAMM_TMP := TO_CHAR(LEAST( NVL(:NEW.DSA301,:OLD.DSA301), NVL(:OLD.DSA301,:NEW.DSA301) ),''YYYYMM'')'
+'*','A302','V_DE_SSAAMM_TMP := TO_CHAR(LEAST( NVL(:NEW.DSA301,:OLD.DSA301), NVL(:OLD.DSA301,:NEW.DSA301) ),''YYYYMM'')'
+'*','A962','V_DE_SSAAMM_TMP := TO_CHAR(LEAST( NVL(:NEW.DSA301,:OLD.DSA301), NVL(:OLD.DSA301,:NEW.DSA301) ),''YYYYMM'')'
+'*','A309','V_DE_SSAAMM_TMP := TO_CHAR(LEAST( NVL(:NEW.DSFCN,:OLD.DSFCN), NVL(:OLD.DSFCN,:NEW.DSFCN) ),''YYYYMM'')'
+'*','A701','SELECT TO_CHAR(MIN(dac.DSFCN),''YYYYMM'') INTO V_DE_SSAAMM_TMP FROM DIC_ADM_CONTRAT dac WHERE dac.NUMPAC = NVL(:NEW.NUMPAC,:OLD.NUMPAC) AND dac.PACMAT = NVL(:NEW.PACMAT,:OLD.PACMAT) AND dac.NUMCNT = NVL(:NEW.NUMCNT,:OLD.NUMCNT)'
+'*','AA82','SELECT TO_CHAR(MIN(dac.DSFCN),''YYYYMM'') INTO V_DE_SSAAMM_TMP FROM DIC_ADM_CONTRAT dac WHERE dac.NUMPAC = NVL(:NEW.NUMPAC,:OLD.NUMPAC) AND dac.PACMAT = NVL(:NEW.PACMAT,:OLD.PACMAT) AND dac.NUMCNT = NVL(:NEW.NUMCNT,:OLD.NUMCNT)'
+'*','Q188','SELECT TO_CHAR(MIN(dac.DSFCN),''YYYYMM'') INTO V_DE_SSAAMM_TMP FROM DIC_ADM_CONTRAT dac WHERE dac.NUMPAC = NVL(:NEW.NUMPAC,:OLD.NUMPAC) AND dac.PACMAT = NVL(:NEW.PACMAT,:OLD.PACMAT) AND dac.NUMCNT = NVL(:NEW.NUMCNT,:OLD.NUMCNT)'
+'*','WL57','SELECT TO_CHAR(MIN(dac.DSFCN),''YYYYMM'') INTO V_DE_SSAAMM_TMP FROM DIC_ADM_CONTRAT dac WHERE dac.NUMPAC = NVL(:NEW.NUMPAC,:OLD.NUMPAC) AND dac.PACMAT = NVL(:NEW.PACMAT,:OLD.PACMAT) AND dac.NUMCNT = NVL(:NEW.NUMCNT,:OLD.NUMCNT)'
+'*','Q974','SELECT TO_CHAR(MIN(dac.DSFCN),''YYYYMM'') INTO V_DE_SSAAMM_TMP FROM DIC_ADM_CONTRAT dac WHERE dac.NUMPAC = NVL(:NEW.NUMPAC,:OLD.NUMPAC) AND dac.PACMAT = NVL(:NEW.PACMAT,:OLD.PACMAT) AND dac.NUMCNT = NVL(:NEW.NUMCNT,:OLD.NUMCNT)'
+'*','Q184','SELECT TO_CHAR(MIN(dac.DSFCN),''YYYYMM'') INTO V_DE_SSAAMM_TMP FROM DIC_ADM_CONTRAT dac WHERE dac.NUMPAC = NVL(:NEW.NUMPAC,:OLD.NUMPAC) AND dac.PACMAT = NVL(:NEW.PACMAT,:OLD.PACMAT) AND dac.NUMCNT = NVL(:NEW.NUMCNT,:OLD.NUMCNT)'
+'*','Q185','SELECT TO_CHAR(MIN(dac.DSFCN),''YYYYMM'') INTO V_DE_SSAAMM_TMP FROM DIC_ADM_CONTRAT dac WHERE dac.NUMPAC = NVL(:NEW.NUMPAC,:OLD.NUMPAC) AND dac.PACMAT = NVL(:NEW.PACMAT,:OLD.PACMAT) AND dac.NUMCNT = NVL(:NEW.NUMCNT,:OLD.NUMCNT)'
+'*','Q269','SELECT TO_CHAR(MIN(dac.DSFCN),''YYYYMM'') INTO V_DE_SSAAMM_TMP FROM DIC_ADM_CONTRAT dac WHERE dac.NUMPAC = NVL(:NEW.NUMPAC,:OLD.NUMPAC) AND dac.PACMAT = NVL(:NEW.PACMAT,:OLD.PACMAT) AND dac.NUMCNT = NVL(:NEW.NUMCNT,:OLD.NUMCNT)'
+'*','B071','SELECT TO_CHAR(MIN(dac.DSFCN),''YYYYMM'') INTO V_DE_SSAAMM_TMP FROM DIC_ADM_CONTRAT dac WHERE dac.NUMPAC = NVL(:NEW.NUMPAC,:OLD.NUMPAC) AND dac.PACMAT = NVL(:NEW.PACMAT,:OLD.PACMAT) AND dac.NUMCNT = NVL(:NEW.NUMCNT,:OLD.NUMCNT)'
+'*','Q283','SELECT TO_CHAR(MIN(dac.DSFCN),''YYYYMM'') INTO V_DE_SSAAMM_TMP FROM DIC_ADM_CONTRAT dac WHERE dac.NUMPAC = NVL(:NEW.NUMPAC,:OLD.NUMPAC) AND dac.PACMAT = NVL(:NEW.PACMAT,:OLD.PACMAT) AND dac.NUMCNT = NVL(:NEW.NUMCNT,:OLD.NUMCNT)'
+'*','A305','V_DE_SSAAMM_TMP := TO_CHAR(LEAST( NVL(:NEW.DSFCN,:OLD.DSFCN), NVL(:OLD.DSFCN,:NEW.DSFCN) ),''YYYYMM'')'
+'*','S379','SELECT TO_CHAR(MIN(dac.DSFCN),''YYYYMM'') INTO V_DE_SSAAMM_TMP FROM DIC_ADM_CONTRAT dac WHERE dac.NUMPAC = NVL(:NEW.NUMPAC,:OLD.NUMPAC) AND dac.PACMAT = NVL(:NEW.PACMAT,:OLD.PACMAT) AND dac.NUMCNT = NVL(:NEW.NUMCNT,:OLD.NUMCNT)'
+'*','Q199','SELECT TO_CHAR(MIN(dac.DSFCN),''YYYYMM'') INTO V_DE_SSAAMM_TMP FROM DIC_ADM_CONTRAT dac WHERE dac.NUMPAC = NVL(:NEW.NUMPAC,:OLD.NUMPAC) AND dac.PACMAT = NVL(:NEW.PACMAT,:OLD.PACMAT) AND dac.NUMCNT = NVL(:NEW.NUMCNT,:OLD.NUMCNT)'
+'*','S381','SELECT TO_CHAR(MIN(dac.DSFCN),''YYYYMM'') INTO V_DE_SSAAMM_TMP FROM DIC_ADM_CONTRAT dac WHERE dac.NUMPAC = NVL(:NEW.NUMPAC,:OLD.NUMPAC) AND dac.PACMAT = NVL(:NEW.PACMAT,:OLD.PACMAT) AND dac.NUMCNT = NVL(:NEW.NUMCNT,:OLD.NUMCNT)'
+'*','Q277','SELECT TO_CHAR(MIN(dac.DSFCN),''YYYYMM'') INTO V_DE_SSAAMM_TMP FROM DIC_ADM_CONTRAT dac WHERE dac.NUMPAC = NVL(:NEW.NUMPAC,:OLD.NUMPAC) AND dac.PACMAT = NVL(:NEW.PACMAT,:OLD.PACMAT) AND dac.NUMCNT = NVL(:NEW.NUMCNT,:OLD.NUMCNT)'
+'*','Q693','SELECT TO_CHAR(MIN(dac.DSFCN),''YYYYMM'') INTO V_DE_SSAAMM_TMP FROM DIC_ADM_CONTRAT dac WHERE dac.NUMPAC = NVL(:NEW.NUMPAC,:OLD.NUMPAC) AND dac.PACMAT = NVL(:NEW.PACMAT,:OLD.PACMAT) AND dac.NUMCNT = NVL(:NEW.NUMCNT,:OLD.NUMCNT)'
+'*','S380','SELECT TO_CHAR(MIN(dac.DSFCN),''YYYYMM'') INTO V_DE_SSAAMM_TMP FROM DIC_ADM_CONTRAT dac WHERE dac.NUMPAC = NVL(:NEW.NUMPAC,:OLD.NUMPAC) AND dac.PACMAT = NVL(:NEW.PACMAT,:OLD.PACMAT) AND dac.NUMCNT = NVL(:NEW.NUMCNT,:OLD.NUMCNT)'
+'*','S382','SELECT TO_CHAR(MIN(dac.DSFCN),''YYYYMM'') INTO V_DE_SSAAMM_TMP FROM DIC_ADM_CONTRAT dac WHERE dac.NUMPAC = NVL(:NEW.NUMPAC,:OLD.NUMPAC) AND dac.PACMAT = NVL(:NEW.PACMAT,:OLD.PACMAT) AND dac.NUMCNT = NVL(:NEW.NUMCNT,:OLD.NUMCNT)'
+'*','Q278','SELECT TO_CHAR(MIN(dac.DSFCN),''YYYYMM'') INTO V_DE_SSAAMM_TMP FROM DIC_ADM_CONTRAT dac WHERE dac.NUMPAC = NVL(:NEW.NUMPAC,:OLD.NUMPAC) AND dac.PACMAT = NVL(:NEW.PACMAT,:OLD.PACMAT) AND dac.NUMCNT = NVL(:NEW.NUMCNT,:OLD.NUMCNT)'
+'*','Q279','SELECT TO_CHAR(MIN(dac.DSFCN),''YYYYMM'') INTO V_DE_SSAAMM_TMP FROM DIC_ADM_CONTRAT dac WHERE dac.NUMPAC = NVL(:NEW.NUMPAC,:OLD.NUMPAC) AND dac.PACMAT = NVL(:NEW.PACMAT,:OLD.PACMAT) AND dac.NUMCNT = NVL(:NEW.NUMCNT,:OLD.NUMCNT)'
+'*','B168','SELECT TO_CHAR(MIN(dac.DSFCN),''YYYYMM'') INTO V_DE_SSAAMM_TMP FROM DIC_ADM_CONTRAT dac WHERE dac.NUMPAC = NVL(:NEW.NUMPAC,:OLD.NUMPAC) AND dac.PACMAT = NVL(:NEW.PACMAT,:OLD.PACMAT) AND dac.NUMCNT = NVL(:NEW.NUMCNT,:OLD.NUMCNT)'
+'*','B092','SELECT TO_CHAR(MIN(dac.DSFCN),''YYYYMM'') INTO V_DE_SSAAMM_TMP FROM DIC_ADM_CONTRAT dac WHERE dac.NUMPAC = NVL(:NEW.NUMPAC,:OLD.NUMPAC) AND dac.PACMAT = NVL(:NEW.PACMAT,:OLD.PACMAT) AND dac.NUMCNT = NVL(:NEW.NUMCNT,:OLD.NUMCNT)'
+'*','B093','SELECT TO_CHAR(MIN(dac.DSFCN),''YYYYMM'') INTO V_DE_SSAAMM_TMP FROM DIC_ADM_CONTRAT dac WHERE dac.NUMPAC = NVL(:NEW.NUMPAC,:OLD.NUMPAC) AND dac.PACMAT = NVL(:NEW.PACMAT,:OLD.PACMAT) AND dac.NUMCNT = NVL(:NEW.NUMCNT,:OLD.NUMCNT)'
+##
+TGE_REF_SER
+=SQL IFNOTEXIST=TGE_REF_SER=
+CREATE TABLE TGE_REF_SER (CODE_CATEG_SERVICE VARCHAR2(2) NOT NULL ENABLE, LIBELLE_CATEG_SERVICE VARCHAR2(32), PRIMARY KEY (CODE_CATEG_SERVICE) )
+##
+TGE_REF_TDR
+=SQL=
+update  TGE_REF_TDR set CODE_NATURCNT = null  where TYPE_REEMBAUCHE in ('08','09')

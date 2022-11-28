@@ -1,0 +1,6 @@
+##
+TAG_CHARSET=@€ιθη
+##
+SIGN_TYPEDOC_DGP
+=IF_ROW_NOTEXIST=
+'H', 'OTHER_HR', 'Divers RH'

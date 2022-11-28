@@ -1,0 +1,38 @@
+##
+TAG_CHARSET=@€ιθη
+##
+SYS_GRAPH_PARAM
+=SQL IFNOTEXIST=SYS_GRAPH_PARAM=MODELE=
+alter table sys_graph_param add MODELE varchar2(1) default '1'
+##
+SYS_GRAPH_PARAM
+=SQL IFEXIST=SYS_GRAPH_PARAM=
+DELETE FROM sys_graph_param WHERE id in (24,25,26)
+##
+SYS_GRAPH_PARAM
+=SQL IFEXIST=SYS_GRAPH_PARAM=
+insert into sys_graph_param (ID, ID_TYPE_GRAPH, REQUETE, TITRE, PAGE_ASSOCIE, PARAMS, CODERR) values ('24','8','select  count(distinct login) as AXEX,  to_char(to_date(FIRST_CONNEXION,''YYYYMMDDHH24MISS''),''HH24'')||''h00-''|| to_char(to_date(FIRST_CONNEXION,''YYYYMMDDHH24MISS''),''HH24'')||''h59'' as AXEY  FROM SYS_USR_CONNEX_HISTO WHERE  substr(FIRST_CONNEXION,0,8)= to_char(sysdate,''YYYYMMDD'') and LOGIN like(''%%'')  group by to_char(to_date(FIRST_CONNEXION,''YYYYMMDDHH24MISS''),''HH24''),substr(FIRST_CONNEXION,0,8)  order by to_number(to_char(to_date(FIRST_CONNEXION,''YYYYMMDDHH24MISS''),''HH24'')) asc','ExempleLine01',NULL,'axeX=AXEX;axeY=AXEY;codeColorList=YELLOWS;orderby=NO;showLabelX=true;showLabelY=true;',NULL)
+##
+SYS_GRAPH_PARAM
+=SQL IFEXIST=SYS_GRAPH_PARAM=
+insert into sys_graph_param (ID, ID_TYPE_GRAPH, REQUETE, TITRE, PAGE_ASSOCIE, PARAMS, CODERR) values ('25','8','select * from ( select to_char(LIBELLEAXEX,''YYYYMM'') as cOrder, to_char(LIBELLEAXEX,''MM.YYYY'') as LIBELLEAXEX, count(*) AS DATA1 from ( select dos_num, trunc(to_date(date_recept,''yyyymmddhh24miss''),''mm'') as LIBELLEAXEX from wkf_tracabilite t1 where trace_num=(select min(trace_num) from wkf_tracabilite t2 where t2.dos_num=t1.dos_num) and exists (select 1 from wkf_tracabilite t2 where t2.dos_num=t1.dos_num and not t2.trace_num=t1.trace_num) and dos_finished=''true'') group by LIBELLEAXEX order by cOrder desc) where rownum <=12','ExempleLine02',NULL,'libelleAxeX=LIBELLEAXEX;data1=DATA1;listOfColumnLine=DATA1;codeColorList=LINE;orderby=NO;showLabelX=true;showLabelY=true;',NULL)
+##
+SYS_GRAPH_PARAM
+=SQL IFEXIST=SYS_GRAPH_PARAM=
+insert into sys_graph_param (ID, ID_TYPE_GRAPH, REQUETE, TITRE, PAGE_ASSOCIE, PARAMS, CODERR) values ('26','8','SELECT * FROM  (SELECT TO_CHAR(LIBELLEAXEX,''YYYYMM'') AS cOrder, TO_CHAR(LIBELLEAXEX,''MM.YYYY'')      AS LIBELLEAXEX,SUM( CASE codsta When 1 THEN 1 ELSE 0 END )                            AS DATA1, SUM( CASE codsta When 2 THEN 1 ELSE 0 END )                            AS DATA2, SUM( CASE codsta When 3 THEN 1 ELSE 0 END )                            AS DATA3 , SUM( CASE codsta When 6 THEN 1 ELSE 0 END )                            AS DATA4  , SUM( CASE codsta When 10 THEN 1 ELSE 0 END )  AS DATA5 FROM ( sELECT codfiche,TRUNC(to_date(datemodif,''yyyymmdd''),''mm'') AS LIBELLEAXEX, codsta FROM HELPDESK_FICHE t1 ) GROUP BY LIBELLEAXEX ORDER BY cOrder DESC ) WHERE rownum <=12','ExempleLine03',NULL,'libelleAxeX=LIBELLEAXEX;data1=DATA1;data2=DATA2;data3=DATA3;listOfColumnLine=DATA1,DATA2,DATA3;codeColorList=LINE;orderby=NO;showLabelX=true;showLabelY=true;',NULL)
+##
+SYS_GRAPH_PARAM
+=SQL IFNOTEXIST=SYS_GRAPH_PARAM=GRAPH_LOADER_CLASS=
+alter table SYS_GRAPH_PARAM ADD GRAPH_LOADER_CLASS VARCHAR2(900)
+##
+SYS_GRAPH_PARAM
+=SQL IFNOTEXIST=SYS_GRAPH_PARAM=HIDE_ON_FAIL=
+alter table SYS_GRAPH_PARAM ADD HIDE_ON_FAIL VARCHAR2(1)
+##
+SYS_GRAPH_PARAM
+==
+DELETE FROM SYS_GRAPH_PARAM WHERE ID IN ('110')
+##
+SYS_GRAPH_PARAM
+=SQL IFEXIST=SYS_GRAPH_PARAM=
+insert into sys_graph_param (ID, ID_TYPE_GRAPH, REQUETE, TITRE, PAGE_ASSOCIE,CODERR, PARAMS,GRAPH_LOADER_CLASS,HIDE_ON_FAIL,MODELE) values ('110','1','SELECT count(codfiche) as angle, HELPDESK_FICHE.CODSTA as code, libsta as libelle from HELPDESK_FICHE, HELPDESK_STATUT where HELPDESK_FICHE.CODSTA = HELPDESK_STATUT.CODSTA AND _@SECUUSERHELPDESK@_ group by  HELPDESK_FICHE.CODSTA,libsta','Demandes Helpdesk par statut','Modules/HelpDesk/HelpDesk_modale.jsp?Double=2020&FSTATUT=',NULL,'angleField=angle;labelField=libelle;codeColorList=LARGELIST;codeFilter=CODE;fieldNumberFormat=0;mandatoryFilter=false;orderby=NO',NULL,NULL,1)

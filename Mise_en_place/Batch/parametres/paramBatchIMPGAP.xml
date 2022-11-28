@@ -1,0 +1,13 @@
+<interface idInterface="IMPGAP">
+	<nomInterface>IMPGAP</nomInterface>
+	<descriptionInterface>Import GAP (specif)</descriptionInterface>
+	<traitements>
+		<traitement>
+			<descriptionTraitement>IMPGAP</descriptionTraitement>
+			<typeTraitement>TraitementClient</typeTraitement>
+			<classTraitement>fr.adp.com.gxp.std.modules.lib.specif.importgap.Traitement_ImportGap</classTraitement>
+			<modeDebug>true</modeDebug>
+			<continueSiErreur>OUI</continueSiErreur>
+		</traitement>
+	</traitements>
+</interface>

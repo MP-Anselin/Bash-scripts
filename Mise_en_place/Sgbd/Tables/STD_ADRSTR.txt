@@ -1,0 +1,6 @@
+##
+TAG_CHARSET=@€ιθη
+##
+NIV1
+=SQL IFEXIST=STD_ADRSTR=
+drop table STD_ADRSTR

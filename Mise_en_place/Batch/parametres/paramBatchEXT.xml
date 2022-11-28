@@ -1,0 +1,18 @@
+<interface idInterface="EXTLIBRE">
+	<nomInterface>Chargement extractions libres</nomInterface>
+	<descriptionInterface></descriptionInterface>
+	<alerteSiFichierNonDisponible>OUI</alerteSiFichierNonDisponible>
+	<listeDependancesFichiers>
+		<nomFichierDep>EXTLIBRE.TXT</nomFichierDep>
+	</listeDependancesFichiers>
+	<traitements>
+		<traitement>
+			<descriptionTraitement>Chargement des donnees</descriptionTraitement>
+			<typeTraitement>CHARGEMENT</typeTraitement>
+			<nbcommit>1000</nbcommit>
+			<nomFichier>EXTLIBRE.TXT</nomFichier>
+			<typeFichier>MAJBASE</typeFichier>
+			<modeChargement>AER</modeChargement>
+		</traitement>
+	</traitements>
+</interface>

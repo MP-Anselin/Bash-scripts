@@ -1,0 +1,27 @@
+##
+GET_GXP_TRT_PARTICULIER_DATAS
+=SQL=
+CREATE OR REPLACE FUNCTION GET_GXP_TRT_PARTICULIER_DATAS(nom_table IN VARCHAR2,code_element IN VARCHAR2 DEFAULT NULL) RETURN GXP_TRT_PARTICULIER_DATAS AS 
+  p_retour GXP_TRT_PARTICULIER_DATAS := GXP_TRT_PARTICULIER_DATAS();
+  regexpPattern VARCHAR2(20) := '\$TABLE\.[A-Z0-9_]+';
+  nbDonnees INTEGER;
+BEGIN
+ FOR r IN (SELECT DISTINCT NUMPAC,TRTPARTICULIER FROM TGE_REF_MAPDO WHERE TRTPARTICULIER LIKE '%$TABLE%' AND ELEMENT=NVL(code_element,ELEMENT) AND  TABLEGXP IN
+      (SELECT tableparam
+      FROM tge_ref_mapta
+      WHERE tablephy = nom_table
+        --RSI DIT 39298 MPE : Fonction d'envoi inconditionnel pour la table TGE_OPTION_REPORT
+        --Ajout du type 'I'
+      AND allerretour IN ('A','2','I')
+      )ORDER BY TRTPARTICULIER)
+  LOOP
+  	nbDonnees := REGEXP_COUNT(r.TRTPARTICULIER, regexpPattern, 1);
+    -- On boucle autant de fois qu’il y a de données
+    FOR i IN 1 .. nbDonnees LOOP
+	   	p_retour.extend;
+	   	 -- On récupère la i-ème donnée (et on supprime au passage les 8 premiers caractères correspondant à "$TABLE.")
+	  	p_retour(p_retour.count) := GXP_TRT_PARTICULIER_DATA(r.NUMPAC,SUBSTR(REGEXP_SUBSTR(r.TRTPARTICULIER, regexpPattern, 1, i), 8));
+    END LOOP;
+  END LOOP;
+  RETURN p_retour;
+END GET_GXP_TRT_PARTICULIER_DATAS;

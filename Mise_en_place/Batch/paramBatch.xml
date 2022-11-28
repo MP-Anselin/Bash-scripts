@@ -1,0 +1,58 @@
+<CLIENTS>
+  <client idClient="RD">
+    <nomClient>RD</nomClient>
+    <environnements>
+      <env idEnv="P">
+        <nomEnvironnement>RD</nomEnvironnement>
+        <SGBD_URL>XXX</SGBD_URL>
+        <SGBD_user>XXX</SGBD_user>
+        <SGBD_password>XXX</SGBD_password>
+        <SGBD_decryptage>NON</SGBD_decryptage>
+        <DocumentSecurityFolder>/ehc/fs1/adp/adplink/adplink_ic/domain1/GxpFiles/DSF/</DocumentSecurityFolder>
+        <repGxpFiles>/ehc/fs1/adp/adplink/adplink_ic/domain1/GxpFiles</repGxpFiles>
+        <repertoireDepotContainer>/ehc/fs1/adp/share/Container</repertoireDepotContainer>
+        <activeLog>false</activeLog>
+        <docserv3Url>XXX</docserv3Url>
+		<docserv2Url>XXX</docserv2Url>
+      </env>
+      <!--
+      <env idEnv="GESTIL-P">
+        <nomEnvironnement></nomEnvironnement>
+        <SGBD_URL></SGBD_URL>
+        <SGBD_user></SGBD_user>
+        <SGBD_password></SGBD_password>
+        <SGBD_decryptage>NON</SGBD_decryptage>
+        <DocumentSecurityFolder>/ehc/fs1/adp/adplink/adplink_ic/domain1/GxpFiles/DSF/</DocumentSecurityFolder>
+      </env>
+      -->
+    </environnements>
+    <mail>
+      <ServeurSMTP>smtp-dc1.ehc.adp.com</ServeurSMTP>
+      <PortSMTP>25</PortSMTP>
+      <MailFrom>support.lx7158@adp.com</MailFrom>
+      <listedestinataire></listedestinataire>
+      <listecopie></listecopie>
+      <typeEnvoie>toujours</typeEnvoie>
+    </mail>
+    <!--
+    <dumaFileNas>/ehc/fs1/adp/share/dumaFile</dumaFileNas>
+    <dumaFileCidToken></dumaFileCidToken>
+    <dumaPac></dumaPac>
+    <bHubbleNas>/ehc/fs1/adp/share/bHubble</bHubbleNas>
+    -->
+    <attente>
+      <tempsControleTraitement>1</tempsControleTraitement>
+      <tempsAttenteTraitement>60</tempsAttenteTraitement>
+    </attente>
+    <purge>
+      <NbFichierConservationLog>20</NbFichierConservationLog>
+      <NbFichierConservationFichier>2</NbFichierConservationFichier>
+    </purge>
+    <RepertoireFichierCommande>/ehc/fs1/adp/adplink/adplink_ic/domain1/GxpFiles/batch/</RepertoireFichierCommande>
+    <exe>
+      <sqlldr>/ehc/fs1/softs/app/oracle/product/12.2.0/bin/sqlldr</sqlldr>
+    </exe>
+    <aceNas>/ehc/fs1/adp/share/acegxp</aceNas>
+    <market_place_url>XXX</market_place_url>
+  </client>
+</CLIENTS>

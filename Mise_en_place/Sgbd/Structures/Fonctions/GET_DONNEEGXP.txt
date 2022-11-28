@@ -1,0 +1,41 @@
+##
+TAG_CHARSET=@€éèç
+##
+GET_DONNEEGXP
+=SQL=
+create or replace FUNCTION GET_DONNEEGXP(pElement VARCHAR2 , pNumpac VARCHAR2, pMatric VARCHAR2 , pacmat VARCHAR2, numcnt VARCHAR2) RETURN VARCHAR2 AS 
+donnee_GXP VARCHAR2(30);
+table_GXP VARCHAR2(30);
+valeur VARCHAR2(50);
+v_requete CLOB;
+
+BEGIN
+
+  BEGIN
+    SELECT donneegxp, tablegxp into donnee_GXP
+        , table_GXP 
+        FROM tge_ref_mapdo
+        WHERE element = pElement
+        AND numpac    =pNumpac;
+  EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        -- Pas trouvé pour le NUMPAC passé en paramètre, on recherche pour NUMPAC='*'
+        BEGIN
+          SELECT DONNEEGXP , TABLEGXP INTO donnee_GXP, table_GXP  FROM TGE_REF_MAPDO WHERE NUMPAC='*' AND ELEMENT=pElement;
+        EXCEPTION
+          WHEN OTHERS THEN
+            RETURN NULL;
+        END;
+      WHEN OTHERS THEN
+        RETURN NULL;
+    END; 
+    v_requete:= 'select '|| donnee_GXP ||  ' from ' || table_GXP || ' where numpac=''' || pNumpac || ''' and matric= '''||pMatric || ''' and pacmat= '''|| pacmat ||''' and numcnt='''||numcnt||''''; 
+    
+begin
+  execute immediate v_requete into valeur;
+   EXCEPTION
+          WHEN OTHERS THEN
+            RETURN NULL;
+ END;
+  RETURN valeur;
+END GET_DONNEEGXP;

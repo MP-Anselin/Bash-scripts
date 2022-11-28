@@ -1,0 +1,28 @@
+##
+TAG_CHARSET=@€éèç
+##
+SYS_AIDE_DYN_2
+=SQL IFNOTEXIST=SYS_AIDE_DYN_2=LAST_EDIT=
+alter table SYS_AIDE_DYN_2 add LAST_EDIT DATE DEFAULT SYSDATE
+##
+SYS_AIDE_DYN_2_SAVE
+=SQL IFEXIST=SYS_AIDE_DYN_2_SAVE=
+drop table SYS_AIDE_DYN_2_SAVE
+##
+SYS_AIDE_DYN_2_SAVE
+=SQL IFNOTEXIST=SYS_AIDE_DYN_2_SAVE=
+create table SYS_AIDE_DYN_2_SAVE as (select * from SYS_AIDE_DYN_2)
+##
+SYS_AIDE_DYN_2
+=SQL IFEXIST=SYS_AIDE_DYN_2=
+delete from SYS_AIDE_DYN_2 where SUJET not in (select upper(NOM_PAGE) from SYS_SCH_ELEMENT where NOM_PAGE is not null)
+##
+SYS_AIDE_DYN_2
+==
+delete from SYS_AIDE_DYN_2 where sujet = upper('Ext.adp.Modules.Signature.SuiviDocumentsEtSignatures') and CODLANG = 'fr_fr' and type='publique'
+'fr_fr','EXT.ADP.MODULES.SIGNATURE.SUIVIDOCUMENTSETSIGNATURES','<h3>Filtres</h3>La liste des signataires proposée dans le filtre est constituée à partir de la liste des procédures de signature électronique restituée dans le tableau.<br><br><h3>Boutons de tableau<br></h3>Le bouton "AFFICHER" met à jour le statut d''édition. Il ne génère pas d''appel à Document Container.<br><br>Le bouton "LANCER / RELANCER LES PROCéDURES SÉLÉCTIONNÉES" lance dans Document Container les procédures sélectionnées du tableau, c''est-à-dire pour lesquelles la fusée a été activée.<br><br>Le bouton "RAFRAÎCHIR LES STATUTS" génère un appel en masse à Container afin de mettre à jour le statut pour toutes les procédures de signature électronique en cours.<br><br>L''export au format Excel des données du tableau peut être lancé grâce à l''icône Excel dans une feuille.<br><br><h3>Fonctionnement de l''écran<br></h3>Après qu''une édition avec signature électronique a été lancée, une ligne est ajoutée dans l''écran. <br><br>Quand l''édition est terminée et que l''option de modification avant envoi n''est pas active, <br>la procédure de signature électronique est automatiquement lancée à Document Container. <br><br>Quand l''édition est terminée et que l''option de modification avant envoi est active, <br>le document est téléchargeable pour modification avant son chargement par l''utilisateur au format PDF. <br>Le document chargé devra avoir le même nom que le document d''origine à l''extension près. <br>Cela garantit que le document est en relation avec la procédure initiée.<br>L''utilisateur devra ensuite lancer manuellement la procédure.<br><br>Avec les icônes de chaque ligne de gauche à droite, l''utilisateur peut respectivement : <br>- annuler la procédure, <br>- télécharger le document, <br>- charger un document modifié, <br>- consulter le détail de la procédure, <br>- modifier un signataire <br>- et sélectionner la procédure pour lancement.<br>','publique','2020-11-17 18:28:22.0'
+##
+SYS_AIDE_DYN_2
+==
+delete from SYS_AIDE_DYN_2 where sujet = upper('Ext.adp.Modules.Signature.SuiviDocumentsEtSignaturesAdmin') and CODLANG = 'fr_fr' and type='publique'
+'fr_fr','EXT.ADP.MODULES.SIGNATURE.SUIVIDOCUMENTSETSIGNATURESADMIN','<h3>Filtres</h3>La liste des signataires proposée dans le filtre est constituée à partir de la liste des procédures de signature électronique restituée dans le tableau.<br><br><h3>Boutons de tableau<br></h3>Le bouton "AFFICHER" met à jour le statut d''édition. Il ne génère pas d''appel à Document Container.<br><br>Le bouton "LANCER / RELANCER LES PROCéDURES SÉLÉCTIONNÉES" lance dans Document Container les procédures sélectionnées du tableau, c''est-à-dire pour lesquelles la fusée a été activée.<br><br>Le bouton "RAFRAÎCHIR LES STATUTS" génère un appel en masse à Container afin de mettre à jour le statut pour toutes les procédures de signature électronique en cours.<br><br>L''export au format Excel des données du tableau peut être lancé grâce à l''icône Excel dans une feuille.<br><br><h3>Fonctionnement de l''écran<br></h3>Après qu''une édition avec signature électronique a été lancée, une ligne est ajoutée dans l''écran. <br><br>Quand l''édition est terminée et que l''option de modification avant envoi n''est pas active, <br>la procédure de signature électronique est automatiquement lancée à Document Container. <br><br>Quand l''édition est terminée et que l''option de modification avant envoi est active, <br>le document est téléchargeable pour modification avant son chargement par l''utilisateur au format PDF. <br>Le document chargé devra avoir le même nom que le document d''origine à l''extension près. <br>Cela garantit que le document est en relation avec la procédure initiée.<br>L''utilisateur devra ensuite lancer manuellement la procédure.<br><br>Avec les icônes de chaque ligne de gauche à droite, l''utilisateur peut respectivement : <br>- annuler la procédure, <br>- télécharger le document, <br>- charger un document modifié, <br>- consulter le détail de la procédure, <br>- modifier un signataire <br>- et sélectionner la procédure pour lancement.<br>','publique','2020-11-17 18:28:22.0'

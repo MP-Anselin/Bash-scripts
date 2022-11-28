@@ -1,0 +1,173 @@
+##
+GEST_MATRIC_INSCRI_RECYCL
+=SQL=
+CREATE OR REPLACE FORCE VIEW GEST_MATRIC_INSCRI_RECYCL (
+  NOM,
+  PRENOM,
+  NUMPAC,
+  PACMAT,
+  PAIEZAD,
+  LIST_LOGIN,
+  DATEMAJ,
+  MODIF_OU_INSCRIT
+) AS
+SELECT
+  T2.NOM,
+  T2.PRENOM,
+  T2.NUMPAC,
+  T2.PACMAT,
+  T2.PAIEZAD,
+  T2.LIST_LOGIN,
+  CASE
+    T2.MODIF_OU_INSCRIT
+    WHEN 'M' THEN NULL
+    ELSE GREATEST (
+      NVL(
+        (
+          SELECT
+            MAX(TO_CHAR(DATE_MAJ, 'yyyymmddHH24MISS')) AS DATEMAJ
+          FROM
+            TGE_MODIF_PACMAT_TORESEND TOR
+          WHERE
+            TOR.NUMPAC = T2.NUMPAC
+            AND TOR.PACMAT = T2.PACMAT
+        ),
+        '19000101010100'
+      ),
+      NVL(
+        (
+          SELECT
+            MAX(DATE_MAJ) || '00' AS DATEMAJ
+          FROM
+            TGE_ELEMENTS_PAIE TEP
+          WHERE
+            TEP.NUMPAC = T2.NUMPAC
+            AND TEP.PAIEZAD = T2.PAIEZAD
+        ),
+        '19000101010100'
+      ),
+      NVL(
+        (
+          SELECT
+            MAX(DATE_MAJ) || '00' AS DATEMAJ
+          FROM
+            TGE_IMPUTATIONS TUP
+          WHERE
+            TUP.NUMPAC = T2.NUMPAC
+            AND TUP.PAIEZAD = T2.PAIEZAD
+        ),
+        '19000101010100'
+      ),
+      NVL(
+        (
+          SELECT
+            MAX(TO_CHAR(DATE_MAJ, 'yyyymmddHH24MISS')) AS DATEMAJ
+          FROM
+            TGE_INCIDENTS_PAIE TIP
+          WHERE
+            TIP.NUMPAC = T2.NUMPAC
+            AND TIP.PAIEZAD = T2.PAIEZAD
+        ),
+        '19000101010100'
+      ),
+      NVL(
+        (
+          SELECT
+            MAX(DATE_MAJ) || '00' AS DATEMAJ
+          FROM
+            TGE_DONNEES_PAIE TDP
+          WHERE
+            TDP.NUMPAC = T2.NUMPAC
+            AND TDP.PAIEZAD = T2.PAIEZAD
+        ),
+        '19000101010100'
+      )
+    )
+  END DATEMAJ,
+  T2.MODIF_OU_INSCRIT
+FROM
+  (
+    SELECT
+      SEC.NOM,
+      SEC.PRENOM,
+      SEC.NUMPAC AS NUMPAC,
+      SEC.PACMAT AS PACMAT,
+      DICADM.CURRENT_PAIEZAD AS PAIEZAD,
+      T1.LIST_LOGIN || CASE
+        WHEN GAP1.PACMAT IS NOT NULL
+        AND INSTR(T1.LIST_LOGIN, '__AUTOMATIC__') = 0 THEN ', __AUTOMATIC__'
+        ELSE ''
+      END AS LIST_LOGIN,
+      MODIF_OU_INSCRIT || CASE
+        WHEN GAP1.PACMAT IS NOT NULL THEN 'A'
+        ELSE ''
+      END AS MODIF_OU_INSCRIT
+    FROM
+      (
+        SELECT
+          DISTINCT SELMAT2.NUMPAC,
+          SELMAT2.PACMAT,
+          (
+            SELECT
+              LISTAGG(SELMAT1.LOGIN, ',') WITHIN GROUP(
+                ORDER BY
+                  SELMAT1.LOGIN
+              )
+            FROM
+              (
+                SELECT
+                  NUMPAC,
+                  PACMAT,
+                  CASE
+                    WHEN PRENOM IS NOT NULL
+                    AND NOM IS NOT NULL THEN PRENOM || ' ' || NOM || '(' || GAP_SELECTION_PACMAT.LOGIN || ')'
+                    ELSE GAP_SELECTION_PACMAT.LOGIN
+                  END AS LOGIN,
+                  GAP_SELECTION_PACMAT.NOMTRAITEMENT
+                FROM
+                  GAP_SELECTION_PACMAT
+                  LEFT JOIN SYS_USR_CONFIG_IHM ON SYS_USR_CONFIG_IHM.LOGIN = GAP_SELECTION_PACMAT.LOGIN
+                WHERE
+                  GAP_SELECTION_PACMAT.NOMTRAITEMENT = 'RECYCLAG'
+              ) SELMAT1
+            WHERE
+              SELMAT1.NUMPAC = SELMAT2.NUMPAC
+              AND SELMAT1.PACMAT = SELMAT2.PACMAT
+              AND SELMAT1.NOMTRAITEMENT = 'RECYCLAG'
+          ) AS LIST_LOGIN,
+          'M' AS MODIF_OU_INSCRIT
+        FROM
+          GAP_SELECTION_PACMAT SELMAT2
+        WHERE
+          SELMAT2.NOMTRAITEMENT = 'RECYCLAG'
+        UNION
+        ALL
+        SELECT
+          NUMPAC,
+          PACMAT,
+          '__AUTOMATIC__' AS LOGIN,
+          'A' AS MODIF_OU_INSCRIT
+        FROM
+          GAP_RECYCL_MATRIC
+        WHERE
+          (
+            GAP_RECYCL_MATRIC.NUMPAC,
+            GAP_RECYCL_MATRIC.PACMAT
+          ) NOT IN (
+            SELECT
+              SELMAT3.NUMPAC,
+              SELMAT3.PACMAT
+            FROM
+              GAP_SELECTION_PACMAT SELMAT3
+            WHERE
+              SELMAT3.NOMTRAITEMENT = 'RECYCLAG'
+          )
+      ) T1
+      LEFT JOIN GAP_RECYCL_MATRIC GAP1 ON GAP1.NUMPAC = T1.NUMPAC
+      AND GAP1.PACMAT = T1.PACMAT
+      INNER JOIN SECUPACMAT SEC ON SEC.NUMPAC = T1.NUMPAC
+      AND SEC.PACMAT = T1.PACMAT
+      INNER JOIN DIC_ADM_CONTRAT DICADM ON DICADM.NUMCNT = SEC.CURRENT_NUMCNT
+      AND DICADM.NUMPAC = SEC.NUMPAC
+      AND DICADM.PACMAT = SEC.PACMAT
+  ) T2

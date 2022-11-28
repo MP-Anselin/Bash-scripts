@@ -1,0 +1,6 @@
+##
+TAG_CHARSET=@€ιθη		 
+##
+TGE_REF_PRE
+=SQL IFEXIST=TGE_REF_PRE=
+update tge_ref_pre set theme_cpt ='' where numpac='*' and code_incident in ('CP','J2','J3','J4')

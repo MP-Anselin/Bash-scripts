@@ -1,0 +1,1699 @@
+##
+TAG_CHARSET=@€éèç
+##
+GA_CVCOLL
+=SQL IFNOTEXIST=GA_CVCOLL=idccCodes_EL=
+ALTER TABLE GA_CVCOLL ADD idccCodes_EL VARCHAR2(1)
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'N'
+##
+GA_CVCOLL
+==
+delete from GA_CVCOLL WHERE CODE = '1297'
+'1297',	'Audiovisuel : secteur public','N'
+##
+GA_CVCOLL
+==
+delete from GA_CVCOLL WHERE CODE = '1675'
+'1675',	'Agences télégraphiques','N'
+##
+GA_CVCOLL
+==
+delete from GA_CVCOLL WHERE CODE = '1797'	
+'1797',	'Métallurgie : Somme','N'
+##
+GA_CVCOLL
+==
+delete from GA_CVCOLL WHERE CODE = '2162'	
+'2162',	'Photographie','N'
+##
+GA_CVCOLL
+==
+delete from GA_CVCOLL WHERE CODE = '3204'	
+'3204',	'Bâtiment et Travaux publics : Guyane (ingénieurs et cadres)','N'
+##
+GA_CVCOLL
+==
+delete from GA_CVCOLL WHERE CODE = '3209'
+'3209',	'Métallurgie : Doubs','N'
+##
+GA_CVCOLL
+==
+delete from GA_CVCOLL WHERE CODE = '3212'
+'3212',	'Travaux publics : cadres','N'
+##
+GA_CVCOLL
+==
+delete from GA_CVCOLL WHERE CODE = '3213'
+'3213',	'Métreurs-vérificateurs','N'
+##
+GA_CVCOLL
+==
+delete from GA_CVCOLL WHERE CODE = '3216'
+'3216',	'Matériaux de construction : négoce','N'
+##
+GA_CVCOLL
+==
+delete from GA_CVCOLL WHERE CODE = '3217'
+'3217',	'Transport ferroviaire et activités associées','N'
+##
+GA_CVCOLL
+==
+delete from GA_CVCOLL WHERE CODE = '3218'
+'3218',	'Enseignement privé non lucratif (EPNL)','N'
+##
+GA_CVCOLL
+==
+delete from GA_CVCOLL WHERE CODE = '3219'
+'3219',	'Portage salarial','N'
+##
+GA_CVCOLL
+==
+delete from GA_CVCOLL WHERE CODE = '3220'
+'3220',	'Habitat : offices publics','N'
+##
+GA_CVCOLL
+==
+delete from GA_CVCOLL WHERE CODE = '3221'
+'3221',	'Presse : agences','N'
+##
+GA_CVCOLL
+==
+delete from GA_CVCOLL WHERE CODE = '3224'
+'3224',	'Papiers-cartons : distribution et commerce de gros (CCN unique)','N'
+##
+GA_CVCOLL
+==
+delete from GA_CVCOLL WHERE CODE = '3225'
+'3225',	'Presse magazine : éditeurs','N' 
+##
+GA_CVCOLL
+==
+delete from GA_CVCOLL WHERE CODE = '3227'
+'3227',	'Chaux (industries de la fabrication de la) (nouvelle CCN)','N'
+##
+GA_CVCOLL
+==
+delete from GA_CVCOLL WHERE CODE = '7015'
+'7015',	'Gardes-chasse et gardes-pêche particuliers','N'
+##
+GA_CVCOLL
+==
+delete from GA_CVCOLL WHERE CODE = '7020'
+'7020',	'Associations de gestion et de comptabilité : réseau CERFRANCE','N'
+##
+GA_CVCOLL
+==
+delete from GA_CVCOLL WHERE CODE = '7023'
+'7023',	'Déshydratation : entreprises agricoles','N'
+##
+GA_CVCOLL
+==
+delete from GA_CVCOLL WHERE CODE = '7520'
+'7520',	'Enseignement privé agricole','N'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0003'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0016'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0018'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0029'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0043'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0044'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0045'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0054'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0083'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0086'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0087'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0112'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0135'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0158'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0176'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0184'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0200'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0207'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0211'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0240'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0247'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0275'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0292'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0303'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0354'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0363'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0379'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0405'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0413'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0418'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0454'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0468'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0478'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0489'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0493'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0500'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0538'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0539'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0567'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0573'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0575'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0614'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0625'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0635'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0637'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0650'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0669'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0673'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0675'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0693'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0698'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0700'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0706'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0711'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0714'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0715'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0716'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0731'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0733'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0735'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0749'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0759'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0771'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0781'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0783'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0787'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0800'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0804'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0814'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0822'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0827'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0828'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0829'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0832'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0833'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0836'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0843'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0860'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0863'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0878'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0887'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0889'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0894'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0897'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0898'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0899'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0901'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0911'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0914'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0915'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0923'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0930'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0934'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0937'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0943'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0948'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0953'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0959'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0965'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0979'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0984'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0992'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='0993'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1000'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1007'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1016'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1017'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1031'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1043'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1044'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1059'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1060'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1077'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1090'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1147'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1159'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1170'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1182'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1194'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1202'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1240'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1256'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1257'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1261'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1266'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1267'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1274'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1276'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1278'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1285'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1286'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1297'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1307'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1311'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1314'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1315'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1316'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1341'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1343'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1351'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1353'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1365'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1369'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1384'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1385'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1387'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1388'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1391'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1394'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1396'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1404'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1405'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1406'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1408'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1411'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1412'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1413'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1415'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1423'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1424'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1431'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1472'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1480'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1483'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1486'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1487'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1492'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1499'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1501'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1504'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1505'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1512'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1513'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1516'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1517'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1518'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1525'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1527'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1534'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1536'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1539'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1543'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1555'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1557'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1558'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1560'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1561'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1563'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1564'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1572'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1576'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1577'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1578'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1580'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1586'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1588'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1589'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1592'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1596'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1597'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1604'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1605'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1606'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1607'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1611'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1618'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1619'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1621'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1626'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1627'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1628'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1631'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1634'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1635'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1659'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1671'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1672'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1675'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1679'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1686'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1702'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1710'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1732'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1734'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1747'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1760'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1790'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1794'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1797'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1800'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1801'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1809'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1813'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1821'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1850'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1867'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1874'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1875'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1880'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1885'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1895'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1902'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1909'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1912'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1921'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1922'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1930'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1938'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1942'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1944'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1947'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1951'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1960'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1966'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1967'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1970'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1974'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1978'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1979'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1982'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1987'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='1996'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2002'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2003'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2021'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2025'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2046'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2060'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2070'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2075'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2089'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2098'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2104'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2111'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2120'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2121'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2126'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2128'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2147'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2148'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2149'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2150'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2156'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2162'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2174'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2190'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2198'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2205'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2216'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2219'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2221'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2230'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2247'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2250'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2257'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2264'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2266'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2272'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2294'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2328'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2329'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2332'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2335'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2336'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2344'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2372'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2397'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2411'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2412'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2420'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2489'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2494'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2511'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2526'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2528'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2542'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2543'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2564'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2579'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2583'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2596'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2609'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2614'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2615'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2630'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2642'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2666'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2683'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2691'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2697'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2700'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2706'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2717'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2728'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2755'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2770'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2785'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2870'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2931'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2941'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2972'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='2992'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='3013'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='3016'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='3017'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='3032'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='3043'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='3053'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='3090'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='3097'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='3107'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='3109'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='3127'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='3128'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='3144'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='3160'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='3203'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='3204'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='3205'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='3209'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='3212'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='3213'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='3216'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='3217'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='3218'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='3219'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='3220'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='3221'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='3224'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='3225'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='3227'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='5507'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='7001'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='7002'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='7003'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='7004'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='7005'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='7006'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='7007'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='7008'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='7009'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='7010'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='7012'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='7013'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='7014'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='7015'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='7017'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='7018'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='7019'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='7020'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='7021'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='7023'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='7501'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='7503'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='7509'
+##
+GA_CVCOLL
+==
+UPDATE GA_CVCOLL SET idccCodes_EL = 'O' where CODE='7520'

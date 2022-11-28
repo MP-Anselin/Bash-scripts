@@ -1,0 +1,17 @@
+<interface idInterface="MIGRATIONDOCSERV3">
+	<nomInterface>InterfaceMigrationDocumentDocserv3</nomInterface>
+	<descriptionInterface>
+		migration docserv 3
+	</descriptionInterface>
+	<traitements>	
+		<traitement>
+			<descriptionTraitement>migre les paragraphes docserv2 vers docserv3</descriptionTraitement>
+			<typeTraitement>InterfaceMigrationDocumentDocserv3</typeTraitement>
+			<modeDebug>false</modeDebug>
+			<versionTraitement>V1</versionTraitement>
+			<activerMail>OUI</activerMail>
+			<multiThreadPosting>NON</multiThreadPosting>
+			<continueSiErreur>OUI</continueSiErreur>
+		</traitement>
+	</traitements>
+</interface>

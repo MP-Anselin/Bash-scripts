@@ -1,0 +1,94 @@
+##
+TAG_CHARSET=@€éèç
+TAG_IMPORT=5.05.004.R024
+##
+DEX_PARTENAIRES
+=SQL IFEXIST=DEX_PARTENAIRES=ID_PARTENAIRE=
+ALTER TABLE DEX_PARTENAIRES MODIFY (ID_PARTENAIRE VARCHAR2(50))		 
+##
+DEX_SECU_DATA
+=SQL IFEXIST=DEX_SECU_DATA=ID_PARTENAIRE=
+ALTER TABLE DEX_SECU_DATA MODIFY (ID_PARTENAIRE VARCHAR2(50))		 
+##
+TAG_CHARSET=@€éèç
+##
+SYS_SEC_RESOLUE_POP_REQ
+=SQL IFEXIST=SYS_SEC_RESOLUE_POP_REQ=LOGIN=
+ALTER TABLE SYS_SEC_RESOLUE_POP_REQ MODIFY (LOGIN VARCHAR2(50))		 
+##
+UX_DATA (NOM_DONNEE_UX,LIBELLE_DONNEE_UX,REGROUPEMENT)
+==
+DELETE FROM UX_DATA WHERE NOM_DONNEE_UX IN ('apprenticeContractNumber','coefficient','workerTypeCode', 'ReasonCode', 'occupationalClassificationField','occupationalClassificationFamily','occupationalClassificationProfession','seniorityDate','lotPermanent','MotifTempsPartiel','TypeReembauche','workArrangementCode','fullTimeEquivalenceRatio','standardHours','standardPayPeriodHours','expectedTerminationDate','initialCddTerminationDate','contratProStartDate','contratProEndDate','intershipAgreementDate','apprenticeContractStartDate','endProbationDate','occupationalEntryDate','dateEntryCompany','recoursReason','gtaCode','admSituation','apprenticeContractDurationCode','probationPeriod','managementPositionIndicator','occupationalCategory','echelonLevel','CPNCode','inseeCode','PCSComplement','collectiveAgreement','additionalRemuneration','additionalRemunerationFood','additionalRemunerationTransport','additionalRemunerationAccomodation','additionalRemunerationNTIC','additionalRemunerationOther','MSACatStatus','matriculeReprise','tpsPartielCotisTxPlein','niveauFormation','diplomePlusEleveObtenu','situationAvantContrat','natureExoPro','categorieSalarieAbattementFraisPro','couvertureATStagParEcole','exoTaxeTransport','alsaceMoselle','RAZPourcentageImpositionCICE','txEmploiAide','txTransportEtab','pourcentageImpositionCICE')
+'workerTypeCode','Type',null
+'ReasonCode','Motif d''embauche',null
+'occupationalClassificationField','Filière',null
+'occupationalClassificationFamily','Famille',null
+'occupationalClassificationProfession','Métier',null
+'seniorityDate','Date de début d''ancienneté',null
+'lotPermanent','Lot permanent',null
+'MotifTempsPartiel','Motif temps partiel',null
+'TypeReembauche','Type de réembauche',null
+'apprenticeContractNumber','Numéro de contrat d''apprentissage',null
+'coefficient','Coefficient',null
+'workArrangementCode','Code OTT',null
+'fullTimeEquivalenceRatio','Taux d''activité',null
+'standardHours','Horaire de présence',null
+'standardPayPeriodHours','Horaire de rémunération',null
+'expectedTerminationDate','Date de fin prévue',null
+'initialCddTerminationDate','Date de fin initiale de CDD',null
+'contratProStartDate','Date de début contrat de profes.',null
+'contratProEndDate','Date de fin contrat de profes.',null
+'intershipAgreementDate','Date signature de la convention de stage',null
+'apprenticeContractStartDate','Date de début d''apprentissage',null
+'endProbationDate','Date de fin période d''essai',null
+'occupationalEntryDate','Date d''entrée dans la prof.',null
+'dateEntryCompany','Date d''entrée société',null
+'recoursReason','Motif de recours',null
+'gtaCode','Code gestion des temps',null
+'admSituation','Situation administrative',null
+'apprenticeContractDurationCode','Code durée apprentissage',null
+'probationPeriod','Période d''essai',null
+'managementPositionIndicator','Statut cadre ',null
+'occupationalCategory','Catégorie professionnelle',null
+'echelonLevel','Niveau échelon',null
+'CPNCode','Code CPN',null
+'inseeCode','Code INSEE',null
+'PCSComplement','Complément PCS',null
+'collectiveAgreement','Convention collective',null
+'additionalRemuneration','Complément salaire',null
+'additionalRemunerationFood','Nourriture',null
+'additionalRemunerationTransport','Véhicule',null
+'additionalRemunerationAccomodation','Logement',null
+'additionalRemunerationNTIC','NTIC',null
+'additionalRemunerationOther','Autre',null
+'MSACatStatus','Statut catégoriel MSA',null
+'matriculeReprise','Matricule de reprise',null
+'tpsPartielCotisTxPlein','Temps partiel cotisant à taux plein',null
+'niveauFormation','Niveau de formation',null
+'diplomePlusEleveObtenu','Diplôme le plus élevé obtenu',null
+'situationAvantContrat','Situation avant contrat',null
+'natureExoPro','Nature exonération professionnelle',null
+'categorieSalarieAbattementFraisPro','Catégorie salarié avec abattement frais prof.',null
+'couvertureATStagParEcole','Couverture AT stagiaire par école',null
+'exoTaxeTransport','Exonération de la taxe de transport',null
+'alsaceMoselle','Alsace-Moselle Salarié',null
+'RAZPourcentageImpositionCICE','Option RAZ pourcentage d''imposition CICE',null
+'txEmploiAide','Taux d''emploi aidé',null
+'txTransportEtab','Taux transport de l''établissement',null
+'pourcentageImpositionCICE','Pourcentage d''imposition CICE',null
+##
+UX_DATA (NOM_DONNEE_UX,LIBELLE_DONNEE_UX,REGROUPEMENT)
+==
+DELETE FROM UX_DATA WHERE NOM_DONNEE_UX IN ('workerLegalProvIdAnnee','workerLegalProvIdCle','workerLegalProvIdDepartement','workerLegalProvIdMois','workerLegalProvIdOrdre','workerLegalProvIdSecteur','workerLegalProvIdSexe')
+##
+UX_DATA (NOM_DONNEE_UX,LIBELLE_DONNEE_UX,REGROUPEMENT)
+==
+DELETE FROM UX_DATA WHERE NOM_DONNEE_UX IN ('workerLegalIdDefPro','workerLegalIdProvAnnee','workerLegalIdProvCle','workerLegalIdProvDepartement','workerLegalIdProvMois','workerLegalIdProvOrdre','workerLegalIdProvSecteur','workerLegalIdProvSexe')
+'workerLegalIdDefPro','n° SS def / prov',null
+'workerLegalIdProvAnnee','n° SS Annee provisoire',null
+'workerLegalIdProvCle','n° SS Clé provisoire',null
+'workerLegalIdProvDepartement','n° SS Département provisoire',null
+'workerLegalIdProvMois','n° SS Mois provisoire',null
+'workerLegalIdProvOrdre','n° SS Ordre provisoire',null
+'workerLegalIdProvSecteur','n° SS Secteur provisoire',null
+'workerLegalIdProvSexe','n° SS Sexe provisoire',null

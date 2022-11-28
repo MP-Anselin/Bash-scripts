@@ -1,0 +1,16 @@
+##
+TAG_CHARSET=@€éèç
+##
+TGE_GTA_ABS_STATUTS
+==
+DELETE FROM TGE_GTA_ABS_STATUTS WHERE code='L' 
+'L','Marqué comme étant supprimé',null,'1','0','0','#f47b19','17',null	
+##
+TGE_GTA_ABS_STATUTS
+=SQL=
+update TGE_GTA_ABS_STATUTS set EST_INITIALE = '1' where code = 'F'
+##
+TGE_GTA_ABS_STATUTS
+==
+DELETE FROM TGE_GTA_ABS_STATUTS WHERE code='I' 
+'I','A justifier ultérieurement','Validation expert, justificatif à fournir ultérieurement','1','1','1','#fcac6b','10','PENDING'

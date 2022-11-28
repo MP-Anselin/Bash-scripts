@@ -1,0 +1,18 @@
+##
+TRACE_DBMS_OUTPUT
+=SQL=
+CREATE OR REPLACE PROCEDURE trace_dbms_output(
+  p_call_name  IN VARCHAR2, -- nom de la procédure/fonction
+  p_output_msg IN VARCHAR2) -- le message à sauver
+AS
+  PRAGMA AUTONOMOUS_TRANSACTION;
+  v_debug_mode BOOLEAN:=FALSE; -- ON / OFF sur l'activation du traçage
+BEGIN
+  IF (v_debug_mode = TRUE) THEN
+    -- sauver le message dans la table TRACE_DBMS_OUTPUT_PUT_LINE
+    INSERT INTO trace_dbms_output_put_line(date_trace, call_name, output_msg)
+     VALUES (CURRENT_TIMESTAMP, p_call_name, p_output_msg); COMMIT;
+  END IF;
+EXCEPTION WHEN OTHERS THEN
+  raise_application_error(-20000, 'TRACE_DBMS_OUTPUT(' || p_call_name || ', ' || p_output_msg || '). Cause: ' || SQLCODE || '-' || sqlerrm);
+END trace_dbms_output;

@@ -1,0 +1,665 @@
+##
+TAG_CHARSET=@€éèç
+##
+META_AT_IMPACT_ERREURS_PARAMETRAGES
+=SQL=
+BEGIN
+  EXECUTE_IMMEDIATE_STRING('DROP MATERIALIZED VIEW "META_AT_IMPACT_ERREURS_PARAMETRAGES"',0);
+EXCEPTION WHEN OTHERS THEN NULL;
+END;
+##
+META_AT_IMPACT_ERREURS_PARAMETRAGES
+=SQL=
+CREATE MATERIALIZED VIEW "META_AT_IMPACT_ERREURS_PARAMETRAGES" ("DATE_MAJ", "NIVEAU_GRAVITE", "TYPE_OBJET", "NOM_OBJET", "MSG_ERREURS", "ERREUR")
+BUILD IMMEDIATE
+USING INDEX 
+REFRESH FORCE ON DEMAND START WITH sysdate+5/1400 NEXT SYSDATE + 1
+AS 
+  WITH liensdonneesgroupes_trav (
+    company_id,
+    id_groupe,
+    id_groupe_fils,
+    nom_donnee,
+    infos_diverses,
+    chemin,
+    ordre
+  ) AS (
+    SELECT
+      gd.company_id,
+      gd.id_groupe,
+      case when gd.nom_donnee like '#GROUPE%' then gd.suffixe_ou_libelle else '' end id_groupe_fils,
+      case when gd.nom_donnee not like '#GROUPE%' then gd.nom_donnee else '' end nom_donnee,
+      gd.TABLEAU_REQUETE_NOMPAGE || ';' || gd.TABLEAU_REQUETE_IDREQUETE || ';' || gd.NOM_PAGE_AJOUT || ';' || gd.NOM_PAGE_MODIF,
+      '' chemin,
+      LPAD(gd.ordre, 4, '0') ordre
+    FROM
+      ref_groupe_donnees gd
+    UNION ALL
+    SELECT
+      l_parent.company_id,
+      l_parent.id_groupe,
+      case when gd.nom_donnee like '#GROUPE%' then gd.suffixe_ou_libelle else '' end id_groupe_fils,
+      case when gd.nom_donnee not like '#GROUPE%' then gd.nom_donnee else '' end nom_donnee,
+      gd.TABLEAU_REQUETE_NOMPAGE || ';' || gd.TABLEAU_REQUETE_IDREQUETE || ';' || gd.NOM_PAGE_AJOUT || ';' || gd.NOM_PAGE_MODIF,
+      chemin || '/' || l_parent.id_groupe_fils chemin,
+      l_parent.ordre || LPAD(gd.ordre, 4, '0') ordre
+    FROM 
+      liensdonneesgroupes_trav l_parent
+      inner join ref_groupe_donnees gd on gd.company_id=l_parent.company_id and gd.id_groupe=l_parent.id_groupe_fils    
+  ),
+  liensdonneesgroupes (
+    company_id,
+    id_groupe,
+    id_groupe_fils,
+    nom_donnee,
+    infos_diverses,
+    chemin,
+    ordre
+  ) as (
+    select 
+      company_id, 
+      id_groupe, 
+      id_groupe_fils, 
+      nom_donnee, 
+      infos_diverses, 
+      nvl(chemin, id_groupe) chemin, 
+      ROW_NUMBER() OVER (PARTITION BY company_id, id_groupe ORDER BY ordre) ordre
+    from 
+      liensdonneesgroupes_trav
+    WHERE 
+      nom_donnee is not null
+  ),
+  liensdonneesgroupesSansMiseEnForme (
+    company_id,
+    id_groupe,
+    id_groupe_fils,
+    nom_donnee,
+    infos_diverses,
+    chemin,
+    ordre
+  ) as (
+    select 
+      company_id, 
+      id_groupe, 
+      id_groupe_fils, 
+      nom_donnee, 
+      infos_diverses, 
+      nvl(chemin, id_groupe) chemin, 
+      ROW_NUMBER() OVER (PARTITION BY company_id, id_groupe ORDER BY ordre) ordre
+    from 
+      liensdonneesgroupes
+    WHERE 
+      nom_donnee is not null
+      and nom_donnee not like '#EOL%'
+      and nom_donnee not like '#TEXTE%'
+      and nom_donnee not like '#LIBELLE%'
+      and nom_donnee not like '#SEP_ZONE%'
+      and nom_donnee not like '#TABLEAU%'
+      and nom_donnee not like '#BOUTON%'
+  ),
+  rechercheProximiteGroupe (
+    company_id, 
+    id_groupe, 
+    id_groupe_similaire, 
+    nb_rapprochement
+  ) as (
+    select 
+      g1.company_id, 
+      g1.id_groupe, 
+      g2.id_groupe, 
+      count(*)
+    from 
+      liensdonneesgroupes g1
+      inner join liensdonneesgroupes g2 on g1.company_id=g2.company_id and g1.nom_donnee=g2.nom_donnee and g1.ordre=g2.ordre and g1.infos_diverses=g2.infos_diverses
+    where 
+      g1.id_groupe!=g2.id_groupe
+    group by 
+      g1.company_id, 
+      g1.id_groupe, 
+      g2.id_groupe
+  )  
+  select 
+    SYSDATE DATE_MAJ, 
+    NIVEAU_GRAVITE, 
+    TYPE_OBJET, 
+    NOM_OBJET, 
+    NIVEAU_GRAVITE || ' - ' || MSG_ERREURS, 
+    ERREUR 
+  from (
+    select 
+      'GROUPE' TYPE_OBJET, 
+      '1' NIVEAU_GRAVITE, 
+      ID_GROUPE NOM_OBJET, 
+      'Référence dans un groupe à une donnée inconnue' MSG_ERREURS, 
+      NOM_DONNEE ERREUR  
+    from 
+      meta_groupe_donnees
+    where 
+      NOM_DONNEE not like '#%'
+      and nom_donnee not in (
+        select 
+          nom_donnee 
+        from 
+          meta_donnee_ecran
+      )
+    UNION ALL
+    select 
+      'WKF_OPERATIONS' TYPE_OBJET, 
+      '1' NIVEAU_GRAVITE, 
+      '' || OP_NUM NOM_OBJET, 
+      'Référence à un processus inexistant' MSG_ERREURS, 
+      '' || PROC_NUM ERREUR   
+    from 
+      wkf_operations 
+    where 
+      proc_num not in (
+        select 
+          proc_num 
+        from 
+          wkf_processus 
+        where 
+          proc_num is not null
+      )
+    UNION ALL
+    select 
+      'WKF_OPERATIONS' TYPE_OBJET, 
+      '1' NIVEAU_GRAVITE, 
+      '' || OP_NUM NOM_OBJET, 
+      'Aucun écran wkf associé à l opération' MSG_ERREURS, 
+      '' ERREUR   
+    from 
+      wkf_operations 
+    where 
+      COMP_WEB='_PARAM_DYN_' 
+      and op_num not in (
+        select 
+          op_num 
+        from 
+          meta_wkf_operation_ecrans
+      )
+    UNION ALL
+    select 
+      'META_WKF_OPERATION_ECRAN' TYPE_OBJET, 
+      '1' NIVEAU_GRAVITE, 
+      '' || OP_NUM NOM_OBJET, 
+      'Paramétrage wkf sur opération inexistante' MSG_ERREURS, 
+      '' || OP_NUM ERREUR   
+    from 
+      meta_wkf_operation_ecrans 
+    where 
+      op_num not in (
+        select 
+          op_num 
+        from 
+          wkf_operations 
+        where 
+          op_num is not null
+      )
+    UNION ALL
+    select 
+      'META_WKF_OPERATION_ECRANS_INFO' TYPE_OBJET, 
+      '1' NIVEAU_GRAVITE, 
+      '' || OP_NUM NOM_OBJET, 
+      'Paramétrage wkf sur opération inexistante' MSG_ERREURS, 
+      '' || OP_NUM ERREUR   
+    from 
+      meta_wkf_operation_ecrans_info 
+    where 
+      op_num not in (
+        select 
+          op_num 
+        from 
+          wkf_operations 
+        where 
+          op_num is not null
+      )
+    UNION ALL
+    select 
+      'META_DONNEE_ECRAN' TYPE_OBJET, 
+      '1' NIVEAU_GRAVITE, 
+      NOM_DONNEE NOM_OBJET, 
+      'Donnée sans donnée générale associé' MSG_ERREURS, 
+      '' ERREUR   
+    from 
+      meta_donnee_ecran 
+    where 
+      nom_donnee not in (
+        select 
+          nom_donnee 
+        from 
+          meta_donnee_generale
+      )
+    UNION ALL
+    select 
+      'META_DONNEE_GENERALE' TYPE_OBJET, 
+      '1' NIVEAU_GRAVITE, 
+      NOM_DONNEE NOM_OBJET, 
+      'Donnée générale sans ergo générale' MSG_ERREURS, 
+      '' ERREUR   
+    from 
+      meta_donnee_generale 
+    where 
+      nom_donnee not in (
+        select 
+          nom_donnee 
+        from 
+          meta_donnee_ecran 
+        where 
+          nom_page='*'
+      )
+    UNION ALL
+    select 
+      'META_REGLEGESTION' TYPE_OBJET, 
+      '1' NIVEAU_GRAVITE, 
+      ID_REGLEGESTION NOM_OBJET, 
+      'Règle non référencée dans meta_reglegestion_desc' MSG_ERREURS, 
+      '' ERREUR   
+    from 
+      meta_reglegestion 
+    where 
+      id_reglegestion not in (
+        select 
+          id_reglegestion 
+        from 
+          meta_reglegestion_desc
+      )
+    UNION ALL
+    select 
+      'META_REGLEGESTION_DESC' TYPE_OBJET, 
+      '1' NIVEAU_GRAVITE, 
+      ID_REGLEGESTION NOM_OBJET, 
+      'Règle non référencée dans meta_reglegestion' MSG_ERREURS, 
+      '' ERREUR   
+    from 
+      meta_reglegestion_desc
+    where 
+      id_reglegestion not in (
+        select 
+          id_reglegestion 
+        from 
+          meta_reglegestion
+      )
+    UNION ALL
+    select 
+      'META_ECRAN' TYPE_OBJET, 
+      '1' NIVEAU_GRAVITE, 
+      NOM_PAGE NOM_OBJET, 
+      'Id_projet inconnu' MSG_ERREURS, 
+      '' || ID_PROJET ERREUR   
+    from 
+      meta_ecran 
+    where 
+      id_projet is not null 
+      and id_projet not in (
+        select 
+          id_projet 
+        from 
+          meta_projet 
+        where 
+          termine!='O'
+      )
+    UNION ALL
+    select 
+      'META_DONNEE_GENERALE' TYPE_OBJET, 
+      '1' NIVEAU_GRAVITE, 
+      NOM_DONNEE NOM_OBJET, 
+      'Id_projet inconnu' MSG_ERREURS, 
+      '' || ID_PROJET ERREUR   
+    from 
+      meta_donnee_generale
+    where 
+      id_projet is not null 
+      and id_projet not in (
+        select 
+          id_projet 
+        from 
+          meta_projet 
+        where 
+          termine!='O'
+      )
+    UNION ALL
+    select 
+      'META_GROUPE_DONNEES_INFO' TYPE_OBJET, 
+      '1' NIVEAU_GRAVITE, 
+      ID_GROUPE NOM_OBJET, 
+      'Id_projet inconnu' MSG_ERREURS, 
+      '' || ID_PROJET ERREUR   
+    from 
+      meta_groupe_donnees_info
+    where 
+      id_projet is not null 
+      and id_projet not in (
+        select 
+          id_projet 
+        from 
+          meta_projet 
+        where 
+          termine!='O'
+      )
+    UNION ALL
+    select 
+      'META_REGLEGESTION_DESC' TYPE_OBJET, 
+      '1' NIVEAU_GRAVITE, 
+      ID_REGLEGESTION NOM_OBJET, 
+      'Id_projet inconnu' MSG_ERREURS, 
+      '' || ID_PROJET ERREUR   
+    from 
+      meta_reglegestion_desc
+    where 
+      id_projet is not null 
+      and id_projet not in (
+        select 
+          id_projet 
+        from 
+          meta_projet 
+        where 
+          termine!='O'
+      )
+    UNION ALL
+    select 
+      TYPE_DONNEE TYPE_OBJET, 
+      '1' NIVEAU_GRAVITE, 
+      ID NOM_OBJET, 
+      'Référence à une règle de gestion inconnue' MSG_ERREURS, 
+      ID_REGLE ERREUR 
+    from (
+      select 
+        'META_DONNEE_ECRAN' TYPE_DONNEE, 
+        NOM_DONNEE||'-'||NOM_PAGE ID, 
+        ID_REGLEGESTION_AUT_RD ID_REGLE  
+      from 
+        META_DONNEE_ECRAN 
+      where 
+        ID_REGLEGESTION_AUT_RD is not null
+      UNION ALL 
+      select 
+        'META_DONNEE_ECRAN' TYPE_DONNEE, 
+        NOM_DONNEE||'-'||NOM_PAGE ID, 
+        ID_REGLEGESTION_AUT_CLI ID_REGLE  
+      from 
+        META_DONNEE_ECRAN 
+      where 
+        ID_REGLEGESTION_AUT_CLI is not null
+      UNION ALL 
+      select 
+        'META_DONNEE_ECRAN' TYPE_DONNEE, 
+        NOM_DONNEE||'-'||NOM_PAGE ID, 
+        ID_REGLEGESTION_AFF_RD ID_REGLE  
+      from 
+        META_DONNEE_ECRAN 
+      where 
+        ID_REGLEGESTION_AFF_RD is not null
+      UNION ALL 
+      select 
+        'META_DONNEE_ECRAN' TYPE_DONNEE, 
+        NOM_DONNEE||'-'||NOM_PAGE ID, 
+        ID_REGLEGESTION_AFF_CLI ID_REGLE  
+      from 
+        META_DONNEE_ECRAN 
+      where 
+        ID_REGLEGESTION_AFF_CLI is not null
+      UNION ALL 
+      select 
+        'META_DONNEE_ECRAN' TYPE_DONNEE, 
+        NOM_DONNEE||'-'||NOM_PAGE ID, 
+        ID_REGLEGESTION_CTL_RD ID_REGLE  
+      from 
+        META_DONNEE_ECRAN 
+      where 
+        ID_REGLEGESTION_CTL_RD is not null
+      UNION ALL 
+      select 
+        'META_DONNEE_ECRAN' TYPE_DONNEE, 
+        NOM_DONNEE||'-'||NOM_PAGE ID, 
+        ID_REGLEGESTION_CTL_CLI ID_REGLE  
+      from 
+        META_DONNEE_ECRAN 
+      where 
+        ID_REGLEGESTION_CTL_CLI is not null
+      UNION ALL 
+      select 
+        'META_ECRAN' TYPE_DONNEE, 
+        NOM_PAGE ID, 
+        ID_REGLEGESTION_AUT_RD ID_REGLE  
+      from 
+        META_ECRAN 
+      where 
+        ID_REGLEGESTION_AUT_RD is not null
+      UNION ALL 
+      select 
+        'META_ECRAN' TYPE_DONNEE, 
+        NOM_PAGE ID, 
+        ID_REGLEGESTION_AUT_CLI ID_REGLE  
+      from 
+        META_ECRAN 
+      where 
+        ID_REGLEGESTION_AUT_CLI is not null
+      UNION ALL 
+      select 
+        'META_ECRAN' TYPE_DONNEE, 
+        NOM_PAGE ID, 
+        ID_REGLEGESTION_CTL_RD ID_REGLE  
+      from 
+        META_ECRAN 
+      where 
+        ID_REGLEGESTION_CTL_RD is not null
+      UNION ALL 
+      select 
+        'META_ECRAN' TYPE_DONNEE, 
+        NOM_PAGE ID, 
+        ID_REGLEGESTION_CTL_CLI ID_REGLE  
+      from 
+        META_ECRAN 
+      where 
+        ID_REGLEGESTION_CTL_CLI is not null
+      UNION ALL 
+      select 
+        'META_GROUPE_DONNEES' TYPE_DONNEE, 
+        ID_GROUPE ID, 
+        ID_REGLEGESTION_CTL_RD_SUPP ID_REGLE  
+      from 
+        META_GROUPE_DONNEES 
+      where 
+        ID_REGLEGESTION_CTL_RD_SUPP is not null
+      UNION ALL 
+      select 
+        'META_GROUPE_DONNEES' TYPE_DONNEE, 
+        ID_GROUPE ID, 
+        ID_REGLEGESTION_CTL_CLI_SUPP ID_REGLE  
+      from 
+        META_GROUPE_DONNEES 
+      where 
+        ID_REGLEGESTION_CTL_CLI_SUPP is not null
+      UNION ALL 
+      select 
+        'META_GROUPE_DONNEES_INFO' TYPE_DONNEE, 
+        ID_GROUPE ID, 
+        ID_REGLEGESTION_AFF_RD ID_REGLE  
+      from 
+        META_GROUPE_DONNEES_INFO 
+      where 
+        ID_REGLEGESTION_AFF_RD is not null
+      UNION ALL 
+      select 
+        'META_GROUPE_DONNEES_INFO' TYPE_DONNEE, 
+        ID_GROUPE ID, 
+        ID_REGLEGESTION_AFF_CLI ID_REGLE  
+      from 
+        META_GROUPE_DONNEES_INFO 
+      where 
+        ID_REGLEGESTION_AFF_CLI is not null
+      UNION ALL 
+      select 
+        'META_WKF_OPERATION_ECRANS' TYPE_DONNEE, 
+        OP_NUM||'-'||ECRAN_NOM_PAGE, 
+        ECRAN_ID_REGLEGESTION_COND ID_REGLE  
+      from 
+        META_WKF_OPERATION_ECRANS 
+      where 
+        ECRAN_ID_REGLEGESTION_COND is not null
+      UNION ALL 
+      select 
+        'META_WKF_OPERATION_ECRANS' TYPE_DONNEE, 
+        OP_NUM||'-'||ECRAN_NOM_PAGE, 
+        RECHERCHE_ID_REGLEGESTION_CTL ID_REGLE  
+      from 
+        META_WKF_OPERATION_ECRANS 
+      where 
+        RECHERCHE_ID_REGLEGESTION_CTL is not null
+    )
+    where ID_REGLE not in ( 
+      select 
+        id_reglegestion 
+      from 
+        meta_reglegestion_desc
+    )
+    UNION ALL
+    select 
+      'META_DONNEE_ECRAN' TYPE_OBJET, 
+      '1' NIVEAU_GRAVITE, 
+      NOM_DONNEE NOM_OBJET, 
+      'Ergo dédiée sur page inconnue' MSG_ERREURS, 
+      NOM_PAGE ERREUR  
+    from 
+      meta_donnee_ecran 
+    where 
+      nom_page!='*' 
+      and nom_page not in (
+        select 
+          nom_page 
+        from 
+          meta_ecran
+        union all
+        select 
+          'GEN_PAGE_RECAP_' || OP_NUM || '_' || ID_GEN_PAGE  
+        from 
+          meta_wkf_operation_ecrans
+      )
+    UNION ALL
+    select 
+      'META_GROUPE_DONNEES' TYPE_OBJET, 
+      '2' NIVEAU_GRAVITE, 
+      ID_GROUPE NOM_OBJET, 
+      'Groupe non utilisé' MSG_ERREURS, 
+      '' ERREUR   
+    from 
+      meta_groupe_donnees_info
+    where 
+      id_groupe not in (
+        select id_groupe from (
+          select 
+            'META_ECRAN' TYPE_DONNEE, 
+            NOM_PAGE NOM_OBJET, 
+            ID_GROUPE_DONNEES ID_GROUPE  
+          from 
+            META_ECRAN 
+          where 
+            ID_GROUPE_DONNEES is not null
+          UNION ALL 
+          select 
+            'META_WKF_OPERATION_ECRANS' TYPE_DONNEE, 
+            OP_NUM||'-'||ECRAN_NOM_PAGE NOM_OBJET, 
+            RECHERCHE_ID_GROUPE_LECTURE ID_GROUPE  
+          from 
+            META_WKF_OPERATION_ECRANS 
+          where 
+            RECHERCHE_ID_GROUPE_LECTURE is not null
+          UNION ALL 
+          select 
+            'META_WKF_OPERATION_ECRANS' TYPE_DONNEE, 
+            OP_NUM||'-'||ECRAN_NOM_PAGE, 
+            RECAP_ID_GROUPE_1 ID_GROUPE  
+          from 
+            META_WKF_OPERATION_ECRANS 
+          where 
+            RECAP_ID_GROUPE_1 is not null
+          UNION ALL 
+          select 
+            'META_WKF_OPERATION_ECRANS' TYPE_DONNEE, 
+            OP_NUM||'-'||ECRAN_NOM_PAGE, 
+            RECAP_ID_GROUPE_2 ID_GROUPE  
+          from 
+            META_WKF_OPERATION_ECRANS 
+          where 
+            RECAP_ID_GROUPE_2 is not null
+          UNION ALL 
+          select 
+            'META_WKF_OPERATION_ECRANS_INFO' TYPE_DONNEE, 
+            '' || OP_NUM, 
+            ID_GROUPE_ECRITURE ID_GROUPE  
+          from 
+            META_WKF_OPERATION_ECRANS_INFO 
+          where 
+            ID_GROUPE_ECRITURE is not null
+          UNION ALL
+          select 
+            'META_GROUPE_DONNEES' TYPE_DONNEE, 
+            ID_GROUPE, 
+            SUFFIXE_OU_LIBELLE ID_GROUPE 
+          from 
+            meta_groupe_donnees 
+          where 
+            NOM_DONNEE like '#GROUP%'
+        )
+      )
+    UNION ALL
+    select 
+      'META_ECRAN' TYPE_OBJET, 
+      '2' NIVEAU_GRAVITE, 
+      NOM_PAGE NOM_OBJET, 
+      'Ecran WKF non utilisé' MSG_ERREURS, 
+      '' ERREUR   
+    from 
+      meta_ecran 
+    where 
+      type_ecran='W'
+      and nom_page not in (
+        select 
+          ecran_nom_page 
+        from 
+          meta_wkf_operation_ecrans 
+        where 
+          ecran_nom_page is not null
+        union all
+        select 
+          ecran_nom_page_alternatif 
+        from 
+          meta_wkf_operation_ecrans 
+        where 
+          ecran_nom_page_alternatif is not null
+      )
+/*
+    UNION ALL
+    select 
+      'DONNEE' TYPE_OBJET, 
+      liensdonneesgroupesSansMiseEnForme.nom_donnee NOM_OBJET, 
+      'Données présentes plusieurs fois dans un écran' MSG_ERREURS,  
+      ref_ecran.nom_page || ' : ' ||  listagg(liensdonneesgroupesSansMiseEnForme.chemin, ' et ') 
+    from 
+      liensdonneesgroupesSansMiseEnForme
+      inner join ref_ecran on ref_ecran.id_groupe_donnees=liensdonneesgroupesSansMiseEnForme.id_groupe and ref_ecran.company_id=liensdonneesgroupesSansMiseEnForme.company_id
+    group by 
+      ref_ecran.libelle_page, 
+      ref_ecran.nom_page, 
+      liensdonneesgroupesSansMiseEnForme.nom_donnee
+    having 
+      count(*)>1
+    order by 
+      1, 2, 3
+    UNION ALL
+    select 
+      * 
+    from 
+      rechercheProximiteGroupe
+    where 
+      nb_rapprochement = (
+        select 
+          count(*) 
+        from 
+          liensdonneesgroupes g1 
+        where 
+          g1.company_id=rechercheProximiteGroupe.company_id 
+          and g1.id_groupe=rechercheProximiteGroupe.id_groupe_similaire
+      )
+*/
+  )

@@ -1,0 +1,42 @@
+##
+HRGP_EXISTSALAIRE
+=SQL=
+CREATE OR REPLACE
+  FUNCTION HRGP_EXISTSALAIRE(
+      p_matric  IN donpaie.matric%TYPE,
+      p_annee   IN donpaie.an%TYPE,
+      p_periode IN VARCHAR)
+    RETURN INTEGER
+  IS
+    nb_salaire INTEGER;
+  BEGIN
+    IF p_periode = 'A' THEN
+      SELECT COUNT(*)
+      INTO nb_salaire
+      FROM donpaie
+      WHERE mois    = 'A'
+      AND an        = p_annee
+      AND matric    = p_matric;
+    ELSIF p_periode = 'M' THEN
+      SELECT COUNT(*)
+      INTO nb_salaire
+      FROM donpaie
+      WHERE mois =
+        (SELECT MAX(mois)
+        FROM donpaie
+        WHERE NOT mois = 'A'
+        AND an         = p_annee
+        AND matric     = p_matric
+        )
+      AND matric = p_matric
+      AND an     = p_annee;
+    ELSE
+      SELECT COUNT(*)
+      INTO nb_salaire
+      FROM donpaie
+      WHERE an   = p_annee
+      AND matric = p_matric;
+    END IF;
+    RETURN nb_salaire;
+  END hrgp_existsalaire; 
+  

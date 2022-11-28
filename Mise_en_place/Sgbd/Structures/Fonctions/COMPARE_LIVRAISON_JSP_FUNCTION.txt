@@ -1,0 +1,89 @@
+##
+COMPARE_LIVRAISON_JSP_FUNCTION
+=SQL=
+create or replace FUNCTION COMPARE_LIVRAISON_JSP_FUNCTION( ID_GENERATION_L1 in varchar2,
+ ID_GENERATION_L2 in varchar2
+ ) RETURN compare_Livraison_Jsp_TABLE is
+ myres compare_Livraison_Jsp_TABLE;
+ begin
+ 
+ 
+ SELECT compare_Livraison_Jsp_RECORD(JSP_ECRAN_L1,
+ nvl((select max(libelle) from sys_sch_element  where nom_page = JSP_ECRAN_L1 ) ,
+ 
+ (select  max(libelle) from sys_pages_modal  where nom_page  =  JSP_ECRAN_L1 )
+ 
+ ),
+ ROUND((TAILLE_VL1 /1024 ),2),
+ ROUND((TAILLE_VL2 /1024),2) ,
+ NB_OCCURENCES_VL1,
+ NB_OCCURENCES_L2,
+ ROUND(indice_presence_VL1,2),
+ ROUND(indice_presence_L2,2),
+ ABS(TAILLE_VL1 - TAILLE_VL2) ,
+ ABS(indice_presence_VL1  - indice_presence_L2),
+ CASE WHEN indice_presence_VL1 > indice_presence_L2 
+      THEN (100 - ROUND((indice_presence_L2*100 /indice_presence_VL1),2) )    
+      ELSE (100- ROUND((indice_presence_VL1 *100/indice_presence_L2),2))
+  END,
+  CASE WHEN TAILLE_VL1 > TAILLE_VL2 
+      THEN (100 - ROUND((TAILLE_VL2  *100/TAILLE_VL1),2) )
+     
+      ELSE (100 - ROUND((TAILLE_VL1  *100/TAILLE_VL2),2))
+  END
+  
+ )
+ bulk collect into myres
+ 
+ FROM
+ (
+ select T1.JSP_ECRAN_L1,NB_OCCURENCES_VL1,NB_OCCURENCES_L2,indice_presence_VL1,indice_presence_L2, T2.TAILLE_VL1,T2.TAILLE_VL2 from (
+
+ SELECT JSP_ECRAN_L1, 
+ SUM(NB_OCCURENCES_VL1)   as NB_OCCURENCES_VL1,
+ SUM(NB_OCCURENCES_L2)   as NB_OCCURENCES_L2,
+ SUM(indice_presence_VL1) AS indice_presence_VL1 ,
+ SUM(indice_presence_L2) AS indice_presence_L2
+ FROM
+ (
+ 
+ SELECT VL1.JSP_PATH                    AS JSP_PATH_L1 ,
+ VL1.JSP_ECRAN                         AS JSP_ECRAN_L1 ,
+ L2.JSP_ECRAN                         AS JSP_ECRAN_5_02 ,
+ VL1.ID_PATTERN                        AS ID_PATTERN_L1,
+ L2.ID_PATTERN                        AS ID_PATTERN_5_02,
+ patterns.poids                          AS pattern_poids,
+ L2.NB_OCCURENCES                     AS NB_OCCURENCES_L2,
+ VL1.NB_OCCURENCES                     AS NB_OCCURENCES_VL1,
+ ( patterns.poids * L2.NB_OCCURENCES) AS indice_presence_L2,
+ ( patterns.poids * VL1.NB_OCCURENCES) AS indice_presence_VL1
+ FROM SYS_JSP_STATS_DETAILS VL1 ,
+ SYS_JSP_STATS_DETAILS L2,
+ 
+ sys_jsp_stats_data_patterns patterns
+ WHERE VL1.jsp_path         = L2.JSP_PATH
+ AND VL1.id_pattern         = L2.id_pattern
+ AND VL1.id_GENERATION      = ID_GENERATION_L1
+ AND L2.id_GENERATION       = ID_GENERATION_L2
+ AND VL1.ID_PATTERN         = patterns.ID_PATTERN 
+ 
+ )
+ GROUP BY JSP_ECRAN_L1
+ ) T1
+ INNER JOIN (
+ SELECT STAT_VL2.JSP_ECRAN as JSP_ECRAN_L1, SUM(STAT_VL1.TAILLE) as TAILLE_VL1 ,SUM(STAT_VL2.TAILLE)  as TAILLE_VL2
+ FROM 
+ SYS_JSP_STATS STAT_VL1,
+ SYS_JSP_STATS STAT_VL2
+ where 
+stat_vL1.id_generation = ID_GENERATION_L1
+and STAT_VL2.id_generation = ID_GENERATION_L2
+ AND stat_vL1.JSP_PATH      = STAT_VL2.JSP_PATH 
+ 
+group by   STAT_VL2.JSP_ECRAN
+ ) T2 ON T1.JSP_ECRAN_L1 = T2.JSP_ECRAN_L1
+ );
+ return myres;
+ 
+ end compare_Livraison_Jsp_Function;
+ 

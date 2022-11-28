@@ -1,0 +1,404 @@
+##
+SYS_MIGR_SECU_STRUCT_NIVSECU
+=SQL=
+CREATE OR REPLACE
+PROCEDURE SYS_MIGR_SECU_STRUCT_NIVSECU
+AS
+TYPE tcur
+IS
+  REF
+  CURSOR;
+    requete CLOB;
+    c_ tcur;
+    c_secu_struct tcur;
+    secu_struct_login std_nivsecu.login%type;
+    secu_struct_codts std_nivsecu.codts%type;
+    secu_struct_code_entite std_nivsecu.codniv1%type;
+    secu_struct_type_entite VARCHAR2(15);
+    secu_struct_libelle_structure std_struc_type.libelle%type;
+    secu_struct_lib_type_entite std_struc_entite_type.libelle%type;
+    req_liste_mat sys_usr_config.req_liste_mat%type;
+    requete_complexe CLOB;
+    requeteecr_gsi_complexe CLOB;
+    requetesql_gsi_complexe CLOB;
+    requete_simple CLOB;
+    requeteecr_gsi_simple CLOB;
+    requetesql_gsi_simple CLOB;
+    clause_hrorg_secu_tmp VARCHAR2(300);
+    secu_struct_nomcol_secumat std_struc_type.nomcol_secumatric%type;
+    origine_affect VARCHAR2(200);
+    cptcodts       NUMBER;
+    cur_login std_nivsecu.login%type;
+    cur_codts std_nivsecu.codts%type;
+    cur_req_liste_mat sys_usr_config.req_liste_mat%type;
+    cod_struc_non_def NUMBER;
+    cod_struc_err_niv NUMBER;
+  BEGIN
+    SELECT MIN(CODTS)
+    INTO cod_struc_non_def
+    FROM STD_NIVSECU
+    WHERE CODTS NOT IN
+      (SELECT CODTS FROM STD_STRUC_TYPE
+      );
+  SELECT MIN(CODTS)
+  INTO cod_struc_err_niv
+  FROM
+    (SELECT CODTS,
+      MAX(NIV_MAX) AS NIV_MAX_NIVSECU,
+      (SELECT MAX(NIVEAU)
+      FROM STD_STRUC_NIV
+      WHERE STD_STRUC_NIV.CODTS=Z.CODTS
+      AND TO_CHAR(SYSDATE,'yyyymmdd') BETWEEN DATE_EFF AND DATE_FIN
+      ) AS NIX_MAX_HRO
+    FROM
+      (SELECT CODTS,
+        CASE
+          WHEN CODNIV2 IS NULL
+          THEN 1
+          WHEN CODNIV3 IS NULL
+          THEN 2
+          WHEN CODNIV4 IS NULL
+          THEN 3
+          WHEN CODNIV5 IS NULL
+          THEN 4
+          WHEN CODNIV6 IS NULL
+          THEN 5
+          ELSE 6
+        END AS NIV_MAX
+      FROM STD_NIVSECU
+      ) Z
+    GROUP BY CODTS
+    ) Y
+  WHERE NIX_MAX_HRO IS NULL
+  OR NIV_MAX_NIVSECU >NIX_MAX_HRO
+  OR (SELECT COUNT(*)
+    FROM STD_STRUC_ENTITE_TYPE
+    WHERE STD_STRUC_ENTITE_TYPE.TYPE_ENTITE IN
+      (SELECT TYPE_ENTITE
+      FROM STD_STRUC_NIV
+      WHERE STD_STRUC_NIV.CODTS=Y.CODTS
+      AND TO_CHAR(SYSDATE,'yyyymmdd') BETWEEN DATE_EFF AND DATE_FIN
+      AND NIVEAU       <=NIV_MAX_NIVSECU
+      ))                <NIV_MAX_NIVSECU;
+  IF cod_struc_non_def IS NOT NULL THEN
+    RAISE_APPLICATION_ERROR(-20000,'Veuillez d''abord renseigner le référentiel HRO (définition des structures) pour les codes TS présents dans STD_NIVSECU (exemple : code TS '||cod_struc_non_def||')');
+  END IF;
+  IF cod_struc_err_niv IS NOT NULL THEN
+    RAISE_APPLICATION_ERROR(-20001,'Veuillez d''abord renseigner correctement le référentiel HRO (types d''entité et organisation des niveaux) pour les codes TS présents dans STD_NIVSECU (exemple : code TS '||cod_struc_err_niv||')');
+  END IF;
+  cur_login        :=NULL;
+  cur_codts        :=NULL;
+  cur_req_liste_mat:=NULL;
+  cptcodts         :=0;
+  OPEN c_secu_struct FOR SELECT z.*,
+  (SELECT req_liste_mat FROM sys_usr_config suc WHERE suc.login=z.login
+  )
+AS
+  req_pop FROM
+  (SELECT sns.login,
+    sns.codts,
+    sns.codniv1 AS code_entite,
+    ssn.type_entite,
+    sst.libelle  AS libelle_structure,
+    sset.libelle AS libelle_type_entite,
+    sst.nomcol_secumatric
+  FROM std_nivsecu sns,
+    std_struc_type sst,
+    std_struc_niv ssn,
+    std_struc_entite_type sset
+  WHERE sns.codts    =sst.codts
+  AND sst.codts      =ssn.codts
+  AND ssn.type_entite=sset.type_entite
+  AND ssn.niveau     =1
+  AND TO_CHAR(sysdate,'yyyymmdd') BETWEEN date_eff AND date_fin
+  AND sns.codniv1 IS NOT NULL
+  AND sns.codniv2 IS NULL
+  AND sns.codniv3 IS NULL
+  AND sns.codniv4 IS NULL
+  AND sns.codniv5 IS NULL
+  AND sns.codniv6 IS NULL
+  UNION ALL
+  SELECT sns.login,
+    sns.codts,
+    sns.codniv2,
+    ssn.type_entite,
+    sst.libelle  AS libelle_structure,
+    sset.libelle AS libelle_type_entite,
+    sst.nomcol_secumatric
+  FROM std_nivsecu sns,
+    std_struc_type sst,
+    std_struc_niv ssn,
+    std_struc_entite_type sset
+  WHERE sns.codts    =sst.codts
+  AND sst.codts      =ssn.codts
+  AND ssn.type_entite=sset.type_entite
+  AND ssn.niveau     =2
+  AND TO_CHAR(sysdate,'yyyymmdd') BETWEEN date_eff AND date_fin
+  AND sns.codniv1 IS NOT NULL
+  AND sns.codniv2 IS NOT NULL
+  AND sns.codniv3 IS NULL
+  AND sns.codniv4 IS NULL
+  AND sns.codniv5 IS NULL
+  AND sns.codniv6 IS NULL
+  UNION ALL
+  SELECT sns.login,
+    sns.codts,
+    sns.codniv3,
+    ssn.type_entite,
+    sst.libelle  AS libelle_structure,
+    sset.libelle AS libelle_type_entite,
+    sst.nomcol_secumatric
+  FROM std_nivsecu sns,
+    std_struc_type sst,
+    std_struc_niv ssn,
+    std_struc_entite_type sset
+  WHERE sns.codts    =sst.codts
+  AND sst.codts      =ssn.codts
+  AND ssn.type_entite=sset.type_entite
+  AND ssn.niveau     =3
+  AND TO_CHAR(sysdate,'yyyymmdd') BETWEEN date_eff AND date_fin
+  AND sns.codniv1 IS NOT NULL
+  AND sns.codniv2 IS NOT NULL
+  AND sns.codniv3 IS NOT NULL
+  AND sns.codniv4 IS NULL
+  AND sns.codniv5 IS NULL
+  AND sns.codniv6 IS NULL
+  UNION ALL
+  SELECT sns.login,
+    sns.codts,
+    sns.codniv4,
+    ssn.type_entite,
+    sst.libelle  AS libelle_structure,
+    sset.libelle AS libelle_type_entite,
+    sst.nomcol_secumatric
+  FROM std_nivsecu sns,
+    std_struc_type sst,
+    std_struc_niv ssn,
+    std_struc_entite_type sset
+  WHERE sns.codts    =sst.codts
+  AND sst.codts      =ssn.codts
+  AND ssn.type_entite=sset.type_entite
+  AND ssn.niveau     =4
+  AND TO_CHAR(sysdate,'yyyymmdd') BETWEEN date_eff AND date_fin
+  AND sns.codniv1 IS NOT NULL
+  AND sns.codniv2 IS NOT NULL
+  AND sns.codniv3 IS NOT NULL
+  AND sns.codniv4 IS NOT NULL
+  AND sns.codniv5 IS NULL
+  AND sns.codniv6 IS NULL
+  UNION ALL
+  SELECT sns.login,
+    sns.codts,
+    sns.codniv5,
+    ssn.type_entite,
+    sst.libelle  AS libelle_structure,
+    sset.libelle AS libelle_type_entite,
+    sst.nomcol_secumatric
+  FROM std_nivsecu sns,
+    std_struc_type sst,
+    std_struc_niv ssn,
+    std_struc_entite_type sset
+  WHERE sns.codts    =sst.codts
+  AND sst.codts      =ssn.codts
+  AND ssn.type_entite=sset.type_entite
+  AND ssn.niveau     =5
+  AND TO_CHAR(sysdate,'yyyymmdd') BETWEEN date_eff AND date_fin
+  AND sns.codniv1 IS NOT NULL
+  AND sns.codniv2 IS NOT NULL
+  AND sns.codniv3 IS NOT NULL
+  AND sns.codniv4 IS NOT NULL
+  AND sns.codniv5 IS NOT NULL
+  AND sns.codniv6 IS NULL
+  UNION ALL
+  SELECT sns.login,
+    sns.codts,
+    sns.codniv6,
+    ssn.type_entite,
+    sst.libelle  AS libelle_structure,
+    sset.libelle AS libelle_type_entite,
+    sst.nomcol_secumatric
+  FROM std_nivsecu sns,
+    std_struc_type sst,
+    std_struc_niv ssn,
+    std_struc_entite_type sset
+  WHERE sns.codts    =sst.codts
+  AND sst.codts      =ssn.codts
+  AND ssn.type_entite=sset.type_entite
+  AND ssn.niveau     =6
+  AND TO_CHAR(sysdate,'yyyymmdd') BETWEEN date_eff AND date_fin
+  AND sns.codniv1     IS NOT NULL
+  AND sns.codniv2     IS NOT NULL
+  AND sns.codniv3     IS NOT NULL
+  AND sns.codniv4     IS NOT NULL
+  AND sns.codniv5     IS NOT NULL
+  AND sns.codniv6     IS NOT NULL
+  ) z WHERE login NOT IN
+  (SELECT login FROM sys_sec_usr_struct
+  ) order by login,
+  codts,
+  code_entite;
+  LOOP
+    FETCH c_secu_struct
+    INTO secu_struct_login,
+      secu_struct_codts,
+      secu_struct_code_entite,
+      secu_struct_type_entite,
+      secu_struct_libelle_structure,
+      secu_struct_lib_type_entite,
+      secu_struct_nomcol_secumat,
+      req_liste_mat;
+    EXIT
+  WHEN c_secu_struct%NOTFOUND;
+    IF cur_login   IS NULL OR NOT cur_login=secu_struct_login THEN
+      IF cur_login IS NOT NULL THEN
+        requete    :='INSERT INTO REQUETESIMPLE VALUES (''SEC_'||cur_login||'_CODTS_'||cur_codts||'_'||TO_CHAR(cptcodts)||''', ''DBA'', ''SEC_LOC_STR'', ''( '||REPLACE(requete_complexe,'''','''''')||' )'', '''||REPLACE(requeteecr_gsi_complexe,'''','''''')||''', '''||REPLACE(requetesql_gsi_complexe,'''','''''')||''', 1, ''0'',''0'')';
+        EXECUTE IMMEDIATE requete;
+        IF requete_simple        IS NOT NULL THEN
+          IF cptcodts             =0 THEN
+            requeteecr_gsi_simple:=requeteecr_gsi_simple||'##';
+            requetesql_gsi_simple:=requetesql_gsi_simple||'##';
+            requete_simple       :=requete_simple||' AND ';
+          ELSE
+            requeteecr_gsi_simple:=requeteecr_gsi_simple||'@@';
+            requetesql_gsi_simple:=requetesql_gsi_simple||'@@';
+            requete_simple       :=requete_simple||' OR ';
+          END IF;
+        END IF;
+        requeteecr_gsi_simple  :=requeteecr_gsi_simple||'  SOUS__REQUETE {{EQUAL{{ '||'SEC_'||cur_login||'_CODTS_'||cur_codts||'_'||TO_CHAR(cptcodts)||' ';
+        requetesql_gsi_simple  :=requetesql_gsi_simple||'SOUS__REQUETE{{={{~~~'||'SEC_'||cur_login||'_CODTS_'||cur_codts||'_'||TO_CHAR(cptcodts)||'~~~';
+        requete_simple         :=requete_simple||'SOUS__REQUETE=~~~'||'SEC_'||cur_login||'_CODTS_'||cur_codts||'_'||TO_CHAR(cptcodts)||'~~~';
+        IF cptcodts             >0 THEN
+          requeteecr_gsi_simple:=requeteecr_gsi_simple||')';
+          requetesql_gsi_simple:=requetesql_gsi_simple||')';
+          requete_simple       :=requete_simple||')';
+        END IF;
+        requeteecr_gsi_simple:=requeteecr_gsi_simple||' ';
+        requete              :='INSERT INTO REQUETESIMPLE VALUES (''SEC_'||cur_login||''', ''DBA'', ''SEC_LOC_STR'', ''( '||REPLACE(requete_simple,'''','''''')||' )'', '''||REPLACE(requeteecr_gsi_simple,'''','''''')||''', '''||REPLACE(requetesql_gsi_simple,'''','''''')||''', 0, ''1'',''0'')';
+        EXECUTE IMMEDIATE requete;
+        requete:='INSERT INTO SYS_SEC_USR_STRUCT VALUES ('''||cur_login||''', ''SEC_'||cur_login||''')';
+        EXECUTE IMMEDIATE requete;
+        IF cur_req_liste_mat IS NULL THEN
+          requete            :='INSERT INTO REQUETESIMPLE SELECT NOMREQUETE, UTILISATEUR, ''SEC_LOC'', REQUETE, REQUETEECR_GSI, REQUETESQL_GSI, TYPE_REQUETE, EST_VISIBLE,''0'' FROM REQUETESIMPLE WHERE (NOMREQUETE=''SEC_'||cur_login||''' OR NOMREQUETE LIKE ''SEC_'||cur_login||'_CODTS_%'') AND UTILISATEUR=''DBA'' AND APPLICATION=''SEC_LOC_STR''';
+          EXECUTE IMMEDIATE requete;
+        ELSE
+          requete:='INSERT INTO REQUETESIMPLE SELECT NOMREQUETE, UTILISATEUR, ''SEC_LOC'', REQUETE, REQUETEECR_GSI, REQUETESQL_GSI, TYPE_REQUETE, EST_VISIBLE,''0'' FROM REQUETESIMPLE WHERE NOMREQUETE LIKE ''SEC_'||cur_login||'_CODTS_%'' AND UTILISATEUR=''DBA'' AND APPLICATION=''SEC_LOC_STR''';
+          EXECUTE IMMEDIATE requete;
+          requete:='INSERT INTO REQUETESIMPLE SELECT NOMREQUETE||''_STR'', UTILISATEUR, ''SEC_LOC'', REQUETE, REQUETEECR_GSI, REQUETESQL_GSI, 1, ''0'',''0'' FROM REQUETESIMPLE WHERE NOMREQUETE=''SEC_'||cur_login||''' AND UTILISATEUR=''DBA'' AND APPLICATION=''SEC_LOC_STR''';
+          EXECUTE IMMEDIATE requete;
+          requete:='INSERT INTO REQUETESIMPLE SELECT ''SEC_'||cur_login||'_POP'', UTILISATEUR, APPLICATION, REQUETE, REQUETEECR_GSI, REQUETESQL_GSI, 1, ''0'',''0'' FROM REQUETESIMPLE WHERE NOMREQUETE='''||cur_req_liste_mat||''' AND UTILISATEUR=''DBA'' AND APPLICATION=''SEC_LOC''';
+          EXECUTE IMMEDIATE requete;
+          requete:='INSERT INTO REQUETESIMPLE VALUES (''SEC_'||cur_login||''', ''DBA'', ''SEC_LOC'', ''( '||'SOUS__REQUETE=~~~SEC_'||cur_login||'_POP~~~ AND SOUS__REQUETE=~~~SEC_'||cur_login||'_STR~~~'||' )'', '''||'##  SOUS__REQUETE {{EQUAL{{ SEC_'||cur_login||'_POP  ##  SOUS__REQUETE {{EQUAL{{ SEC_'||cur_login||'_STR  '||''', '''||'##SOUS__REQUETE{{={{~~~SEC_'||cur_login||'_POP~~~##SOUS__REQUETE{{={{~~~SEC_'||cur_login||'_STR~~~'||''', 0, ''1'', ''0'')';
+          EXECUTE IMMEDIATE requete;
+        END IF;
+        requete:='UPDATE SYS_USR_CONFIG SET REQ_LISTE_MAT=''SEC_'||cur_login||''' WHERE LOGIN='''||cur_login||'''';
+        EXECUTE IMMEDIATE requete;
+      END IF;
+      requeteecr_gsi_simple  :='##';
+      requetesql_gsi_simple  :='##';
+      requete_simple         :=NULL;
+      requeteecr_gsi_complexe:='##';
+      requetesql_gsi_complexe:='##';
+      requete_complexe       :=NULL;
+      cptcodts               :=0;
+    END IF;
+    IF cur_login IS NOT NULL AND cur_login=secu_struct_login AND (NOT cur_codts=secu_struct_codts OR LENGTH(requete_complexe)>=3700 OR LENGTH(requeteecr_gsi_complexe)>=3700 OR LENGTH(requetesql_gsi_complexe)>=3700) THEN
+      requete    :='INSERT INTO REQUETESIMPLE VALUES (''SEC_'||secu_struct_login||'_CODTS_'||cur_codts||'_'||TO_CHAR(cptcodts)||''', ''DBA'', ''SEC_LOC_STR'', ''( '||REPLACE(requete_complexe,'''','''''')||' )'', '''||REPLACE(requeteecr_gsi_complexe,'''','''''')||''', '''||REPLACE(requetesql_gsi_complexe,'''','''''')||''', 1, ''0'', ''0'')';
+      EXECUTE IMMEDIATE requete;
+      IF requete_simple        IS NOT NULL THEN
+        IF cptcodts             =0 THEN
+          requeteecr_gsi_simple:=requeteecr_gsi_simple||'##';
+          requetesql_gsi_simple:=requetesql_gsi_simple||'##';
+          requete_simple       :=requete_simple||' AND ';
+        ELSE
+          requeteecr_gsi_simple:=requeteecr_gsi_simple||'@@';
+          requetesql_gsi_simple:=requetesql_gsi_simple||'@@';
+          requete_simple       :=requete_simple||' OR ';
+        END IF;
+      END IF;
+      requeteecr_gsi_simple  :=requeteecr_gsi_simple||' ';
+      IF cur_codts            =secu_struct_codts AND cptcodts=0 THEN
+        requeteecr_gsi_simple:=requeteecr_gsi_simple||'(';
+        requetesql_gsi_simple:=requetesql_gsi_simple||'(';
+        requete_simple       :=requete_simple||'(';
+      END IF;
+      requeteecr_gsi_simple  :=requeteecr_gsi_simple||' SOUS__REQUETE {{EQUAL{{ '||'SEC_'||secu_struct_login||'_CODTS_'||cur_codts||'_'||TO_CHAR(cptcodts)||' ';
+      requetesql_gsi_simple  :=requetesql_gsi_simple||'SOUS__REQUETE{{={{~~~'||'SEC_'||secu_struct_login||'_CODTS_'||cur_codts||'_'||TO_CHAR(cptcodts)||'~~~';
+      requete_simple         :=requete_simple||'SOUS__REQUETE=~~~'||'SEC_'||secu_struct_login||'_CODTS_'||cur_codts||'_'||TO_CHAR(cptcodts)||'~~~';
+      IF NOT cur_codts        =secu_struct_codts AND cptcodts>0 THEN
+        requeteecr_gsi_simple:=requeteecr_gsi_simple||')';
+        requetesql_gsi_simple:=requetesql_gsi_simple||')';
+        requete_simple       :=requete_simple||')';
+      END IF;
+      requeteecr_gsi_simple  :=requeteecr_gsi_simple||' ';
+      requeteecr_gsi_complexe:='##';
+      requetesql_gsi_complexe:='##';
+      requete_complexe       :=NULL;
+      IF NOT cur_codts        =secu_struct_codts THEN
+        cptcodts             :=0;
+      ELSE
+        cptcodts:=cptcodts+1;
+      END IF;
+    END IF;
+    origine_affect    :=secu_struct_nomcol_secumat;
+    IF origine_affect IS NULL THEN
+      origine_affect  :='(SELECT CODE_ENTITE FROM STD_STRUC_AFFECTATION WHERE STD_STRUC_AFFECTATION.MATRIC=SECUMATRIC.MATRIC AND CODTS='||secu_struct_codts||' AND ''@DATE_DU_JOUR'' BETWEEN DATE_EFF AND DATE_FIN)';
+    END IF;
+    clause_hrorg_secu_tmp    :='HRORG_SECU('||secu_struct_codts||','''||secu_struct_type_entite||''' ,@POP_'||origine_affect||',@STRUCT_CODE_ENTITE, ''@DATE_DU_JOUR'' )§CODTS'||secu_struct_codts||'§';
+    IF requete_complexe      IS NOT NULL THEN
+      requeteecr_gsi_complexe:=requeteecr_gsi_complexe||'@@';
+      requetesql_gsi_complexe:=requetesql_gsi_complexe||'@@';
+      requete_complexe       :=requete_complexe||' OR ';
+    END IF;
+    requeteecr_gsi_complexe:=requeteecr_gsi_complexe||'  '||secu_struct_libelle_structure||' '||secu_struct_lib_type_entite||' {{EQUAL{{ '||secu_struct_code_entite||'  ';
+    requetesql_gsi_complexe:=requetesql_gsi_complexe||clause_hrorg_secu_tmp||'{{={{'''||secu_struct_code_entite||'''';
+    requete_complexe       :=requete_complexe||clause_hrorg_secu_tmp||'='''||secu_struct_code_entite||'''';
+    cur_login              :=secu_struct_login;
+    cur_codts              :=secu_struct_codts;
+    cur_req_liste_mat      :=req_liste_mat;
+  END LOOP;
+  CLOSE c_secu_struct;
+  IF cur_login IS NOT NULL THEN
+    requete    :='INSERT INTO REQUETESIMPLE VALUES (''SEC_'||cur_login||'_CODTS_'||cur_codts||'_'||TO_CHAR(cptcodts)||''', ''DBA'', ''SEC_LOC_STR'', ''( '||REPLACE(requete_complexe,'''','''''')||' )'', '''||REPLACE(requeteecr_gsi_complexe,'''','''''')||''', '''||REPLACE(requetesql_gsi_complexe,'''','''''')||''', 1, ''0'', ''0'')';
+    EXECUTE IMMEDIATE requete;
+    IF requete_simple        IS NOT NULL THEN
+      IF cptcodts             =0 THEN
+        requeteecr_gsi_simple:=requeteecr_gsi_simple||'##';
+        requetesql_gsi_simple:=requetesql_gsi_simple||'##';
+        requete_simple       :=requete_simple||' AND ';
+      ELSE
+        requeteecr_gsi_simple:=requeteecr_gsi_simple||'@@';
+        requetesql_gsi_simple:=requetesql_gsi_simple||'@@';
+        requete_simple       :=requete_simple||' OR ';
+      END IF;
+    END IF;
+    requeteecr_gsi_simple  :=requeteecr_gsi_simple||'  SOUS__REQUETE {{EQUAL{{ '||'SEC_'||cur_login||'_CODTS_'||cur_codts||'_'||TO_CHAR(cptcodts)||' ';
+    requetesql_gsi_simple  :=requetesql_gsi_simple||'SOUS__REQUETE{{={{~~~'||'SEC_'||cur_login||'_CODTS_'||cur_codts||'_'||TO_CHAR(cptcodts)||'~~~';
+    requete_simple         :=requete_simple||'SOUS__REQUETE=~~~'||'SEC_'||cur_login||'_CODTS_'||cur_codts||'_'||TO_CHAR(cptcodts)||'~~~';
+    IF cptcodts             >0 THEN
+      requeteecr_gsi_simple:=requeteecr_gsi_simple||')';
+      requetesql_gsi_simple:=requetesql_gsi_simple||')';
+      requete_simple       :=requete_simple||')';
+    END IF;
+    requeteecr_gsi_simple:=requeteecr_gsi_simple||' ';
+    requete              :='INSERT INTO REQUETESIMPLE VALUES (''SEC_'||cur_login||''', ''DBA'', ''SEC_LOC_STR'', ''( '||REPLACE(requete_simple,'''','''''')||' )'', '''||REPLACE(requeteecr_gsi_simple,'''','''''')||''', '''||REPLACE(requetesql_gsi_simple,'''','''''')||''', 0, ''1'', ''0'')';
+    EXECUTE IMMEDIATE requete;
+    requete:='INSERT INTO SYS_SEC_USR_STRUCT VALUES ('''||cur_login||''', ''SEC_'||cur_login||''')';
+    EXECUTE IMMEDIATE requete;
+    IF cur_req_liste_mat IS NULL THEN
+      requete            :='INSERT INTO REQUETESIMPLE SELECT NOMREQUETE, UTILISATEUR, ''SEC_LOC'', REQUETE, REQUETEECR_GSI, REQUETESQL_GSI, TYPE_REQUETE, EST_VISIBLE,''0'' FROM REQUETESIMPLE WHERE (NOMREQUETE=''SEC_'||cur_login||''' OR NOMREQUETE LIKE ''SEC_'||cur_login||'_CODTS_%'') AND UTILISATEUR=''DBA'' AND APPLICATION=''SEC_LOC_STR''';
+      EXECUTE IMMEDIATE requete;
+    ELSE
+      requete:='INSERT INTO REQUETESIMPLE SELECT NOMREQUETE, UTILISATEUR, ''SEC_LOC'', REQUETE, REQUETEECR_GSI, REQUETESQL_GSI, TYPE_REQUETE, EST_VISIBLE ,''0'' FROM REQUETESIMPLE WHERE NOMREQUETE LIKE ''SEC_'||cur_login||'_CODTS_%'' AND UTILISATEUR=''DBA'' AND APPLICATION=''SEC_LOC_STR''';
+      EXECUTE IMMEDIATE requete;
+      requete:='INSERT INTO REQUETESIMPLE SELECT NOMREQUETE||''_STR'', UTILISATEUR, ''SEC_LOC'', REQUETE, REQUETEECR_GSI, REQUETESQL_GSI, 1, ''0'',''0'' FROM REQUETESIMPLE WHERE NOMREQUETE=''SEC_'||cur_login||''' AND UTILISATEUR=''DBA'' AND APPLICATION=''SEC_LOC_STR''';
+      EXECUTE IMMEDIATE requete;
+      requete:='INSERT INTO REQUETESIMPLE SELECT ''SEC_'||cur_login||'_POP'', UTILISATEUR, APPLICATION, REQUETE, REQUETEECR_GSI, REQUETESQL_GSI, 1, ''0'',''0'' FROM REQUETESIMPLE WHERE NOMREQUETE='''||cur_req_liste_mat||''' AND UTILISATEUR=''DBA'' AND APPLICATION=''SEC_LOC''';
+      EXECUTE IMMEDIATE requete;
+      requete:='INSERT INTO REQUETESIMPLE VALUES (''SEC_'||cur_login||''', ''DBA'', ''SEC_LOC'', ''( '||'SOUS__REQUETE=~~~SEC_'||cur_login||'_POP~~~ AND SOUS__REQUETE=~~~SEC_'||cur_login||'_STR~~~'||' )'', '''||'##  SOUS__REQUETE {{EQUAL{{ SEC_'||cur_login||'_POP  ##  SOUS__REQUETE {{EQUAL{{ SEC_'||cur_login||'_STR  '||''', '''||'##SOUS__REQUETE{{={{~~~SEC_'||cur_login||'_POP~~~##SOUS__REQUETE{{={{~~~SEC_'||cur_login||'_STR~~~'||''', 0, ''1'',''0'')';
+      EXECUTE IMMEDIATE requete;
+    END IF;
+    requete:='UPDATE SYS_USR_CONFIG SET REQ_LISTE_MAT=''SEC_'||cur_login||''' WHERE LOGIN='''||cur_login||'''';
+    EXECUTE IMMEDIATE requete;
+  END IF;
+  COMMIT;
+END SYS_MIGR_SECU_STRUCT_NIVSECU; 

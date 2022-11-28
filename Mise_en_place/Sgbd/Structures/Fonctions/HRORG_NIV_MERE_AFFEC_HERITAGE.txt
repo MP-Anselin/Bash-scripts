@@ -1,0 +1,42 @@
+##
+HRORG_NIV_MERE_AFFEC_HERITAGE
+=SQL=
+CREATE OR REPLACE
+  FUNCTION HRORG_NIV_MERE_AFFEC_HERITAGE(
+      p_codts IN std_struc_arbre.codts%TYPE,
+      p_date  IN std_struc_entite.date_eff%TYPE)
+    RETURN VARCHAR2
+  IS
+    v_lien_codts std_struc_type.lien_codts%TYPE;
+    v_type_entite std_struc_entite.type_entite%TYPE;
+    v_niveau NUMBER;
+  BEGIN
+    /* On vérifie que la structure hérite d'une autre structure */
+    SELECT lien_codts INTO v_lien_codts FROM std_struc_type WHERE codts =p_codts;
+    IF (v_lien_codts IS NULL) THEN
+      RETURN '0';
+    END IF;
+    /* On récupère le type d'entité le plus bas dans l'organisation des niveaux */
+    SELECT type_entite
+    INTO v_type_entite
+    FROM std_struc_niv
+    WHERE codts=p_codts
+    AND niveau =
+      (SELECT MAX(niveau) FROM std_struc_niv WHERE codts=p_codts
+      );
+    /* On regarde si le type entité est utilisé dans l'organisation des niveaux de la structure mère */
+    SELECT niveau
+    INTO v_niveau
+    FROM std_struc_niv
+    WHERE codts    =v_lien_codts
+    AND type_entite=v_type_entite
+    AND p_date BETWEEN date_eff AND date_fin ;
+    IF (v_niveau IS NULL) THEN
+      RETURN '0';
+    END IF;
+    RETURN v_niveau;
+  EXCEPTION
+  WHEN OTHERS THEN
+    RETURN '0' ;
+  END HRORG_NIV_MERE_AFFEC_HERITAGE ;
+  

@@ -1,0 +1,7 @@
+##
+TAG_CHARSET=@€ιθη
+##
+EDI_REQ_EXIT
+==
+DELETE FROM EDI_REQ_EXIT WHERE NOMREQ = 'RD_EDI_CLIENT'
+'RD_EDI_CLIENT','fr.adp.com.gxp.std.mot_met.lib.objects.docserver.moduleeditique.ModuleEditionDocServMgr'

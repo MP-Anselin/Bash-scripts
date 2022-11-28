@@ -1,0 +1,571 @@
+##
+TAG_CHARSET=@€éèç
+##
+TGE_CONTROLE_30
+=SQL=
+create or replace PROCEDURE TGE_CONTROLE_30 ( P_LOGIN IN VARCHAR2
+ , P_DATE_IMPORT IN VARCHAR2
+ , P_NUMLIGNE IN VARCHAR2
+ , P_CODLANG in VARCHAR2
+ -- Valeurs attendues : EC/ECS -> écran création (S en mode SimuPaie),  EM/EMS -> écran modification (S en mode SimuPaie), GAP -> création en sous-marin,
+ -- I --> pour le préchargement des imports Web, VI -> pour la validation des imports Web ou Batch, MP -> création depuis la Market Place
+ , P_TYPE_ACTION IN VARCHAR2
+ ) AS
+ /********************************************************************************
+ Version     : V5.05.000
+ *********************************************************************************/
+ clWhere varchar2(1000);
+ -- Pour les merge, la clause where ne doit pas inclure la colonne ERREURS, on gère des clauses spécifiques
+ clWhereMerge varchar2(1000);
+ clWhereMergeErreur varchar2(250);
+ 
+ req varchar2(2000);
+ w_exist_element NUMBER ;
+ w_err VARCHAR2(2000);
+ w_param_longueur VARCHAR2(10);
+ w_id_natcol varchar2(4000);
+ 
+ BEGIN
+ clwhere:='EI.login='''||p_login||''' and EI.date_import='''||P_DATE_IMPORT||''' and EI.code_element not in (''B690'',''B691'') ';
+ 
+ if p_numligne is not null then
+ 	clwhere:=clwhere||' AND EI.NUMLIGNE='||p_numligne;
+ end if;
+
+ -- On ne traite que les lignes qui sont en statut TRAIT et TRANS (les autres FIN, ANNULER, ... ne doivent plus être controlées 
+ clwhere:=clwhere || ' AND (EI.STATUT = ''TRAIT''';
+ clwhere:=clwhere || ' OR EI.STATUT = ''TRANS'') ';
+  
+ clWhereMerge := clwhere;
+ clWhereMergeErreur := '';
+ 
+ IF p_type_action = 'VI' and p_login <> 'BATCH' then
+   -- A la validation d'import Web, on ne va passer que sur les lignes qui ne sont pas déjà en erreur.
+   -- Certaines lignes sont déjà en erreur et on ne veut pas les retraiter (sinon double message)
+   clwhere := clwhere || ' and EI.ERREURS is null';
+   clWhereMergeErreur := ' where EI.ERREURS is null';
+ END IF;
+ 
+ IF p_login ='BATCH' THEN 
+ -- Mise à blanc de tous les messages d'erreur des lignes qui vont être contrôlées. Seulement pour le BATCH, car dans les autres cas il y a des contrôles
+ -- qui sont fait en amont des contrôles PL/SQL (côté Java)
+ 	req:='update TGE_IMPORT_ELEMENTS EI SET ERREURS = '''' WHERE '||clwhere;
+ 	EXECUTE_IMMEDIATE_STRING( req,0);
+ 	
+ -- Contrôle que le collaborateur est cohérent : date effet / paiezad. En Batch, on n'utilise pas IdentifiantCollab pour récupérer les informations
+ -- du collaborateur, on prend juste ce qui est dans le fichier. On doit donc contrôler que le collab existe
+  	req:= 'update TGE_IMPORT_ELEMENTS EI SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS, '''||replace(get_message_erreur('STD', 'STD00046', p_codlang),'''','''''')||''',EI.MATRICULE||''|''||EI.NUMPAC||''|''||EI.PACMAT||''|''||EI.PAIEZAD||''|''||EI.DATE_EFFET,'''||p_codlang||''') where '||clwhere;
+  	req:= req || ' and EI.NUMPAC is not null and EI.PAIEZAD is not null';
+  	req:= req || ' and (not exists(SELECT 1 FROM DIC_ADM_CONTRAT_SITU DACS WHERE DACS.NUMPAC=EI.NUMPAC and DACS.PAIEZAD=EI.PAIEZAD';
+  	req:= req || ' and TO_DATE(EI.DATE_EFFET, ''YYYYMMDD'') between DACS.DSDSC and DACS.DSFSC))';
+  	EXECUTE_IMMEDIATE_STRING( req,0);
+ END IF;
+ 
+ -- Met une erreur sur les lignes en doublon dans le fichier d'import
+ IF p_type_action = 'I' or p_type_action = 'VI' or p_type_action = 'MP' THEN
+ req :='update TGE_IMPORT_ELEMENTS EI SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','ZEZ00032',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''') WHERE  '||clwhere||' AND ';
+ req := req ||' NUMLIGNE IN (select numligne from  tge_import_elements P where P.date_import ='''||P_DATE_IMPORT||''' and  P.LOGIN='''||p_login||''' and P.ERREURS is null';
+ req := req ||' AND (NUMPAC,PAIEZAD,PERIODE,TYPE_TRAITEMENT,code_element,nvl(INDICATIF,''XyZ''),NVL(CODE_REMPLACEMENT,''*'') )in ';
+ req := req ||' (select t.NUMPAC,t.PAIEZAD,t.PERIODE,t.TYPE_TRAITEMENT,t.CODE_ELEMENT,nvl(t.INDICATIF,''XyZ''),NVL(t.CODE_REMPLACEMENT,''*'') from tge_import_elements t';
+ req := req ||' where t.login='''||p_login||''' and t.date_import='''||P_DATE_IMPORT||''' and t.ERREURS is null group by t.NUMPAC,t.PAIEZAD,t.PERIODE,t.TYPE_TRAITEMENT,t.CODE_ELEMENT,t.INDICATIF,t.CODE_REMPLACEMENT having count(*)>1) )' ;
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ END IF;
+ 
+ -- On conserve la ligne dont le numLigne est le max dans la liste des doublons (on enlève le message d'erreur)
+ IF p_type_action = 'I' or p_type_action = 'VI' or p_type_action = 'MP' THEN
+ req :='update TGE_IMPORT_ELEMENTS EI SET ERREURS=null WHERE  '||clwhere||' AND ';
+ req := req ||' NUMLIGNE IN (select numligne from  tge_import_elements P where P.date_import ='''||P_DATE_IMPORT||''' AND  P.LOGIN='''||p_login||''' ';
+ req := req ||' AND (NUMPAC,PAIEZAD,PERIODE,TYPE_TRAITEMENT,code_element,nvl(INDICATIF,''XyZ''),NVL(CODE_REMPLACEMENT,''*''),numligne) in ';
+ req := req ||' (select t.NUMPAC,t.PAIEZAD,t.PERIODE,t.TYPE_TRAITEMENT,t.CODE_ELEMENT,nvl(t.INDICATIF,''XyZ''),NVL(t.CODE_REMPLACEMENT,''*''),max(numligne) as numligne from tge_import_elements t';
+ req := req ||' where t.login='''||p_login||''' and t.date_import='''||P_DATE_IMPORT||''' group by t.NUMPAC,t.PAIEZAD,t.PERIODE,t.TYPE_TRAITEMENT,t.CODE_ELEMENT,t.INDICATIF,t.CODE_REMPLACEMENT having count(*)>1) )' ;
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ END IF;
+ 
+ IF p_type_action = 'EC' or p_type_action = 'ECS' or p_type_action = 'I' or p_type_action = 'VI' or p_type_action = 'MP' THEN
+   -- Non existe EZ (seulement en création ou import. Les tests d'existence en modification sont exécutés en Java)
+   -- Si l'élément existant a comme DERNIER_CODE_OPE = 'S', alors message ZEZ00040
+   -- sinon ZEZ00030
+   req :='merge into TGE_IMPORT_ELEMENTS EI using TGE_ELEMENTS_PAIE E on (';
+   req := req || clwhereMerge;
+   req := req ||' and E.NUMPAC = EI.NUMPAC and E.PAIEZAD = EI.PAIEZAD and E.PERIODE = EI.PERIODE';
+   --req := req ||' and E.TYPE_TRAITEMENT = EI.TYPE_TRAITEMENT and E.CODE_ELEMENT = EI.CODE_ELEMENT and E.INDICATIF = EI.INDICATIF AND E.CODE_REMPLACEMENT=NVL(EI.CODE_REMPLACEMENT,''*''))';
+   req := req ||' and E.TYPE_TRAITEMENT = EI.TYPE_TRAITEMENT and E.CODE_ELEMENT = EI.CODE_ELEMENT and E.INDICATIF = EI.INDICATIF AND E.CODE_REMPLACEMENT=NVL(EI.CODE_REMPLACEMENT,''*'')';
+   -- On rajoute une clause sur la table TGE_IMPORT_ANNULATION car avant l'insertion il peut y avoir eu des cartes d'annulation (FSED) et donc l'élément sera supprimé
+   req := req ||' and not exists (select 1 from  TGE_IMPORT_ANNULATION A where A.LOGIN = '''||P_LOGIN||''' and A.DATE_IMPORT = '''||P_DATE_IMPORT||''' and A.NUMPAC = E.NUMPAC';
+   req := req ||' and A.PAIEZAD = E.PAIEZAD and A.PERIODE = E.PERIODE and A.ORIGINE = E.ORIGINE';
+   -- Lors de l'annulation, on ne supprime pas les EZ de remplacement si MODE_3060 est égal à 'F'
+   req := req ||' and ((exists (select 1 from TGE_REF_ORIGINE_GTA where NUMPAC = E.NUMPAC and CODE_ORIGINE = E.ORIGINE';
+   req := req ||' and MODE_3060 != ''F'' ) and E.CODE_REMPLACEMENT = ''R'') or E.CODE_REMPLACEMENT = ''*'' ))';
+   req := req ||' )';
+   req := req ||' when matched then update set ERREURS ='; 
+   req := req ||' case';
+   req := req ||' when E.DERNIER_CODE_OPE = ''S'' then TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','ZEZ00040',p_codlang),'''','''''')||''',EI.CODE_ELEMENT||''|''||TGE_IMPORT_FORMATE_DATE(EI.PERIODE, EI.LOGIN, ''YYYYMM'', ''MM.YYYY'')||''|''||EI.INDICATIF,'''||p_codlang||''')';
+   req := req ||' else TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','ZEZ00030',p_codlang),'''','''''')||''',CODE_ELEMENT||''|''||INDICATIF||''|''||TGE_IMPORT_FORMATE_DATE(PERIODE, LOGIN, ''YYYYMM'', ''MM.YYYY''),'''||p_codlang||''')';
+   req := req ||' end';
+   req:= req || clWhereMergeErreur;
+   EXECUTE_IMMEDIATE_STRING( req,0);
+ END IF;
+ 
+ -- Numpac non vide
+ req:='update TGE_IMPORT_ELEMENTS EI SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00077',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''') where '||clwhere||' AND NUMPAC is null ';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- PaieZad non vide
+ req:='update TGE_IMPORT_ELEMENTS EI SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00078',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''') where '||clwhere||' AND PAIEZAD is null ';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- Periode non vide
+ req:='update TGE_IMPORT_ELEMENTS EI SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00010',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''') where '||clwhere||' AND PERIODE is null ';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- Type Traitement non vide
+ req:='update TGE_IMPORT_ELEMENTS EI SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00079',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''') where '||clwhere||' AND TYPE_TRAITEMENT is null ';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- Code_element non vide
+ req:='update TGE_IMPORT_ELEMENTS EI SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00016',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''') where '||clwhere||' AND CODE_ELEMENT is null ';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- Date d'effet non vide
+ req:='update TGE_IMPORT_ELEMENTS EI SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00314',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''') where '||clwhere||' AND DATE_EFFET is null ';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- Longueur Matricule
+ req:='update TGE_IMPORT_ELEMENTS EI SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00089',p_codlang),'''','''''')||''',MATRICULE,'''||p_codlang||''') where '||clwhere||' AND MATRICULE is NOT null AND LENGTH (MATRICULE)>32 ';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ -- Longueur Origine
+ req:='update TGE_IMPORT_ELEMENTS EI SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00100',p_codlang),'''','''''')||''',ORIGINE,'''||p_codlang||''') where '||clwhere||' AND ORIGINE is NOT null AND LENGTH (ORIGINE)>1 ';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ --
+ -- Longueur LOGIN (sauf pour le Batch)
+ req:='update TGE_IMPORT_ELEMENTS EI SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00107',p_codlang),'''','''''')||''',LOGIN,'''||p_codlang||''') where '||clwhere||' AND LOGIN!=''BATCH'' AND LENGTH (LOGIN)>32 ';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- date_effet/periode de paie TGE00310
+ req:='update TGE_IMPORT_ELEMENTS EI SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00310',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''') where '||clwhere;
+ -- permet de gérer les cas où DATE_EFFET ou PERIODE ne sont pas des dates valides
+ req:= req ||' and (select case when to_date(EI.DATE_EFFET,''YYYYMMDD'') > last_day(to_date(EI.PERIODE,''YYYYMM'')) then ''O'' else ''N'' end from dual where is_date(EI.DATE_EFFET, ''YYYYMMDD'')=1 and is_date(EI.PERIODE, ''YYYYMM'')=1 ) = ''O''';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ IF p_type_action = 'ECS' or p_type_action = 'EMS' then
+	-- En SimuPaie, on contrôle seulement l'interdiction de la saisie dans la passé : TGE00311 (il n'y a pas de passé, rétro) 
+	req:='update TGE_IMPORT_ELEMENTS EI set EI.ERREURS=TGE_GET_MESSAGE_ERREUR(EI.ERREURS,'''||replace(get_message_erreur('TGE','TGE00311',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''')';
+	req:= req ||' where '||clwhere || ' ';
+	-- permet de gérer les cas où PERIODE n'est pas une date valide 
+	req:= req ||' and (select case when to_date(EI.PERIODE,''YYYYMM'') < (select to_date(P.PERIODEENCOURS,''YYYYMM'') from TGE_REF_PAC P where P.NUMPAC = EI.NUMPAC) then ''O'' else ''N'' end from dual where is_date(EI.PERIODE, ''YYYYMM'')=1 ) = ''O''';
+	EXECUTE_IMMEDIATE_STRING( req,0);
+ ELSE
+	 -- période de paie pour les EZ : TGE00311 / ZEZ00037 / TGE00336 / TGE00337
+	 req:='merge into TGE_IMPORT_ELEMENTS EI using';
+	 req:= req ||' (select P1.NUMPAC, P1.PERIODEENCOURS, P1.DEB_RETRO, GREATEST(P1.DEB_HISTO_RETRO,NVL( S.PREMIERE_PAIE, ''190101'')) AS DEB_HISTO_RETRO, P1.NB_MOIS_RETRO, S.PACMAT,';
+	 -- Pour le calcul de la limite rétro, on ne tient pas compte du max entre DEB_HISTO_RETRO et PERIODEENCOURS - NB_MOIS
+	 -- car c'est le test sur la DEB_HISTO_RETRO et le message TGE00336 qui sera pris en compte
+	 req:= req ||' TO_CHAR(ADD_MONTHS(TO_DATE(P1.PERIODEENCOURS, ''YYYYMM''), - P1.NB_MOIS_RETRO), ''YYYYMM'') AS LIMITE_RETRO '; 
+	 req:= req ||' from TGE_REF_PAC P1 LEFT JOIN SECUPACMAT S ON P1.NUMPAC = S.NUMPAC ) P';
+	 req:= req ||' on (';
+	 req:= req || clwhereMerge;
+	 req:= req ||' and EI.PERIODE < P.PERIODEENCOURS';
+	 req:= req ||' and ( P.DEB_RETRO IS NULL or P.PERIODEENCOURS < P.DEB_RETRO';
+	 IF not p_type_action = 'GAP' then
+	   -- Pour les éléments créés en sous-marin depuis la GAP, on ne teste pas le caractère CALCUL_RETRO de l'élément, ni la cohérence entre la période et la date d'effet
+	   req:= req ||' or EI.PERIODE <> substr(EI.DATE_EFFET, 0, 6)';
+	 END IF;
+	 req:= req ||' or EI.PERIODE < P.DEB_HISTO_RETRO or EI.PERIODE < P.LIMITE_RETRO)';
+	 req:= req ||' AND ( EI.PACMAT is  null or EI.PACMAT = P.PACMAT )'; 
+	 req:= req ||' and EI.NUMPAC = P.NUMPAC)'; 
+	 req:= req ||' when matched then update set EI.ERREURS = case';
+	 req:= req ||' when P.DEB_RETRO is null or P.PERIODEENCOURS < P.DEB_RETRO then TGE_GET_MESSAGE_ERREUR(EI.ERREURS,'''||replace(get_message_erreur('TGE','TGE00311',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''')';
+	 req:= req ||' when EI.PERIODE < P.DEB_HISTO_RETRO then TGE_GET_MESSAGE_ERREUR(EI.ERREURS,'''||replace(get_message_erreur('TGE','TGE00336',p_codlang),'''','''''')||''',to_char(to_date(P.DEB_HISTO_RETRO, ''YYYYMM''), ''MM.YYYY''),'''||p_codlang||''')';
+	 req:= req ||' when EI.PERIODE < P.LIMITE_RETRO then TGE_GET_MESSAGE_ERREUR(EI.ERREURS,'''||replace(get_message_erreur('TGE','TGE00337',p_codlang),'''','''''')||''',TO_CHAR(TO_DATE(P.LIMITE_RETRO, ''YYYYMM''), ''MM.YYYY''),'''||p_codlang||''')';
+	 req:= req ||' end';
+	 req:= req || clWhereMergeErreur;
+	 EXECUTE_IMMEDIATE_STRING( req,0);
+ END IF;
+ 
+ -- Format date d'effet TGE00315
+ req:='update TGE_IMPORT_ELEMENTS EI SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00315',p_codlang),'''','''''')||''',EI.DATE_EFFET,'''||p_codlang||''') where '||clwhere||' AND EI.DATE_EFFET is not null and IS_DATE(EI.DATE_EFFET,''YYYYMMDD'')=0';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ -- IdPacMat non vide
+ req:='update TGE_IMPORT_ELEMENTS EI SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00102',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''') where '||clwhere||' AND (RPAD(NUMPAC,6) || PACMAT) is null ';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ -- Longueur NumPac
+ req:='update TGE_IMPORT_ELEMENTS EI SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00072',p_codlang),'''','''''')||''',numpac,'''||p_codlang||''') where '||clwhere||' AND NVL(LENGTH(NUMPAC),0)>6 ';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ -- Longueur PaieZad
+ req:='update TGE_IMPORT_ELEMENTS EI SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00073',p_codlang),'''','''''')||''',NULL,PAIEZAD) where '||clwhere||' AND NVL(LENGTH(PAIEZAD),0)>8 ';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ -- Format Periode
+ req:='update TGE_IMPORT_ELEMENTS EI SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00328',p_codlang),'''','''''')||''',PERIODE,'''||p_codlang||''') WHERE '||clwhere||' AND PERIODE is NOT null AND IS_DATE(PERIODE,''YYYYMM'')=0 ';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ -- Longueur Cle_import
+ req:='update TGE_IMPORT_ELEMENTS EI SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00099',p_codlang),'''','''''')||''',LOGIN || ''#'' ||DATE_IMPORT || ''#'' ||NUMLIGNE,'''||p_codlang||''') WHERE '||clwhere||' AND LOGIN IS NOT NULL AND DATE_IMPORT IS NOT NULL AND NUMLIGNE IS NOT NULL AND  LENGTH(LOGIN || ''#'' ||DATE_IMPORT || ''#'' ||NUMLIGNE) >70 ';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ -- Longueur IdPacMat
+ req:='update TGE_IMPORT_ELEMENTS EI SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00103',p_codlang),'''','''''')||''',RPAD(NUMPAC,6) || PACMAT,'''||p_codlang||''') WHERE '||clwhere||' AND NUMPAC   IS NOT NULL AND PACMAT IS NOT NULL AND  LENGTH(RPAD(NUMPAC,6) || PACMAT) >14 ';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- controle NATCOL doit avoir la valeur SAL ou STA TGE00027
+ select VALVAR into w_id_natcol from sys_varsys where module='STD' and codvar='ID_NATCOL';
+ req:='update TGE_IMPORT_ELEMENTS EI SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00027',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''') where '||clwhere;
+ req := req ||' and (select DAC.'||w_id_natcol||' from DIC_ADM_CONTRAT DAC inner join DIC_ADM_CONTRAT_SITU DACS on (DACS.NUMPAC = DAC.NUMPAC and DACS.PACMAT = DAC.PACMAT and DACS.NUMCNT = DAC.NUMCNT) where DACS.PAIEZAD = EI.PAIEZAD and DAC.NUMPAC = EI.NUMPAC';
+-- Si le PAC n'est pas MPE, le couple NUMPAC/PAIEZAD ne suffit pas à déterminer un contrat, on utilise la date d'effet
+ req := req ||' and case when ((select MPE from TGE_REF_PAC P where P.NUMPAC = EI.NUMPAC) = ''N'' and TO_DATE(EI.DATE_EFFET, ''YYYYMMDD'') between DAC.DSDCN and nvl(DAC.DSFCN, to_date(''20991231'', ''YYYYMMDD'')))';
+ req := req ||' or (select MPE from TGE_REF_PAC P2 where P2.NUMPAC = EI.NUMPAC) <> ''N'' then 1 else 0 end = 1) not in (''SAL'', ''STA'')';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ IF p_login = 'BATCH' THEN
+ -- Autorisation paiezad
+ req:='update TGE_IMPORT_ELEMENTS EI SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('STD','STD00049',p_codlang),'''','''''')||''',paiezad||''|''||numpac,'''||p_codlang||''') ';
+ req:= req || ' WHERE '||clwhere||' AND EI.paiezad IS NOT NULL AND EI.numpac is not null AND NOT ';
+ req:= req || '(';
+ req:= req ||   ' ( exists (SELECT * from DIC_ADM_CONTRAT C WHERE C.NUMPAC =EI.numpac and C.CURRENT_PAIEZAD =EI.paiezad and c.numpac in (select numpac from TGE_REF_PAC where numpac = c.numpac and not nvl(mpe,''N'')=''N'')) )';
+ req:= req || ' OR ';
+ req:= req ||   '(exists (SELECT * from DIC_ADM_CONTRAT C ,SECUPACMAT S  WHERE C.NUMPAC = S.NUMPAC and C.PACMAT = S.PACMAT and C.NUMCNT = S.CURRENT_NUMCNT AND C.NUMPAC =EI.numpac and C.CURRENT_PAIEZAD =EI.paiezad and c.numpac in (select numpac from TGE_REF_PAC where numpac = c.numpac and nvl(mpe,''N'')=''N'')) )';
+ req:= req || ') ' ;
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ END IF;
+ 
+ -- Il ne doit pas y avoir de pac * dans la table TGE_REF_DICOZ
+ -- Existe code_element
+ req:='update TGE_IMPORT_ELEMENTS EI SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00017',p_codlang),'''','''''')||''',code_element,'''||p_codlang||''') ';
+ req:= req || ' where '||clwhere||' AND EI.code_element is not null';
+ req:= req || ' and not exists (select 1 from TGE_REF_DICOZ DZ where DZ.NUMPAC = EI.NUMPAC and DZ.ELEMENT= EI.CODE_ELEMENT)';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- Existe type_traitement
+ req:='update TGE_IMPORT_ELEMENTS EI set EI.ERREURS=TGE_GET_MESSAGE_ERREUR(EI.ERREURS,'''||replace(get_message_erreur('TGE','TGE00101',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''') ';
+ req:= req || ' where '||clwhere||' AND  EI.type_traitement is not null';
+ req:= req || ' and not exists (select 1 from TGE_REF_TYPETRT TT where TT.CODETYPTRT = EI.TYPE_TRAITEMENT';
+ req:= req || ' and (';
+ req:= req ||   ' ((select count(*) from TGE_REF_TYPETRT TT2 where TT2.NUMPAC = EI.NUMPAC and TT2.CODETYPTRT = EI.TYPE_TRAITEMENT) > 0 and TT.NUMPAC = EI.NUMPAC)';
+ req:= req ||   ' or';
+ req:= req ||   ' ((select count(*) from TGE_REF_TYPETRT TT2 where TT2.NUMPAC = EI.NUMPAC and TT2.CODETYPTRT= EI.TYPE_TRAITEMENT) = 0 and TT.NUMPAC=''*'')';
+ req:= req || ' ))';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- Format sens
+ req:='update TGE_IMPORT_ELEMENTS EI SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00038',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''') WHERE '||clwhere||' AND sens IS NOT NULL AND sens NOT IN (''+'',''-'') ';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- Autorisation sens (Valeur 'Aucun' attendue pour les TYPE = 'A')
+ req:='update TGE_IMPORT_ELEMENTS EI SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','ZEZ00015',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''') ';
+ req:= req || ' where '||clwhere||' and EI.SENS is not null and EI.SENS in (''+'',''-'') ';
+ req:= req || ' and exists (select 1 from TGE_REF_DICOZ DZ where DZ.NUMPAC = EI.NUMPAC and DZ.ELEMENT= EI.CODE_ELEMENT and DZ.TYPE = ''A'')';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ /** Début des tests sur l'INDICATIF */
+ -- On fait les tests sur l'indicatif qu'en création ou import. En modification, l'indicatif ne change pas.
+ IF p_type_action = 'EC' or p_type_action = 'I' or p_type_action = 'VI' or p_type_action = 'MP' THEN
+ -- OCC1 > 0 et GROUPE = COT/CZR/CTM/CRA : Existe code_caisse
+ req:='update TGE_IMPORT_ELEMENTS EI set EI.ERREURS=TGE_GET_MESSAGE_ERREUR(EI.ERREURS,'''||replace(get_message_erreur('TGE','TGE00013',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''')';
+ req:= req || ' where '||clwhere||' AND EI.INDICATIF is not null AND EI.NUMPAC is not null';
+ req:= req || ' and exists (select 1 from TGE_REF_DICOZ DZ where DZ.NUMPAC = EI.NUMPAC and DZ.ELEMENT = EI.CODE_ELEMENT and DZ.OCC1 > 0 and DZ.GROUPE in (''COT'',''CZR'',''CTM'',''CRA''))';
+ req:= req || ' and not exists (select 1 from TGE_REF_CAISSE RC where RC.NUMPAC = EI.NUMPAC and RC.CODECAISSE = EI.INDICATIF)';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+
+  -- OCC1 > 0 et GROUPE = TXR : Existe code_rubrique
+ req:='update TGE_IMPORT_ELEMENTS EI set EI.ERREURS=TGE_GET_MESSAGE_ERREUR(EI.ERREURS,'''||replace(get_message_erreur('TGE','TGE00334',p_codlang),'''','''''')||''',EI.INDICATIF,'''||p_codlang||''')';
+ req:= req || ' where '||clwhere||' AND EI.INDICATIF is not null AND EI.NUMPAC is not null';
+ req:= req || ' and exists (select 1 from TGE_REF_DICOZ DZ where DZ.NUMPAC = EI.NUMPAC and DZ.ELEMENT = EI.CODE_ELEMENT and DZ.OCC1 > 0 and DZ.GROUPE in (''TXR''))';
+ req:= req || ' and not exists (select 1 from TGE_REF_RUBRIQUE R where R.NUMPAC = EI.NUMPAC and R.CODERUB = EI.INDICATIF)';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+
+ -- OCC1 > 0 et GROUPE = COT/CZR/CTM/CRA : Caisse référence interdite si on est NewCot (TGE_REF_PAC.OLDCOT = 'N')
+ req:='update TGE_IMPORT_ELEMENTS EI set EI.ERREURS=TGE_GET_MESSAGE_ERREUR(EI.ERREURS,'''||replace(get_message_erreur('TGE','ZEZ00010',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''')';
+ req:= req || ' where '||clwhere||' AND EI.INDICATIF is not null and EI.NUMPAC is not null';
+ req:= req || ' and exists (select 1 from TGE_REF_DICOZ DZ where DZ.NUMPAC = EI.NUMPAC and DZ.ELEMENT = EI.CODE_ELEMENT and DZ.OCC1 > 0 and DZ.GROUPE in (''COT'',''CZR'',''CTM'',''CRA''))';
+ req:= req || ' and exists (select 1 from TGE_REF_CAISSE RC where RC.NUMPAC = EI.NUMPAC and RC.CODECAISSE = EI.INDICATIF and RC.CODEGROUP = ''R'')';
+ req:= req || ' and nvl((select P.OLDCOT from TGE_REF_PAC P where P.NUMPAC = EI.NUMPAC), ''N'') != ''O'' ';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- OCC1 > 0 et GROUPE = HCO : Format attendu MM:CCC - longueur attendue 6
+ req:='update TGE_IMPORT_ELEMENTS EI set EI.ERREURS=TGE_GET_MESSAGE_ERREUR(EI.ERREURS,'''||replace(get_message_erreur('TGE','ZEZ00036',p_codlang),'''','''''')||''',''MM:CCC'','''||p_codlang||''')';
+ req:= req || ' where '||clwhere||' and EI.INDICATIF is not null  and length(EI.INDICATIF) != 6';
+ req:= req || ' and exists (select 1 from TGE_REF_DICOZ DZ where DZ.NUMPAC = EI.NUMPAC and DZ.ELEMENT = EI.CODE_ELEMENT and DZ.OCC1 > 0 and DZ.GROUPE = ''HCO'')';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- OCC1 > 0 et GROUPE = HCO : Format attendu MM:CCC - MM doit correspondre à un mois
+ req:='update TGE_IMPORT_ELEMENTS EI set EI.ERREURS=TGE_GET_MESSAGE_ERREUR(EI.ERREURS,'''||replace(get_message_erreur('TGE','ZEZ00011',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''')';
+ req:= req || ' where '||clwhere||' and EI.INDICATIF is not null AND EI.NUMPAC is not null and length(EI.INDICATIF) = 6';
+ req:= req || ' and (IS_NUMBER(substr(EI.INDICATIF, 0, 2)) is null or IS_DATE(substr(EI.INDICATIF,0, 2),''MM'') !=1)';
+ req:= req || ' and exists (select 1 from TGE_REF_DICOZ DZ where DZ.NUMPAC = EI.NUMPAC and DZ.ELEMENT = EI.CODE_ELEMENT and DZ.OCC1 > 0 and DZ.GROUPE = ''HCO'')';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- OCC1 > 0 et GROUPE = HCO : Format attendu MM:CCC - CCC Existe code_caisse
+ req:='update TGE_IMPORT_ELEMENTS EI set EI.ERREURS=TGE_GET_MESSAGE_ERREUR(EI.ERREURS,'''||replace(get_message_erreur('TGE','TGE00013',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''')';
+ req:= req || ' where '||clwhere||' and EI.INDICATIF is not null and EI.NUMPAC is not null and length(EI.INDICATIF) = 6';
+ req:= req || ' and exists (select 1 from TGE_REF_DICOZ DZ where DZ.NUMPAC = EI.NUMPAC and DZ.ELEMENT = EI.CODE_ELEMENT and DZ.OCC1 > 0 and DZ.GROUPE = ''HCO'')';
+ req:= req || ' and not exists (select 1 from TGE_REF_CAISSE RC where RC.NUMPAC = EI.NUMPAC and RC.CODECAISSE = substr(EI.INDICATIF, 4))';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- OCC1 > 0 et GROUPE = HCO : Format attendu MM:CCC - CCC Caisse référence interdite
+ req:='update TGE_IMPORT_ELEMENTS EI set EI.ERREURS=TGE_GET_MESSAGE_ERREUR(EI.ERREURS,'''||replace(get_message_erreur('TGE','ZEZ00010',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''')';
+ req:= req || ' where '||clwhere||' and EI.INDICATIF is not null and EI.NUMPAC is not null and length(EI.INDICATIF) = 6';
+ req:= req || ' and exists (select 1 from TGE_REF_DICOZ DZ where DZ.NUMPAC = EI.NUMPAC and DZ.ELEMENT = EI.CODE_ELEMENT and DZ.OCC1 > 0 and DZ.GROUPE in (''HCO''))';
+ req:= req || ' and exists (select 1 from TGE_REF_CAISSE RC where RC.NUMPAC = EI.NUMPAC and RC.CODECAISSE = substr(EI.INDICATIF, 4) and RC.CODEGROUP = ''R'')';
+ req:= req || ' and nvl((select P.OLDCOT from TGE_REF_PAC P where P.NUMPAC = EI.NUMPAC), ''N'') != ''O'' ';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- OCC1 > 0 et GROUPE = HIS et OCC2 = 0 : Format attendu SSAAMMN
+ req:='update TGE_IMPORT_ELEMENTS EI set EI.ERREURS=TGE_GET_MESSAGE_ERREUR(EI.ERREURS,'''||replace(get_message_erreur('TGE','ZEZ00036',p_codlang),'''','''''')||''',''SSAAMMN'','''||p_codlang||''')';
+ req:= req || ' where '||clwhere||' and (length(EI.INDICATIF) != 7 or IS_NUMBER(substr(EI.INDICATIF,7,1)) is null or IS_DATE(substr(EI.INDICATIF, 0, 6),''YYYYMM'') !=1 )';
+ req:= req || ' and exists (select 1 from TGE_REF_DICOZ DZ where DZ.ELEMENT = EI.CODE_ELEMENT and DZ.NUMPAC = EI.NUMPAC and DZ.OCC1 > 0 and DZ.OCC2 = 0 and DZ.GROUPE = ''HIS'')';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- OCC1 > 0 et GROUPE = HIS et OCC2 = 0 : Format attendu SSAAMMN - N doit etre compris etre 1 et 9
+ req:='update TGE_IMPORT_ELEMENTS EI set EI.ERREURS=TGE_GET_MESSAGE_ERREUR(EI.ERREURS,'''||replace(get_message_erreur('TGE','ZEZ00012',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''')';
+ req:= req || ' where '||clwhere;
+ req:= req || ' and exists (select 1 from TGE_REF_DICOZ DZ where DZ.ELEMENT = EI.CODE_ELEMENT and DZ.NUMPAC = EI.NUMPAC and DZ.OCC1 > 0 and DZ.OCC2 = 0 and DZ.GROUPE = ''HIS'')';
+ -- On gère avec un "exist/from dual" pour effectuer les tests > 1 et < 9 sans que ça plante si la valeur de "N" n'est pas un nombre valide
+ req:= req || ' and exists (select 1 from dual where length(EI.INDICATIF) = 7 and (IS_NUMBER(substr(EI.INDICATIF, 7, 1)) is null or to_number(substr(EI.INDICATIF, 7, 1)) < 1 or to_number(substr(EI.INDICATIF, 7, 1)) > 9))';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- OCC1 > 0 et GROUPE = HIS et OCC2 > 0 : Format attendu SSAAMMN:XX
+ req:='update TGE_IMPORT_ELEMENTS EI set EI.ERREURS=TGE_GET_MESSAGE_ERREUR(EI.ERREURS,'''||replace(get_message_erreur('TGE','ZEZ00036',p_codlang),'''','''''')||''',''SSAAMMN:XX'','''||p_codlang||''')';
+ req:= req || ' where '||clwhere||' and (length(EI.INDICATIF) != 10 or IS_NUMBER(substr(EI.INDICATIF, 7, 1)) is null or IS_DATE(substr(EI.INDICATIF, 0, 6),''YYYYMM'') !=1 ';
+ req:= req || ' or substr(EI.INDICATIF,8,1) != '':'' or IS_NUMBER(substr(EI.INDICATIF,9,2)) is null)';
+ req:= req || ' and exists (select 1 from TGE_REF_DICOZ DZ where DZ.ELEMENT = EI.CODE_ELEMENT and DZ.NUMPAC = EI.NUMPAC and DZ.OCC1 > 0 and DZ.OCC2 > 0 and DZ.GROUPE = ''HIS'')';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- OCC1 > 0 et GROUPE = HIS et OCC2 > 0 : Format attendu SSAAMMN:XX - N doit etre compris etre 1 et 9
+ req:='update TGE_IMPORT_ELEMENTS EI set EI.ERREURS=TGE_GET_MESSAGE_ERREUR(EI.ERREURS,'''||replace(get_message_erreur('TGE','ZEZ00012',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''')';
+ req:= req || ' where '||clwhere;
+ req:= req || ' and exists (select 1 from TGE_REF_DICOZ DZ where DZ.ELEMENT = EI.CODE_ELEMENT and DZ.NUMPAC = EI.NUMPAC and DZ.OCC1 > 0 and DZ.OCC2 > 0 and DZ.GROUPE = ''HIS'')';
+ -- On gère avec un "exist/from dual" pour effectuer les tests > 1 et < 9 sans que ça plante si la valeur de "N" n'est pas un nombre valide
+ req:= req || ' and exists (select 1 from dual where length(EI.INDICATIF) = 10 and (IS_NUMBER(substr(EI.INDICATIF, 7, 1)) is null or to_number(substr(EI.INDICATIF, 7, 1)) < 1 or to_number(substr(EI.INDICATIF, 7, 1)) > 9))';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- OCC1 > 0 et GROUPE = HIS et OCC2 > 0 : Format attendu SSAAMMN:XX - XX doit être compris entre 01 et TGE_REF_DICOZ.OCC2
+ -- Utilisation d'un merge afin de pouvoir utiliser DZ.OCC2 dans le message d'erreurs
+ req:='merge into TGE_IMPORT_ELEMENTS EI using TGE_REF_DICOZ DZ on (';
+ req:= req || clwhereMerge;
+ req:= req || ' and DZ.ELEMENT = EI.CODE_ELEMENT and DZ.NUMPAC = EI.NUMPAC and DZ.OCC1 > 0 AND DZ.OCC2 > 0 and DZ.GROUPE = ''HIS'' ';
+ req:= req || ' and (length(EI.INDICATIF)) = 10 and IS_NUMBER(substr(EI.INDICATIF,7,1)) is not null and IS_DATE(substr(EI.INDICATIF,0,6),''YYYYMM'') !=0 and (IS_NUMBER(substr(EI.INDICATIF,9,2)) is null ';
+ req:= req || ' or to_number(substr(EI.INDICATIF,9,2)) < 1 or to_number(substr(EI.INDICATIF,9,2)) > DZ.OCC2 )) ';
+ req:= req || ' when matched then update set EI.ERREURS = TGE_GET_MESSAGE_ERREUR(EI.ERREURS,'''||replace(get_message_erreur('TGE','ZEZ00013',p_codlang),'''','''''')||''',DZ.OCC2,'''||p_codlang||''')';
+ req:= req || clWhereMergeErreur; 
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- OCC1 > 0 et GROUPE = HCP ou HC2 : Format indicatif attendu AAMM+Code Chrono
+ req:='update TGE_IMPORT_ELEMENTS EI set EI.ERREURS=TGE_GET_MESSAGE_ERREUR(EI.ERREURS,'''||replace(get_message_erreur('TGE','ZEZ00036',p_codlang),'''','''''')||''',''AAMM+Code Chrono'','''||p_codlang||''')';
+ req:= req || ' where '||clwhere||' and length(EI.INDICATIF) !=10 ';
+ req:= req || ' and exists (select 1 from TGE_REF_DICOZ DZ where DZ.ELEMENT = EI.CODE_ELEMENT and DZ.NUMPAC = EI.NUMPAC and DZ.OCC1 > 0 and DZ.GROUPE in (''HCP'',''HC2''))';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- OCC1 > 0 et GROUPE = HCP ou HC2 : Format indicatif attendu AAMM+Code Chrono, partie AAMM non valide
+ req:='update TGE_IMPORT_ELEMENTS EI set EI.ERREURS=TGE_GET_MESSAGE_ERREUR(EI.ERREURS,'''||replace(get_message_erreur('TGE','ZEZ00035',p_codlang),'''','''''')||''',''AAMM+Code Chrono|AAMM'','''||p_codlang||''')';
+ req:= req || ' where '||clwhere||' and length(EI.INDICATIF) = 10 and IS_DATE(substr(EI.INDICATIF, 0, 4),''YYMM'') != 1';
+ req:= req || ' and exists (select 1 from TGE_REF_DICOZ DZ where DZ.ELEMENT = EI.CODE_ELEMENT and DZ.NUMPAC = EI.NUMPAC and DZ.OCC1 > 0 and DZ.GROUPE in (''HCP'',''HC2''))';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- OCC1 > 0 et GROUPE = HCP ou HC2 : Format indicatif attendu AAMM+Code Chrono, Code chrono n'existe pas pour le collaborateur
+ req:='update TGE_IMPORT_ELEMENTS EI set EI.ERREURS=TGE_GET_MESSAGE_ERREUR(EI.ERREURS,'''||replace(get_message_erreur('TGE','ZEZ00034',p_codlang),'''','''''')||''',substr(Ei.indicatif,5),'''||p_codlang||''')';
+ req:= req || ' where '||clwhere||' and length(EI.INDICATIF) = 10 and IS_DATE(substr(EI.INDICATIF, 0, 4),''YYMM'') = 1';
+ req:= req || ' and exists (select 1 from TGE_REF_DICOZ DZ where DZ.ELEMENT = EI.CODE_ELEMENT and DZ.NUMPAC = EI.NUMPAC and DZ.OCC1 > 0 and DZ.GROUPE in (''HCP'',''HC2''))';
+ req:= req || ' and not exists (select 1 from DIC_ADM_CONTRAT_SITU where NUMPAC = EI.NUMPAC and PACMAT = EI.PACMAT and CODE_CHRONO  = substr(EI.INDICATIF, 5))';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- OCC2 = 0 et OCC1 = 13 et GROUPE not in COT / CZR / CTM / CRA / HCO / HIS / HCP / HC2 / TXR / CRF / CAA / CPP: Format indicatif attendu SSAAMM
+ req:='update TGE_IMPORT_ELEMENTS EI set EI.ERREURS=TGE_GET_MESSAGE_ERREUR(EI.ERREURS,'''||replace(get_message_erreur('TGE','ZEZ00036',p_codlang),'''','''''')||''',''SSAAMM'','''||p_codlang||''')';
+ req:= req || ' where '||clwhere||' and IS_DATE(EI.INDICATIF,''YYYYMM'') !=1';
+ req:= req || ' and exists (select 1 from TGE_REF_DICOZ DZ where DZ.ELEMENT = EI.CODE_ELEMENT and DZ.NUMPAC = EI.NUMPAC and DZ.OCC2 = 0 and DZ.OCC1 = 13 and DZ.GROUPE not in (''COT'',''CZR'',''CTM'',''CRA'',''HCO'',''HIS'',''HCP'',''HC2'',''TXR'',''CRF'',''CAA'',''CPP''))';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- CODE_ELEMENT commence par 'R' et OCC2 = 0 et OCC1 = 13 et GROUPE not in COT / CZR / CTM / CRA / HCO / HIS / HCP / HC2 / TXR /CRF / CAA / CPP: Format indicatif attendu compris entre (PERIODE -12 mois) et (PERIODE - 1 mois)
+ req:='update TGE_IMPORT_ELEMENTS EI set EI.ERREURS=TGE_GET_MESSAGE_ERREUR(EI.ERREURS,'''||replace(get_message_erreur('TGE','TGE00035',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''')';
+ req:= req || ' where '||clwhere||' and EI.CODE_ELEMENT is not null and length(EI.CODE_ELEMENT) = 4 and EI.CODE_ELEMENT like ''R%'' ';
+ req:= req || ' and exists (select 1 from TGE_REF_DICOZ DZ where DZ.ELEMENT = EI.CODE_ELEMENT and DZ.NUMPAC = EI.NUMPAC and DZ.OCC2 = 0 and DZ.OCC1 = 13 and DZ.GROUPE not in (''COT'',''CZR'',''CTM'',''CRA'',''HCO'',''HIS'',''HCP'',''HC2'',''TXR'',''CRF'',''CAA'',''CPP''))';
+ -- permet de gérer les cas où INDICATIF n'est pas une date valide
+ req:= req || ' and (select case when (to_date(EI.INDICATIF,''YYYYMM'') > add_months(to_date(EI.PERIODE,''YYYYMM''),-1) or to_date(EI.INDICATIF,''YYYYMM'') < add_months(to_date(EI.PERIODE,''YYYYMM''),-12)) then ''O'' else ''N'' end from dual where IS_DATE(EI.INDICATIF, ''YYYYMM'')=1) = ''O'' ';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- OCC1 > 0 et OCC1 <> 13 et GROUPE not in COT / CZR / CTM / CRA / HCO / HIS / HCP / HC2 / TXR / CRF / CAA / CPP: Format indicatif attendu entre 1 et OCC1 
+ -- Utilisation d'un MERGE afin de pouvoir utiliser DZ.OCC1 dans le message d'erreurs
+ req:='merge into TGE_IMPORT_ELEMENTS EI using TGE_REF_DICOZ DZ on (';
+ req:= req || clwhereMerge;
+ req:= req || ' and DZ.ELEMENT = EI.CODE_ELEMENT and DZ.NUMPAC = EI.NUMPAC and DZ.OCC1 > 0 and DZ.OCC1 <> 13';
+ req:= req || ' and DZ.GROUPE not in (''HIS'',''HCO'',''COT'',''CZR'',''CTM'',''CRA'',''DFR'', ''HCP'', ''HC2'', ''TXR'',''CRF'',''CAA'',''CPP'')';
+ req:= req || ' and (is_number(EI.INDICATIF) is null or to_number(EI.INDICATIF) < 1 or to_number(EI.INDICATIF) > DZ.OCC1))';
+ req:= req || ' when matched then update set EI.ERREURS = TGE_GET_MESSAGE_ERREUR(EI.ERREURS,'''||replace(get_message_erreur('TGE','ZEZ00014',p_codlang),'''','''''')||''',DZ.OCC1,'''||p_codlang||''')';
+ req:= req || clWhereMergeErreur;
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- GROUPE in CRF / CAA / CPP : Format indicatif attendu alphanumerique <= 2 Caractères
+ req:='update TGE_IMPORT_ELEMENTS EI set EI.ERREURS=TGE_GET_MESSAGE_ERREUR(EI.ERREURS,'''||replace(get_message_erreur('TGE','TGE00343',p_codlang),'''','''''')||''',''XX=alphanumérique'','''||p_codlang||''')';
+ req:= req || ' where '||clwhere||' and (length(EI.INDICATIF) > 2 or not regexp_like(EI.INDICATIF, ''^[a-zA-Z0-9]+$''))';
+ req:= req || ' and exists (select 1 from TGE_REF_DICOZ DZ where DZ.ELEMENT = EI.CODE_ELEMENT and DZ.NUMPAC = EI.NUMPAC and DZ.GROUPE in (''CRF'',''CAA'',''CPP''))';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ END IF;
+ -- Fin tests sur l'indicatif
+ 
+ -- Format valeur : longueur valide (TYPE = A ou N ou B)
+ req:='update TGE_IMPORT_ELEMENTS EI set EI.ERREURS=TGE_GET_MESSAGE_ERREUR(EI.ERREURS,'''||replace(get_message_erreur('TGE','ZEZ00006',p_codlang),'''','''''')||''',(select distinct(oz.longueur) from tge_ref_dicoz oz where oz.element = ei.code_element and ei.numpac =oz.numpac and oz.type in (''A'',''N'',''B'')),'''||p_codlang||''')';
+ req:= req || ' where '||clwhere|| ' and EI.VALEUR is not null';
+ req:= req || ' and exists (select 1 from TGE_REF_DICOZ DZ where DZ.ELEMENT = EI.CODE_ELEMENT and DZ.NUMPAC = EI.NUMPAC';
+ req:= req ||   ' and (';
+ req:= req ||   ' ((DZ.TYPE = ''A'' or DZ.TYPE = ''B'') and length(EI.VALEUR) > DZ.LONGUEUR)';
+ req:= req ||   ' or (DZ.TYPE = ''N'' and (DZ.MASQUE < 1 or DZ.MASQUE > 16) and length(EI.VALEUR) > DZ.LONGUEUR)';
+ req:= req ||   ')';
+ req:= req || ' )';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- Format valeur : nombre signé(TYPE = N ou B)
+ req:='update TGE_IMPORT_ELEMENTS EI set EI.ERREURS=TGE_GET_MESSAGE_ERREUR(EI.ERREURS,'''||replace(get_message_erreur('STD','STDERR04',p_codlang),'''','''''')||''',EI.VALEUR,'''||p_codlang||''')';
+ req:= req || ' where '||clwhere|| ' and EI.VALEUR is not null';
+ req:= req || ' and exists (select 1 from TGE_REF_DICOZ DZ where DZ.ELEMENT = EI.CODE_ELEMENT and DZ.NUMPAC = EI.NUMPAC';
+ req:= req ||   ' and ( (DZ.TYPE = ''N'' and (DZ.MASQUE < 1 or DZ.MASQUE > 16)) or (DZ.TYPE = ''B'')) ';
+ req:= req ||   ' and (regexp_like(EI.VALEUR, ''^[-+]+.*''))';
+ req:= req || ' )';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- Format valeur : partie entière <= TGE_REF_DICOZ.LONGUEUR (TYPE =P)
+ req:='merge into TGE_IMPORT_ELEMENTS Ei using TGE_REF_DICOZ DZ on (';
+ req:= req || clwhereMerge;
+ req:= req || ' and DZ.ELEMENT = EI.CODE_ELEMENT and DZ.NUMPAC = EI.NUMPAC ';
+ req:= req || ' and (DZ.TYPE = ''P'' and is_number(EI.VALEUR) is not null and (((INSTR(replace(EI.VALEUR,''.'','',''),'','')-1)> DZ.LONGUEUR) or (INSTR(replace(EI.VALEUR,''.'','',''),'','')= 0 and length(EI.VALEUR) > DZ.LONGUEUR))  ) ';
+ req:= req || ' )';
+ req:= req || ' when matched then update set EI.ERREURS = TGE_GET_MESSAGE_ERREUR(EI.ERREURS,'''||replace(get_message_erreur('STD','STDERR02',p_codlang),'''','''''')||''', EI.VALEUR||''|''||DZ.LONGUEUR,'''||p_codlang||''')';
+ req:= req || clWhereMergeErreur;
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- Format valeur : partie décimale <= TGE_REF_DICOZ.NBDECI (TYPE =P)
+ req:='merge into TGE_IMPORT_ELEMENTS Ei using TGE_REF_DICOZ DZ on (';
+ req:= req || clwhereMerge;
+ req:= req || ' and DZ.ELEMENT = EI.CODE_ELEMENT and DZ.NUMPAC = EI.NUMPAC ';
+ req:= req || ' and (DZ.TYPE = ''P'' and INSTR(replace(EI.VALEUR,''.'','',''),'','') > 0 and length(EI.VALEUR)-INSTR(replace(EI.VALEUR,''.'','',''),'','')> DZ.NBDECI)'; 
+ req:= req || ' )';
+ req:= req || ' when matched then update set EI.ERREURS = TGE_GET_MESSAGE_ERREUR(EI.ERREURS,'''||replace(get_message_erreur('STD','STDERR01',p_codlang),'''','''''')||''', EI.VALEUR||''|''||(DZ.NBDECI),'''||p_codlang||''')';
+ req:= req || clWhereMergeErreur;
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ 
+ -- Format valeur : nombre non décimal (TYPE = N ou B)
+ req:='update TGE_IMPORT_ELEMENTS EI set EI.ERREURS=TGE_GET_MESSAGE_ERREUR(EI.ERREURS,'''||replace(get_message_erreur('TGE','ZEZ00007',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''')';
+ req:= req || ' where '||clwhere|| ' and EI.VALEUR is not null and (is_number(EI.VALEUR) is null or instr(EI.VALEUR, '','') > 0 or instr(EI.VALEUR, ''.'') > 0)';
+ req:= req || ' and exists (select 1 from TGE_REF_DICOZ DZ where DZ.ELEMENT = EI.CODE_ELEMENT and DZ.NUMPAC = EI.NUMPAC'; 
+ req:= req ||   ' and (DZ.TYPE = ''B'' or (DZ.TYPE = ''N'' and (DZ.MASQUE < 1 or DZ.MASQUE > 16))))';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- Format valeur : date ne respectant pas la longueur (TYPE = N)
+ -- Utilisation d'un MERGE afin de pouvoir utiliser DZ.LONGUEUR dans le message d'erreurs
+ req:='merge into TGE_IMPORT_ELEMENTS EI using TGE_REF_DICOZ DZ on (';
+ req:= req || clwhereMerge;
+ req:= req || ' and DZ.ELEMENT = EI.CODE_ELEMENT and DZ.NUMPAC = EI.NUMPAC';
+ req:= req || ' and EI.VALEUR is not null and DZ.TYPE = ''N'' and DZ.MASQUE>=1 AND DZ.MASQUE<=16';
+ req:= req || ' and length(EI.VALEUR) != DZ.LONGUEUR';
+ req:= req || ' )';
+ req:= req || ' when matched then update set EI.ERREURS = TGE_GET_MESSAGE_ERREUR(EI.ERREURS,'''||replace(get_message_erreur('TGE','ZEZ00008',p_codlang),'''','''''')||''',DZ.LONGUEUR,'''||p_codlang||''')';
+ req:= req || clWhereMergeErreur;
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- Format valeur : date pas dans bon format (TYPE = N)
+ -- Utilisation d'un MERGE afin de pouvoir utiliser DZ.MASQUE dans le message d'erreurs
+ req:='merge into TGE_IMPORT_ELEMENTS Ei using TGE_REF_DICOZ DZ on (';
+ req:= req || clwhereMerge;
+ req:= req || ' and DZ.ELEMENT = Ei.CODE_ELEMENT and DZ.NUMPAC = EI.NUMPAC'; 
+ req:= req || ' and DZ.TYPE = ''N'' AND DZ.MASQUE >= 1 AND DZ.MASQUE <= 16';
+ req:= req || ' and length(EI.VALEUR) = DZ.LONGUEUR and (';
+ req:= req || ' (DZ.MASQUE =1 AND (IS_DATE(EI.VALEUR,''DDMMYYYY'')!=1 AND EI.VALEUR<>''00000000'')) OR';
+ req:= req || ' (DZ.MASQUE =2 AND (IS_DATE(EI.VALEUR,''MMYYYY'')!=1 AND EI.VALEUR<>''000000'')) OR';
+ req:= req || ' (DZ.MASQUE =3 AND (IS_DATE(EI.VALEUR,''YYYYMM'')!=1 AND EI.VALEUR<>''000000'')) OR';
+ req:= req || ' (DZ.MASQUE =4 AND (IS_DATE(EI.VALEUR,''DD'')!=1 AND EI.VALEUR<>''00'' ) ) OR';
+ req:= req || ' (DZ.MASQUE =5 AND (IS_DATE(EI.VALEUR,''MM'')!=1 AND EI.VALEUR<>''00'')) OR';
+ req:= req || ' (DZ.MASQUE =6 AND (IS_DATE(EI.VALEUR,''YYYY'')!=1 AND EI.VALEUR<>''0000'' )) OR';
+ req:= req || ' (DZ.MASQUE =7 AND (IS_DATE(EI.VALEUR,''YYYYMMDD'')!=1 AND EI.VALEUR<>''00000000'')) OR';
+ req:= req || ' (DZ.MASQUE =8 AND (IS_DATE(EI.VALEUR,''DDMMYY'')!=1 AND EI.VALEUR<>''000000'')) OR';
+ req:= req || ' (DZ.MASQUE =9 AND (IS_DATE(EI.VALEUR,''MMYY'')!=1 AND EI.VALEUR<>''0000'')) OR';
+ req:= req || ' (DZ.MASQUE =10 AND (IS_DATE(EI.VALEUR,''YYMM'')!=1 AND EI.VALEUR<>''0000'' )) OR';
+ req:= req || ' (DZ.MASQUE =11 AND (IS_DATE(EI.VALEUR,''YY'')!=1 AND EI.VALEUR<>''00'')) OR';
+ req:= req || ' (DZ.MASQUE =12 AND (IS_DATE(EI.VALEUR,''YYMMDD'')!=1 AND EI.VALEUR<>''000000'')) OR';
+ req:= req || ' (DZ.MASQUE =13 AND( IS_DATE(EI.VALEUR,''DDYY'')!=1 AND EI.VALEUR<>''0000'')) OR';
+ req:= req || ' (DZ.MASQUE =14 AND (IS_DATE(EI.VALEUR,''DDMM'')!=1 AND EI.VALEUR<>''0000'')) OR';
+ req:= req || ' (DZ.MASQUE =15 AND (IS_DATE(EI.VALEUR,''MMDD'')!=1 AND EI.VALEUR<>''0000'')) OR';
+ req:= req || ' (DZ.MASQUE =16 AND (IS_DATE(EI.VALEUR,''MMDDYYYY'')!=1 AND EI.VALEUR<>''00000000''))';
+ req:= req || '))';
+ req:= req || ' when matched then update set EI.ERREURS = TGE_GET_MESSAGE_ERREUR(EI.ERREURS,'''||replace(get_message_erreur('TGE','TGE00024',p_codlang),'''','''''')||''',TGE_VALEUR_FORMAT_DATE(DZ.MASQUE),'''||p_codlang||''')';
+ req:= req || clWhereMergeErreur;
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- Format valeur : nombre attendu (TYPE = P)
+ req:='update TGE_IMPORT_ELEMENTS EI set EI.ERREURS=TGE_GET_MESSAGE_ERREUR(EI.ERREURS,'''||replace(get_message_erreur('TGE','ZEZ00009',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''')';
+ req:= req || ' where '||clwhere||' and EI.VALEUR is not null and is_number(EI.VALEUR) is null';
+ req:= req || ' and exists (select 1 from TGE_REF_DICOZ DZ where DZ.ELEMENT = EI.CODE_ELEMENT and DZ.NUMPAC = EI.NUMPAC and DZ.TYPE = ''P'')';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- Controle Origine et mode_3060 : TGE00317
+ req:='update TGE_IMPORT_ELEMENTS EI set EI.ERREURS=TGE_GET_MESSAGE_ERREUR(EI.ERREURS,'''||replace(get_message_erreur('TGE','TGE00317',p_codlang),'''','''''')||''',EI.ORIGINE ,'''||p_codlang||''') where '||clwhere;
+ req:= req || ' and EI.ORIGINE is not null and EI.CODE_REMPLACEMENT = ''R''';
+ req:= req || ' and exists (select 1 from TGE_REF_ORIGINE_GTA G where G.CODE_ORIGINE = EI.ORIGINE and G.NUMPAC = EI.NUMPAC and G.MODE_3060 <> ''R'' and G.MODE_3060 <> ''F'')';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ IF P_TYPE_ACTION = 'EM' or p_type_action = 'EMS' THEN
+ -- Ce test n'est à faire qu'en modification (EM), mais pas à la création (EC ou I)
+ -- Controle Origine et mode_3060 : TGE00318
+ req:='update TGE_IMPORT_ELEMENTS EI set EI.ERREURS=TGE_GET_MESSAGE_ERREUR(EI.ERREURS,'''||replace(get_message_erreur('TGE','TGE00318',p_codlang),'''','''''')||''',EI.ORIGINE ,'''||p_codlang||''') where '||clwhere;
+ req:= req || ' and EI.ORIGINE is not null and nvl(EI.CODE_REMPLACEMENT, ''*'') <> ''R''';
+ req:= req || ' and exists (select 1 from TGE_REF_ORIGINE_GTA G where G.CODE_ORIGINE = EI.ORIGINE and G.NUMPAC = EI.NUMPAC and G.MODE_3060 <> ''W'')';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ END IF;
+ 
+ -- Mise à jour de l'élément autorisée ZEZ00005 seulement si on n'est pas en simulation
+ /*      
+  	 	 - Si on est en simulation
+  	 	 - Si l'élément a une ORIGINE = '&'
+         - sinon CODEMODIF doit être égale à 2 et :
+            - soit l'élément n'est pas présent dans MAPDO
+            - soit il est présent dans TGE_REF_MAPDO et il doit avoir TGE_REF_MAPDO.OCCURRENCE like '%!%' ou TGE_REF_MAPTA.ALLERRETOUR = 'R'
+ */
+ IF p_type_action <> 'ECS' and p_type_action <> 'EMS' then
+ 	req:='update TGE_IMPORT_ELEMENTS EI set EI.ERREURS=TGE_GET_MESSAGE_ERREUR(EI.ERREURS,'''||replace(get_message_erreur('TGE','ZEZ00005',p_codlang),'''','''''')||''',EI.CODE_ELEMENT ,'''||p_codlang||''') where '||clwhere;
+ 	req:= req || ' and EI.CODE_ELEMENT is not null and (EI.ORIGINE is null or EI.ORIGINE <> ''&'') and not exists (select 1 from TGE_REF_DICOZ DZ where DZ.ELEMENT = EI.CODE_ELEMENT and DZ.CODEMODIF =''2'' ';
+ 	req:= req || ' and EI.NUMPAC = DZ.NUMPAC ';
+ 	-- L'élément n'est pas présent dans MAPDO (pour le numpac ou le pac *)
+ 	req:= req || ' and (DZ.ELEMENT not in (select ELEMENT from TGE_REF_MAPDO DO2 where (((select count(*) from TGE_REF_MAPDO where NUMPAC = DZ.NUMPAC and ELEMENT = DZ.ELEMENT ) > 0 and DO2.NUMPAC = DZ.NUMPAC) ';
+ 	req:= req || ' or ((select count(*) from TGE_REF_MAPDO where NUMPAC = DZ.NUMPAC and ELEMENT = DZ.ELEMENT ) = 0 and DO2.NUMPAC = ''*''))) ';
+ 	-- Si l'élément est présent dans MAPDO alors TGE_REF_MAPDO.OCCURENCE doit contenir '!'
+ 	-- ou TGE_REF_MAPTA.ALLERRETOUR = 'R' pour être modifiable
+ 	req:= req || ' or ((select count(*) from TGE_REF_MAPDO DO left outer join TGE_REF_MAPTA TA on DO.TABLEGXP = TA.TABLEPARAM where DO.ELEMENT = DZ.ELEMENT ';
+ 	req:= req || ' and (((select count(*) from TGE_REF_MAPDO where NUMPAC = DZ.NUMPAC and ELEMENT = DZ.ELEMENT ) > 0 and DO.NUMPAC = DZ.NUMPAC) ';
+ 	req:= req || ' or ((select count(*) from TGE_REF_MAPDO where NUMPAC = DZ.NUMPAC and ELEMENT = DZ.ELEMENT ) = 0 and DO.NUMPAC = ''*'')) ';
+ 	req:= req || ' and (((select count(*) from TGE_REF_MAPTA where NUMPAC = DZ.NUMPAC and TABLEPARAM = DO.TABLEGXP ) > 0 and TA.NUMPAC = DZ.NUMPAC) ';
+ 	req:= req || ' or ((select count(*) from TGE_REF_MAPTA where NUMPAC = DZ.NUMPAC and TABLEPARAM = DO.TABLEGXP ) = 0 and TA.NUMPAC = ''*'')) ';
+ 	req:= req || ' and (DO.OCCURENCE like ''%!%'' or TA.ALLERRETOUR = ''R'')) > 0 )) ';
+ 	req:= req || ' )';
+ 	EXECUTE_IMMEDIATE_STRING( req,0);
+ END IF;
+ 
+ -- Contrôle Origine existe pour le numPac TGE00331
+ -- Ce test devra être supprimé lorsque celui associé au message TGE00321(origine est cohérente avec la GTA du collaborateur)
+ -- sera intégré au contrôle PL/SQL (pour le moment fait en Java pour les saisies écrans et imports Web)
+ req:='update TGE_IMPORT_ELEMENTS EI SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00331',p_codlang),'''','''''')||''',EI.ORIGINE||''|''||EI.NUMPAC ,'''||p_codlang||''') where '||clwhere;
+ req:= req || ' and EI.ORIGINE is not null';
+ req:= req || ' and not exists (select 1 from TGE_REF_ORIGINE_GTA G where G.CODE_ORIGINE = EI.ORIGINE and G.NUMPAC = EI.NUMPAC)';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+  
+ -- Ecrasement de la clause Where
+ clwhere:='EI.login='''||p_login||''' and EI.date_import='''||P_DATE_IMPORT||'''';
+ -- Controles pour les éléments B691 et B690
+ req:='update TGE_IMPORT_ELEMENTS EI set EI.ERREURS=TGE_GET_MESSAGE_ERREUR(EI.ERREURS,'''||replace(get_message_erreur('TGE','TGE00195',p_codlang),'''','''''')||''',ei.valeur,'''||p_codlang||''')';
+ req:= req || ' where '||clwhere||' AND code_element=''B690'' and not exists(select * from   TGE_REF_IMPUTATION
+ Ei2 where ei2.numpac in (Ei.numpac,''*'') and ei2.codeimp=ei.valeur )  ';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ --
+ req:='update TGE_IMPORT_ELEMENTS EI set EI.ERREURS=TGE_GET_MESSAGE_ERREUR(EI.ERREURS,'''||replace(get_message_erreur('TGE','TGE00193',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''')';
+ req:= req || ' where '||clwhere||' AND code_element=''B691'' and exists(select * from
+ (select date_import,login,numpac,paiezad, code_element, sum(to_number(replace(valeur,''.'','',''))) as somme from TGE_IMPORT_ELEMENTS Ei2 where code_element=''B691'' AND IS_NUMBER(VALEUR) is not null  group by  date_import,login,numpac,paiezad, code_element) tmp where   ei.date_import  =tmp.date_import  AND ei.login =tmp.login and somme<>100 and ei.numpac =tmp.numpac
+ AND ei.paiezad  =tmp.paiezad)  ';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ --
+ req:='update TGE_IMPORT_ELEMENTS Ei SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00194',p_codlang),'''','''''')||''',CODE_ELEMENT||''|''||INDICATIF,'''||p_codlang||''')';
+ req:= req || ' where '||clwhere||' AND code_element in (''B690'',''B691'') and not exists(select * from TGE_REF_MAPDO d where code_element=ELEMENT and indicatif=occurence and (d.numpac=Ei.numpac or d.numpac=''*''))  ';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ EXCEPTION
+ WHEN OTHERS THEN
+ 	IF (P_LOGIN != 'BATCH') THEN
+    	-- On remonte l'erreur à l'application
+ 		raise;
+	END IF;
+ END TGE_CONTROLE_30;

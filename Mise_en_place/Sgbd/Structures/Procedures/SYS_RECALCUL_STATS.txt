@@ -1,0 +1,18 @@
+##
+SYS_RECALCUL_STATS
+=SQL=
+create or replace PROCEDURE SYS_RECALCUL_STATS(p_table in varchar2) AS 
+ err_msg  VARCHAR(1000);
+ err_code VARCHAR(200);
+BEGIN
+  if p_table is null then
+ DBMS_STATS.gather_schema_stats( ownname => sys_context('USERENV','SESSION_SCHEMA') , cascade => true);
+ else
+ DBMS_STATS.GATHER_TABLE_STATS( ownname => sys_context('USERENV','SESSION_SCHEMA') ,TABNAME=>p_table, cascade => true);
+ end if;
+ EXCEPTION
+WHEN OTHERS THEN
+ ERR_CODE := SQLCODE;
+ ERR_MSG  := SQLERRM;
+ INSERT INTO SYS_TRC_ERR VALUES (CURRENT_TIMESTAMP,ERR_CODE||'  MESSAGE='||ERR_MSG,'SYS_RECALCUL_STATS P_TABLE='||P_TABLE,'PL_SQL');
+END SYS_RECALCUL_STATS;

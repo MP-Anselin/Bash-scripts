@@ -1,0 +1,6 @@
+##
+TAG_CHARSET=@€éèç
+##
+STD_LHW_DONNEE
+==
+Insert into STD_LHW_DONNEE select 'NUMCNT_ORIGINE','Numéro de&nbsp;contrat origine','*',null,null,'Ext.adp.Modules.RD.STD.EXP.CNT_COURANT.CNT_COURANT',null,null,null,null,null,null from dual where not exists (select 1 from STD_LHW_DONNEE where NOM_DONNEE='NUMCNT_ORIGINE')

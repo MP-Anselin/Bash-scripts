@@ -1,0 +1,83 @@
+##
+TAG_CHARSET=@€éèç
+##
+HRORG_RESP_CODTS
+=SQL=
+CREATE OR REPLACE
+FUNCTION HRORG_RESP_CODTS(
+  p_codts  IN std_struc_arbre.codts%TYPE,
+  p_matric IN VARCHAR2,
+  p_date   IN std_struc_entite.date_eff%TYPE,
+  p_cid    IN std_struc_entite.cid%TYPE default null)
+RETURN std_struc_entite.matric_resp%TYPE
+IS
+  v_matricPrincipal secumatric.matric%TYPE;
+  v_retour std_struc_arbre.matric_resp%TYPE;
+  v_nomcolsecumatric std_struc_type.NOMCOL_SECUMATRIC%TYPE ;
+  v_nomcoletat_civ std_struc_type.nomcol_etat_civ%TYPE ;
+  v_matricdefaut std_struc_type.matric_resp%TYPE ;
+  v_entite std_struc_entite.code_entite%TYPE ;
+  v_req VARCHAR2(500);
+  v_nbParam NUMBER;
+  v_cid std_struc_entite.cid%TYPE;
+BEGIN
+	
+  v_cid := p_cid;
+  IF (v_cid IS NULL) THEN
+  	BEGIN
+  		SELECT VALVAR INTO v_cid FROM SYS_VARSYS where CODVAR = 'NS_CLIENT_ID';
+  	EXCEPTION
+  	WHEN NO_DATA_FOUND THEN
+  		v_cid := null;
+  	END;
+  END IF;
+  IF (v_cid IS NULL) THEN
+  	-- En mode multiclient, la varsys peut être null et le passage du paramètre pCid est obligatoire
+  	RETURN null;
+  END IF;	
+
+  v_matricPrincipal             := p_matric;
+  IF INSTR(v_matricPrincipal,',')>0 THEN
+    v_matricPrincipal           := SUBSTR(v_matricPrincipal,1,INSTR(v_matricPrincipal,',')-1);
+  END IF;
+  SELECT NOMCOL_SECUMATRIC,
+    nomcol_etat_civ,
+    matric_resp
+  INTO v_nomcolsecumatric,
+    v_nomcoletat_civ,
+    v_matricdefaut
+  FROM std_struc_type
+  WHERE codts=p_codts ;
+  v_nbParam := 1;
+  IF (v_nomcolsecumatric IS NOT NULL) THEN
+    v_req := 'SELECT '||v_nomcolsecumatric||' FROM SECUMATRIC WHERE MATRIC = :1';
+  ELSE
+    IF (v_nomcoletat_civ IS NOT NULL) THEN
+      v_req := 'SELECT '||v_nomcoletat_civ||' FROM ETAT_CIV WHERE MATRIC = :1';
+    ELSE
+      -- TODO VRI : ZEU FE, il faudra gérer le CID lors du traitement de cette partie utilisé v_cid
+      v_req := 'SELECT CODE_ENTITE FROM STD_STRUC_AFFECTATION WHERE MATRIC = :1 AND :2 BETWEEN DATE_EFF AND DATE_FIN AND NOT CODE_ENTITE=''@NON_AFFECTE@'' AND CODTS = :3' ;
+      v_nbParam := 3;
+    END IF;
+  END IF;
+  BEGIN
+    IF v_nbParam=1 THEN
+      EXECUTE IMMEDIATE v_req INTO v_entite USING v_matricPrincipal ;
+    ELSE
+      EXECUTE IMMEDIATE v_req INTO v_entite USING v_matricPrincipal, p_date, p_codts ;
+    END IF;
+  EXCEPTION
+  WHEN NO_DATA_FOUND THEN
+    v_entite := NULL;
+  END ;
+  IF (v_entite IS NOT NULL) THEN
+    v_retour   := HRORG_RESP_ENTITE(p_codts, v_entite, p_date, 0, p_matric, v_cid);
+  END IF ;
+  RETURN v_retour ;
+EXCEPTION
+  WHEN OTHERS THEN
+  IF(v_matricdefaut <> v_matricPrincipal) THEN
+    RETURN v_matricdefaut ;
+  END IF ;
+  RETURN NULL;
+END HRORG_RESP_CODTS ; 

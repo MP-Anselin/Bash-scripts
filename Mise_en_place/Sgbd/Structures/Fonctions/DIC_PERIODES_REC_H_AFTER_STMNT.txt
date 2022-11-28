@@ -1,0 +1,24 @@
+##
+TAG_CHARSET=@€יטח
+##
+DIC_PERIODES_REC_H_AFTER_STMNT
+=SQL=
+create or replace FUNCTION DIC_PERIODES_REC_H_AFTER_STMNT RETURN VARCHAR2 AS BEGIN
+ RETURN '
+ idx       := paiezadPacPeriodModifed.FIRST;
+  WHILE idx IS NOT NULL
+  LOOP
+    IF v_type_writer = ''M'' THEN
+      listJobMasseAsyncTab.extend();
+      listJobMasseAsyncTab(listJobMasseAsyncTab.last):='' TGE_ALIM_PERIODE_INDIV(0, '''''' || paiezadPacPeriodModifed(idx).NUMPAC || '''''', '''''' || paiezadPacPeriodModifed(idx).PERIODE || '''''', '''''' || paiezadPacPeriodModifed(idx).PAIEZAD || '''''');'';
+    ELSE
+      TGE_ALIM_PERIODE_INDIV(0, paiezadPacPeriodModifed(idx).NUMPAC, paiezadPacPeriodModifed(idx).PERIODE, paiezadPacPeriodModifed(idx).PAIEZAD);
+    END IF;
+    idx := paiezadPacPeriodModifed.NEXT(idx);
+  END LOOP;
+    --Lancement du job async lors d''une mise א jour Manuelle, en Masse (type_writer = ''M'')
+  IF v_type_writer = ''M'' THEN
+    DBMS_JOB_SUBMIT_MASSE(listJobMasseAsyncTab, ''TRG_DPRH'');
+  END IF;
+ ';
+ END DIC_PERIODES_REC_H_AFTER_STMNT;

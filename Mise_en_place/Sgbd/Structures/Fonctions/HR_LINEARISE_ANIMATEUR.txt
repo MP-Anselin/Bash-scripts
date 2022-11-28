@@ -1,0 +1,52 @@
+##
+HR_LINEARISE_ANIMATEUR
+=SQL=
+CREATE OR REPLACE
+  FUNCTION HR_LINEARISE_ANIMATEUR(
+      pcodfor IN VARCHAR2,
+      pcodses IN VARCHAR2,
+      poccseq IN VARCHAR2,
+      sep     IN VARCHAR2 )
+    RETURN VARCHAR2
+  IS
+  type tcur
+IS
+  ref
+  CURSOR;
+    cur tcur;
+    retourselect VARCHAR2(2000);
+    retour CLOB;
+  BEGIN
+    OPEN cur FOR SELECT '- '||I.nomfam||' '||I.prenom||' de '||O.nomorg||' ('||NVL(DOM_EXPERTISE,'Domaine non renseigné')||')' FROM interloc I,animseq A, ORG O WHERE O.codorg = I.codOrg AND I.codorg = A.codorg AND I.occinloc = A.occinloc AND codfor= pcodfor AND codses = pcodses AND occseq = poccseq
+    UNION ALL
+  SELECT '- '
+    ||E.nom
+    ||' '
+    ||E.prenom
+    ||'('
+    || NVL(DOM_EXPERTISE,'Domaine non renseigné')
+    || ')'
+  FROM SECUMATRIC E
+  INNER JOIN animseq A
+  ON A.matric = E.matric
+  LEFT OUTER JOIN for_hfteint f
+  ON f.matric = E.matric
+  INNER JOIN for_ses s
+  ON A.codfor    = s.codfor
+  AND A.codses   = s.codses
+  WHERE A.codfor = pcodfor
+  AND A.codses   = pcodses
+  AND A.codact   = '*'
+  AND A.occseq   = poccseq
+  AND s.jdeb BETWEEN f.datdeb AND NVL(f.datfin,'20990101')
+  AND F.typp <>'4'
+  ORDER BY 1 ASC ;
+  LOOP
+    FETCH cur INTO retourselect;
+    EXIT
+  WHEN cur % NOTFOUND;
+    retour := retour||retourselect||sep;
+  END LOOP ;
+  CLOSE cur;
+  RETURN '<br>'||SUBSTR(retour, 0, LENGTH(retour)-LENGTH(sep));
+END;

@@ -1,0 +1,295 @@
+##
+DIF_FSED_HISTO_REP
+=SQL=
+CREATE OR REPLACE PROCEDURE DIF_FSED_HISTO_REP 
+IS
+ req                   CLOB;
+ tab1   TAB_VARCHAR;
+ table_name             VARCHAR2(50);
+ aujourdhui             VARCHAR2(8);
+ type_mois              NUMBER;
+ test_trt               NUMBER;
+ p_id                   NUMBER;
+ p_periode              VARCHAR2(6);
+ p_numpac         TGE_REF_PAC.numpac%TYPE;
+ p_PERIODEENCOURS TGE_REF_PAC.PERIODEENCOURS%TYPE;
+ p_DEB_HISTO_RETRO TGE_REF_PAC.DEB_HISTO_RETRO%TYPE;
+ p_DEB_RETRO TGE_REF_PAC.DEB_RETRO%TYPE;
+ p_NB_MOIS_RETRO TGE_REF_PAC.NB_MOIS_RETRO%TYPE;
+ 
+ BEGIN
+
+ p_id := GAP_TRT_SEQ_ID.nextval;
+ FSED.FSED_AVANCEMENT(p_id,'*** Réparation DIF_FSED_HISTO start ***');
+
+--Sauvegarde DFH à la date du jour et purge
+ SELECT to_char(sysdate,'yyyymmdd') into aujourdhui from dual;
+ req :='CREATE TABLE DIF_FSED_HISTO_'||aujourdhui||' AS SELECT * FROM DIF_FSED_HISTO';
+ FSED.FSED_AVANCEMENT(p_id,'Sauvegarde à date du jour '||req);
+ EXECUTE immediate req;
+ COMMIT;
+ req :='TRUNCATE TABLE dif_fsed_histo';
+ FSED.FSED_AVANCEMENT(p_id,'Vidage '||req);
+ EXECUTE immediate req;
+ 
+ --Boucle sur les mois DIF_FSED_ssaamm
+ FOR C in ( SELECT substr(table_name,10,length(table_name)) as periode from user_tables where table_name like 'DIF_FSED_%' and is_number(substr(table_name,10,length(table_name))) is not null order by
+ substr(table_name,10,length(table_name)) asc ) 
+ LOOP
+
+table_name := 'DIF_FSED_'||C.periode ;
+p_periode  := C.periode ;
+req :='SELECT DISTINCT numpac from '||table_name;
+EXECUTE immediate req bulk collect INTO tab1 ;
+
+--Boucle sur les Pacs
+FOR i IN tab1.first..tab1.last
+ LOOP
+ p_numpac := tab1(i);
+
+ SELECT DEB_HISTO_RETRO,   DEB_RETRO,   NB_MOIS_RETRO,   PERIODEENCOURS
+ INTO p_DEB_HISTO_RETRO, p_DEB_RETRO, p_NB_MOIS_RETRO, p_PERIODEENCOURS
+ FROM TGE_REF_PAC WHERE NUMPAC =p_numpac;
+ 
+ --Booléen (type_mois) 0/1/2 le mois pour ce Pac est concerné
+ SELECT CASE WHEN (p_periode >  greatest(p_DEB_HISTO_RETRO,to_char(add_months(to_date(p_PERIODEENCOURS,'yyyymm'),-1*p_NB_MOIS_RETRO),'yyyymm')) and p_periode < p_PERIODEENCOURS) THEN 2
+             WHEN (p_periode >= greatest(p_DEB_HISTO_RETRO,to_char(add_months(to_date(p_PERIODEENCOURS,'yyyymm'),-1*p_NB_MOIS_RETRO),'yyyymm')) and p_periode < p_PERIODEENCOURS) THEN 1
+             ELSE 0 END INTO type_mois FROM dual;
+IF type_mois = 0 THEN
+ FSED.FSED_AVANCEMENT(p_id,'*** Période='||p_periode||' Pac='||p_numpac||' non concernée (deb_histo_retro='||p_DEB_HISTO_RETRO||' nb_mois='||p_NB_MOIS_RETRO||' periodeencours='||p_PERIODEENCOURS||')');
+ ELSE
+ FSED.FSED_AVANCEMENT(p_id,'*** Période='||p_periode||' Pac='||p_numpac||' : lancement du traitement');
+
+ --Comptage des ID absents de GAP_TRT et création si nécessaire
+ req :='SELECT COUNT(DISTINCT id_trt) from '||table_name||' z WHERE NOT EXISTS (SELECT 1 from gap_trt t where t.id_trt=z.id_trt)';
+ EXECUTE immediate req INTO test_trt;
+ IF test_trt > 0 THEN
+
+ req :='DELETE FROM gap_trt_liste_mat WHERE id_trt IN (
+ SELECT DISTINCT id_trt from '||table_name||' z
+ WHERE NOT EXISTS (SELECT 1 from gap_trt t where t.id_trt=z.id_trt) )';
+ FSED.FSED_AVANCEMENT(p_id,'Nettoyage préalable de GAP_TRT_LISTE_MAT ' ||req);
+ EXECUTE immediate req;
+ 
+ req :='INSERT INTO gap_trt_liste_mat (ID_TRT,NUMPAC,PACMAT,TRAITE)
+ SELECT DISTINCT id_trt,'''||p_numpac||''',z.pacmat,''DIF_FSED_HISTO_REP'' from '||table_name||' z
+ WHERE NOT EXISTS (SELECT 1 from gap_trt t where t.id_trt=z.id_trt)';
+ FSED.FSED_AVANCEMENT(p_id,'Création des ID manquants dans GAP_TRT_LISTE_MAT ' ||req);
+ EXECUTE immediate req;
+
+ req :='INSERT INTO gap_trt_suivi (ID_TRT,DATE_EVT,STATUT,CODE_RETOUR_ZPP,LOGIN)
+ SELECT DISTINCT id_trt,(SELECT sysdate from dual),''PA'',''00'',''DIF_FSED_HISTO_REP'' from '||table_name||' z
+ WHERE NOT EXISTS (SELECT 1 from gap_trt t where t.id_trt=z.id_trt)';
+ FSED.FSED_AVANCEMENT(p_id,'Création des ID manquants dans GAP_TRT_SUIVI ' ||req);
+ EXECUTE immediate req;
+
+ req :='INSERT INTO gap_trt (ID_TRT,NUMPAC,PERIODE_PAIE,NUMERO_ECHANGE,MODELE,NATURE,DATE_FIN_TRT)
+ SELECT DISTINCT id_trt,a.numpac,'''||p_periode||''',''0001'',a.modele,a.nature,(SELECT sysdate from dual) from '||table_name||' z,
+ (SELECT numpac,modele,nature FROM TGE_SCHEMA_PRODUCTION WHERE numpac='''||p_numpac||''' AND modele||nature =
+  (SELECT max(a2.modele||a2.nature) FROM TGE_SCHEMA_PRODUCTION a2 WHERE a2.numpac='''||p_numpac||''' AND a2.TYPE_PAIE=''CONTROLE'' AND a2.date_fin is null)) a
+ WHERE NOT EXISTS (SELECT 1 from gap_trt t where t.id_trt=z.id_trt)';
+ FSED.FSED_AVANCEMENT(p_id,'Création des ID manquants dans GAP_TRT ' ||req);
+ EXECUTE immediate req;
+
+ COMMIT;
+
+ END IF; 
+
+ /*Partie 1 : recopie du mois en cours.
+   Comme la table a été vidée, pas besoin de DELETE préalable.*/
+
+ req := 'INSERT INTO dif_fsed_histo
+ WITH max_id_trt AS (SELECT pacmat,MAX(b.id_trt) as id_trt
+ FROM TGE_SCHEMA_PRODUCTION a, GAP_TRT b, GAP_TRT_LISTE_MAT m, GAP_TRT_SUIVI c
+ WHERE a.numpac                 ='''||p_numpac||'''
+ AND a.TYPE_PAIE               IN (''PRECONTR'',''CONTROLE'',''RECYCLAG'',''PARTICUL'',''REGLE'',''REGLEALL'',''GAPSELMA'')
+ AND a.numpac                   =b.numpac
+ AND a.modele                   =b.modele
+ AND a.nature                   =b.nature
+ AND a.numpac                   =m.numpac
+ AND b.id_trt                   =c.id_trt
+ AND b.id_trt                   =m.id_trt
+ AND c.statut                  IN (''PA'',''EX'',''DEMSEA'')
+ AND NVL(c.code_retour_zpp,''00'')=''00''
+ AND b.PERIODE_PAIE             = '''||p_periode||'''
+ AND b.numero_echange          <>''0000''
+ GROUP BY pacmat)
+ SELECT '''||p_periode||''' AS PERIODE,NUMPAC,CLE,z.PACMAT,PAIEZAD,ELEM,OCC,VALEUR,CODEOP,TYPE_DONNEE,DTEFFET
+ FROM '||table_name||' z, max_id_trt
+ WHERE z.numpac                 ='''||p_numpac||'''
+ AND z.pacmat = max_id_trt.pacmat
+ AND z.id_trt = max_id_trt.id_trt';
+ FSED.FSED_AVANCEMENT(p_id,'Partie 1.0 '||req);
+ EXECUTE IMMEDIATE req ;
+
+ --Les parties 2 et 3 ne sont faites qu'à partir du 2ème mois histo rétro minimum
+ IF type_mois = 2 THEN
+
+ /*Partie 2 : Cas des embauches rétro à partir de DEB_RETRO jusqu'à M-1.
+   On détruit toutes les lignes de toutes les périodes comprises entre le mois rétro d’embauche et la paie en cours de rattrapage.
+   Puis on insère les embauches sur la bonne période rétro. Il y a donc 1 DELETE + 1 INSERT à exécuter sur chaque mois.*/
+
+ req :='DELETE FROM dif_fsed_histo h WHERE h.periode<'''||p_periode||''' and h.numpac='''||p_numpac ||''' AND EXISTS (
+ WITH max_id_trt AS (SELECT pacmat,MAX(b.id_trt) as id_trt
+ FROM TGE_SCHEMA_PRODUCTION a, GAP_TRT b, GAP_TRT_LISTE_MAT m, GAP_TRT_SUIVI c
+ WHERE a.numpac                 ='''||p_numpac||'''
+ AND a.TYPE_PAIE               IN (''PRECONTR'',''CONTROLE'',''RECYCLAG'',''PARTICUL'',''REGLE'',''REGLEALL'',''GAPSELMA'')
+ AND a.numpac                   =b.numpac
+ AND a.modele                   =b.modele
+ AND a.nature                   =b.nature
+ AND a.numpac                   =m.numpac
+ AND b.id_trt                   =c.id_trt
+ AND b.id_trt                   =m.id_trt
+ AND c.statut                  IN (''PA'',''EX'',''DEMSEA'')
+ AND NVL(c.code_retour_zpp,''00'')=''00''
+ AND b.PERIODE_PAIE             = '''||p_periode||'''
+ AND b.numero_echange          <>''0000''
+ GROUP BY pacmat)
+ SELECT 1
+ FROM '||table_name ||' z INNER JOIN  max_id_trt
+ ON z.pacmat = max_id_trt.pacmat
+ AND z.id_trt = max_id_trt.id_trt
+ LEFT JOIN secupacmat s
+ ON s.numpac=z.numpac AND s.pacmat = z.pacmat
+ WHERE NUMPAC='''||p_numpac ||'''
+ AND h.periode>=greatest(NVL( s.PREMIERE_PAIE, ''190101''),to_char(z.dteffet,''yyyymm''),'''||p_DEB_HISTO_RETRO||''')
+ AND h.paiezad=z.paiezad
+ AND z.dteffet < to_date('''||p_periode||''',''yyyymm'')
+ AND z.elem =''A001'' and z.codeop=''C''
+
+ )'; 
+ FSED.FSED_AVANCEMENT(p_id,'Partie 2.1 '||req);
+ EXECUTE IMMEDIATE req ;
+
+ --Validation des modifs pour pouvoir analyser les tables et la dernière requête
+ COMMIT;
+
+ req :='INSERT INTO dif_fsed_histo
+ WITH max_id_trt AS (SELECT pacmat,MAX(b.id_trt) as id_trt
+ FROM TGE_SCHEMA_PRODUCTION a, GAP_TRT b, GAP_TRT_LISTE_MAT m, GAP_TRT_SUIVI c
+ WHERE a.numpac                 ='''||p_numpac||'''
+ AND a.TYPE_PAIE               IN (''PRECONTR'',''CONTROLE'',''RECYCLAG'',''PARTICUL'',''REGLE'',''REGLEALL'',''GAPSELMA'')
+ AND a.numpac                   =b.numpac
+ AND a.modele                   =b.modele
+ AND a.nature                   =b.nature
+ AND a.numpac                   =m.numpac
+ AND b.id_trt                   =c.id_trt
+ AND b.id_trt                   =m.id_trt
+ AND c.statut                  IN (''PA'',''EX'',''DEMSEA'')
+ AND NVL(c.code_retour_zpp,''00'')=''00''
+ AND b.PERIODE_PAIE             = '''||p_periode||'''
+ AND b.numero_echange          <>''0000''
+ GROUP BY pacmat),
+ dif_a001 as --dates deffet des embauches rétro
+ (SELECT NUMPAC,PAIEZAD,PACMAT,z.ID_TRT,DTEFFET
+ FROM '||table_name||' z, max_id_trt
+ WHERE NUMPAC='''||p_numpac||'''
+ AND dteffet < to_date('''||p_periode||''',''yyyymm'')
+ AND z.elem =''A001'' and z.codeop=''C''
+ AND z.pacmat = max_id_trt.pacmat
+ AND z.id_trt = max_id_trt.id_trt
+ )
+ SELECT DISTINCT GREATEST(NVL( s.PREMIERE_PAIE, ''190101''),to_char(a.dteffet,''yyyymm''),'''||p_DEB_HISTO_RETRO||''') AS PERIODE,a.NUMPAC,CLE,PACMAT,a.PAIEZAD,ELEM,OCC,VALEUR,CODEOP,TYPE_DONNEE,a.DTEFFET
+ FROM dif_a001 a INNER JOIN  '||table_name||' f
+ ON  a.paiezad=f.paiezad
+ AND a.id_trt=f.id_trt
+ LEFT JOIN secupacmat s
+ ON s.numpac=a.numpac AND s.pacmat = a.pacmat
+ WHERE f.numpac='''||p_numpac||'''';
+ FSED.FSED_AVANCEMENT(p_id,'Partie 2.2 '||req);
+ EXECUTE IMMEDIATE req ;
+
+ /*Partie 3 : Corrections rétro. On détruit les éléments corrigés en rétro sur toutes les périodes comprises entre le mois rétro et la paie en cours de rattrapage.
+   Puis on insère les éléments corrigés sur la bonne période rétro. Il y a donc 1 DELETE + 1 INSERT à exécuter sur chaque mois.*/
+
+ req :='DELETE FROM dif_fsed_histo h WHERE h.periode<'''||p_periode||''' and h.numpac='''||p_numpac ||''' 
+ AND h.elem IN (SELECT element FROM tge_ref_dicoz WHERE numpac='''||p_numpac||''' AND calcul_retro=1) AND EXISTS (
+ WITH max_id_trt AS (SELECT pacmat,MAX(b.id_trt) as id_trt
+ FROM TGE_SCHEMA_PRODUCTION a, GAP_TRT b, GAP_TRT_LISTE_MAT m, GAP_TRT_SUIVI c
+ WHERE a.numpac                 ='''||p_numpac||'''
+ AND a.TYPE_PAIE               IN (''PRECONTR'',''CONTROLE'',''RECYCLAG'',''PARTICUL'',''REGLE'',''REGLEALL'',''GAPSELMA'')
+ AND a.numpac                   =b.numpac
+ AND a.modele                   =b.modele
+ AND a.nature                   =b.nature
+ AND a.numpac                   =m.numpac
+ AND b.id_trt                   =c.id_trt
+ AND b.id_trt                   =m.id_trt
+ AND c.statut                  IN (''PA'',''EX'',''DEMSEA'')
+ AND NVL(c.code_retour_zpp,''00'')=''00''
+ AND b.PERIODE_PAIE             = '''||p_periode||'''
+ AND b.numero_echange          <>''0000''
+ GROUP BY pacmat)
+ SELECT 1
+ FROM '||table_name ||' z INNER JOIN  max_id_trt
+ ON z.pacmat = max_id_trt.pacmat
+ AND z.id_trt = max_id_trt.id_trt
+ LEFT Join secupacmat s
+ ON s.numpac=z.numpac AND s.pacmat = z.pacmat
+ WHERE NUMPAC='''||p_numpac ||'''
+ AND h.periode>=greatest(NVL( s.PREMIERE_PAIE, ''190101''),to_char(z.dteffet,''yyyymm''),'''||p_DEB_HISTO_RETRO||''')
+ AND h.paiezad=z.paiezad
+ AND h.elem=z.elem
+ AND h.occ=z.occ
+ AND z.dteffet < to_date('''||p_periode||''',''yyyymm'')
+
+ )';
+ FSED.FSED_AVANCEMENT(p_id,'Partie 3.1 '||req);
+ EXECUTE IMMEDIATE req ;
+
+ --Validation des modifs pour pouvoir analyser les tables et la dernière requête
+ COMMIT;
+
+ req :='INSERT INTO dif_fsed_histo
+ WITH max_id_trt AS (SELECT pacmat,MAX(b.id_trt) as id_trt
+ FROM TGE_SCHEMA_PRODUCTION a, GAP_TRT b, GAP_TRT_LISTE_MAT m, GAP_TRT_SUIVI c
+ WHERE a.numpac                 ='''||p_numpac||'''
+ AND a.TYPE_PAIE               IN (''PRECONTR'',''CONTROLE'',''RECYCLAG'',''PARTICUL'',''REGLE'',''REGLEALL'',''GAPSELMA'')
+ AND a.numpac                   =b.numpac
+ AND a.modele                   =b.modele
+ AND a.nature                   =b.nature
+ AND a.numpac                   =m.numpac
+ AND b.id_trt                   =c.id_trt
+ AND b.id_trt                   =m.id_trt
+ AND c.statut                  IN (''PA'',''EX'',''DEMSEA'')
+ AND NVL(c.code_retour_zpp,''00'')=''00''
+ AND b.PERIODE_PAIE             = '''||p_periode||'''
+ AND b.numero_echange          <>''0000''
+ GROUP BY pacmat)
+ SELECT DISTINCT GREATEST(NVL( s.PREMIERE_PAIE, ''190101''),to_char(z.dteffet,''yyyymm''),'''||p_DEB_HISTO_RETRO||''') AS PERIODE,NUMPAC,CLE,z.PACMAT,PAIEZAD,ELEM,OCC,VALEUR,CODEOP,TYPE_DONNEE,DTEFFET
+ FROM '||table_name||' z INNER JOIN  max_id_trt
+ ON z.pacmat = max_id_trt.pacmat
+ AND z.id_trt = max_id_trt.id_trt
+ LEFT Join secupacmat s
+ ON s.numpac=z.numpac AND s.pacmat = z.pacmat
+ WHERE z.numpac='''||p_numpac||'''
+ AND elem in (SELECT element from tge_ref_dicoz where numpac='''||p_numpac||''' and calcul_retro=1)
+ AND z.dteffet < to_date('''||p_periode||''',''yyyymm'')';
+ FSED.FSED_AVANCEMENT(p_id,'Partie 3.2 '||req);
+ EXECUTE IMMEDIATE req ;
+
+ END IF;
+ END IF;
+
+ --Fin boucle sur les Pacs
+ END LOOP;
+ --Fin boucle sur les mois
+ END LOOP;
+
+ FSED.FSED_AVANCEMENT(p_id,'*** Réparation DIF_FSED end ***');
+
+ EXCEPTION
+ WHEN OTHERS THEN
+ req :='Une erreur est survenue lors de la réparation de DIF_FSED_HISTO.
+ Veuillez consulter la table TGE_FSED_ERREUR.
+ Pour reprendre le script, adapter SSAAMMJJ et lancer ceci :
+ TRUNCATE TABLE dif_fsed_histo;
+ INSERT INTO dif_fsed_histo SELECT * FROM dif_fsed_histo_SSAAMMJJ;
+ DROP TABLE dif_fsed_histo_SSAAMMJJ;
+ CALL DIF_FSED_HISTO_REP();';
+ FSED.FSED_AVANCEMENT(p_id,req);
+ FSED.FSED_ERREUR(p_id,'PURGE_HISTO_DIF_FSED',P_NUMPAC,SQLCODE||'-'||SQLERRM);
+ --Validation des modifs pour pouvoir analyser les tables et la dernière requête
+ COMMIT;
+ raise;
+ END DIF_FSED_HISTO_REP;
+ 

@@ -1,0 +1,15 @@
+##
+TGE_SEQ_NUM_ECHANGE
+=SQL=
+create or replace
+FUNCTION TGE_SEQ_NUM_ECHANGE (
+ p_NUMPAC IN VARCHAR2  ,
+ p_PERIODEENCOURS IN VARCHAR2
+ ) RETURN VARCHAR2 AS
+ num_echange number;
+ num_echange_str varchar2(4);
+ BEGIN
+ TGE_SEQ_NUM_ECHANGE_UP(p_NUMPAC,p_PERIODEENCOURS,num_echange_str);
+ --update TGE_REF_PER set DERNIER_NUM_ECHANGE=num_echange_str where numpac=p_NUMPAC and PERIODEENCOURS=p_PERIODEENCOURS;
+ RETURN num_echange_str;
+ END TGE_SEQ_NUM_ECHANGE;

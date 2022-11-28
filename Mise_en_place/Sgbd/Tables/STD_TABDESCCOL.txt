@@ -1,0 +1,89 @@
+##
+TAG_CHARSET=@€éèç
+##
+STD_TABDESCCOL (IDENT,ORDRE,LIBELLE,CLE,OBLIGATOIRE,AFFICHER,FILTRER,MASKAFF,MINIMUM,MAXIMUM,COLLOC,TYPLOC,LGLOC,NULLLOC,FORMATLOC,COLMAIN,TYPMAIN,LGMAIN,LGDECMAIN,FORMATMAIN,TAB,CODETABLE,LIBTABLE,WEBCOL,CLEDATE,MASKIN)
+==
+DELETE FROM STD_TABDESCCOL WHERE IDENT='UX_PFP_PARAM'
+'UX_PFP_PARAM','0','Code placement','O','O','O','O',null,null,null,'CODE_PLAC','X','32','N',null,null,null,'0','0',null,null,null,null,'1','N',null
+'UX_PFP_PARAM','1','Libellé du solde','N','N','O','O',null,null,null,'LIB_SOLDE_PLAC','X','128','O',null,null,null,'0','0',null,null,null,null,'2','N',null
+'UX_PFP_PARAM','2','Libellé du motif','N','N','O','O',null,null,null,'LIB_MOTIF_PLAC','X','256','O',null,null,null,'0','0',null,null,null,null,'3','N',null
+'UX_PFP_PARAM','3','Donnée stockant le solde','N','N','O','O',null,null,null,'DONNEE_SOLDE','X','20','O',null,null,null,'0','0',null,null,null,null,'4','N',null
+'UX_PFP_PARAM','4','Code compteur stockant le solde','N','N','O','O',null,null,null,'CODE_COMPTEUR','X','20','O',null,null,null,'0','0',null,null,null,null,'5','N',null
+'UX_PFP_PARAM','5','Pot stockant le solde','N','N','O','O',null,null,null,'POT','X','20','O',null,null,null,'0','0',null,null,null,null,'6','N',null
+'UX_PFP_PARAM','6','Donnée stockant le placement','N','N','O','O',null,null,null,'DONNEE_PLAC','X','20','O',null,null,null,'0','0',null,null,null,null,'7','N',null
+'UX_PFP_PARAM','7','Unité du solde','N','N','O','O',null,null,null,'UNITE','X','20','O',null,null,null,'0','0',null,null,null,null,'8','N',null
+##
+STD_TABDESCCOL
+==
+DELETE FROM STD_TABDESCCOL WHERE IDENT='GAP_TRT_MAILING'
+'GAP_TRT_MAILING','0','NUMPAC','O','O','O','O',null,null,null,'NUMPAC','X','6','N',null,null,null,'0','0',null,null,null,null,'1','N',null
+'GAP_TRT_MAILING','1','MODELE','O','O','O','O',null,null,null,'MODELE','X','8','N',null,null,null,'0','0',null,null,null,null,'2','N',null
+'GAP_TRT_MAILING','2','NATURE','O','O','O','O',null,null,null,'NATURE','X','8','N',null,null,null,'0','0',null,null,null,null,'3','N',null
+'GAP_TRT_MAILING','3','LISTE_DIFFUSION','N','N','O','O',null,null,null,'LISTE_DIFFUSION','X','1000','O',null,null,null,'0','0',null,null,null,null,'4','N',null
+##
+STD_TABDESCCOL
+==
+DELETE FROM STD_TABDESCCOL WHERE IDENT='GA_ZTYCTA'
+'GA_ZTYCTA','0','CODE','N','O','O','O',null,null,null,'CODE','X','2','N',null,null,null,'0','0',null,null,null,null,'1','N',null
+'GA_ZTYCTA','1','LIBELLE','N','N','O','O',null,null,null,'LIBELLE','X','32','O',null,null,null,'0','0',null,null,null,null,'2','N',null
+'GA_ZTYCTA','2','UTILISE','N','N','O','O',null,null,null,'UTILISE','X','32','O',null,null,null,'0','0',null,null,null,null,'3','N',null
+##
+STD_TABDESCCOL
+==
+DELETE FROM STD_TABDESCCOL WHERE IDENT='GA_MOTDISP'
+'GA_MOTDISP','0','CODE','N','O','O','O',null,null,null,'CODE','X','2','N',null,null,null,'0','0',null,null,null,null,'1','N',null
+'GA_MOTDISP','1','LIBELLE','N','N','O','O',null,null,null,'LIBELLE','X','32','O',null,null,null,'0','0',null,null,null,null,'2','N',null
+##
+STD_TABDESCCOL
+==
+DELETE FROM STD_TABDESCCOL WHERE IDENT='UX_PFP_PARAM'
+##
+STD_TABDESCCOL
+==
+DELETE FROM STD_TABDESCCOL WHERE IDENT='UX_PROFIL_DOCUMENTS_TYPE'
+'UX_PROFIL_DOCUMENTS_TYPE','0','ID_DOC','O','O','O','O',null,null,null,'ID_DOC','X','32','N',null,null,null,'0','0',null,null,null,null,'1','N',null
+'UX_PROFIL_DOCUMENTS_TYPE','1','LIBELLE','N','O','O','O',null,null,null,'LIBELLE','X','200','N',null,null,null,'0','0',null,null,null,null,'2','N',null
+##
+STD_TABDESCCOL
+==
+DELETE FROM STD_TABDESCCOL WHERE IDENT='GA_EDITIONS_GAP'
+'GA_EDITIONS_GAP','0','Code','O','O','O','O',NULL,NULL,NULL,'CODE','X','10','N',NULL,NULL,NULL,'0','0',NULL,NULL,NULL,NULL,'1','N',NULL
+'GA_EDITIONS_GAP','1','Libellé','N','N','O','O',NULL,NULL,NULL,'LIBELLE','X','100','O',NULL,NULL,NULL,'0','0',NULL,NULL,NULL,NULL,'2','N',NULL
+'GA_EDITIONS_GAP','2','Type de document','N','N','O','O',NULL,NULL,NULL,'TYPE','X','1','O',NULL,NULL,NULL,'0','0',NULL,NULL,NULL,NULL,'3','N',NULL
+'GA_EDITIONS_GAP','3','Données salarié (O/N)','N','N','N','O',NULL,NULL,NULL,'SAL_DATA','X','1','O',NULL,NULL,NULL,'0','0',NULL,NULL,NULL,NULL,'0','N',NULL
+'GA_EDITIONS_GAP','4','Données contrat (O/N)','N','N','N','O',NULL,NULL,NULL,'CNT_DATA','X','1','O',NULL,NULL,NULL,'0','0',NULL,NULL,NULL,NULL,'0','N',NULL
+'GA_EDITIONS_GAP','5','DocServ (O/N)','N','N','N','O',NULL,NULL,NULL,'IS_DOCSERV','X','1','O',NULL,NULL,NULL,'0','0',NULL,NULL,NULL,NULL,'0','N',NULL
+'GA_EDITIONS_GAP','6','Asynchrone (O/N)','N','N','O','O',NULL,NULL,NULL,'IS_MODE_ASYNCHRONE','X','1','O',NULL,NULL,NULL,'0','0',NULL,NULL,NULL,NULL,'4','N',NULL
+'GA_EDITIONS_GAP','7','Dispo collab (O/N)','N','N','N','O',NULL,NULL,NULL,'IS_DISPO_COLLAB','X','1','O',NULL,NULL,NULL,'0','0',NULL,NULL,NULL,NULL,'0','N',NULL
+'GA_EDITIONS_GAP','8','Description','N','N','N','O',NULL,NULL,NULL,'DESCRIPTION','X','200','O',NULL,NULL,NULL,'0','0',NULL,NULL,NULL,NULL,'0','N',NULL
+'GA_EDITIONS_GAP','9','Chemin de l''image','N','N','N','O',NULL,NULL,NULL,'IMG_SPECIMEN_PATH','X','100','O',NULL,NULL,NULL,'0','0',NULL,NULL,NULL,NULL,'0','N',NULL
+'GA_EDITIONS_GAP','10','Nature de contrat','N','N','O','O',NULL,NULL,NULL,'NATCNT','X','5','O',NULL,NULL,NULL,'0','0',NULL,NULL,NULL,NULL,'5','N',NULL
+'GA_EDITIONS_GAP','11','Embauche (O/N)','N','N','O','O',NULL,NULL,NULL,'IS_EMBAUCHE','X','1','O',NULL,NULL,NULL,'0','0',NULL,NULL,NULL,NULL,'6','N',NULL
+'GA_EDITIONS_GAP','12','Renouvel. CDD (O/N)','N','N','O','O',NULL,NULL,NULL,'IS_MODIF_RENOUVEL_CDD','X','1','O',NULL,NULL,NULL,'0','0',NULL,NULL,NULL,NULL,'7','N',NULL
+'GA_EDITIONS_GAP','13','Transfo. CDD/CDI (O/N)','N','N','O','O',NULL,NULL,NULL,'IS_MODIF_TRANSFO_CDD_CDI','X','1','O',NULL,NULL,NULL,'0','0',NULL,NULL,NULL,NULL,'8','N',NULL
+'GA_EDITIONS_GAP','14','Modif. contrat (O/N)','N','N','O','O',NULL,NULL,NULL,'IS_MODIF_CONTRAT','X','1','O',NULL,NULL,NULL,'0','0',NULL,NULL,NULL,NULL,'9','N',NULL
+'GA_EDITIONS_GAP','15','Modif. affectation (O/N)','N','N','O','O',NULL,NULL,NULL,'IS_MODIF_AFFECTATION','X','1','O',NULL,NULL,NULL,'0','0',NULL,NULL,NULL,NULL,'10','N',NULL
+'GA_EDITIONS_GAP','16','Modif. classification (O/','N','N','O','O',NULL,NULL,NULL,'IS_MODIF_CLASSIFICATION','X','1','O',NULL,NULL,NULL,'0','0',NULL,NULL,NULL,NULL,'11','N',NULL
+'GA_EDITIONS_GAP','17','Modif. horaires (O/N)','N','N','O','O',NULL,NULL,NULL,'IS_MODIF_HORAIRES','X','1','O',NULL,NULL,NULL,'0','0',NULL,NULL,NULL,NULL,'12','N',NULL
+'GA_EDITIONS_GAP','18','Modif. rémunération (O/N)','N','N','O','O',NULL,NULL,NULL,'IS_MODIF_APPOINTEMENT','X','1','O',NULL,NULL,NULL,'0','0',NULL,NULL,NULL,NULL,'13','N',NULL
+'GA_EDITIONS_GAP','19','Modif. infos DSN (O/N)','N','N','O','O',NULL,NULL,NULL,'IS_MODIF_DSN','X','1','O',NULL,NULL,NULL,'0','0',NULL,NULL,NULL,NULL,'14','N',NULL
+'GA_EDITIONS_GAP','20','Départ (O/N)','N','N','O','O',NULL,NULL,NULL,'IS_DEPART','X','1','O',NULL,NULL,NULL,'0','0',NULL,NULL,NULL,NULL,'15','N',NULL
+'GA_EDITIONS_GAP','21','Signature (O/N)','N','N','O','O',NULL,NULL,NULL,'IS_SIGNATURE','X','1','O',NULL,NULL,NULL,'0','0',NULL,NULL,NULL,NULL,'16','N',NULL
+'GA_EDITIONS_GAP','22','Sous-type de document','N','N','O','O',NULL,NULL,NULL,'SOUSTYPE','X','20','O',NULL,NULL,NULL,'0','0',NULL,NULL,NULL,NULL,'17','N',NULL
+##
+STD_TABDESCCOL
+==
+DELETE FROM STD_TABDESCCOL WHERE IDENT IN ('MP_CODELISTS_ESI_BUSINESSUNITS','MP_CODELISTS_ESI_DEPARTMENTS','MP_CODELISTS_ESI_JOB_TITLES','MP_CODELISTS_ESI_LOCATIONS','MP_CODELISTS_ESI_PAY_GRADES')
+'MP_CODELISTS_ESI_BUSINESSUNITS','0','Code','N','N','O','O',null,null,null,'CODE','X','25','O',null,null,null,'0','0',null,null,null,null,'1','N',null
+'MP_CODELISTS_ESI_BUSINESSUNITS','1','Libellé réduit','N','N','O','O',null,null,null,'LIBELLE_REDUIT','X','20','O',null,null,null,'0','0',null,null,null,null,'2','N',null
+'MP_CODELISTS_ESI_BUSINESSUNITS','2','Libellé','N','N','O','O',null,null,null,'LIBELLE','X','255','O',null,null,null,'0','0',null,null,null,null,'3','N',null
+'MP_CODELISTS_ESI_DEPARTMENTS','0','Code','N','N','O','O',null,null,null,'CODE','X','25','O',null,null,null,'0','0',null,null,null,null,'1','N',null
+'MP_CODELISTS_ESI_DEPARTMENTS','1','Libellé réduit','N','N','O','O',null,null,null,'LIBELLE_REDUIT','X','20','O',null,null,null,'0','0',null,null,null,null,'2','N',null
+'MP_CODELISTS_ESI_DEPARTMENTS','2','Libellé','N','N','O','O',null,null,null,'LIBELLE','X','255','O',null,null,null,'0','0',null,null,null,null,'3','N',null
+'MP_CODELISTS_ESI_JOB_TITLES','0','Code','N','N','O','O',null,null,null,'CODE','X','14','O',null,null,null,'0','0',null,null,null,null,'1','N',null
+'MP_CODELISTS_ESI_JOB_TITLES','1','Libellé','N','N','O','O',null,null,null,'LIBELLE','X','32','O',null,null,null,'0','0',null,null,null,null,'2','N',null
+'MP_CODELISTS_ESI_LOCATIONS','0','Code','N','N','O','O',null,null,null,'CODE','X','25','O',null,null,null,'0','0',null,null,null,null,'1','N',null
+'MP_CODELISTS_ESI_LOCATIONS','1','Libellé réduit','N','N','O','O',null,null,null,'LIBELLE_REDUIT','X','20','O',null,null,null,'0','0',null,null,null,null,'2','N',null
+'MP_CODELISTS_ESI_LOCATIONS','2','Libellé','N','N','O','O',null,null,null,'LIBELLE','X','255','O',null,null,null,'0','0',null,null,null,null,'3','N',null
+'MP_CODELISTS_ESI_PAY_GRADES','0','Code','N','N','O','O',null,null,null,'CODE','X','4','O',null,null,null,'0','0',null,null,null,null,'1','N',null
+'MP_CODELISTS_ESI_PAY_GRADES','1','Libellé','N','N','O','O',null,null,null,'LIBELLE','X','10','O',null,null,null,'0','0',null,null,null,null,'2','N',null

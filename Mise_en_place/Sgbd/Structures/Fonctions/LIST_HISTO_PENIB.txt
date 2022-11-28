@@ -1,0 +1,97 @@
+##
+LIST_HISTO_PENIB
+=SQL=
+create or replace FUNCTION LIST_HISTO_PENIB(  
+  p_pacmat IN DIC_ADM_CONTRAT_HISTO.PACMAT%type,
+  p_numpac IN DIC_ADM_CONTRAT_HISTO.NUMPAC%type) RETURN TAB_HISTO_PENIB AS pReturn TAB_HISTO_PENIB := TAB_HISTO_PENIB();
+  v_date_eff DATE;
+  v_date_fin DATE;
+  v_date_stc DATE;
+  v_actual_date DATE :=sysdate;
+  yearEff integer;
+  yearFin integer;
+  yearSTSC integer;
+  yearTmp integer;
+  yearTmpFin integer;
+  yearActuel integer;
+  v_num_contrat_actu integer;
+  v_num_contrat_futur integer;
+  
+BEGIN
+  for r in (select PACMAT,NUMPAC,DSSTC,NUMCNT,DECODE(ZAB09,'O','Oui','Non') AS ZAB09 ,DECODE(ZAB10,'O','Oui','Non') AS ZAB10 ,DECODE(ZAB11,'O','Oui','Non') AS ZAB11, DECODE(ZAB12,'O','Oui','Non') AS ZAB12 ,DECODE(ZAB13,'O','Oui','Non') AS ZAB13 ,DECODE(ZAB14,'O','Oui','Non') AS ZAB14,DECODE(ZAB15,'O','Oui','Non') AS ZAB15,DECODE(ZAB16,'O','Oui','Non') AS ZAB16,DECODE(ZAB17,'O','Oui','Non') AS ZAB17,DECODE(ZAB18,'O','Oui','Non') AS ZAB18,DATE_EFF, DATE_FIN from DIC_ADM_CONTRAT_HISTO a where  a.pacmat = p_pacmat and a.numpac = p_numpac ORDER BY DATE_EFF)
+  loop
+    v_date_eff := r.DATE_EFF;
+    v_date_fin := r.DATE_FIN;
+    v_date_stc := r.DSSTC;
+    yearFin := TO_NUMBER(TO_CHAR(v_date_fin ,'yyyy'));
+    yearEff := TO_NUMBER(TO_CHAR(v_date_eff ,'yyyy'));
+    yearActuel := TO_NUMBER(TO_CHAR(v_actual_date ,'yyyy'));
+    yearTmp := yearEff;
+    v_num_contrat_actu := r.NUMCNT;
+    IF v_date_stc IS NOT NULL THEN
+      BEGIN
+        select NUMCNT INTO v_num_contrat_futur from (select NUMCNT from DIC_ADM_CONTRAT_HISTO a where  a.pacmat = p_pacmat and a.numpac = p_numpac and DATE_EFF > v_date_eff ORDER BY DATE_EFF) where rownum = 1;
+      EXCEPTION 
+        WHEN OTHERS THEN v_num_contrat_futur := 0;
+      END;
+      IF v_num_contrat_futur = v_num_contrat_actu THEN
+        v_date_stc := NULL;
+      END IF;
+    END IF;
+    -- traitement ou il n'y a pas du DSSTC positionné
+    IF v_date_stc IS NULL THEN
+        -- si la date de fin et plus au moins recente que la date du jour
+        IF yearActuel >= yearFin THEN
+          -- pour le 31/12 on prend tt l'année si no on aurait arreté a l'année precedent
+          IF TO_CHAR(v_date_fin ,'mmdd') = '1231' THEN
+               yearTmpFin := yearFin+1;
+          ELSE
+              yearTmpFin := yearFin;
+          END IF;
+        ELSE
+          yearTmpFin := yearActuel+1;
+        END IF;
+        WHILE yearTmp < yearTmpFin LOOP
+          pReturn.extend;
+          pReturn(pReturn.COUNT) := HISTO_PENIB_ROW_DATA(r.PACMAT,r.NUMPAC,yearTmp, null , r.NUMCNT ,r.ZAB09,r.ZAB10,r.ZAB11,r.ZAB12,r.ZAB13,r.ZAB14,r.ZAB15,r.ZAB16,r.ZAB17,r.ZAB18,r.DATE_EFF, r.DATE_FIN);  
+          yearTmp := yearTmp + 1;
+        END LOOP;
+     -- traitement ou il Y A un DSSTC positionné
+     ELSE
+       -- il Y A un DSSTC <= Date_fin
+       IF v_date_stc <= v_date_fin THEN       
+          WHILE yearTmp < TO_NUMBER(TO_CHAR(v_date_stc ,'yyyy')) LOOP
+            pReturn.extend;
+            pReturn(pReturn.COUNT) := HISTO_PENIB_ROW_DATA(r.PACMAT,r.NUMPAC,yearTmp, null , r.NUMCNT ,r.ZAB09,r.ZAB10,r.ZAB11,r.ZAB12,r.ZAB13,r.ZAB14,r.ZAB15,r.ZAB16,r.ZAB17,r.ZAB18,r.DATE_EFF, r.DATE_FIN);  
+            yearTmp := yearTmp + 1;
+          END LOOP;
+          pReturn.extend;
+          pReturn(pReturn.COUNT) := HISTO_PENIB_ROW_DATA(r.PACMAT,r.NUMPAC,TO_NUMBER(TO_CHAR(v_date_stc ,'yyyy')), r.DSSTC , r.NUMCNT ,r.ZAB09,r.ZAB10,r.ZAB11,r.ZAB12,r.ZAB13,r.ZAB14,r.ZAB15,r.ZAB16,r.ZAB17,r.ZAB18,r.DATE_EFF, r.DATE_FIN);  
+       -- il Y A un DSSTC > Date_fin
+       ELSE
+          WHILE yearTmp < yearFin LOOP
+            pReturn.extend;
+            pReturn(pReturn.COUNT) := HISTO_PENIB_ROW_DATA(r.PACMAT,r.NUMPAC,yearTmp, null , r.NUMCNT ,r.ZAB09,r.ZAB10,r.ZAB11,r.ZAB12,r.ZAB13,r.ZAB14,r.ZAB15,r.ZAB16,r.ZAB17,r.ZAB18,r.DATE_EFF, r.DATE_FIN);  
+            yearTmp := yearTmp + 1;
+          END LOOP;
+          IF v_num_contrat_futur != v_num_contrat_actu THEN 
+            WHILE yearTmp < TO_NUMBER(TO_CHAR(v_date_stc ,'yyyy')) LOOP
+              pReturn.extend;
+              pReturn(pReturn.COUNT) := HISTO_PENIB_ROW_DATA(r.PACMAT,r.NUMPAC,yearTmp, null , r.NUMCNT ,r.ZAB09,r.ZAB10,r.ZAB11,r.ZAB12,r.ZAB13,r.ZAB14,r.ZAB15,r.ZAB16,r.ZAB17,r.ZAB18,r.DATE_EFF, r.DATE_FIN);  
+              yearTmp := yearTmp + 1;
+            END LOOP;
+            pReturn.extend;
+            pReturn(pReturn.COUNT) := HISTO_PENIB_ROW_DATA(r.PACMAT,r.NUMPAC,TO_NUMBER(TO_CHAR(v_date_stc ,'yyyy')), r.DSSTC , r.NUMCNT ,r.ZAB09,r.ZAB10,r.ZAB11,r.ZAB12,r.ZAB13,r.ZAB14,r.ZAB15,r.ZAB16,r.ZAB17,r.ZAB18,r.DATE_EFF, r.DATE_FIN);  
+          ELSE  
+            IF TO_CHAR(v_date_fin ,'mmdd') = '1231' THEN
+              pReturn.extend;
+              pReturn(pReturn.COUNT) := HISTO_PENIB_ROW_DATA(r.PACMAT,r.NUMPAC, yearFin, null , r.NUMCNT ,r.ZAB09,r.ZAB10,r.ZAB11,r.ZAB12,r.ZAB13,r.ZAB14,r.ZAB15,r.ZAB16,r.ZAB17,r.ZAB18,r.DATE_EFF, r.DATE_FIN);  
+            END IF;            
+          END IF;
+       END IF;
+        
+     END IF;
+     
+  end loop;
+  return pReturn;
+END;

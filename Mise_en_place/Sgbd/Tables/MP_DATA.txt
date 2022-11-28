@@ -1,0 +1,106 @@
+##
+TAG_CHARSET=@€ιθη
+##
+MP_DATA
+=SQL IFNOTEXIST=MP_DATA=
+CREATE TABLE "MP_DATA" (DATA_NAME_MP_ALP VARCHAR(50) NOT NULL ENABLE ,REGROUPEMENT VARCHAR(20),PRIMARY KEY (DATA_NAME_MP_ALP)) 
+INSERT INTO MP_DATA (select NOM_DONNEE_UX, REGROUPEMENT from UX_DATA)
+##
+MP_DATA
+==
+DELETE FROM MP_DATA WHERE DATA_NAME_MP_ALP='codeINSEEFiscal'
+'codeINSEEFiscal',NULL
+##
+MP_DATA
+==
+DELETE FROM MP_DATA WHERE DATA_NAME_MP_ALP='codeINSEEPerso'
+'codeINSEEPerso',NULL
+##
+MP_DATA
+=SQL IFEXIST=UX_DATA=
+INSERT INTO MP_DATA (select NOM_DONNEE_UX, REGROUPEMENT from UX_DATA where NOM_DONNEE_UX not in (select DATA_NAME_MP_ALP from MP_DATA))
+##
+MP_DATA
+==
+delete from MP_DATA where DATA_NAME_MP_ALP in ('documentTypeCode','documentFileName')
+'documentTypeCode',null
+##
+MP_DATA
+==
+delete from MP_DATA where DATA_NAME_MP_ALP in ('rankEmergency','adresseMailEmergency','officeLineEmergency','countryDialMobileEmergency','commentEmergency','countryDialLandLineEmergency','countryDialOfficeLineEmergency','familyName1Emergency','givenNameEmergency','landLineEmergency','relationshipEmergency','mobileEmergency','relationshipEmergency')
+'adresseMailEmergency','personalContact'
+'commentEmergency','personalContact'
+'countryDialLandLineEmergency','personalContact'
+'countryDialMobileEmergency','personalContact'
+'countryDialOfficeLineEmergency','personalContact'
+'familyName1Emergency','personalContact'
+'givenNameEmergency','personalContact'
+'landLineEmergency','personalContact'
+'mobileEmergency','personalContact'
+'officeLineEmergency','personalContact'
+'relationshipEmergency','personalContact'
+'rankEmergency','personalContact'
+##
+MP_DATA
+==
+DELETE FROM MP_DATA WHERE DATA_NAME_MP_ALP='payAdvanceMsgAideMontantAcompte'
+'payAdvanceMsgAideMontantAcompte',NULL
+##
+MP_DATA
+==
+UPDATE MP_DATA SET REGROUPEMENT='retourPaie' WHERE DATA_NAME_MP_ALP IN ('MDEkey','MDIdentifiant','MDPat','MDPayeur','MDSalFix','MDSalNet','TRNombre','TRPartPatronale','TRPartSalariale','TROrganisme')
+##
+MP_DATA
+==
+DELETE FROM MP_DATA WHERE DATA_NAME_MP_ALP='workerStatus'
+'workerStatus',NULL
+##
+MP_DATA
+==
+DELETE FROM MP_DATA WHERE DATA_NAME_MP_ALP='forcedHiredMatric'
+'forcedHiredMatric',NULL
+##
+MP_DATA
+==
+DELETE FROM MP_DATA WHERE DATA_NAME_MP_ALP IN ('cityNameFiscal','cityNamePerso')
+'cityNameFiscal',NULL
+'cityNamePerso',NULL
+##
+MP_DATA
+==
+DELETE FROM MP_DATA WHERE DATA_NAME_MP_ALP IN ('remoteWorkArrangementDiscussedWithManager','remoteWorkArrangementNeedOfficeSupplies','remoteWorkArrangementComment','remoteWorkArrangementEngagement','remoteWorkArrangementTypeCode','remoteWorkArrangementRequestID','remoteWorkArrangementStartDate','remoteWorkArrangementEndDate','remoteWorkArrangementMonday','remoteWorkArrangementMondayAM','remoteWorkArrangementMondayPM','remoteWorkArrangementTuesday','remoteWorkArrangementTuesdayAM','remoteWorkArrangementTuesdayPM','remoteWorkArrangementWednesday','remoteWorkArrangementWednesdayAM','remoteWorkArrangementWednesdayPM','remoteWorkArrangementThursday','remoteWorkArrangementThursdayAM','remoteWorkArrangementThursdayPM','remoteWorkArrangementFriday','remoteWorkArrangementFridayAM','remoteWorkArrangementFridayPM','remoteWorkArrangementSaturday','remoteWorkArrangementSaturdayAM','remoteWorkArrangementSaturdayPM','remoteWorkArrangementSunday','remoteWorkArrangementSundayAM','remoteWorkArrangementSundayPM')
+'remoteWorkArrangementDiscussedWithManager',NULL
+'remoteWorkArrangementNeedOfficeSupplies',NULL
+'remoteWorkArrangementComment',NULL
+'remoteWorkArrangementEngagement',NULL
+'remoteWorkArrangementTypeCode',NULL
+'remoteWorkArrangementRequestID',NULL
+'remoteWorkArrangementStartDate',NULL
+'remoteWorkArrangementEndDate',NULL
+'remoteWorkArrangementMonday',NULL
+'remoteWorkArrangementMondayAM',NULL
+'remoteWorkArrangementMondayPM',NULL
+'remoteWorkArrangementTuesday',NULL
+'remoteWorkArrangementTuesdayAM',NULL
+'remoteWorkArrangementTuesdayPM',NULL
+'remoteWorkArrangementWednesday',NULL
+'remoteWorkArrangementWednesdayAM',NULL
+'remoteWorkArrangementWednesdayPM',NULL
+'remoteWorkArrangementThursday',NULL
+'remoteWorkArrangementThursdayAM',NULL
+'remoteWorkArrangementThursdayPM',NULL
+'remoteWorkArrangementFriday',NULL
+'remoteWorkArrangementFridayAM',NULL
+'remoteWorkArrangementFridayPM',NULL
+'remoteWorkArrangementSaturday',NULL
+'remoteWorkArrangementSaturdayAM',NULL
+'remoteWorkArrangementSaturdayPM',NULL
+'remoteWorkArrangementSunday',NULL
+'remoteWorkArrangementSundayAM',NULL
+'remoteWorkArrangementSundayPM',NULL
+##
+MP_DATA
+==
+DELETE FROM MP_DATA WHERE DATA_NAME_MP_ALP IN ('remoteWorkArrangementTxtConditionUtilisation','remoteWorkArrangementLibelleTemplate')
+'remoteWorkArrangementTxtConditionUtilisation',NULL
+'remoteWorkArrangementLibelleTemplate',NULL

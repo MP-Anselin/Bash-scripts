@@ -1,0 +1,5 @@
+##
+SYS_TGE_THEME_DETAILS_IHM
+=SQL=
+CREATE OR REPLACE FORCE VIEW SYS_TGE_THEME_DETAILS_IHM AS (SELECT T.numpac, T.id_theme, T.nom_theme, T.nom_ecran, D.nom_donnee, TGE_GAP_IS_DONNEE_RETRO(T.numpac,D.nom_donnee) AS IS_RETRO, D.NUM_ORDRE 
+FROM SYS_TGE_THEME T, SYS_TGE_THEME_DETAILS D WHERE T.numpac = D.numpac AND t.id_theme = d.id_theme )

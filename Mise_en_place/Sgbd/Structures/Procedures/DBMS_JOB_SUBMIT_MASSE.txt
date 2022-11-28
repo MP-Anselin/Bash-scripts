@@ -1,0 +1,40 @@
+##
+TAG_CHARSET=@€éèç
+##
+DBMS_JOB_SUBMIT_MASSE
+=SQL=
+CREATE OR REPLACE PROCEDURE DBMS_JOB_SUBMIT_MASSE(listJobMasseAsyncTab IN TAB_VARCHAR, traceStr VARCHAR2)
+AS
+  listJobMasseAsync varchar2(4000) := NULL;
+  v_jobAsyncMasseIdx NUMBER;
+BEGIN
+  IF NOT listJobMasseAsyncTab.exists(1) THEN
+    RETURN;
+  END IF;
+  -- On va jusqu'à listJobMasseAsyncTab.last+1 pour traiter les derniers job dans la boucle
+  FOR j IN listJobMasseAsyncTab.first..listJobMasseAsyncTab.last+1
+  LOOP
+    IF j = listJobMasseAsyncTab.last+1 OR (j <= listJobMasseAsyncTab.last AND LENGTH(listJobMasseAsync)+LENGTH(listJobMasseAsyncTab(j))>3500) THEN
+      -- Le résultat de la concaténation va dépasser 3500 caractères (plus de qu'on va ajouter avant et après, il ne faut pas dépasser les 4000), ou alors on a fini de boucler : on envoie ce qu'on a
+
+      DBMS_JOB.SUBMIT(v_jobAsyncMasseIdx , 'BEGIN NULL; END;' , sysdate+1);
+      DBMS_JOB.WHAT(v_jobAsyncMasseIdx , '
+        BEGIN
+          TGE_IMPORT_AVANCEMENT_proc(''TGE_JOB_MASSE_'||v_jobAsyncMasseIdx||''',''début ASYNC '||traceStr||'''); 
+          ' || REPLACE(listJobMasseAsync,'#JOB#',v_jobAsyncMasseIdx) || '
+          TGE_IMPORT_AVANCEMENT_proc(''TGE_JOB_MASSE_'||v_jobAsyncMasseIdx||''',''fin ASYNC '||traceStr||' OK''); 
+        EXCEPTION
+          WHEN OTHERS THEN
+            TGE_IMPORT_AVANCEMENT_proc(''TGE_JOB_MASSE_'||v_jobAsyncMasseIdx||''',''fin ASYNC '||traceStr||' KO : ''|| SQLCODE|| SQLERRM); 
+        END;');
+ 	  DBMS_JOB.NEXT_DATE(v_jobAsyncMasseIdx ,  sysdate-1);
+
+
+      IF j <= listJobMasseAsyncTab.last THEN
+        listJobMasseAsync := listJobMasseAsyncTab(j);
+      END IF;
+    ELSE
+      listJobMasseAsync := listJobMasseAsync||listJobMasseAsyncTab(j);
+    END IF;
+  END LOOP;
+END DBMS_JOB_SUBMIT_MASSE;

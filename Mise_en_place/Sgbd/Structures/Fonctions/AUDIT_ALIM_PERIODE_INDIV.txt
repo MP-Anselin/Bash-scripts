@@ -1,0 +1,89 @@
+##
+AUDIT_ALIM_PERIODE_INDIV
+=SQL=
+CREATE OR REPLACE FUNCTION AUDIT_ALIM_PERIODE_INDIV(
+    p_id           IN NUMBER,
+    p_numpac       IN VARCHAR2,
+    p_periode_paie IN VARCHAR2,
+    p_pacmat       IN VARCHAR2 )
+  RETURN AUDIT_ALIM_PERIODE_TAB
+AS
+  w_err VARCHAR2(2000);
+  req CLOB;
+type PERIODE
+IS
+  RECORD
+  (
+    paiezad DIC_ADM_CONTRAT_SITU.PAIEZAD%TYPE,
+    deb_rec DATE,
+    fin_rec DATE );
+type PERIODE_TAB
+IS
+  TABLE OF PERIODE INDEX BY BINARY_INTEGER;
+  tab1 PERIODE_TAB;
+  retour AUDIT_ALIM_PERIODE_TAB := AUDIT_ALIM_PERIODE_TAB();
+  w_tablegxp TGE_REF_MAPDO.TABLEGXP%TYPE;
+  w_Y326 TGE_REF_MAPDO.DONNEEGXP%TYPE;
+  w_Y327 TGE_REF_MAPDO.DONNEEGXP%TYPE;
+BEGIN
+  TGE_IMPORT_AVANCEMENT_proc('TGE_ALIM_PER','AUDIT_ALIM_PERIODE_INDIV début');
+  BEGIN
+    SELECT tablegxp ,
+      Y326_DONNEE ,
+      Y327_DONNEE
+    INTO w_tablegxp,
+      w_Y326,
+      w_Y327
+    FROM
+      ( SELECT DISTINCT c.element,
+        c.tablegxp,
+        c.DONNEEGXP
+      FROM tge_ref_mapdo c
+      WHERE C.numpac = p_numpac
+      AND c.element IN ('Y326','Y327')
+      UNION ALL
+      SELECT DISTINCT c.element,
+        c.tablegxp,
+        c.DONNEEGXP
+      FROM tge_ref_mapdo c
+      WHERE C.numpac                  ='*'
+      AND c.element                  IN ('Y326','Y327')
+      AND (c.TABLEGXP,c.ELEMENT) NOT IN
+        (SELECT a.TABLEGXP,
+          a.element
+        FROM tge_ref_mapdo a
+        WHERE a.numpac = p_numpac
+        AND A.ELEMENT IN ('Y326','Y327')
+        )
+      ) pivot ( MAX(DONNEEGXP) AS DONNEE FOR (element) IN('Y326' AS Y326 ,'Y327' AS Y327));
+  EXCEPTION
+  WHEN NO_DATA_FOUND THEN
+    TGE_IMPORT_AVANCEMENT_proc('TGE_ALIM_PER','AUDIT_ALIM_PERIODE_INDIV ERR : Erreurs de configuration de TGE_REF_MAPDO : NUMPAC = ''' || p_numpac || ''' AND ELEMENT in (''Y326'',''Y327'')');
+    raise;
+  END;
+req         := 'select rec.PAIEZAD, rec.'|| w_Y326|| ' as deb_rec , rec.'|| w_Y327||' as fin_rec ';
+req         := req || 'from '|| w_tablegxp ||' rec inner join DIC_ADM_CONTRAT_SITU sit on rec.numpac = sit.numpac AND rec.paiezad = sit.paiezad ';
+req         := req || 'where NVL(sit.DSFSC,TO_DATE(''20990101'',''YYYYMMDD'')) >= last_day(to_date(to_char('''|| p_periode_paie ||'''),''yyyymm'')) ';
+req         := req || 'AND ((rec.'|| w_Y326 ||' IS NULL AND rec.'|| w_Y327 ||' IS NOT NULL) OR (rec.'|| w_Y326 ||' IS NOT NULL AND rec.'|| w_Y327 ||' IS NULL)) ';
+req         := req || 'AND sit.numpac = ''' || p_numpac || '''';
+IF p_pacmat IS NOT NULL THEN
+  req       := req || ' AND sit.pacmat = ''' || p_pacmat || '''';
+END IF;
+TGE_IMPORT_AVANCEMENT_proc('TGE_ALIM_PER','AUDIT_ALIM_PERIODE_INDIV EXECUTE ' || req);
+EXECUTE IMMEDIATE req BULK COLLECT INTO tab1;
+IF tab1.exists(1) THEN
+  FOR i IN tab1.first..tab1.last
+  LOOP
+    retour.extend;
+    retour(retour.count) := AUDIT_ALIM_PERIODE_COL(tab1(i).PAIEZAD, tab1(i).deb_rec,tab1(i).fin_rec);
+  END LOOP;
+END IF;
+TGE_IMPORT_AVANCEMENT_proc('TGE_ALIM_PER','fin AUDIT_ALIM_PERIODE_INDIV OK');
+RETURN retour;
+EXCEPTION
+WHEN OTHERS THEN
+  w_err := SQLCODE;
+  w_err := 'AUDIT_ALIM_PERIODE_INDIV '||w_err||' '||sqlerrm;
+  TGE_IMPORT_AVANCEMENT_proc('TGE_ALIM_PER','fin AUDIT_ALIM_PERIODE_INDIV KO ' || w_err);
+  raise;
+END AUDIT_ALIM_PERIODE_INDIV;

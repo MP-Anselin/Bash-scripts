@@ -1,0 +1,27 @@
+##
+LINEARISEREQ
+=SQL=
+CREATE OR REPLACE
+  FUNCTION LINEARISEREQ(
+      req IN VARCHAR2,
+      sep IN VARCHAR2)
+    RETURN CLOB
+  IS
+  type tcur
+IS
+  ref
+  CURSOR;
+    cur tcur;
+    retourselect VARCHAR2(2000);
+    retour CLOB;
+  BEGIN
+    OPEN cur FOR req;
+    LOOP
+      FETCH cur INTO retourselect;
+    EXIT
+  WHEN cur % NOTFOUND;
+    retour := retour || retourselect || sep;
+  END LOOP;
+  CLOSE cur;
+  RETURN retour;
+END; 

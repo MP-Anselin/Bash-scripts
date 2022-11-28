@@ -1,0 +1,4 @@
+##
+HUB_SCH_LOGIN
+==
+CREATE OR REPLACE FORCE VIEW "HUB_SCH_LOGIN" ("LOGIN") AS   select distinct u.login from sys_usr_config u, sys_usr_connu c where c.NOMLONG='HUB' and u.LOGIN=c.LOGIN order by u.login  

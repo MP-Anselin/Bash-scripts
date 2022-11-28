@@ -1,0 +1,4 @@
+##
+DATE_W580
+=SQL IF_TYPE_NOTEXIST=DATE_W580=
+create TYPE DATE_W580 IS Object  (numpac   varchar2(6),   IDPACMAT  varchar2(14),   donnee_W580 Varchar2(8)  );

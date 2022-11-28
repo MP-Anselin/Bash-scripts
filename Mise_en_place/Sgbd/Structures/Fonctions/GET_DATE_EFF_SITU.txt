@@ -1,0 +1,38 @@
+##
+TAG_CHARSET=@€ιθη
+##
+GET_DATE_EFF_SITU
+=SQL=
+CREATE OR REPLACE FUNCTION GET_DATE_EFF_SITU(p_numpac VARCHAR2, p_pacmat VARCHAR2, p_numcnt NUMBER, p_paiezad VARCHAR2, p_dateRef DATE DEFAULT NULL) RETURN DATE IS 
+  v_dateRef DATE;
+  retour DATE; 
+BEGIN 
+  IF p_dateRef IS NULL THEN
+    v_dateRef := SYSDATE;
+  ELSE
+    v_dateRef := p_dateRef;
+  END IF;
+  v_dateRef := TRUNC(v_dateRef,'dd');
+  BEGIN
+    SELECT MAX(DATE_EFF) INTO retour FROM DIC_ADM_CONTRAT_HISTO WHERE NUMPAC=p_numpac AND PACMAT=p_pacmat AND NUMCNT=p_numcnt AND PAIEZAD=p_paiezad AND v_dateRef BETWEEN DATE_EFF AND DATE_FIN;
+  EXCEPTION
+    WHEN OTHERS THEN retour:=NULL;
+  END;
+  IF retour IS NOT NULL THEN
+    RETURN retour;
+  END IF;
+  BEGIN
+    SELECT MIN(DATE_EFF) INTO retour FROM DIC_ADM_CONTRAT_HISTO WHERE NUMPAC=p_numpac AND PACMAT=p_pacmat AND NUMCNT=p_numcnt AND PAIEZAD=p_paiezad AND DATE_EFF>v_dateRef;
+  EXCEPTION
+    WHEN OTHERS THEN retour:=NULL;
+  END;
+  IF retour IS NOT NULL THEN
+    RETURN retour;
+  END IF;
+  BEGIN
+    SELECT MAX(DATE_EFF) INTO retour FROM DIC_ADM_CONTRAT_HISTO WHERE NUMPAC=p_numpac AND PACMAT=p_pacmat AND NUMCNT=p_numcnt AND PAIEZAD=p_paiezad AND DATE_EFF<v_dateRef;
+  EXCEPTION
+    WHEN OTHERS THEN retour:=NULL;
+  END;
+  RETURN retour;
+END GET_DATE_EFF_SITU;

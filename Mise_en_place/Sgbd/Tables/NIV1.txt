@@ -1,0 +1,6 @@
+##
+TAG_CHARSET=@€ιθη
+##
+NIV1
+=SQL IFEXIST=NIV1=
+drop table NIV1

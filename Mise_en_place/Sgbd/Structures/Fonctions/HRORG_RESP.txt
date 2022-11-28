@@ -1,0 +1,41 @@
+##
+TAG_CHARSET=@€éèç
+##
+HRORG_RESP
+=SQL=
+CREATE OR REPLACE
+  FUNCTION HRORG_RESP(
+      p_matric IN secumatric.matric%TYPE,
+      p_date   IN std_struc_entite.date_eff%TYPE,
+      p_cid   IN std_struc_entite.cid%TYPE default null)
+    RETURN std_struc_entite.matric_resp%TYPE
+  IS
+    v_retour std_struc_arbre.matric_resp%TYPE;
+    v_cid std_struc_entite.cid%TYPE;
+  BEGIN
+	  
+  v_cid := p_cid;
+  IF (v_cid IS NULL) THEN
+  	BEGIN
+  		SELECT VALVAR INTO v_cid FROM SYS_VARSYS where CODVAR = 'NS_CLIENT_ID';
+  	EXCEPTION
+  	WHEN NO_DATA_FOUND THEN
+  		v_cid := null;
+  	END;
+  END IF;
+  IF (v_cid IS NULL) THEN
+  	-- En mode multiclient, la varsys peut être null et le passage du paramètre pCid est obligatoire
+  	RETURN null;
+  END IF;
+	  
+    /* Regarde le codts hierachique */
+    SELECT HRORG_RESP_CODTS(codts,p_matric,p_date, v_cid)
+    INTO v_retour
+    FROM std_struc_type
+    WHERE critere_hierarchique =1 ;
+    RETURN v_retour ;
+  EXCEPTION
+  WHEN OTHERS THEN
+    RETURN NULL;
+  END HRORG_RESP ; 
+  

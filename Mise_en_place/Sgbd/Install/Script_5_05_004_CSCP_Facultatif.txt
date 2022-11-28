@@ -1,0 +1,12 @@
+##
+GENERATION_PHOTO_DACS
+=SQL=
+DECLARE
+	CURSOR ref_pac is
+		select distinct numpac,periodeencours  from tge_ref_pac ;
+BEGIN
+  FOR C in ref_pac LOOP
+  EXECUTE immediate 'CALL TGE_GENERATION_PHOTO_DACS('''||c.numpac||''','''||c.periodeencours||'01' ||''','''||c.periodeencours||''')';
+  END LOOP;
+  commit;
+END;

@@ -1,0 +1,12 @@
+##
+TAG_IMPORT=5.05.004.R012
+##
+SYS_VARSYS
+==
+DELETE SYS_VARSYS WHERE  MODULE='STD' and CODVAR='ENV_PRODUCTION'
+'STD', 'ENV_PRODUCTION', 'false', 'Booleen', 'Permettant d indiquer si on est sur un environnement de production.'
+##
+SYS_VARSYS
+==
+DELETE SYS_VARSYS WHERE  MODULE='STD' and CODVAR='LOG_SOAP_REQUEST'
+'STD', 'LOG_SOAP_REQUEST', 'true', 'Booleen', 'Permettant d indiquer si le traçage des requetes Soap envoyées à eService est active ou non.'

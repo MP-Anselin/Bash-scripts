@@ -1,0 +1,298 @@
+##
+HRGP_INITIALISE_BUDGET
+=SQL=
+CREATE OR REPLACE
+PROCEDURE HRGP_INITIALISE_BUDGET(
+    codescn  IN VARCHAR,
+    moisaug  IN NUMBER,
+    multi    IN NUMBER ,
+    moisaug2 IN NUMBER,
+    multi2   IN NUMBER,
+    moisaug3 IN NUMBER,
+    multi3   IN NUMBER)
+AS
+  CURSOR c_bud
+  IS
+    SELECT * FROM hrgp_budget_prepare WHERE codscn = codescn;
+  lig hrgp_budget_prepare % rowtype;
+  salavaug  NUMBER;
+  salapaug1 NUMBER;
+  salapaug2 NUMBER;
+  salapaug3 NUMBER;
+  tmp hrgp_affectations % rowtype;
+  exit_function EXCEPTION;
+BEGIN
+  OPEN c_bud;
+  LOOP
+    BEGIN
+      FETCH c_bud INTO lig;
+      EXIT
+    WHEN c_bud % NOTFOUND;
+      salavaug        := hrgp_salaire_mensuel(lig.matric, lig.anneeprec);
+      lig.salprec     := salavaug  *12;
+      salapaug1       := salavaug  *multi;
+      salapaug2       := salapaug1 *multi2;
+      salapaug3       := salapaug2 *multi3;
+      IF moisaug       > 1 THEN
+        lig.sal_mois1 := salavaug;
+      ELSE
+        lig.sal_mois1 := salapaug1;
+      END IF;
+      IF moisaug       > 2 THEN
+        lig.sal_mois2 := salavaug;
+      ELSE
+        lig.sal_mois2 := salapaug1;
+      END IF;
+      IF moisaug       > 3 THEN
+        lig.sal_mois3 := salavaug;
+      ELSE
+        lig.sal_mois3 := salapaug1;
+      END IF;
+      IF moisaug       > 4 THEN
+        lig.sal_mois4 := salavaug;
+      ELSE
+        lig.sal_mois4 := salapaug1;
+      END IF;
+      IF moisaug       > 5 THEN
+        lig.sal_mois5 := salavaug;
+      ELSE
+        lig.sal_mois5 := salapaug1;
+      END IF;
+      IF moisaug       > 6 THEN
+        lig.sal_mois6 := salavaug;
+      ELSE
+        lig.sal_mois6 := salapaug1;
+      END IF;
+      IF moisaug       > 7 THEN
+        lig.sal_mois7 := salavaug;
+      ELSE
+        lig.sal_mois7 := salapaug1;
+      END IF;
+      IF moisaug       > 8 THEN
+        lig.sal_mois8 := salavaug;
+      ELSE
+        lig.sal_mois8 := salapaug1;
+      END IF;
+      IF moisaug       > 9 THEN
+        lig.sal_mois9 := salavaug;
+      ELSE
+        lig.sal_mois9 := salapaug1;
+      END IF;
+      IF moisaug        > 10 THEN
+        lig.sal_mois10 := salavaug;
+      ELSE
+        lig.sal_mois10 := salapaug1;
+      END IF;
+      IF moisaug        > 11 THEN
+        lig.sal_mois11 := salavaug;
+      ELSE
+        lig.sal_mois11 := salapaug1;
+      END IF;
+      IF moisaug        > 12 THEN
+        lig.sal_mois12 := salavaug;
+      ELSE
+        lig.sal_mois12 := salapaug1;
+      END IF;
+      IF moisaug2      > 1 AND moisaug<1 THEN
+        lig.sal_mois1 := salapaug1;
+      ELSE
+        IF moisaug2     <=1 THEN
+          lig.sal_mois1 := salapaug2;
+        END IF;
+      END IF;
+      IF moisaug       > 2 AND moisaug<2 THEN
+        lig.sal_mois2 := salapaug1;
+      ELSE
+        IF moisaug2     <=2 THEN
+          lig.sal_mois2 := salapaug2;
+        END IF;
+      END IF;
+      IF moisaug       > 3 AND moisaug<3 THEN
+        lig.sal_mois3 := salapaug1;
+      ELSE
+        IF moisaug2     <=3 THEN
+          lig.sal_mois3 := salapaug2;
+        END IF;
+      END IF;
+      IF moisaug       > 4 AND moisaug<4 THEN
+        lig.sal_mois4 := salapaug1;
+      ELSE
+        IF moisaug2     <=4 THEN
+          lig.sal_mois4 := salapaug2;
+        END IF;
+      END IF;
+      IF moisaug       > 5 AND moisaug<5 THEN
+        lig.sal_mois5 := salapaug1;
+      ELSE
+        IF moisaug2     <=5 THEN
+          lig.sal_mois5 := salapaug2;
+        END IF;
+      END IF;
+      IF moisaug       > 6 AND moisaug<6 THEN
+        lig.sal_mois6 := salapaug1;
+      ELSE
+        IF moisaug2     <=6 THEN
+          lig.sal_mois6 := salapaug2;
+        END IF;
+      END IF;
+      IF moisaug       > 7 AND moisaug<7 THEN
+        lig.sal_mois7 := salapaug1;
+      ELSE
+        IF moisaug2     <=7 THEN
+          lig.sal_mois7 := salapaug2;
+        END IF;
+      END IF;
+      IF moisaug       > 8 AND moisaug<8 THEN
+        lig.sal_mois8 := salapaug1;
+      ELSE
+        IF moisaug2     <=8 THEN
+          lig.sal_mois8 := salapaug2;
+        END IF;
+      END IF;
+      IF moisaug       > 9 AND moisaug<9 THEN
+        lig.sal_mois9 := salapaug1;
+      ELSE
+        IF moisaug2     <=9 THEN
+          lig.sal_mois9 := salapaug2;
+        END IF;
+      END IF;
+      IF moisaug        > 10 AND moisaug<10 THEN
+        lig.sal_mois10 := salapaug1;
+      ELSE
+        IF moisaug2      <=10 THEN
+          lig.sal_mois10 := salapaug2;
+        END IF;
+      END IF;
+      IF moisaug        > 11 AND moisaug<11 THEN
+        lig.sal_mois11 := salapaug1;
+      ELSE
+        IF moisaug2      <=11 THEN
+          lig.sal_mois11 := salapaug2;
+        END IF;
+      END IF;
+      IF moisaug        > 12 AND moisaug<12 THEN
+        lig.sal_mois12 := salapaug1;
+      ELSE
+        IF moisaug2      <=12 THEN
+          lig.sal_mois12 := salapaug2;
+        END IF;
+      END IF;
+      IF moisaug3      > 1 AND moisaug2<1 AND moisaug<1 THEN
+        lig.sal_mois1 := salapaug2;
+      ELSE
+        IF moisaug3     <=1 THEN
+          lig.sal_mois1 := salapaug3;
+        END IF;
+      END IF;
+      IF moisaug3      > 2 AND moisaug2<2 AND moisaug<1 THEN
+        lig.sal_mois2 := salapaug2;
+      ELSE
+        IF moisaug3     <=2 THEN
+          lig.sal_mois2 := salapaug3;
+        END IF;
+      END IF;
+      IF moisaug3      > 3 AND moisaug2<3 AND moisaug<1 THEN
+        lig.sal_mois3 := salapaug2;
+      ELSE
+        IF moisaug3     <=3 THEN
+          lig.sal_mois3 := salapaug3;
+        END IF;
+      END IF;
+      IF moisaug3      > 4 AND moisaug2<4 AND moisaug<1 THEN
+        lig.sal_mois4 := salapaug2;
+      ELSE
+        IF moisaug3     <=4 THEN
+          lig.sal_mois4 := salapaug3;
+        END IF;
+      END IF;
+      IF moisaug3      > 5 AND moisaug2<5 AND moisaug<1 THEN
+        lig.sal_mois5 := salapaug2;
+      ELSE
+        IF moisaug3     <=5 THEN
+          lig.sal_mois5 := salapaug3;
+        END IF;
+      END IF;
+      IF moisaug3      > 6 AND moisaug2<6 AND moisaug<1 THEN
+        lig.sal_mois6 := salapaug2;
+      ELSE
+        IF moisaug3     <=6 THEN
+          lig.sal_mois6 := salapaug3;
+        END IF;
+      END IF;
+      IF moisaug3      > 7 AND moisaug2<7 AND moisaug<1 THEN
+        lig.sal_mois7 := salapaug2;
+      ELSE
+        IF moisaug3     <=7 THEN
+          lig.sal_mois7 := salapaug3;
+        END IF;
+      END IF;
+      IF moisaug3      > 8 AND moisaug2<8 AND moisaug<1 THEN
+        lig.sal_mois8 := salapaug2;
+      ELSE
+        IF moisaug3     <=8 THEN
+          lig.sal_mois8 := salapaug3;
+        END IF;
+      END IF;
+      IF moisaug3      > 9 AND moisaug2<9 AND moisaug<1 THEN
+        lig.sal_mois9 := salapaug2;
+      ELSE
+        IF moisaug3     <=9 THEN
+          lig.sal_mois9 := salapaug3;
+        END IF;
+      END IF;
+      IF moisaug3       > 10 AND moisaug2<10 AND moisaug<1 THEN
+        lig.sal_mois10 := salapaug2;
+      ELSE
+        IF moisaug3      <=10 THEN
+          lig.sal_mois10 := salapaug3;
+        END IF;
+      END IF;
+      IF moisaug3       > 11 AND moisaug2<11 AND moisaug<1 THEN
+        lig.sal_mois11 := salapaug2;
+      ELSE
+        IF moisaug3      <=11 THEN
+          lig.sal_mois11 := salapaug3;
+        END IF;
+      END IF;
+      IF moisaug3       > 12 AND moisaug2<12 AND moisaug<1 THEN
+        lig.sal_mois12 := salapaug2;
+      ELSE
+        IF moisaug3      <=12 THEN
+          lig.sal_mois12 := salapaug3;
+        END IF;
+      END IF;
+      lig.sal := lig.sal_mois1 + lig.sal_mois2 + lig.sal_mois3 + lig.sal_mois4 + lig.sal_mois5 + lig.sal_mois6 + lig.sal_mois7 + lig.sal_mois8 + lig.sal_mois9 + lig.sal_mois10 + lig.sal_mois11 + lig.sal_mois12;
+      BEGIN
+        SELECT *
+        INTO tmp
+        FROM hrgp_affectations
+        WHERE matric   = lig.matric
+        AND dtdeb     <= TO_CHAR(sysdate, 'yyyyMMdd')
+        AND(dtfin     IS NULL
+        OR dtfin      >= TO_CHAR(sysdate, 'yyyyMMdd'))
+        AND est_prev   = '0'
+        AND typeaff    = '1';
+        lig.codefam   := tmp.codefam;
+        lig.codemet   := tmp.codemet;
+        lig.codeempt  := tmp.codeempt;
+        lig.codeempl  := tmp.codeempl;
+        lig.codeposte := tmp.codeposte;
+      EXCEPTION
+      WHEN no_data_found THEN
+        lig.codefam   := '*';
+        lig.codemet   := '*';
+        lig.codeempt  := '*';
+        lig.codeempl  := '*';
+        lig.codeposte := '*';
+      END;
+      UPDATE hrgp_budget_prepare
+      SET ROW      = lig
+      WHERE codscn = codescn
+      AND matric   = lig.matric;
+    EXCEPTION
+    WHEN OTHERS THEN
+      RAISE exit_function;
+    END;
+  END LOOP;
+  CLOSE c_bud;
+END hrgp_initialise_budget;

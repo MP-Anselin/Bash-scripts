@@ -1,0 +1,202 @@
+##
+HR_LINEARISE_SEQUENCE
+=SQL=
+CREATE OR REPLACE
+  FUNCTION HR_LINEARISE_SEQUENCE(
+      pcodfor IN VARCHAR2,
+      pcodses IN VARCHAR2,
+      poccseq IN VARCHAR2,
+      sep     IN VARCHAR2 )
+    RETURN VARCHAR2
+  IS
+    retour CLOB;
+    v_libfor      VARCHAR2(150);
+    v_dateseq     VARCHAR2(150);
+    v_nomsal      VARCHAR2(50);
+    v_codsal      VARCHAR2(50);
+    v_lieu        VARCHAR2(250);
+    v_anim        VARCHAR2(250);
+    v_participant VARCHAR2(512);
+    v_objectif    VARCHAR2(512);
+    v_contexte    VARCHAR2(512);
+    v_description VARCHAR2(512);
+    v_costcenter  VARCHAR2(250);
+    nb            INTEGER ;
+  BEGIN
+    SELECT 'Module '
+      ||libfor
+      ||' ('
+      ||codfor
+      ||')'
+    INTO v_libfor
+    FROM for_form
+    WHERE for_form.codfor=pcodfor;
+    retour              := sep || sep || v_libfor;
+    SELECT sq.codsal,
+      'Du '
+      ||TO_CHAR(to_date(SQ.JDEB,'yyyymmdd'),'dd.mm.yyyy')
+      ||' au '
+      ||TO_CHAR(to_date(SQ.JFIN,'yyyymmdd'),'dd.mm.yyyy')
+      ||' de '
+      ||SUBSTR(SQ.HDEB,1,2)
+      ||'h'
+      ||SUBSTR(SQ.HDEB,3,2)
+      ||' à '
+      ||SUBSTR(SQ.HFIN,1,2)
+      ||'h'
+      ||SUBSTR(SQ.HFIN,3,2)
+    INTO v_codsal,
+      v_dateseq
+    FROM seqses sq
+    WHERE sq.codfor =pcodfor
+    AND sq.codses   =pcodses
+    AND sq.occseq   = poccseq ;
+    retour         := retour || sep || v_dateseq ;
+    IF v_codsal    IS NULL THEN
+      retour       := retour || sep ||'Pas de Salle';
+    ELSE
+      SELECT Sl.NOMSAL
+      INTO v_nomsal
+      FROM salfor sl,
+        seqses sq
+      WHERE sl.codsal = sq.codsal
+      AND sq.codfor   =pcodfor
+      AND sq.codses   =pcodses
+      AND sq.occseq   = poccseq ;
+      retour         := retour || sep || 'Salle : '||v_nomsal;
+      SELECT 'Lieu : '
+        ||
+        ( SELECT nomorg FROM org WHERE ORG.CODORG = SQ.CODORG
+        UNION
+        SELECT liblieuint
+        FROM for_lieu_int
+        WHERE for_lieu_int.CODLIEUINT=SQ.CODLIEUINT
+        )
+        ||' '
+        ||
+        (SELECT numv
+          ||' '
+          ||btq.lib
+          ||' '
+          ||typvoie.lib
+          ||' '
+          ||nomv
+          ||' '
+          ||cp
+          ||' '
+          ||com
+        FROM org,
+          btq,
+          typvoie
+        WHERE ORG.CODORG   =SQ.CODORG
+        AND btq.cod (+)    = org.btq
+        AND typvoie.cod (+)= org.typv
+        UNION
+        SELECT numvlieuint
+          ||' '
+          ||btq.lib
+          ||' '
+          ||typvoie.lib
+          ||' '
+          ||nomvlieuint
+          ||' '
+          ||cplieuint
+          ||' '
+          ||comlieuint
+        FROM for_lieu_int,
+          btq,
+          typvoie
+        WHERE for_lieu_int.CODLIEUINT = SQ.CODLIEUINT
+        AND btq.cod (+)               = for_lieu_int.btqlieuint
+        AND typvoie.cod (+)           = for_lieu_int.typvlieuint
+        )
+      INTO v_lieu
+      FROM seqses sq
+      WHERE sq.codfor =pcodfor
+      AND sq.codses   =pcodses
+      AND sq.occseq   = poccseq ;
+      retour         := retour || sep || v_lieu;
+    END IF;
+    SELECT HR_LINEARISE_ANIMATEUR(SQ.CODFOR,SQ.CODSES,SQ.OCCSEQ,' ')
+    INTO v_anim
+    FROM seqses sq
+    WHERE sq.codfor =pcodfor
+    AND sq.codses   =pcodses
+    AND sq.occseq   = poccseq ;
+    retour         := retour || sep ||'Animateur(s) :'|| v_anim ;
+    SELECT HR_LINEARISE_PARTICIPANTABSENT(SQ.CODFOR,SQ.CODSES,SQ.OCCSEQ,' ')
+    INTO v_participant
+    FROM seqses sq
+    WHERE sq.codfor =pcodfor
+    AND sq.codses   =pcodses
+    AND sq.occseq   = poccseq ;
+    retour         := retour || sep ||'Participant(s) : Tous à l''exception de :'|| v_participant ;
+    SELECT COUNT(*)
+    INTO nb
+    FROM FOR_DESCRI
+    WHERE codfor = pcodfor
+    AND coddesc  ='03';
+    IF nb        > 0 THEN
+      SELECT ( TO_CHAR(TXT))
+      INTO v_contexte
+      FROM FOR_DESCRI
+      WHERE codfor = pcodfor
+      AND coddesc  ='03';
+      retour      := retour || sep || 'Contexte: ' || v_contexte;
+    ELSE
+      retour := retour || sep || 'Contexte: Non renseigné';
+    END IF ;
+    retour := retour || sep || sep|| 'Programme de formation ';
+    SELECT COUNT(*)
+    INTO nb
+    FROM FOR_DESCRI
+    WHERE codfor = pcodfor
+    AND coddesc  ='01';
+    IF nb        > 0 THEN
+      SELECT ('Objectif: '
+        || TXT)
+      INTO v_objectif
+      FROM FOR_DESCRI
+      WHERE codfor = pcodfor
+      AND coddesc  ='01';
+      retour      := retour || sep || sep || v_objectif;
+    ELSE
+      retour := retour || sep || sep|| 'Objectif: Non renseigné';
+    END IF ;
+    SELECT COUNT(*)
+    INTO nb
+    FROM FOR_DESCRI
+    WHERE codfor = pcodfor
+    AND coddesc  ='02';
+    IF nb        > 0 THEN
+      SELECT ( TO_CHAR(TXT))
+      INTO v_description
+      FROM FOR_DESCRI
+      WHERE codfor = pcodfor
+      AND coddesc  ='02';
+      retour      := retour || sep || 'Description: ' ||v_description;
+    ELSE
+      retour := retour || sep || 'Description: Non renseigné';
+    END IF ;
+    SELECT COUNT(*)
+    INTO nb
+    FROM FOR_FORMASSOOPT FO ,
+      FOR_FORMOPTLIB FL
+    WHERE FO.CODLIB = FL.CODLIB
+    AND FO.CODOPT   = 'D'
+    AND FO.CODFOR   = pcodfor;
+    IF nb           > 0 THEN
+      SELECT ( LIBELLE)
+      INTO v_costcenter
+      FROM FOR_FORMASSOOPT FO ,
+        FOR_FORMOPTLIB FL
+      WHERE FO.CODLIB = FL.CODLIB
+      AND FO.CODOPT   = 'D'
+      AND FO.CODFOR   = pcodfor;
+      retour         := retour || sep || 'Centre de coût: '|| v_costcenter;
+    ELSE
+      retour := retour || sep || 'Centre de coût: Non renseigné';
+    END IF ;
+    RETURN retour;
+  END ; 
+  

@@ -1,0 +1,64 @@
+##
+TAG_CHARSET=@€ιθη
+##
+TGE_CTRL40_GET_INFO_ABSENCE
+=SQL=
+create or replace FUNCTION TGE_CTRL40_GET_INFO_ABSENCE(p_absence  IN  TGE_CTRL40_abs_row_cursor,dateDebutSQL IN OUT varchar2, dateFinSQL IN OUT varchar) RETURN TGE_CTRL40_info_absence  IS
+info TGE_CTRL40_info_absence:=TGE_CTRL40_info_absence(null,null,null) ;
+duree varchar2(500);
+BEGIN
+dateDebutSQL:=p_absence.DATE_DEBUT;
+dateFinSQL:=p_absence.DATE_FIN;
+duree :=REPLACE(NVL(p_absence.heures_ip,'0'), '.', ',') ;
+
+
+IF p_absence.UNITE='J' THEN
+  IF IS_NUMBER(p_absence.HEURES_IP) IS NOT NULL THEN
+    IF duree='1,0' OR duree='1' OR duree='1,00' THEN
+        info.DEBUT_MA:='J'; info.FIN_MA:='J';
+    ELSIF duree='0,5' OR duree='0,50' THEN
+        info.DEBUT_MA:='J';
+        info.FIN_MA:='J';
+    END IF;
+  END IF;
+ELSIF p_absence.UNITE='H' THEN
+  IF IS_NUMBER(p_absence.HEURES_IP) IS NOT NULL THEN
+     info.DEBUT_MA:='D';
+     info.FIN_MA:='D';
+  ELSE
+     info.DEBUT_MA:='J';
+     info.FIN_MA:='J';
+  END IF;
+END IF;
+IF p_absence.DEMI_JOURNEE=1 THEN
+  info.DEBUT_MA:='J';
+  info.FIN_MA:='J';
+END IF;
+
+IF p_absence.RUB_ECHANGE IS NOT NULL AND duree>'0' THEN
+  info.DEBUT_MA:='J';
+  info.FIN_MA:='J';  
+ELSIF info.DEBUT_MA IS NULL AND  duree>'0'  THEN
+  info.DEBUT_MA:='D';
+  info.FIN_MA:='D'; 
+END IF;
+
+IF dateFinSQL IS NULL THEN 
+  dateFinSQL:=dateDebutSQL;
+  IF info.FIN_MA IS NULL THEN info.FIN_MA:=info.DEBUT_MA; END IF;
+ELSIF info.FIN_MA IS NULL AND dateDebutSQL IS NOT NULL AND dateFinSQL IS NOT NULL AND dateDebutSQL=dateFinSQL THEN 
+  info.FIN_MA:=info.DEBUT_MA;
+END IF;
+
+IF (duree IS NULL OR duree='0' OR duree='0,0')  AND dateFinSQL IS NOT NULL AND dateDebutSQL IS NOT NULL AND  NOT(dateFinSQL=dateDebutSQL)   THEN 
+  IF info.DEBUT_MA IS NULL THEN info.DEBUT_MA:='J'; END IF;
+  IF info.FIN_MA IS NULL THEN info.FIN_MA:='J'; END IF;
+END IF;
+
+IF info.DEBUT_MA IS NULL AND info.FIN_MA IS NULL AND (duree IS NULL OR duree='0' OR duree='0,0' ) THEN 
+ info.DEBUT_MA:='J';
+  info.FIN_MA:='J';
+END IF;
+
+return info;
+END TGE_CTRL40_GET_INFO_ABSENCE;

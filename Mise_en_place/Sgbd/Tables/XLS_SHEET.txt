@@ -1,0 +1,17 @@
+##
+TAG_CHARSET=@€ιθη
+##
+XLS_SHEET
+==
+delete from XLS_SHEET where CODDOC = 'TGE_EXP_ANN' and DTEFFET = '20201130'
+'TGE_EXP_ANN', '20201130', 0, 1, 'fr.adp.com.cougar.std.modules.lib.objects.zpaie.importexport.ImpExpAnnulationXls','TGE_EXP_ANN',8, 8
+##
+XLS_SHEET
+==
+delete from XLS_SHEET where CODDOC = 'TGE_EXP_IMP' and DTEFFET = '20211130'
+'TGE_EXP_IMP', '20211130', 0, 1, 'fr.adp.com.cougar.std.modules.lib.objects.zpaie.importexport.ImpExpImputationsXls','TGE_EXP_IMP',11, 11
+##
+XLS_SHEET
+==
+delete from XLS_SHEET where CODDOC = 'TGE_EXP_IMP_I' and DTEFFET = '20211130'
+'TGE_EXP_IMP_I', '20211130', 0, 1, 'fr.adp.com.cougar.std.modules.lib.objects.zpaie.importexport.ImportExportImputationsXls','TGE_EXP_IMP_I',24, 24

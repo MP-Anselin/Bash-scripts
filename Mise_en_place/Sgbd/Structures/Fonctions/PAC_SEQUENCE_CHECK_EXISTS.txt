@@ -1,0 +1,25 @@
+##
+PAC_SEQUENCE_CHECK_EXISTS
+=SQL=
+create or replace
+FUNCTION PAC_SEQUENCE_CHECK_EXISTS(
+      p_numpac VARCHAR2)
+    RETURN NUMBER
+  IS
+    v_existSequence NUMBER;
+  BEGIN
+    IF p_numpac IS NULL THEN
+      RETURN 0;
+    END IF;
+    SELECT COUNT(*)
+    INTO v_existSequence
+    FROM USER_SEQUENCES
+    WHERE SEQUENCE_NAME = PAC_SEQUENCE_GET_NAME(p_numpac);
+    IF v_existSequence  >0 THEN
+      RETURN 1;
+    END IF;
+    RETURN 0;
+  EXCEPTION
+  WHEN OTHERS THEN
+    RETURN 0;
+  END PAC_SEQUENCE_CHECK_EXISTS;

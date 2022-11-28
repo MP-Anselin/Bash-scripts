@@ -1,0 +1,26 @@
+##
+HREXTR_CHARGER_DATE_EFF
+=SQL=
+CREATE OR REPLACE
+  FUNCTION HREXTR_CHARGER_DATE_EFF(
+      DateSynchro IN VARCHAR2,
+      DateCloture IN VARCHAR2)
+    RETURN VARCHAR2
+  AS
+  BEGIN
+    IF (DateSynchro IS NOT NULL) THEN
+      IF (sysdate    < TO_DATE(DateSynchro, 'YYYYMMDD')) THEN
+        RETURN TO_CHAR(sysdate, 'YYYYMMDD');
+      ELSE
+        RETURN DateSynchro;
+      END IF;
+    ELSE
+      IF (DateCloture IS NOT NULL) THEN
+        RETURN DateCloture;
+      ELSE
+        RETURN TO_CHAR(sysdate, 'YYYYMMDD');
+      END IF;
+    END IF;
+    RETURN NULL;
+  END HREXTR_CHARGER_DATE_EFF; 
+  

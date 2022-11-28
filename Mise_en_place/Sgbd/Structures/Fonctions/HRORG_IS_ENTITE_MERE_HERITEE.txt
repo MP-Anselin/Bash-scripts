@@ -1,0 +1,92 @@
+##
+TAG_CHARSET=@€éèç
+##
+HRORG_IS_ENTITE_MERE_HERITEE
+=SQL=
+CREATE OR REPLACE
+  FUNCTION HRORG_IS_ENTITE_MERE_HERITEE(
+      p_codts  IN std_struc_arbre.codts%TYPE,
+      p_entite IN std_struc_entite.code_entite%TYPE,
+      p_date   IN std_struc_entite.date_eff%TYPE,
+      p_cid   IN std_struc_entite.cid%TYPE default null)
+    RETURN VARCHAR2
+  IS
+    v_lien_codts std_struc_type.lien_codts%TYPE;
+    v_type_entite std_struc_entite.type_entite%TYPE;
+    v_niveau std_struc_niv.niveau%TYPE;
+    v_type_entite_mere std_struc_entite.type_entite%TYPE;
+    v_count NUMBER;
+    v_cid std_struc_entite.cid%TYPE;
+  BEGIN
+	  
+	v_cid := p_cid;
+  	IF (v_cid IS NULL) THEN
+  		BEGIN
+  			SELECT VALVAR INTO v_cid FROM SYS_VARSYS where CODVAR = 'NS_CLIENT_ID';
+  		EXCEPTION
+  		WHEN NO_DATA_FOUND THEN
+  			v_cid := null;
+  		END;
+  	END IF;
+  	IF (v_cid IS NULL) THEN
+  		-- En mode multiclient, la varsys peut être null et le passage du paramètre pCid est obligatoire
+  		RETURN 0;
+  	END IF;
+	
+    /* On vérifie que la structure hérite d'une autre structure */
+    SELECT lien_codts INTO v_lien_codts FROM std_struc_type WHERE codts=p_codts;
+    IF (v_lien_codts IS NULL) THEN
+      RETURN '0';
+    END IF;
+    /* On récupère le type d'entité de l'entité */
+    SELECT type_entite
+    INTO v_type_entite
+    FROM std_struc_entite
+    WHERE code_entite=p_entite
+    AND cid = v_cid
+    AND p_date BETWEEN date_eff AND date_fin;
+    /* On récupère le niveau de l'entité dans la structure */
+    SELECT niveau
+    INTO v_niveau
+    FROM std_struc_niv
+    WHERE codts=p_codts
+    AND p_date BETWEEN date_eff AND date_fin
+    AND type_entite=v_type_entite;
+    IF (v_niveau   =1) THEN
+      /* On regarde si le type d'entité existe dans la structure mère */
+      SELECT COUNT(*)
+      INTO v_count
+      FROM std_struc_niv
+      WHERE codts    =v_lien_codts
+      AND type_entite=v_type_entite
+      AND p_date BETWEEN date_eff AND date_fin;
+    ELSE
+      /* On récupère le type d'entité mère de l'entité */
+      SELECT type_entite
+      INTO v_type_entite_mere
+      FROM std_struc_niv
+      WHERE codts=p_codts
+      AND p_date BETWEEN date_eff AND date_fin
+      AND niveau=v_niveau-1;
+      /* On regarde si le lien type entité <-> type entité mère existe (directement ou indirectement) dans la structure mère */
+      SELECT COUNT(*)
+      INTO v_count
+      FROM std_struc_niv n1,
+        std_struc_niv n2
+      WHERE n1.codts    =v_lien_codts
+      AND n1.type_entite=v_type_entite_mere
+      AND n2.codts      =v_lien_codts
+      AND n2.type_entite=v_type_entite
+      AND n1.niveau     <n2.niveau
+      AND p_date BETWEEN n1.date_eff AND n1.date_fin
+      AND p_date BETWEEN n2.date_eff AND n2.date_fin;
+    END IF;
+    IF (v_count=0) THEN
+      RETURN '0';
+    END IF;
+    RETURN '1';
+  EXCEPTION
+  WHEN OTHERS THEN
+    RETURN '0' ;
+  END HRORG_IS_ENTITE_MERE_HERITEE ;
+  

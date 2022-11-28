@@ -1,0 +1,46 @@
+##
+META_LISTE_DONNEES_UX_ECRAN
+=SQL=
+create or replace FUNCTION META_LISTE_DONNEES_UX_ECRAN 
+(P_COMPANY_id IN VARCHAR2 
+, P_ID_GROUPE IN VARCHAR2) 
+RETURN TAB_DONNEES_UX AS retour TAB_DONNEES_UX := TAB_DONNEES_UX();
+  CURSOR CUR_DONNEES_UX
+  IS
+  SELECT NOM_DONNEE, SUFFIXE_OU_LIBELLE
+  FROM META_GROUPE_DONNEES 
+  WHERE ID_GROUPE   =p_id_groupe
+  AND COMPANY_ID = p_company_id 
+  AND NOM_DONNEE NOT LIKE '#%'
+  UNION 
+  SELECT NOM_DONNEE, SUFFIXE_OU_LIBELLE
+  FROM META_GROUPE_DONNEES 
+  WHERE ID_GROUPE   = p_id_groupe
+  AND COMPANY_ID = p_company_id
+  AND NOM_DONNEE  LIKE '#GROUPE%';
+  
+   v_ligneDonnee CUR_DONNEES_UX%ROWTYPE;
+   retourTmp TAB_DONNEES_UX;
+ BEGIN
+   OPEN CUR_DONNEES_UX;
+   LOOP
+    FETCH  CUR_DONNEES_UX INTO v_ligneDonnee;
+    EXIT WHEN CUR_DONNEES_UX%NOTFOUND;
+    IF NOT SUBSTR(v_ligneDonnee.NOM_DONNEE,1,1)='#' THEN 
+         IF (META_EST_DONNEE_UX(v_ligneDonnee.NOM_DONNEE,p_company_id)<>0) THEN 
+              retour.extend;
+              retour(retour.count) := TYP_DONNEES_UX(v_ligneDonnee.NOM_DONNEE);   
+          END IF;    
+     ELSE 
+         retourTmp := META_LISTE_DONNEES_UX_ECRAN(p_company_id,v_ligneDonnee.SUFFIXE_OU_LIBELLE);
+         if (retourTmp.count>0) then
+         FOR i IN retourTmp.FIRST..retourTmp.LAST LOOP 
+              retour.extend;
+              retour(retour.count) := retourTmp(i); 
+          END LOOP;
+          END IF;
+      END IF;
+   END LOOP;
+   CLOSE CUR_DONNEES_UX;
+   return retour;
+END META_LISTE_DONNEES_UX_ECRAN;

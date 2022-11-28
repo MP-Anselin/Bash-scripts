@@ -1,0 +1,54 @@
+##
+TAG_CHARSET=@€éèç
+##
+SYS_DEF_FONCTION_EXIT
+==
+DELETE FROM SYS_DEF_FONCTION_EXIT WHERE NOM_FONCTION = 'CliAttestSimpleExit' 
+##
+SYS_DEF_FONCTION_EXIT
+==
+DELETE FROM SYS_DEF_FONCTION_EXIT WHERE NOM_FONCTION='UX_LISTE_PLACEMENT_FIN_PERIODE'
+'UX_LISTE_PLACEMENT_FIN_PERIODE','_toDefine_','List<UxPfpParamObj>','UxPfpParamMatricObj','On passe en paramètre un objet contenant le matricule du salarié et la liste des placements présents dans la table UX_PFP_PARAM, et doit retourner la liste des placements autorisés pour le salarié'
+##
+SYS_DEF_FONCTION_EXIT
+==
+DELETE FROM SYS_DEF_FONCTION_EXIT WHERE NOM_FONCTION = 'ATTESTATION' 
+##
+SYS_DEF_FONCTION_EXIT
+'ATTESTATION','_toDefine_','InfoExit','InfoExit','Fonction exit permettant de réaliser des contrôles sur l''écran éditions d''attestation'
+##
+SYS_DEF_FONCTION_EXIT
+==
+delete from SYS_DEF_FONCTION_EXIT where NOM_FONCTION IN ( 'UX_LISTE_CPT_FIN_PERIODE','UX_LISTE_PLACEMENT_FIN_PERIODE')
+'UX_LISTE_CPT_FIN_PERIODE','_toDefine_','List<AccruedTimeAutomaticInvestmentPlan>','PfpParamExitObj','On passe en paramètre un objet contenant le matricule du salarié et la liste des compteurs présents dans la table UX_PFP_COMPTEUR, et doit retourner la liste des compteurs autorisés pour le salarié'
+'UX_LISTE_PLACEMENT_FIN_PERIODE','_toDefine_','List<AccruedTimeAutomaticInvestmentAllocation>','PfpParamAllocExitObj','On passe en paramètre un objet contenant le matricule du salarié et la liste des placements présents dans la table UX_PFP_INVESTMENT_ALLOCATION, et doit retourner la liste des placements autorisés pour le salarié'
+##
+SYS_DEF_FONCTION_EXIT
+==
+DELETE FROM SYS_DEF_FONCTION_EXIT WHERE NOM_FONCTION = 'DOCSERV_OBJ_PARAM_EDITION'
+'DOCSERV_OBJ_PARAM_EDITION','_toDefine_','Object','DSParamExitLancementObj','Fonction exit permettant de personnaliser l''objet passé en paramètre de la fonction ExternEdition.executerequete (si les champs de fusion d''une édition DocServ sont gérés par une classe Java).'
+##
+SYS_DEF_FONCTION_EXIT
+==
+DELETE FROM SYS_DEF_FONCTION_EXIT WHERE NOM_FONCTION = 'SYS-CONSOLE-GOBAL-SEARCH' 
+'SYS-CONSOLE-GOBAL-SEARCH','fr.adp.com.gxp.std.mot_met.lib.objects.web.search.RechercheCollaborateurGlobalSearch','Object','RechercheCollaborateurGlobalSearch','Classe la recherche de matricule pour ADP LINK.'
+##
+SYS_DEF_FONCTION_EXIT
+==
+DELETE FROM SYS_DEF_FONCTION_EXIT WHERE NOM_FONCTION = 'USER_PREFERENCE'
+'USER_PREFERENCE','_toDefine_','InfoExit','InfoExit','Fonction exit permettant d''effectuer des actions spécifiques lors de la mise à jour des préférences utilisateur (SlidePreferenceJsonServlet)'
+##
+SYS_DEF_FONCTION_EXIT
+==
+DELETE FROM SYS_DEF_FONCTION_EXIT WHERE NOM_FONCTION = 'SYS-CONSOLE-GOBAL-MODULE-UTILITIES' 
+'SYS-CONSOLE-GOBAL-MODULE-UTILITIES','fr.adp.com.gxp.std.mot_met.lib.objects.web.ALPGlobalModuleUtilities','Object','ALPGlobalModuleUtilities','Classe ALPGlobalModuleUtilities pour ADP LINK.'
+##
+SYS_DEF_FONCTION_EXIT
+==
+DELETE FROM SYS_DEF_FONCTION_EXIT WHERE NOM_FONCTION = 'BatchPpcForMQ' 
+'BatchPpcForMQ','fr.adp.com.uc.std.modules.lib.objects.ppc.mgr.importexport.LaunchBatchPpc','void','LaunchBatchPpc','Permet de lancer le batch du chargement ppc (TraitementIntegrationPersoZeuFe) '
+##
+SYS_DEF_FONCTION_EXIT
+==
+DELETE FROM SYS_DEF_FONCTION_EXIT WHERE NOM_FONCTION = 'BatchPmoForMQ' 
+'BatchPmoForMQ','fr.adp.com.uc.std.modules.lib.objects.ppc.mgr.importexport.LaunchBatchPmo','void','LaunchBatchPmo','Permet de lancer le batch du chargement pmo (TraitementIntegrationModeleZeuFe) '

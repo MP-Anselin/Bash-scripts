@@ -1,0 +1,104 @@
+##
+TAG_CHARSET=@€éèç
+##
+HRORG_MAJ_AFFEC_HERITE_STRUC
+=SQL=
+create or replace
+PROCEDURE HRORG_MAJ_AFFEC_HERITE_STRUC(
+ p_codts             NUMBER,
+ p_matric            VARCHAR2,
+ p_date_eff_heritage VARCHAR2,
+ -- TODO VRI : ZEU FE, quand on gèrera il faudra remplacer par la table STD_STRUC_AFFECTATION 
+ p_cid   IN std_struc_entite.cid%TYPE default null)
+ AS
+ TYPE tcur
+ IS
+ REF
+ CURSOR;
+ c_struc_heritees tcur;
+ c_aff tcur;
+ v_codts                 NUMBER;
+ v_niv_heritage          NUMBER;
+ aff_matric              VARCHAR2 (32);
+ aff_code_entite         VARCHAR2 (25);
+ aff_date_eff            VARCHAR2 (8);
+ aff_date_fin            VARCHAR2 (8);
+ aff_est_affec_principal VARCHAR2 (1);
+ -- TODO VRI : ZEU FE, quand on gèrera il faudra remplacer par la table STD_STRUC_AFFECTATION
+ v_cid std_struc_entite.cid%TYPE;
+ exit_function           EXCEPTION;
+ BEGIN
+  
+  v_cid := p_cid;
+  IF (v_cid IS NULL) THEN
+  	BEGIN
+  		SELECT VALVAR INTO v_cid FROM SYS_VARSYS where CODVAR = 'NS_CLIENT_ID';
+  	EXCEPTION
+  	WHEN NO_DATA_FOUND THEN
+  		v_cid := null;
+  	END;
+  END IF;
+  IF (v_cid IS NULL) THEN
+  	-- En mode multiclient, la varsys peut être null et le passage du paramètre pCid est obligatoire
+  	RETURN;
+  END IF;
+	 
+ OPEN c_struc_heritees FOR SELECT codts, hrorg_niv_mere_affec_heritage(codts, p_date_eff_heritage)
+ AS
+ niv_heritage FROM std_struc_type WHERE lien_codts=p_codts ORDER BY codts;
+ LOOP
+ FETCH c_struc_heritees INTO v_codts, v_niv_heritage;
+ EXIT
+ WHEN c_struc_heritees % NOTFOUND;
+ IF (v_niv_heritage IS NOT NULL AND v_niv_heritage>0) THEN
+ IF (p_matric     IS NULL) THEN
+ DELETE FROM STD_STRUC_AFFECTATION WHERE codts=v_codts;
+ ELSE
+ DELETE FROM STD_STRUC_AFFECTATION WHERE codts=v_codts AND matric=p_matric;
+ END IF;
+ END IF;
+ END LOOP;
+ CLOSE c_struc_heritees;
+ IF (p_matric IS NULL) THEN
+ OPEN c_aff FOR SELECT matric,
+ code_entite,
+ date_eff,
+ date_fin,
+ -- TODO VRI : ZEU FE, ajouter v_cid dans le where
+ est_affec_principal FROM std_struc_affectation WHERE codts=p_codts ORDER BY matric,
+ date_eff;
+ ELSE
+ OPEN c_aff FOR SELECT matric,
+ code_entite,
+ date_eff,
+ date_fin,
+ -- TODO VRI : ZEU FE, ajouter v_cid dans le where
+ est_affec_principal FROM std_struc_affectation WHERE codts=p_codts AND matric=p_matric ORDER BY date_eff;
+ END IF;
+ LOOP
+ FETCH c_aff
+ INTO aff_matric,
+ aff_code_entite,
+ aff_date_eff,
+ aff_date_fin,
+ aff_est_affec_principal;
+ EXIT
+ WHEN c_aff % NOTFOUND;
+ -- Ici on utilise le CID passé en paramètre et pas celui qu'on pourrait récupérer dans la requête (de toute façon ce serait le même)
+ HRORG_MAJ_AFFEC_HERITE_ENT(p_codts, aff_matric, aff_code_entite, aff_date_eff, aff_date_fin, aff_est_affec_principal, v_cid);
+ END LOOP;
+ CLOSE c_aff;
+ OPEN c_struc_heritees FOR SELECT codts,
+ hrorg_niv_mere_affec_heritage(codts, p_date_eff_heritage)
+ AS
+ niv_heritage FROM std_struc_type WHERE lien_codts=p_codts ORDER BY codts;
+ LOOP
+ FETCH c_struc_heritees INTO v_codts, v_niv_heritage;
+ EXIT
+ WHEN c_struc_heritees % NOTFOUND;
+ IF (v_niv_heritage IS NOT NULL AND v_niv_heritage>0) THEN
+ HRORG_MAJ_AFFEC_HERITE_STRUC(v_codts, p_matric, p_date_eff_heritage);
+ END IF;
+ END LOOP;
+ END HRORG_MAJ_AFFEC_HERITE_STRUC;
+ 

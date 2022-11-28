@@ -1,0 +1,74 @@
+##
+TAG_CHARSET=@€éèç
+##
+ORG_S_ARBRE_TO_NIV
+=SQL=
+create or replace
+TRIGGER "ORG_S_ARBRE_TO_NIV" AFTER DELETE
+ON STD_STRUC_ARBRE FOR EACH ROW
+declare 
+-- trigger qui modifie dans la table de niveau appropriée les dates d'ouverture et de fermeture
+derNiv       NUMBER        :=0 ;
+BEGIN
+-- si l'occurrence de STD_STRUC_ARBRE est à la date du jour on va tenter la création dans une table de niveau
+ if to_char(SYSDATE,'yyyymmdd') between :old.date_eff and :old.date_fin then
+-- recuperation du niveau
+ begin 
+    --dbms_output.put_line('ici'||derNiv);
+    --FIXME utiliser la procédure trace_dbms_output()
+    select Sn.niveau into derNiv from  std_struc_entite se, std_struc_niv sn 
+    where sn.codts=:old.CODTS and se.type_entite=sn.type_entite and se.code_entite=:old.CODE_ENTITE
+     and to_char(SYSDATE,'yyyymmdd') between se.date_eff and se.date_fin 
+    and to_char(SYSDATE,'yyyymmdd') between sn.date_eff and sn.date_fin ;
+    --dbms_output.put_line('niveau : '||derNiv);
+    --FIXME utiliser la procédure trace_dbms_output()
+    exception
+     when no_data_found then
+     --dbms_output.put_line('ici'||derNiv);
+     --FIXME utiliser la procédure trace_dbms_output()
+     NULL;
+     when others then
+     --dbms_output.put_line('pas de niveau');
+     --FIXME utiliser la procédure trace_dbms_output()
+     NULL;
+    end;
+   BEGIN
+      --dbms_output.put_line('code entite : '||:old.CODE_ENTITE);
+      --dbms_output.put_line('derNiv : '||derNiv);
+      --FIXME utiliser la procédure trace_dbms_output()
+         if derNiv =1 then 
+  --suppression dans NIV1
+           delete from NIV1 where CODTS=:old.CODTS and CODNIV1=:old.CODE_ENTITE ;
+          end if;
+           if derNiv =2 then 
+  --suppression dans NIV2
+           delete from NIV2 where CODTS=:old.CODTS and CODNIV2=:old.CODE_ENTITE ;
+         end if;
+  --suppression dans NIV3
+         if derNiv =3 then 
+           delete from NIV3 where CODTS=:old.CODTS and CODNIV3=:old.CODE_ENTITE ;
+       end if;
+   --suppression dans NIV4
+    if derNiv =4 then 
+           delete from NIV4 where CODTS=:old.CODTS and CODNIV4=:old.CODE_ENTITE ;
+        end if;
+  --suppression dans NIV5
+    if derNiv =5 then 
+           delete from NIV5 where CODTS=:old.CODTS and CODNIV5=:old.CODE_ENTITE ;
+      end if;
+  --suppression dans NIV6
+           if derNiv =6 then 
+           delete from NIV6 where CODTS=:old.CODTS and CODNIV6=:old.CODE_ENTITE ;
+     end if;
+      exception
+  When OTHERS then
+   --dbms_output.put_line('problème de mise à jour lié à non existance probable dans table de niveau');
+   --FIXME utiliser la procédure trace_dbms_output()
+   null;
+end ;
+end if;
+END;
+##
+ORG_S_ARBRE_TO_NIV
+=SQL=
+DROP TRIGGER ORG_S_ARBRE_TO_NIV

@@ -1,0 +1,46 @@
+##
+TAG_CHARSET=@€éèç
+##
+TGE_CTRL40_GET_ETATS_ABSENCE
+=SQL=
+create or replace FUNCTION TGE_CTRL40_GET_ETATS_ABSENCE(v_heures_ip IN varchar,v_demi_journee  IN  NUMBER, v_inf_abs IN TGE_CTRL40_info_absence,  date_debut IN varchar,  date_fin IN varchar) RETURN TGE_CTRL40_prop_absence  IS
+etats_absence TGE_CTRL40_prop_absence:=TGE_CTRL40_prop_absence(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
+duree varchar2(500);
+  BEGIN
+   duree :=REPLACE(NVL(v_heures_ip,'0'), '.', ',') ;
+  IF v_inf_abs.debut_ma='J' AND v_inf_abs.fin_ma ='J' AND date_debut=date_fin AND v_demi_journee !=1  AND (duree='0,5' OR duree='0,50') THEN
+    etats_absence.isDemiJourneeSurUnSeulJour:=1;
+  ELSIF v_inf_abs.debut_ma='J' AND v_inf_abs.fin_ma ='J' AND date_debut < date_fin AND v_demi_journee !=1  AND (duree='0,5' OR duree='0,50') THEN
+    etats_absence.isDemiJourneeSurPlusieursJour:=1;
+  ELSIF v_inf_abs.debut_ma='J' AND v_inf_abs.fin_ma ='J' AND date_debut=date_fin AND v_demi_journee !=1 THEN
+    etats_absence.isJourneeCompleteSurUnSeulJour:=1;
+  ELSIF v_inf_abs.debut_ma='D' AND v_inf_abs.fin_ma='D' AND date_debut=date_fin THEN
+    etats_absence.isEnDureeSurUnSeulJour :=1;
+  ELSIF v_inf_abs.debut_ma='J' AND v_inf_abs.fin_ma='J' AND date_debut < date_fin AND v_demi_journee !=1 THEN 
+    etats_absence.isJourneCompletSurPlusieurJour:=1;
+  ELSIF v_inf_abs.debut_ma='D' AND v_inf_abs.fin_ma='D' AND date_debut<date_fin THEN
+    etats_absence.isEnDureeSurPlusieursJour:=1;
+  ELSIF v_inf_abs.debut_ma='M' AND v_inf_abs.fin_ma='M' AND date_debut=date_fin THEN
+    etats_absence.isMatinSurUnSeulJour:=1;--
+  ELSIF v_inf_abs.debut_ma='M' AND v_inf_abs.fin_ma='M' AND date_debut<date_fin THEN
+    etats_absence.isMatinSurPlusieursJour:=1;--
+  ELSIF v_inf_abs.debut_ma='A' AND v_inf_abs.fin_ma='A' AND date_debut=date_fin THEN
+    etats_absence.isApresMidiSurUnSeulJour:=1;
+  ELSIF v_inf_abs.debut_ma='A' AND v_inf_abs.fin_ma='A' AND date_debut<date_fin THEN
+    etats_absence.isApresMidiSurPlusieursJour:=1;
+  ELSIF v_inf_abs.debut_ma='A' AND v_inf_abs.fin_ma='J' AND date_debut<date_fin THEN
+    etats_absence.isStatApremdAndFinitToutJourne:=1;
+  ELSIF v_inf_abs.debut_ma='A' AND v_inf_abs.fin_ma='M' AND date_debut<date_fin THEN
+    etats_absence.isStartApremidiAndFinitMatin:=1;
+  ELSIF v_inf_abs.debut_ma='J' AND v_inf_abs.fin_ma='M' AND date_debut<date_fin THEN
+    etats_absence.isStartToutJourneAndFinitMatin:=1;
+  ELSIF v_demi_journee=1 THEN
+    etats_absence.estDemiJournee:=1;
+  ELSE
+    etats_absence.erreur:=1;
+   -- DBMS_OUTPUT.PUT_LINE('Pas de type trouvé');
+  END IF;
+
+
+  return etats_absence ;
+END TGE_CTRL40_GET_ETATS_ABSENCE;

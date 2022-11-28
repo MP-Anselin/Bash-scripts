@@ -1,0 +1,79 @@
+##
+TAG_CHARSET=@€éèç
+##
+SYS_SCH_ELEMENT
+==
+UPDATE SYS_SCH_ELEMENT SET TAGS='_PAS_VISIBLE_' WHERE niveau = '99' and nom_page='Modules/AdpUx/UxCertificateMgr.jsp'
+##
+SYS_SCH_ELEMENT
+==
+UPDATE SYS_SCH_ELEMENT SET TAGS='_PAS_VISIBLE_' WHERE niveau = '99' and nom_page='Modules/AdpUx/UxFamilyMgr.jsp'
+##
+SYS_SCH_ELEMENT
+==
+UPDATE SYS_SCH_ELEMENT SET TAGS='_PAS_VISIBLE_' WHERE niveau = '99' and nom_page='Modules/AdpUx/UxPayAdvanceMgr.jsp'
+##
+SYS_SCH_ELEMENT
+==
+UPDATE SYS_SCH_ELEMENT SET TAGS='_PAS_VISIBLE_' WHERE niveau = '99' and nom_page='Modules/AdpUx/UxPayBankMgr.jsp'
+##
+SYS_SCH_ELEMENT
+==
+UPDATE SYS_SCH_ELEMENT SET TAGS='_PAS_VISIBLE_' WHERE niveau = '99' and nom_page='Modules/AdpUx/UxPayMgr.jsp'
+##
+SYS_SCH_ELEMENT
+==
+UPDATE SYS_SCH_ELEMENT SET TAGS='_PAS_VISIBLE_' WHERE niveau = '99' and nom_page='Modules/AdpUx/UxProfileMgr.jsp'
+##
+SYS_SCH_ELEMENT
+==
+UPDATE SYS_SCH_ELEMENT SET TAGS='_PAS_VISIBLE_' WHERE niveau = '99' and nom_page='Modules/AdpUx/UxTeamMgr.jsp'
+##
+SYS_SCH_ELEMENT
+==
+UPDATE SYS_SCH_ELEMENT SET TAGS='_PAS_VISIBLE_' WHERE niveau = '99' and nom_page='Modules/AdpUx/UxTimeBIMgr.jsp'
+##
+SYS_SCH_ELEMENT
+==
+DELETE FROM SYS_SCH_ELEMENT WHERE NOM_PAGE = 'Modules/Gta/CAD/Param/CreationEvtDeclench.jsp' AND LIBELLE = 'Paramétrage des bascules pour un évènement' AND CODE_ELEMENT = 833 AND NIVEAU = 99
+'99','833','Paramétrage des bascules pour un évènement','Modules/Gta/CAD/Param/CreationEvtDeclench.jsp',NULL,NULL,NULL,NULL
+##
+SYS_SCH_ELEMENT
+==
+UPDATE SYS_SCH_ELEMENT SET TAGS='_PAS_VISIBLE_' WHERE niveau = '99' and nom_page='Modules/AdpUx/UxPayPrefs.jsp'
+##
+SYS_SCH_ELEMENT
+==
+UPDATE SYS_SCH_ELEMENT SET TAGS='_PAS_VISIBLE_' WHERE niveau = '99' and nom_page='Modules/AdpUx/UxTimesheetMgr.jsp'
+##
+SYS_SCH_ELEMENT
+==
+UPDATE SYS_SCH_ELEMENT SET TAGS='_PAS_VISIBLE_' WHERE niveau = '99' and nom_page='Modules/AdpUx/UxCalendarMgr.jsp'
+##
+SYS_SCH_ELEMENT
+==
+UPDATE SYS_SCH_ELEMENT SET TAGS='_PAS_VISIBLE_' WHERE niveau = '99' and nom_page='Modules/AdpUx/UxBenefitsCoverage.jsp'
+##
+SYS_SCH_ELEMENT
+==
+UPDATE SYS_SCH_ELEMENT SET TAGS='_PAS_VISIBLE_' WHERE niveau = '99' and nom_page='Modules/AdpUx/UxPfp.jsp'
+##
+SYS_SCH_ELEMENT
+==
+CALL ADM_CREATE_NOM_PAGE(99,'UX - Demande indemnités transport','Modules/AdpUx/UxExpenseCommute.jsp',null,'false')
+##
+SYS_SCH_ELEMENT
+==
+UPDATE SYS_SCH_ELEMENT SET TAGS='_PAS_VISIBLE_' WHERE niveau = '99' and nom_page='Modules/AdpUx/UxExpenseCommute.jsp'
+##
+SYS_SCH_ELEMENT
+==
+UPDATE SYS_SCH_ELEMENT SET TAGS='_PAS_VISIBLE_' WHERE niveau = '99' and nom_page='Modules/AdpUx/UxHelpdesk.jsp'
+##
+SYS_SCH_ELEMENT
+==
+UPDATE SYS_SCH_ELEMENT SET TAGS='_PAS_VISIBLE_' WHERE niveau = '99' and nom_page='Modules/AdpUx/UxOrganigramme.jsp'
+##
+SYS_SCH_ELEMENT
+=SQL IFEXIST=SYS_SCH_ELEMENT=
+UPDATE SYS_SCH_ELEMENT SET LIBELLE = 'Cartes de travail' WHERE LIBELLE = 'Autorisation de travail'

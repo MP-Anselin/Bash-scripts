@@ -1,0 +1,16 @@
+##
+GET_MESSAGE_ERREUR
+=SQL=
+create or replace FUNCTION GET_MESSAGE_ERREUR 
+(
+  P_CODMOD IN VARCHAR2 
+, P_CODERR IN VARCHAR2 
+, P_CODLANG IN VARCHAR2 
+) RETURN VARCHAR2 AS 
+
+message varchar2(1000);
+
+BEGIN
+  select liberr into message from sys_def_erreurs where codmod=p_codmod and coderr=p_coderr and codlang=p_codlang;
+  return message;  
+END GET_MESSAGE_ERREUR;

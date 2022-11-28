@@ -1,0 +1,97 @@
+##
+TAG_CHARSET=@€éèç
+##
+HRORG_SECU_OPTI
+=SQL=
+CREATE OR REPLACE FUNCTION HRORG_SECU_OPTI(
+  p_codts       IN std_struc_arbre.codts%TYPE,
+  p_type_entite IN std_struc_entite.type_entite%TYPE,
+  p_entite      IN std_struc_entite.code_entite%TYPE,
+  p_date        IN std_struc_entite.date_eff%TYPE,
+  p_clauseWhere IN VARCHAR2,
+  p_cid   IN std_struc_entite.cid%TYPE default null)
+RETURN INTEGER
+IS
+  v_req              VARCHAR2(4000);
+  TYPE CODE_ENTITE_ROW IS TABLE OF std_struc_entite.code_entite%TYPE;
+  tab_entitesRecherchees CODE_ENTITE_ROW;
+  v_tmpEntite std_struc_entite.code_entite%TYPE;
+  v_niveauTypeEntite std_struc_niv.niveau%TYPE;
+  v_nbOccTypeEntite std_struc_niv_info.nb_occurrences%TYPE;
+  v_retour           INTEGER;
+  v_cid std_struc_entite.cid%TYPE;
+BEGIN
+	
+  v_cid := p_cid;
+  IF (v_cid IS NULL) THEN
+  	BEGIN
+  		SELECT VALVAR INTO v_cid FROM SYS_VARSYS where CODVAR = 'NS_CLIENT_ID';
+  	EXCEPTION
+  	WHEN NO_DATA_FOUND THEN
+  		v_cid := null;
+  	END;
+  END IF;
+  IF (v_cid IS NULL) THEN
+  	-- En mode multiclient, la varsys peut être null et le passage du paramètre pCid est obligatoire
+  	RETURN -1;
+  END IF;
+	
+  IF p_codts IS NULL OR p_type_entite IS NULL OR p_date IS NULL THEN
+    RETURN -1;
+  END IF;
+  IF p_clauseWhere IS NULL THEN
+    RETURN 1;
+  END IF;
+  IF p_entite IS NOT NULL THEN
+    v_req := 'SELECT count(*)
+      FROM STD_STRUC_ENTITE
+      WHERE CODE_ENTITE = :1
+      AND :2 BETWEEN date_eff AND date_fin
+      AND TYPE_ENTITE = :3
+      AND CID = :4
+      AND CODE_ENTITE '||p_clauseWhere;
+    EXECUTE immediate v_req INTO v_retour USING p_entite,p_date,p_type_entite, v_cid ;
+    IF v_retour>0 THEN
+      RETURN 1;
+    END IF;
+    v_req := 'select n.niveau, ni.nb_occurrences from std_struc_niv n, std_struc_niv_info ni where n.codts=ni.codts and n.type_entite=ni.type_entite and :1 between n.date_eff and n.date_fin and n.codts=:2 and n.type_entite=:3';
+    EXECUTE immediate v_req INTO v_niveauTypeEntite, v_nbOccTypeEntite USING p_date,p_codts,p_type_entite;
+    IF v_niveauTypeEntite IS NOT NULL AND v_niveauTypeEntite>0 THEN
+      IF v_nbOccTypeEntite IS NULL THEN
+        v_nbOccTypeEntite := 1;
+      END IF;
+      v_req := '';
+      FOR i IN 0..v_nbOccTypeEntite-1 LOOP
+        IF i>0 THEN
+          v_req := v_req||' union all ';
+        END IF;
+         v_req := v_req||' select niv'||(v_niveauTypeEntite+i)||' as code_entite from std_struc_index where cid = '||v_cid||' and '''||p_date||''' between date_eff and date_fin and codts='||p_codts||' and last_entite='''||p_entite||''' and niv'||(v_niveauTypeEntite+i)||' is not null ';
+      END LOOP;
+      --DBMS_OUTPUT.PUT_LINE(v_req);
+      --FIXME utiliser la procédure trace_dbms_output()
+      EXECUTE immediate v_req bulk collect INTO tab_entitesRecherchees;
+    END IF;
+  END IF;
+  IF NOT tab_entitesRecherchees.exists(1) AND NOT INSTR(p_clauseWhere,' NULL')=0 THEN
+    v_req := 'SELECT count(*)
+      FROM DUAL
+      WHERE '''' '||p_clauseWhere;
+    EXECUTE immediate v_req INTO v_retour;
+  ELSE
+    v_req := 'SELECT count(*)
+      FROM DUAL
+      WHERE :1 '||p_clauseWhere;
+    IF NOT tab_entitesRecherchees.exists(1) THEN
+      v_tmpEntite := '@VIDE@';
+      EXECUTE immediate v_req INTO v_retour USING v_tmpEntite;
+    ELSE
+      FOR i IN tab_entitesRecherchees.first..tab_entitesRecherchees.last LOOP 
+        EXIT WHEN v_retour>0;
+        EXECUTE immediate v_req INTO v_retour USING tab_entitesRecherchees(i);
+      END LOOP;
+    END IF;
+  END IF;
+  RETURN v_retour ;
+EXCEPTION
+  WHEN OTHERS THEN RETURN -99 ;
+END HRORG_SECU_OPTI;

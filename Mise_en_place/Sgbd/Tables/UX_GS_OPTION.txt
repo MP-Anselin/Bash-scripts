@@ -1,0 +1,86 @@
+##
+TAG_CHARSET=@€éèç
+##
+UX_GS_OPTION
+==
+delete from UX_GS_OPTION WHERE ACCES_OPT IN ('CERTIFICATEMGR','FAMILYMGR','PAY-ADVMGR','PAY-BANKMGR','PAYMGR','PROFILMGR','TEAMMGR')
+'managerBusinessFeatures','CERTIFICATEMGR','Manager','Demande d''attestation Manager','Modules/AdpUx/UxCertificateMgr.jsp'
+'managerBusinessFeatures','FAMILYMGR','Manager','Famille Manager','Modules/AdpUx/UxFamilyMgr.jsp'
+'managerBusinessFeatures','PAY-ADVMGR','Manager','Demande d''acompte Manager','Modules/AdpUx/UxPayAdvanceMgr.jsp'
+'managerBusinessFeatures','PAY-BANKMGR','Manager','Gestion des  modes de paiement Manager','Modules/AdpUx/UxPayBankMgr.jsp'
+'managerBusinessFeatures','PAYMGR','Manager','Paie Manager','Modules/AdpUx/UxPayMgr.jsp'
+'managerBusinessFeatures','PROFILMGR','Manager','Gestion du Profil Manager','Modules/AdpUx/UxProfileMgr.jsp'
+'managerBusinessFeatures','TEAMMGR','Manager','Equipe','Modules/AdpUx/UxTeamMgr.jsp'
+##
+UX_GS_OPTION
+==
+delete from UX_GS_OPTION WHERE ACCES_OPT IN ('TIME-BIMGR')
+'managerBusinessFeatures','TIME-BIMGR','Manager','Solde compteurs équipe','Modules/AdpUx/UxTimeBIMgr.jsp'
+##
+UX_GS_OPTION
+==
+delete from UX_GS_OPTION WHERE ACCES_OPT IN ('DELEGATIONMGR')
+'managerBusinessFeatures','DELEGATIONMGR','Manager','Délégation','Modules/AdpUx/UxDelegationMgr.jsp'
+##
+UX_GS_OPTION
+==
+delete from UX_GS_OPTION WHERE ACCES_OPT IN ('ONBOARD')
+'businessFeatures','ONBOARD','Collaborateur','Activation du Onboarding','Modules/AdpUx/UxOnBoard.jsp'
+##
+UX_GS_OPTION
+==
+delete from UX_GS_OPTION WHERE ACCES_OPT IN ('BRAND-GROUP')
+'businessFeatures','BRAND-GROUP','Collaborateur','Multi-Branding','Modules/AdpUx/UxBrandGroup.jsp'
+##
+UX_GS_OPTION
+==
+delete from UX_GS_OPTION WHERE ACCES_OPT IN ('PAY-PREFS')
+'MobileESSPayrollStatementPreferences','PAY-PREFS','Collaborateur','Refus de la dématérialisation','Modules/AdpUx/UxPayPrefs.jsp'
+##
+UX_GS_OPTION
+==
+delete from UX_GS_OPTION WHERE ACCES_OPT IN ('TIMESHEETMGR','CALENDARMGR') AND ABONN_OPT = 'managerBusinessFeatures' 
+'managerBusinessFeatures','TIMESHEETMGR','Manager','Feuille de pointage Manager','Modules/AdpUx/UxTimesheetMgr.jsp'
+'managerBusinessFeatures','CALENDARMGR','Manager','Horaires Manager','Modules/AdpUx/UxCalendarMgr.jsp'
+##
+UX_GS_OPTION
+==
+delete from UX_GS_OPTION WHERE ACCES_OPT IN ('PAY-PREFS')
+'businessFeatures','PAY-PREFS','Collaborateur','Refus de la dématérialisation','Modules/AdpUx/UxPayPrefs.jsp'
+##
+UX_GS_OPTION
+==
+delete from UX_GS_OPTION WHERE ACCES_OPT IN ('BENEFITS-COVERAGE')
+'businessFeatures','BENEFITS-COVERAGE','Collaborateur','Couverture santé - Mutuelle','Modules/AdpUx/UxBenefitsCoverage.jsp'
+##
+UX_GS_OPTION
+==
+delete from UX_GS_OPTION WHERE ABONN_OPT ='businessFeatures' AND ACCES_OPT ='PFP'
+'businessFeatures','PFP','Collaborateur','Placement fin de période','Modules/AdpUx/UxPfp.jsp'
+##
+UX_GS_OPTION
+==
+DELETE FROM UX_GS_OPTION WHERE ACCES_OPT='EXPENSE-COMMUTE'
+'businessFeatures','EXPENSE-COMMUTE','Collaborateur','Indemnités transport','Modules/AdpUx/UxExpenseCommute.jsp'
+##
+UX_GS_OPTION
+==
+delete from UX_GS_OPTION WHERE ACCES_OPT IN ('HELPDESK')
+'businessFeatures','HELPDESK','Collaborateur','UX - Helpdesk','Modules/AdpUx/UxHelpdesk.jsp'
+##
+UX_GS_OPTION
+==
+delete from UX_GS_OPTION WHERE ACCES_OPT = 'GRAPH'
+'businessFeatures','GRAPH','Collaborateur','Organigramme','Modules/AdpUx/UxOrganigramme.jsp'
+##
+UX_GS_OPTION
+==
+delete from UX_GS_OPTION WHERE ACCES_OPT IN ('CSE','OTF-REPORTSMGR','BRIDGING')
+'businessFeatures','CSE','Collaborateur','Don CSE','Modules/AdpUx/UxDonCSE.jsp'
+'businessFeatures','BRIDGING','Collaborateur','Bridging','Modules/AdpUx/UxBridging.jsp'
+'managerBusinessFeatures','OTF-REPORTSMGR','Manager','Bridging Manager','Modules/AdpUx/UxOTFReportsMgr.jsp'
+##
+UX_GS_OPTION
+==
+delete from UX_GS_OPTION WHERE ACCES_OPT = 'REMOTE-WORK'
+'businessFeatures','REMOTE-WORK','Collaborateur','UX - TAD','Modules/AdpUx/UxTAD.jsp'

@@ -1,0 +1,22 @@
+##
+TAG_CHARSET=@€éèç
+##
+EXISTS_CODE_CHRONO
+=SQL=
+CREATE OR REPLACE FUNCTION EXISTS_CODE_CHRONO(p_numpac VARCHAR2, p_pacmat VARCHAR2, p_codeChrono VARCHAR2) RETURN NUMBER IS 
+PRAGMA AUTONOMOUS_TRANSACTION; 
+retour NUMBER;
+BEGIN 
+  	-- On regarde d'abord si le code_chrono n'est pas utilisé dans DACS
+	SELECT COUNT(*) INTO retour FROM DIC_ADM_CONTRAT_SITU WHERE NUMPAC=p_numpac AND PACMAT=p_pacmat AND CODE_CHRONO=p_codeChrono;
+	
+	IF retour = 0 THEN
+		-- Si le code_chrono n'est pas utilisé dans DACS, on va vérifier que le code_chrono n'a pas déjà été utilisé (présent dans DELETED_PAIEZAD)
+		-- (cas d'une réembauche après une annulation avec réutilisation du code_chrono)
+		select COUNT(*) INTO retour from DELETED_PAIEZAD where NUMPAC = p_numpac and PACMAT = p_pacmat and CODE_CHRONO = p_codeChrono;	
+	END IF;
+	
+  	RETURN retour;
+EXCEPTION
+  WHEN OTHERS THEN RETURN 0;
+END EXISTS_CODE_CHRONO;

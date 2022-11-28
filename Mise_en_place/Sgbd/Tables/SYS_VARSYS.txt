@@ -1,0 +1,539 @@
+##
+TAG_CHARSET=@€éèç
+##
+SYS_VARSYS
+=SQL IFEXIST=SYS_VARSYS=
+DELETE SYS_VARSYS WHERE MODULE = 'SYS' AND CODVAR = 'SHOW_AVATAR_PICTURE'
+##
+SYS_VARSYS
+=SQL IFEXIST=SYS_VARSYS=
+INSERT INTO SYS_VARSYS ( MODULE, CODVAR, VALVAR, TYPVAR, DESCRIPTION ) VALUES ('SYS', 'SHOW_AVATAR_PICTURE', 'false', 'Booléen', 'true = afficher l''image dans l''avatar. false = afficher l''acronyme dans l''avatar')
+##
+SYS_VARSYS
+=SQL IFEXIST=SYS_VARSYS=
+DELETE SYS_VARSYS WHERE MODULE = 'STD' AND CODVAR = 'ACTION_BASCULE_ABS'
+##
+SYS_VARSYS
+=SQL IFEXIST=SYS_VARSYS=
+INSERT INTO SYS_VARSYS ( MODULE, CODVAR, VALVAR, TYPVAR, DESCRIPTION ) VALUES ('STD','ACTION_BASCULE_ABS','2','Entier','Sélectionner une des 3 valeurs ‘En attente’, ‘Validée’, ‘Refusée’ si valvar = 3 ou 2 valeurs ‘Validée’, ‘Refusée’ si valvar = 2. Par défaut la varsys a 2 valeurs si vide.')
+##
+SYS_VARSYS
+==
+DELETE SYS_VARSYS WHERE  MODULE='TGE' and CODVAR='TGE_NON_MPE_IMPORT_IGNORE_DATE_EFF'
+'TGE', 'TGE_NON_MPE_IMPORT_IGNORE_DATE_EFF', 'false', 'Booléen','Avant le MPE, certains clients ne fournissaient pas la date d''effet ou la fournissaient avec le 1er jour de la période dans les fichiers issus de la GTA externe.Avec le MPE, la méthode de reconnaissance de la période d''emploi, commune à tous les clients MPE ou non, tient compte de la date d''effet fournie.Afin de ne pas faire évoluer toutes les interfaces GTA des clients non MPE : ajout d''une varsys permettant d''indiquer pour les clients non MPE que la date d''effet fournie est significative ou non d''une période d''emploi.(Suppression de la varsys lorsque les GTA externes auront été corrigés.'
+##
+SYS_VARSYS
+==
+DELETE SYS_VARSYS WHERE CODVAR='LISTATTESTATION' AND MODULE='STD'
+##
+SYS_VARSYS
+'STD','LISTATTESTATION','ATTESTATIONLISTE;1','Texte','Appel qui sera utilisé pour afficher la liste des éditions proposées sur l''écran "Edition d''attestation" nompage;idrequete'
+##
+SYS_VARSYS
+==
+DELETE SYS_VARSYS WHERE  MODULE='STD' and CODVAR='DEX_URL'
+'STD', 'DEX_URL', '', 'Texte','URL utilisée pour envoyer des evenements à DEX'
+##
+SYS_VARSYS
+==
+DELETE SYS_VARSYS WHERE  MODULE='STD' and CODVAR='NBR_MAX_USER'
+'STD', 'NBR_MAX_USER', '10', 'Entier','Nombre Max de users à afficher'
+##
+SYS_VARSYS
+==
+DELETE SYS_VARSYS WHERE  MODULE='WKF' and CODVAR='NBR_DOSSIERS_AFFICHAGE_MAX'
+'WKF', 'NBR_DOSSIERS_AFFICHAGE_MAX', '100', 'Entier','Représente le nombre de dossiers maxi à afficher dans la Workbox lorsque l''utilisateur déplie un regroupement processus : opération'
+##
+SYS_VARSYS
+==
+delete from SYS_VARSYS where CODVAR = 'EXP_REG_LIBELLE_MASKRE_JSP' and MODULE = 'STD'
+'STD','EXP_REG_LIBELLE_MASKRE_JSP','[a-zA-Z0-9éèêëàâäùûüîïôöç''_()\\s]','Texte','Expression régulière pour contrôler la saisie des caractères dans un champ libellé.(maskRe dans ExtJS pour un écran JSP le \\s est obligatoire car on récupère la varsys dans une jsp et avec un simple \s le slash est supprimé).'
+##
+SYS_VARSYS
+==
+DELETE SYS_VARSYS WHERE  MODULE='GES' and CODVAR='MCT_THREAD_POOL_SIZE'
+'GES', 'MCT_THREAD_POOL_SIZE', '20', 'Entier','Nombre de Thread pour traiter l''interface MCT.'
+##
+SYS_VARSYS
+==
+DELETE SYS_VARSYS WHERE  MODULE='STD' and CODVAR='INTERFACE_FSED'
+'STD', 'INTERFACE_FSED', 'FSD', 'Texte','Nom de l''interface FSED'
+##
+SYS_VARSYS
+==
+DELETE SYS_VARSYS WHERE  MODULE='SYS' and CODVAR='RESPONSIVE_IGNORE'
+'SYS', 'RESPONSIVE_IGNORE', 'IGNORE=ZRU;ZBU;ZCH;ZTX;ZST;ZCO;ZCB;ZOT;ZIP', 'Texte','Permet de paramétrer le générateur afin d''activer ou de désactiver le responsive layout.Le paramétrage est régit par les règles ci-dessous:1)	Si la valeur est « ALL » alors le responsive layout est désactivé pour tous les écrans.2)	Si la valeur commence par « IGNORE= » alors le responsive layout est désactivé pour tous les écrans spécifiés après  « IGNORE=».3)	Si la valeur commence par « DO_NOT_IGNORE= » alors le responsive layout est désactivé pour tous les écrans sauf ceux spécifiés après  « DO_NOT_IGNORE = ».Il est à noter que le séparateur utilisé entre les noms d’écrans est le « ; ».'
+##
+SYS_VARSYS
+==
+UPDATE SYS_VARSYS SET VALVAR=(CASE WHEN VALVAR LIKE '%/' THEN SUBSTR(VALVAR,1,LENGTH(VALVAR)-1) ELSE VALVAR END), DESCRIPTION='URL associée à gsrest pour interroger la base GS ¿¿Environnement INTEGRATION GSREST_URL=http://lx2811:10042/gsrest ¿¿Environnement STAGING GSREST_URL=http://fragsrestfront01stg-dc1.staging.adp.com:8280/gsrest ¿¿Environnement PRODUCTION GSREST_URL=http://fragsrestfront01prd-dc1.fr.ehc.adp.com:8280/gsrest ' WHERE  MODULE='STD' and CODVAR='GSREST_URL'
+##
+SYS_VARSYS
+==
+DELETE SYS_VARSYS WHERE  MODULE='UX' and CODVAR='MULTI_BRANDING_REGROUP'
+'UX', 'MULTI_BRANDING_REGROUP', '', 'Texte','Indique sur quelle information le regroupement est fait pour la fonctionnalité Multi-Branding. ''SOCIETE'' pour regrouper sur la Société. Toute autre valeur regroupe sur le PAC.'
+##
+SYS_VARSYS
+==
+DELETE SYS_VARSYS WHERE  MODULE='STD' and CODVAR='ENV_PRODUCTION'
+'STD', 'ENV_PRODUCTION', 'false', 'Booleen', 'Permettant d''indiquer si on est sur un environnement de production.'
+##
+SYS_VARSYS
+==
+DELETE SYS_VARSYS WHERE  MODULE='STD' and CODVAR='LOG_SOAP_REQUEST'
+'STD', 'LOG_SOAP_REQUEST', 'true', 'Booleen', 'Permettant d''indiquer si le traçage des requetes Soap envoyées à eService est active ou non.'
+##
+SYS_REQUETES_JSP
+==
+DELETE FROM SYS_REQUETES_JSP WHERE NOMPAGE = 'ATTESTATIONLISTE'
+'ATTESTATIONLISTE','1','Utilisateur','GA_ATTESTATION_TYPES','ATTEST_ID,ATTEST_LIBELLE,CODEDI,FAMEDI,DESCRIPTION','ATTEST_ID,ATTEST_LIBELLE,CODEDI,FAMEDI,DESCRIPTION',NULL,'0',NULL,'ORDRE, ATTEST_LIBELLE',NULL,'Liste des attestations proposé sur l''écran Edition des attestations','ATTEST_ID,ATTEST_LIBELLE'
+##
+SYS_VARSYS
+==
+DELETE SYS_VARSYS WHERE  MODULE='STD' and CODVAR='CONTAINER_MAX_NB_FILE_DW'
+'STD', 'CONTAINER_MAX_NB_FILE_DW', '2000', 'Entier', 'Représente le nombre maximal de documents téléchargeables depuis container.'
+##
+SYS_VARSYS
+=SQL IFEXIST=SYS_VARSYS=
+DELETE SYS_VARSYS WHERE MODULE = 'SYS' AND CODVAR = 'TEST_AUTO'
+##
+SYS_VARSYS
+=SQL IFEXIST=SYS_VARSYS=
+INSERT INTO SYS_VARSYS ( MODULE, CODVAR, VALVAR, TYPVAR, DESCRIPTION ) VALUES ('SYS', 'TEST_AUTO', 'false', 'Booléen', 'true = afficher l''icone de test auto dans le bureau')
+##
+SYS_VARSYS
+==
+DELETE SYS_VARSYS WHERE  MODULE='STD' and CODVAR='TIMEOUT_SIEBEL'
+'STD', 'TIMEOUT_SIEBEL', '20000', 'Entier', 'Représente le timeout d''envoi des demandes à adp eService'
+##
+SYS_VARSYS
+==
+DELETE FROM SYS_VARSYS WHERE MODULE = 'SYS' AND CODVAR = 'BI_TYPE_USER_CONNECT'
+'SYS','BI_TYPE_USER_CONNECT','CONCURRENT','Texte','BI 4.1 = CONCURRENT, BI 4.2 = NAMED, si vide ou pas de var on sera en NAMED'
+##
+SYS_VARSYS
+==
+DELETE FROM SYS_VARSYS WHERE MODULE = 'GES' AND CODVAR = 'TGE_GESTIL_TRACES'
+'GES','TGE_GESTIL_TRACES','false','Booleen','true = Alimente la table TGE_GESTIL_TRACES'
+##
+SYS_VARSYS
+==
+DELETE FROM SYS_VARSYS WHERE MODULE = 'UX' AND CODVAR = 'LIMIT_RECURSIVITE_SUBALTERNE'
+'UX','LIMIT_RECURSIVITE_SUBALTERNE','1','Entier','Ce nombre fixe la profondeur de la récursivité pour récuperer la liste des subalternes indirects afin de prévenir d''une récursivité sans fin'
+##
+SYS_VARSYS
+==
+DELETE FROM SYS_VARSYS WHERE MODULE = 'UX' AND CODVAR = 'NB_COLLAB_MAX'
+'UX','NB_COLLAB_MAX','500','Entier','Ce nombre fixe le nombre maximum des subalternes directe et  indirects '
+##
+SYS_VARSYS
+==
+DELETE SYS_VARSYS WHERE  MODULE='STD' and CODVAR='TIMEOUT_IDD'
+'STD', 'TIMEOUT_IDD', '20000', 'Entier', 'Represente le timeout d''envoi des demandes à l''application éditions législatives pour calculer l''indimnité de départ IDD'
+##
+SYS_VARSYS
+==
+DELETE SYS_VARSYS WHERE  MODULE='STD' and CODVAR='LOG_IDD_REQUEST'
+'STD', 'LOG_IDD_REQUEST', 'true', 'Booleen', 'Permettant d''indiquer si le traçage de flux json envoyées à EL pour calcul IDD est active ou non.'
+##
+SYS_VARSYS
+==
+DELETE SYS_VARSYS WHERE  MODULE='STD' and CODVAR='MODE_MS'
+##
+SYS_VARSYS
+=SQL IFEXIST=SYS_VARSYS=
+DELETE SYS_VARSYS WHERE MODULE = 'SYS' AND CODVAR = 'USER_TAB_COLS_IN_MEMORY'
+##
+SYS_VARSYS
+=SQL IFEXIST=SYS_VARSYS=
+INSERT INTO SYS_VARSYS ( MODULE, CODVAR, VALVAR, TYPVAR, DESCRIPTION ) VALUES ('SYS', 'USER_TAB_COLS_IN_MEMORY', 'true', 'Booléen', 'true = charger la structure de toutes les tables en mémoire pour optimiser le temps d''exécution de certaines requêtes SQL / false = ne rien faire')
+##
+SYS_VARSYS
+==
+DELETE SYS_VARSYS WHERE  MODULE='SYS' and CODVAR='CHIFFREMENT_DB'
+'SYS', 'CHIFFREMENT_DB', 'false', 'Booleen', 'Permettant d''indiquer si le chiffrement met à blanc les colonnes les colonnes d''origines.'
+##
+SYS_VARSYS
+==
+DELETE SYS_VARSYS WHERE  MODULE='SYS' and CODVAR in ('ORGANIGRAMME_ACTIF', 'FLEXGRAPH_ACT_PAGINATION')
+'SYS', 'ORGANIGRAMME_ACTIF', 'false', 'Booleen', 'Permettant d''indiquer si l''envoi de flux json des données hiérarchiques à Flexgraph est active ou non.'
+'SYS', 'FLEXGRAPH_ACT_PAGINATION', '100', 'Entier', 'Nombre de workers max par lot utilisés pour l''envoi des données hiérarchiques à Flexgraph.'
+##
+SYS_VARSYS
+==
+DELETE SYS_VARSYS WHERE  MODULE='SYS' and CODVAR='ACTIVE_BETA_FEATURES'
+'SYS', 'ACTIVE_BETA_FEATURES', '', 'Texte', 'Activation de certaines fonctionnalités en mode BETA. Les codes des fonctionnalités activées sont séparées par des virgules. La VarSys peut-être défini par utilisateurs'
+##
+SYS_VARSYS
+==
+INSERT INTO SYS_VARSYS SELECT 'SYS', 'CID_REFERENCE_CHIFFREMENT', '', 'Texte', 'NE PAS VALORISER EN PROD !!! CID utilisé pour générer la clé de chiffrement (des données bancaires par exemple). Doit être valorisée avec le CID de prod sur tous les environnements des clients ayant un CID différent en recette interne, recette client...' FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM SYS_VARSYS WHERE MODULE='SYS' AND CODVAR='CID_REFERENCE_CHIFFREMENT')
+##
+SYS_VARSYS
+==
+DELETE SYS_VARSYS WHERE  MODULE='SYS' and CODVAR='ADR_API_URL'
+'SYS', 'ADR_API_URL', 'GEOSERVICE,MAPBOX', 'Texte', 'Préciser  l''ordre d''appel des API.'
+##
+SYS_VARSYS
+=SQL=
+UPDATE SYS_VARSYS SET VALVAR = 'Copyright 2020 ADP, Inc.' WHERE MODULE = 'STD' AND CODVAR = 'DESK_COPYRIGHT'
+##
+SYS_VARSYS
+==
+DELETE SYS_VARSYS WHERE  MODULE='STD' and CODVAR='DOCSERV_PDF_PROTECTION'
+'STD', 'DOCSERV_PDF_PROTECTION', '', 'Texte', 'protection des pdf générés par docserver, on concatene les paramètres sans séparateurs. protection max = PCFS, protection mini = pas de varsys ou varsys a vide (P = Impression interdite, C = copie du contenu pour accessibilité interdite, copie du contenu interdite, F = remplissage de champs de formulaire interdit, apposition de signature interdite, création de modèle de page interdite, S = copie du contenu pour accessibilité interdite)'
+##
+SYS_VARSYS
+==
+DELETE SYS_VARSYS WHERE  MODULE='STD' and CODVAR='DESACTIVE_TRAITEMENTS_IMPORT_3040'
+'STD','DESACTIVE_TRAITEMENTS_IMPORT_3040',NULL,'Texte','Liste des traitements de l''import 3040 à désactiver : - TGE_CONTROLE_40_CHEVAUCHEMENT: le traitement de contrôle de chevauchement des absences - TGE_REGROUPE_ABS : le traitement de regroupement des absences'
+##
+SYS_VARSYS
+==
+INSERT INTO SYS_VARSYS SELECT 'SYS', 'EMB_AOID_CREATION_ACTIVATED', 'true', 'Booleen', 'Indique si la création d''un AOID à l''embauche d''un nouveau salarié est activée. Cette VarSys ne doit être positionnée à false que si un autre traitement prend en charge cette création (contrainte GSO : un salarié dans le S.I. ADP = un AOID)' FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM SYS_VARSYS WHERE MODULE='SYS' AND CODVAR='EMB_AOID_CREATION_ACTIVATED')
+##
+SYS_VARSYS
+=SQL=
+DECLARE
+varsysok NUMBER;
+BEGIN
+select count(*) into varsysok from sys_varsys where codvar ='LIBELLE_ENTITE_DEFAUT';
+if (varsysok = 0) then
+insert into sys_varsys values ('HRO','LIBELLE_ENTITE_DEFAUT','false','Booléen',' Détermine quel libellé sera affiché devant la zone de saisie structure lorsque celle-ci est vide;  true : Le libellé correspond à celui de la donnée (META_DONNEE_ECRAN), false : le libellé correspond au type de structure (STD_STRUC_TYPE) ');
+END IF;
+END;
+##
+SYS_VARSYS
+==
+DELETE SYS_VARSYS WHERE  MODULE='STD' and CODVAR='ACCUEIL_MAX_SIMULTANEOUS_TUILE_LOAD'
+'STD', 'ACCUEIL_MAX_SIMULTANEOUS_TUILE_LOAD', '3', 'Entier', 'Nombre de chargements simultanés de contenu de tuile de la page d''accueil.La limitation le nombre de chargements simultanés permet d''éviter la surcharge de navigateur à l''affichage de la page d''accueil '
+##
+SYS_VARSYS
+==
+DELETE SYS_VARSYS WHERE  MODULE='STD' and CODVAR='USER_MANAGEMENT_BY_PAC'
+'STD', 'USER_MANAGEMENT_BY_PAC', 'false', 'Booléen', 'Indique si l''administration de l''écran utilisateur est décentralisé par PAC.'
+##
+SYS_VARSYS
+==
+DELETE SYS_VARSYS WHERE  MODULE='SYS' and CODVAR='ACTIVE_SURVEILLANCE_LENTEURS_REST_API'
+'SYS', 'ACTIVE_SURVEILLANCE_LENTEURS_REST_API', '5', 'Entier', 'Permet d''activer les traces liées au temps de traitement des requêtes API (UX et Marketplace) : <0 -> On trace tout, =0 -> Aucune trace, >x -> On trace les requêtes API dont le temps de traitement est supérieurs ou égal à x secondes.'
+##
+SYS_VARSYS
+==
+DELETE SYS_VARSYS WHERE  MODULE='STD' and CODVAR IN ('TYPE_ENTITE_BUSINESS_UNITS','TYPE_ENTITE_DEPARTMENTS')
+'STD', 'TYPE_ENTITE_BUSINESS_UNITS', 'BU', 'Texte', 'Code du type entité représentant les business units à retourner pour les codelists.'
+'STD', 'TYPE_ENTITE_DEPARTMENTS', 'SERVICE', 'Texte', 'Code du type entité représentant les departments à retourner pour les codelists.'
+##
+SYS_VARSYS
+==   
+DELETE SYS_VARSYS WHERE  MODULE='SYS' and CODVAR IN ('ASSOCIATE_OID','ORG_OID')
+'SYS', 'ASSOCIATE_OID', 'localassociateoid', 'Texte', 'Permet de paramétrer le nom du header standard associé à ASSOCIATE_OID.'
+'SYS', 'ORG_OID','localorgoid', 'Texte', 'Permet de paramétrer le nom du header standard associé à ORG_OID.'
+##
+SYS_VARSYS
+==
+DELETE FROM SYS_VARSYS WHERE MODULE = 'GES' AND CODVAR = 'GESTIL_BANDEAU'
+'GES','GESTIL_BANDEAU','true','Booléen','true = dans le bandeau, interroger Gestil pour l''inscription en recyclage et rétro. false = dans le bandeau, ne pas interroger Gestil pour l''inscription en recyclage et rétro (à utiliser si perte de performance)'
+##
+SYS_VARSYS
+==   
+DELETE SYS_VARSYS WHERE  MODULE='SYS' and CODVAR IN ('ASSOCIATE_OID','ORG_OID')
+'SYS', 'ASSOCIATE_OID', 'associateoid', 'Texte', 'Permet de paramétrer le nom du header standard associé à ASSOCIATE_OID.'
+'SYS', 'ORG_OID','orgoid', 'Texte', 'Permet de paramétrer le nom du header standard associé à ORG_OID.'
+##
+sys_varsys
+==
+DELETE FROM sys_varsys WHERE codvar = 'LIBELLE_TITRE_ENTITE_DEFAUT'
+'HRO','LIBELLE_TITRE_ENTITE_DEFAUT','false','Booléen',' Détermine quel sera le titre du cadre ou sera affiché la liste des strucutre ;  true : Le libellé correspond à celui de la donnée saisie (META_DONNEE_ECRAN), false : le libellé correspond au type de structure (STD_STRUC_TYPE)'
+##
+sys_varsys
+==
+UPDATE sys_varsys set VALVAR = (SELECT VALVAR FROM SYS_VARSYS WHERE CODVAR = 'LIBELLE_ENTITE_DEFAUT') where codvar = 'LIBELLE_TITRE_ENTITE_DEFAUT'
+##
+sys_varsys
+==
+UPDATE sys_varsys set VALVAR = 'Détermine quel libellé sera affiché devant la zone de saisie structure lorsque celle-ci est vide ;  true : Le libellé correspond à celui de la donnée (META_DONNEE_ECRAN), false : le libellé correspond à celui de la structure (STD_STRUC_TYPE)' where codvar = 'LIBELLE_ENTITE_DEFAUT'
+##
+sys_varsys
+==
+UPDATE sys_varsys set VALVAR = 'Détermine quel sera le titre du cadre ou sera affiché la liste des structures ; true : Le libellé correspond à celui de la donnée saisie (META_DONNEE_ECRAN), false : le libellé correspond à celui de la structure (STD_STRUC_TYPE)' where codvar = 'LIBELLE_TITRE_ENTITE_DEFAUT'
+##
+sys_varsys
+==
+DELETE FROM sys_varsys WHERE codvar = 'NS_SERVICE_DIGIPOSTE_ID'
+'SYS','NS_SERVICE_DIGIPOSTE_ID','digiposte','Texte','ID NS du service Digiposte'
+##
+SYS_VARSYS
+==   
+DELETE SYS_VARSYS WHERE  MODULE='SYS' and CODVAR=('NAT_TRAIT_REGLE')
+'SYS', 'NAT_TRAIT_REGLE', 'Z4REGLE', 'Texte', 'Nature de traitement d''une paie de réglé.'
+##
+SYS_VARSYS
+==   
+DELETE SYS_VARSYS WHERE  MODULE='SYS' and CODVAR='CONTENT-SECURITY-POLICY'
+'SYS', 'CONTENT-SECURITY-POLICY', '', 'Texte', 'Header http Content-Security-Policy permettant d''autoriser de charger l'application dans une iframe.Exemple "frame-ancestors https://*.adp.com."'
+##
+SYS_VARSYS
+==   
+DELETE SYS_VARSYS WHERE  MODULE='SYS' and CODVAR='X-FRAME-OPTION'
+'SYS', 'X-FRAME-OPTION', '', 'Texte', 'Header http X-Frame-Option permettant d''autoriser de charger l'application dans une iframe.Exemple frame-ancestors "allow-from  http://mypc.ad.esi.adp.com:8000/"'
+##
+sys_varsys
+==
+DELETE FROM sys_varsys WHERE codvar = 'DOCSERV_VERSION' and module = 'STD'
+'STD','DOCSERV_VERSION','2.00','Texte','version de docserver 2.0 ou 3.0'
+##
+sys_varsys
+==
+DELETE FROM SYS_VARSYS WHERE MODULE = 'SYS' AND CODVAR = 'SIGN_EXPORT_REP_ID'
+'SYS','SIGN_EXPORT_REP_ID', NULL,'Texte','Contient l''ID de répertoire web pour le traitement d''export des documents signés.'
+##
+SYS_VARSYS
+==
+DELETE SYS_VARSYS WHERE  MODULE='UX' and CODVAR='UX_MOTIFEVT_AFF'
+'UX', 'UX_MOTIFEVT_AFF', '', 'Texte', 'Indique la liste de codes de motifs d’absence autorises a etre affiches sur le planning des collegues (MonAdp). Il s’agit d’une liste de codes separes par des virgules, par exemple : FA, FP, FH.'
+##
+SYS_VARSYS
+==
+DELETE SYS_VARSYS WHERE  MODULE='GAP' and CODVAR='GESTIL_ATTENTE_PAI'
+'GAP', 'GESTIL_ATTENTE_PAI', '1800', 'Entier', 'Indique en secondes le temps maximum pendant lequel le traitement de paie attend le calcul des PAI dans GESTIL.'
+##
+SYS_VARSYS
+==
+DELETE SYS_VARSYS WHERE  MODULE='MP' and CODVAR='MP_NOTIF_RESPAIE'
+'MP', 'MP_NOTIF_RESPAIE', '', 'Texte', 'La nature de traitement qui doit déclencher l''envoi de la notification MP des résultats de paie.Seulement deux valeurs sont possibles : RN et Z4CONLOT. '
+##
+SYS_VARSYS
+=SQL IFEXIST=SYS_VARSYS=
+update sys_varsys set valvar = '21600' where codvar = 'GESTIL_ATTENTE_PAI' and to_number(VALVAR) <= 18000
+##
+SYS_VARSYS
+==
+DELETE SYS_VARSYS WHERE  MODULE = 'GAP' and CODVAR = 'GESTIL_ATTENTE_EVT'
+'GAP', 'GESTIL_ATTENTE_EVT', '10', 'Entier', 'Le temps d''attente en seconde après le calcul des PAI dans GESTIL (ne pas mettre à zéro)'
+##
+sys_varsys
+=SQL=
+update sys_varsys set DESCRIPTION = 'version de docserver 2.00 ou 3.00' WHERE codvar = 'DOCSERV_VERSION' and module = 'STD'
+##
+SYS_VARSYS
+==
+DELETE SYS_VARSYS WHERE  MODULE = 'GTA' and CODVAR = 'IS_T1_LIKE_DECIDIUM'
+'GTA', 'IS_T1_LIKE_DECIDIUM', 'FALSE', 'Booléen', 'TRUE = GTA T1 is like DECIDIUM '
+##
+SYS_VARSYS
+==
+DELETE SYS_VARSYS WHERE  MODULE='SYS' and CODVAR='DELETE_AVATAR_IN_PHOTOMATRIC'
+'SYS', 'DELETE_AVATAR_IN_PHOTOMATRIC', 'true', 'Booléen', 'Supprimer la photo du collaborateur qui a été déposé temporairement dans le répertoire GxpFiles\DSF\ENTERPRISE\IMAGES\PhotoMatric lorsqu''on upload la photo sur Container'
+##
+SYS_VARSYS
+==
+DELETE FROM SYS_VARSYS WHERE CODVAR = 'IS_BENCHMARK_VISIBLE'
+'STD','IS_BENCHMARK_VISIBLE','true','Booléen','Cette VarSys conditionne l''affichage du bouton de benchmark dans le bandeau matricule. Ainsi un client peut décider de ne pas afficher le bouton s''il le souhaite.'
+##
+SYS_VARSYS
+==
+DELETE FROM SYS_VARSYS WHERE CODVAR = 'URL_DOC_BENCHMARK'
+'STD','URL_DOC_BENCHMARK','https://www.fr.adp.com/-/media/adpfr/pdfs/whatweoffer/products/link/coll_adp-benchmark_brochure-art_2019_fr_446402_50692_fv_digital.pdf?rev=09823b1c3cdd4860a4d5374a4965df60&hash=385B243B4F92CB5391B6BF6C9F87BD99','Texte','URL menant vers le document expliquant qu''est ce que l''application Benchmark'
+##
+SYS_VARSYS
+==   
+DELETE SYS_VARSYS WHERE  MODULE='SYS' and CODVAR IN ('ORG_OID')
+'SYS', 'ORG_OID','orgoid', 'Texte', 'Permet de paramétrer le nom du header standard associé à ORG_OID.'
+##
+SYS_VARSYS
+==   
+DELETE SYS_VARSYS WHERE  CODVAR IN ('AJAX_DEFAULT_TIMEOUT','AJAX_WKF_TIMEOUT','AJAX_POPUP_TIMEOUT')
+##
+SYS_VARSYS
+=SQL=
+DECLARE
+varsysok NUMBER;
+BEGIN
+select count(*) into varsysok from sys_varsys where module ='STD' and codvar ='IS_ICONE_COMPARAISON';
+if (varsysok = 0) then
+insert into sys_varsys values ('STD', 'IS_ICONE_COMPARAISON','true','Booléen', 'Cette varsys conditionne l''affichage de l''icône de comparaison dans le composant date d''effet. True si le client veut afficher l''icône, false s''il souhaite la masquer en attendant une solution définitive.');
+END IF;
+END;
+##
+SYS_VARSYS
+==
+DELETE SYS_VARSYS WHERE  MODULE='SYS' and CODVAR='URL_OCN'
+'SYS', 'URL_OCN', 'https://eu1.orgchartnow.com/', 'Texte', 'URL de connexion à OrgChart Now, si la VarSys ACTIVE_BETA_FEATURES active la fonctionnalité ''OCN'''
+##
+sys_varsys
+==
+DELETE FROM sys_varsys WHERE codvar = 'NB_ITEM_RECUPER_DOC_META_CONTAINER'
+'SYS','NB_ITEM_RECUPER_DOC_META_CONTAINER','500','Entier','Nombre des documents à récupérer pour chaque appel à container dans le traitement Traitement_AlimDocContainerMetadata.'
+##
+SYS_VARSYS
+=SQL IFEXIST=SYS_VARSYS=
+update sys_varsys set valvar = CASE WHEN (lower(valvar) = 'true' or lower(valvar) = 'false') THEN valvar ELSE 'false' END where codvar = 'LIBELLE_ENTITE_DEFAUT'
+##
+SYS_VARSYS
+=SQL IFEXIST=SYS_VARSYS=
+update sys_varsys set valvar = CASE WHEN (lower(valvar) = 'true' or lower(valvar) = 'false') THEN valvar ELSE 'false' END where codvar = 'LIBELLE_TITRE_ENTITE_DEFAUT'
+##
+SYS_VARSYS
+==
+call ADM_ADD_OR_UPDATE_VARSYS ('STD', 'EDITIQUE_FONCTIONS_CHAMPS', 'false','Booléen', 'Booléen permettant d''activer(true)/désactiver(false) la gestion des champs de fusion en majuscule, minuscule, et nom propre, pour le module éditique.')
+##
+SYS_VARSYS
+=SQL=
+DECLARE
+	varsysok NUMBER;
+BEGIN
+	select count(*) into varsysok from sys_varsys where module = 'STD' AND codvar ='NOM_THEME';
+	if (varsysok = 0) then
+		INSERT INTO SYS_VARSYS VALUES ('STD','NOM_THEME','DEFAUT','Texte','Nom du thème utilisé pour le bureau et configuré dans la table SYS_USR_THEME/SYS_USR_THEME_CONFIG.');
+	END IF;
+END;
+##
+SYS_VARSYS
+=SQL=
+DECLARE
+	varsysok NUMBER;
+BEGIN
+	select count(*) into varsysok from sys_varsys where module = 'STD' AND codvar = 'MARGIN_SIZE';
+	if (varsysok = 0) then
+		INSERT INTO SYS_VARSYS VALUES ('STD','MARGIN_SIZE','0','Entier','Taille des marges gauche et droite du bureau.');
+	END IF;
+END;
+##
+SYS_VARSYS
+==
+DELETE FROM sys_varsys WHERE codvar = 'DESK_NOM_CLIENT' and module = 'STD'
+'STD','DESK_NOM_CLIENT',NULL,'Texte','A la place du logo de l''entreprise, il est possible d''afficher le nom du client au format texte'
+##
+SYS_VARSYS
+=SQL IFEXIST=SYS_VARSYS=
+UPDATE SYS_VARSYS SET DESCRIPTION = 'Dans cette VarSys est déclaré le nom de l''image (celui paramétré sur Bibliothèque d''image et de documents) qui est utilisée pour être affichée comme favicon' WHERE CODVAR = 'DESK_FAVICON' AND MODULE = 'STD'
+##
+SYS_VARSYS
+==
+DELETE FROM SYS_VARSYS WHERE MODULE = 'STD' AND CODVAR = 'DESK_THEME_DEFAUT'
+'STD','DESK_THEME_DEFAUT','ADPONEUX','Texte','Look & Feel par défaut utilisé dans l''application lorsque l''utilisateur n''a pas de préférence enregistrée'
+##
+SYS_VARSYS
+==
+DELETE FROM SYS_VARSYS WHERE MODULE = 'STD' AND CODVAR = 'DESK_MENUPREFERENCE_ACTIF'
+'STD','DESK_MENUPREFERENCE_ACTIF','false','Booléen','Afficher (true) ou masquer (false) le menu des préférences utilisateur'
+##
+sys_varsys
+==
+DELETE FROM sys_varsys WHERE codvar = 'DESK_PERSOLOGO' and module = 'STD'
+'STD','DESK_PERSOLOGO','false', 'Booléen','Afficher l''icône personnalisation du logo pour l''utilisateur connecté (par défaut à FALSE)'
+##
+sys_varsys
+==
+UPDATE SYS_VARSYS SET DESCRIPTION = 'Conditionne l''affichage de la favicon (true = afficher, false = ne pas afficher).' WHERE CODVAR = 'DESK_SHOW_FAVICONE' AND MODULE = 'STD'
+##
+sys_varsys
+==
+DELETE FROM SYS_VARSYS WHERE CODVAR = 'DESK_FAVICON' AND MODULE = 'STD'
+'STD','DESK_FAVICON','','Texte','Libellé de l''image du favicon (dans bibliothèque d''image et de documents). Ne pas saisir le nom du fichier.'
+##
+sys_varsys
+==
+DELETE FROM SYS_VARSYS WHERE CODVAR = 'DESK_LOGO_ENTREPRISE' AND MODULE = 'STD'
+'STD','DESK_LOGO_ENTREPRISE','','Texte','Libellé de l''image du logo d''entreprise (dans bibliothèque d''image et de documents). Ne pas saisir le nom du fichier.'
+##
+SYS_VARSYS
+==
+DELETE FROM SYS_VARSYS WHERE CODVAR = 'DESK_LEFTMENU' AND MODULE = 'STD'
+'STD','DESK_LEFTMENU','true','Booléen','Cette VarSys conditionne l''affichage du menu de gauche dans le bureau Révolution.¿Le menu de gauche apparaît seulement si la VarSys est valorisée à True.'
+##
+sys_varsys
+==
+DELETE FROM sys_varsys WHERE codvar = 'DESK_COPYRIGHT' and module = 'STD'
+'STD','DESK_COPYRIGHT','Copyright 2022 ADP, Inc.','Texte','Copyright ADP'
+##
+sys_varsys
+==
+DELETE FROM SYS_VARSYS WHERE CODVAR = 'LIBELLE_SALARIE_PRESENT' AND MODULE = 'STD'
+'STD','LIBELLE_SALARIE_PRESENT','Présent(e)','Texte','Mot pour qualifier une personne présente à l''effectif. On retrouve ce terme dans les badges du bandeau. Par défaut ( Présent(e) ).'
+##
+sys_varsys
+==
+DELETE FROM SYS_VARSYS WHERE CODVAR = 'LIBELLE_SALARIE_NON_PRESENT' AND MODULE = 'STD'
+'STD','LIBELLE_SALARIE_NON_PRESENT','Sorti(e)','Texte','Mot pour qualifier une personne non présente à l''effectif. On retrouve ce terme dans les badges du bandeau. Par défaut ( Sorti(e) ).'
+##
+sys_varsys
+==
+DELETE FROM SYS_VARSYS WHERE CODVAR = 'LIBELLE_MANAGER' AND MODULE = 'STD'
+'STD','LIBELLE_MANAGER','Manager','Texte','Mot pour qualifier un manager. On retrouve ce terme dans les badges du bandeau. Par défaut ( Manager ).'
+##
+SYS_VARSYS
+==
+call ADM_ADD_OR_UPDATE_VARSYS ('SYS', 'URL_OCN', '','Texte', 'URL de connexion à OrgChart Now. Si la valeur est vide OrgChart Now n''est pas activé. Si la valeur est https://eu1.orgchartnow.com/ OrgChart Now est activé.')
+##
+SYS_VARSYS
+=SQL=
+UPDATE SYS_VARSYS SET VALVAR = null WHERE CODVAR = 'URL_OCN' AND MODULE = 'SYS' AND instr(nvl((select VALVAR from SYS_VARSYS WHERE CODVAR = 'ACTIVE_BETA_FEATURES' AND MODULE = 'SYS'),'-'), 'OCN') = 0
+##
+SYS_VARSYS
+==
+call ADM_ADD_OR_UPDATE_VARSYS ('STD', 'PUBLICA_LOGO', '','Texte', 'URL d''accès au logo affiché sur le bureau à droite du logo ADP. A noter que la sécurité ADP bloque l''accès à certaines URL sur le Web.')
+##
+SYS_VARSYS
+==
+call ADM_ADD_OR_UPDATE_VARSYS ('SYS', 'ENVOI_ACE', 'false','Booléen', 'Variable indiquant si le traitement export des droits ACE doit être exécuté après la fin du traitement OptiSecu')
+##
+sys_varsys
+==
+UPDATE SYS_VARSYS SET DESCRIPTION = 'Libellé de l''application visible en titre de fenêtre et lors de l''ajout d''un favori dans le navigateur.' WHERE CODVAR = 'DEFAULT_SITE_NAME' AND MODULE = 'WWW'
+##
+sys_varsys
+==
+UPDATE SYS_VARSYS SET DESCRIPTION = 'Variable permettant d''indiquer sur le bureau l''environnement utilisé (Staging, Recette). Il ne faut pas la renseigner en environnement de production.' WHERE CODVAR = 'ENVIRONNEMENT' AND MODULE = 'WWW'
+##
+sys_varsys
+==
+DELETE FROM sys_varsys WHERE codvar = 'HELDPESK_OFFRE_SIEBEL' and module = 'STD'
+'STD','HELDPESK_OFFRE_SIEBEL','','Texte','Paramétrer par client l''offre relative au produit ADP Link à envoyer lors de la création d''un ticket Siebel depuis le HelpDesk'
+##
+SYS_VARSYS
+==
+call ADM_ADD_OR_UPDATE_VARSYS ('SYS', 'ALL_SERVICELET', 'true','Booléen', 'true : la totalité du contenu des tables SYS_SERVICELET/SYS_SERVICELET_CLIENT sont chargées au start de la console. false : les éléments (servicelet,jsonservelt,etc..) sont chargés au fur et à mesure lors de leur premier appel.')
+##
+SYS_VARSYS
+=IF_ROW_NOTEXIST=
+'STD','DESK_STOREMARKETP','CP','Texte','fait apparaitre l''icone MarketPlace dans les boutons de la barre de recherche du Schell OneUX, FALSE ==> Icone non affichée TRUE ==> Icone affichée pour tous les utilisateurs d''un profil Expert (Role 3) CP ==> Icone affichée uniquement pour les Experts positionné comme Chef de file'
+##
+SYS_VARSYS
+=IF_ROW_NOTEXIST=
+'STD','DESK_STOREMARKETP_URL','https://fr.apps.adp.com/fr-FR/listing?attr=14589','Texte','url pointée par l''icone MarketPlace'
+##
+SYS_VARSYS
+=IF_ROW_NOTEXIST=
+'STD','SYNERGIE_LINK','https://synerg.adp.com/config/synerg-config','Texte','url pointée par l''API Synergie'
+##
+SYS_VARSYS
+=IF_ROW_NOTEXIST=
+'STD','SYNERGIE_VERSION','-1.17.1','Texte','version de l''API Synergie'
+##
+SYS_VARSYS
+=IF_ROW_NOTEXIST=
+'STD','SYNERGIE_INIT_JS','window.SynergConfig.initialize().then(cfg => {cfg.loadGlobalStyles([''sdf-global'', ''sdf-utilities'']);});','Texte','Script J.S pour intitiet l''API Synergie'
+##
+SYS_VARSYS
+=SQL=
+DECLARE
+varsysok NUMBER;
+BEGIN
+select count(*) into varsysok from sys_varsys where codvar ='NB_EXTENSION_DACH' AND MODULE ='SYS';
+if (varsysok = 0) then
+insert into sys_varsys values ('SYS','NB_EXTENSION_DACH','0','Entier','Indique le nombre d''extension DACH, sa valeur maximum est 5. Si elle est nulle ou 0, pas d''extension.');
+END IF;
+END;
+##
+SYS_VARSYS
+=IF_ROW_NOTEXIST=
+'SYS','TRACE_BANDEAU_ACTIVE','true','Booléen','Indique si l''icône trace dans le bandeau expert doit être affichée.'
+##
+SYS_VARSYS
+=SQL=
+CALL ADM_ADD_OR_UPDATE_VARSYS('WWW', 'ENVIRONNEMENT', 'à paramétrer', 'Texte', 'Variable permettant d''indiquer sur le bureau et dans le menu avatar l''environnement utilisé (Production, Recette, etc.). Sur le bureau en environnement de production, le contenu de la variable n''est pas affiché.')
+##
+SYS_VARSYS
+==
+call ADM_ADD_OR_UPDATE_VARSYS ('STD', 'IS_ICONE_COMPARAISON','true','Texte', 'Cette varsys conditionne l''affichage de l''icône de comparaison dans le composant date d''effet. True si le client veut afficher l''icône, false s''il souhaite la masquer ou un code profil de schéma représentant une liste d''écrans autorisés pour un utilisateur.')

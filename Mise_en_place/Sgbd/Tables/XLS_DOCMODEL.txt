@@ -1,0 +1,17 @@
+##
+TAG_CHARSET=@€ιθη
+##
+XLS_DOCMODEL
+==
+delete from XLS_DOCMODEL where CODDOC = 'TGE_EXP_ANN' and DTEFFET = '20201130'
+'TGE_EXP_ANN', '20201130', 'Export annulations', 'Annulation_', 0, 0, 'TGE'
+##
+XLS_DOCMODEL
+==
+delete from XLS_DOCMODEL where CODDOC = 'TGE_EXP_IMP' and DTEFFET = '20211130'
+'TGE_EXP_IMP', '20211130', 'Export imputations', 'Imputation_', 0, 0, 'TGE'
+##
+XLS_DOCMODEL
+==
+delete from XLS_DOCMODEL where CODDOC = 'TGE_EXP_IMP_I' and DTEFFET = '20211130'
+'TGE_EXP_IMP_I', '20211130', 'Export imputations', 'Imputation_', 0, 0, 'TGE'

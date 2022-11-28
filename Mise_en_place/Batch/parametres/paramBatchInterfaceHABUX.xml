@@ -1,0 +1,10 @@
+<interface idInterface="InterfaceHABUX">
+	<nomInterface>Habilitation UX</nomInterface>
+	<descriptionInterface>Habilitation UX</descriptionInterface>
+	<traitements>
+		<traitement>
+			<descriptionTraitement>Abonnement UX</descriptionTraitement>
+			<typeTraitement>InterfaceSynchroUXNS</typeTraitement>
+		</traitement>
+	</traitements>
+</interface>

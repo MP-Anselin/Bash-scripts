@@ -1,0 +1,45 @@
+##
+TRG_GAP_TRT
+=SQL=
+CREATE OR REPLACE TRIGGER TRG_GAP_TRT FOR INSERT OR UPDATE ON GAP_TRT COMPOUND TRIGGER
+
+ v_matric varchar2(6);
+ v_ligOld GAP_TRT%ROWTYPE;
+ v_ligNew GAP_TRT%ROWTYPE;
+ v_periode varchar2(6);
+ v_event varchar2(4000);
+ v_nature VARCHAR2(32);
+ v_date_fin_trait DATE;
+ v_nature_varsys varchar2(4000);
+ BEFORE EACH ROW IS BEGIN
+ IF INSERTING THEN
+ -- On initialise le 'OLD' (car :OLD n'existe pas, en insertion)
+ v_ligOld := NULL; 
+ ELSE
+ v_ligOld.NUMPAC := :OLD.NUMPAC;
+ v_ligOld.DATE_FIN_TRT  := :OLD.DATE_FIN_TRT ;
+ v_ligOld.PERIODE_PAIE   := :OLD.PERIODE_PAIE  ;
+ v_ligOld.NATURE   := :OLD.NATURE  ;
+  END IF;
+ v_ligNew.NUMPAC := :NEW.NUMPAC;
+ v_ligNew.DATE_FIN_TRT := :NEW.DATE_FIN_TRT;
+ v_ligNew.PERIODE_PAIE := :NEW.PERIODE_PAIE;
+ v_ligNew.NATURE   := :NEW.NATURE  ;
+ 
+select NVL(VALVAR, ' ') into v_nature_varsys from sys_varsys where module='MP' and codvar='MP_NOTIF_RESPAIE';
+ v_matric := NVL(v_ligNew.NUMPAC,v_ligOld.NUMPAC);
+ v_nature := NVL(v_ligNew.NATURE,v_ligOld.NATURE);
+ v_date_fin_trait := NVL(v_ligNew.DATE_FIN_TRT,v_ligOld.DATE_FIN_TRT);
+ v_event :='payrollProcessingJob.status.change';
+ v_periode := to_char(to_date(NVL(v_ligNew.PERIODE_PAIE,v_ligOld.PERIODE_PAIE),'YYYYMM'), 'MMYYYY')  ;
+ -- DEBUT TRAITEMENT MP NOTIF TR
+IF  v_date_fin_trait IS NOT NULL AND v_nature = v_nature_varsys AND (v_nature = 'RN' OR v_nature = 'Z4CONLOT')  THEN
+ MERGE INTO MP_EVENTS DE
+ USING (SELECT v_matric AS MATRIC,v_event AS EVENT, v_periode AS CLE_SECONDAIRE FROM DUAL) Z
+ ON (Z.MATRIC=DE.MATRIC AND Z.EVENT=DE.EVENT AND Z.CLE_SECONDAIRE=DE.CLE_SECONDAIRE)
+ WHEN NOT MATCHED THEN INSERT (MATRIC,EVENT,CLE_SECONDAIRE,ACTION,DATE_MODIF) VALUES (v_matric,v_event,v_periode,'C',CURRENT_TIMESTAMP);
+ END IF;
+ -- FIN TRAITEMENT TRAITEMENT MP NOTIF TR
+ END BEFORE EACH ROW; 
+ END TRG_GAP_TRT;
+ 

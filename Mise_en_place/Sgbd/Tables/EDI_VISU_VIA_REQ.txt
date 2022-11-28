@@ -1,0 +1,41 @@
+##
+TAG_CHARSET=@€éèç
+##
+EDI_VISU_VIA_REQ
+==
+update EDI_VISU_VIA_REQ set TYPEEDITION = 'PDF' where (codedi,famedi) in (select codedi,famedi from GA_ATTESTATION_TYPES)
+##
+EDI_VISU_VIA_REQ
+==
+DELETE FROM EDI_VISU_VIA_REQ WHERE CODEDI = '22' AND NOMEDI ='Historique des connexions pour un utilisateur'
+'22','Historique des connexions pour un utilisateur','REQ_SEC','Historique des connexions pour un utilisateur','Historique des connexions pour un utilisateur',null,'Premières et dernières connexions par jour en tenant compte des délégations.','XLS','O','20191029','20191029','20191029','L',null,null,null);
+##
+EDI_VISU_VIA_REQ
+==
+DELETE FROM EDI_VISU_VIA_REQ WHERE CODEDI = '23' AND NOMEDI ='Utilisateurs avec droits BI' AND FAMEDI = 'REQ_SEC'
+'23','Utilisateurs avec droits BI','REQ_SEC','RD_REQ_USR_DROITS_BI','Utilisateurs avec droits BI',null,'Ensemble des utilisateurs avec leurs droits BI.','XLS','O','20191029','20191029','20191029','L',null,null,null);
+##
+EDI_VISU_VIA_REQ
+==
+DELETE FROM EDI_VISU_VIA_REQ WHERE CODEDI = '1' AND NOMEDI ='Comptabilisation de l''IDD' AND FAMEDI ='IDD'
+'1','Comptabilisation de l''IDD','IDD','IDD','Comptabilisation de l''IDD',null,'Nombre de clics sur le lien de calcul de l''indemnité de départ','XLS','O','20200413','20200413','20200413','L',null,null,null
+##
+EDI_VISU_VIA_REQ
+==
+DELETE FROM EDI_VISU_VIA_REQ WHERE CODEDI = '5' AND FAMEDI ='REQ_SEC'
+'5','Liste des profils de sécurité ','REQ_SEC','secu_usr55','Liste des profils de sécurité ',NULL,'Liste des utilisateurs avec leurs profils de sécurité associés  ','XLS','N','20090224','20210208',NULL,'L',NULL,NULL,NULL
+##
+EDI_VISU_VIA_REQ
+==
+DELETE FROM EDI_VISU_VIA_REQ WHERE CODEDI='34' AND FAMEDI='GAP_ADMINISTRATIF'
+'34','LISTE_MANAGERS','GAP_ADMINISTRATIF','RD_LISTE_MANAGERS','Liste des managers',null,null,'XLS','O','20210322','20210322','20210322','L',null,null,null
+##
+EDI_VISU_VIA_REQ
+==
+DELETE FROM EDI_VISU_VIA_REQ WHERE CODEDI='80002' AND FAMEDI='PARAMDYN'
+'80002', 'Liste des groupes de données', 'PARAMDYN', 'GROUPES_DONNEES','Liste des groupes de données', '' , '', 'XLS', 'O' , '20220110' , '20220110' , '20220110' , 'L', '', '', ''
+##
+EDI_VISU_VIA_REQ
+==
+DELETE FROM EDI_VISU_VIA_REQ WHERE CODEDI='80003' AND FAMEDI='PARAMDYN'
+'80003', 'Liste des données liées à un élément de paie', 'PARAMDYN', 'LISTE_DONNEES_ELEMENT_PAIE','Liste des données liées à un élément de paie', '' , '', 'XLS', 'O' , '20220117' , '20220117' , '20220117' , 'L', '', '', ''
