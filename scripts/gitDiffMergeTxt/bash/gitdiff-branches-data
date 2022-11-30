@@ -61,6 +61,22 @@ lineContentGitAnnotation() {
   return 1
 }
 
+#Function to check if the line start by + so with replace it plus by space :
+changePlusBySpace() {
+  local line=$1
+  local lineBackUP=$1
+  local numberList='s/[0-9]//g'
+
+  line=$(echo "$line" | sed "$numberList")
+  local SUB=':+##'
+
+  if [[ "$line" == "$SUB"* ]]; then
+    tr -s + ' '  <<< "$lineBackUP"
+    return 0
+  fi
+  echo "$lineBackUP"
+  return 1
+}
 #Function to check if the line receive as param content the annotation:
 # : ##
 lineTeamAnnotationHash() {
@@ -69,6 +85,7 @@ lineTeamAnnotationHash() {
 
   line=$(echo "$line" | sed "$numberList")
   local SUB=': ##'
+
   if [[ "$line" == "$SUB"* ]]; then
     return 0
   fi
@@ -181,12 +198,12 @@ mergeFileOfSpecialFolder() {
     if [ "${folderInfoArray[1]}" != "null" ]; then
       cat "${folderInfoArray[1]}" >>"$MERGE_PATH"
       echo "SCRIPT MERGE FILE: ${folderInfoArray[2]} into $MERGE_FILE" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
-      rm -rf "${folderInfoArray[1]}"
+      #rm -rf "${folderInfoArray[1]}"
       echo "SCRIPT DELETE FILE: ${folderInfoArray[1]}" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
     fi
   done
 
-  rmdir "$FOLDER_FILES_PARSED"
+  #rmdir "$FOLDER_FILES_PARSED"
   echo "SCRIPT DELETE FOLDER: $FOLDER_FILES_PARSED" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
   echo -e "" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
 }
@@ -255,7 +272,6 @@ getModifFromFile() {
       firstHash=$((firstHash + 1))
     fi
 
-    #echo "getModifFromFile firstHash => $firstHash lineChangedData => $lineChangedData"
     if [ $firstHash == 0 ]; then
       l=$((l - 1))
     elif [ $firstHash == 2 ]; then
@@ -263,14 +279,12 @@ getModifFromFile() {
     else
       ## If firstHash == 1 mean we have found one line with '##' and we add the content between the line of '##'
       echo "$lineChangedData" >>"$fileRedirect"
-      ##echo "INSERT >>$lineChangedData<<"
       l=$((l + 1))
     fi
     countOfLine=$((countOfLine + 1))
   done
 
   echo -e "ADD new file block \t=> linePosition: $((linePosition - 1)) length: $length end L: $l" >>"$GIT_DIFF_BRANCH_PATH"
-  #read -rp "next ": dd
   ## if the l is equal to the number of line of the file we inform we have finished to read the file.
   if [ $l == "$length" ]; then
     return 0
@@ -325,6 +339,9 @@ mainLoop() {
   ## Read the file differences.log line.
   for ((dl = 0; dl < "$length"; dl++)); do
     line=${_differencesFileData[dl]}
+    #Replace the + by space next to ##
+    line=$(changePlusBySpace "$line")
+
     if (($((dl - 1)) > 0)); then
       previousLine=${_differencesFileData[$((dl - 1))]}
     fi
@@ -404,7 +421,7 @@ mainLoop() {
           while read -r line || [ -n "$line" ]; do
             fileContent+=("$line")
           done < <(git show "$branchToExtractFileData:$filePath")
-          echo "SCRIPT RUN: git show $branchToExtractFileData:$filePath" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
+          echo "SCRIPT RUN: git show $branchToExtractFileData:$filePath" >> "$GIT_DIFF_BRANCH_PATH"
           endOfFile=1
           passOnce=0
           if [ $isGitAnnotationAdd != 1 ]; then
@@ -577,8 +594,8 @@ checkIfFolderExist() {
 
 help() {
   echo ".$SCRIPT_PATH param1 param2 param3"
-  echo "param1: { branch to be compare A }"
-  echo "param2: {branch to compare B }"
+  echo "param1: { branch to be compare B the most recently version }"
+  echo "param2: {branch to compare A the older version }"
   echo "param3: { folder where are the files }"
   echo "param4: { username git }"
   echo "param5: { password git }"
@@ -597,8 +614,8 @@ main() {
     help
   fi
 
-  local branchA=$1
-  local branchB=$2
+  local branchA=$2
+  local branchB=$1
   local folderFilesPath=$3
   local userGit=$4
   local passwordGit=$5
