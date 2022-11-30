@@ -1,5 +1,5 @@
 ##
-TAG_CHARSET=@€éèç
+TAG_CHARSET=@€éèç release
 ##
 SYS_DEF_ERREURS
 ==
