@@ -1,5 +1,5 @@
 ##
-TAG_CHARSET=@€éèç
+TAG_CHARSET=@ï¿½ï¿½ï¿½ï¿½ delivery
 ##
 SYS_DEF_ERREURS
 ==
@@ -7,157 +7,157 @@ DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'UXATT01' AND CODLANG = 'fr_fr' AND N
 ##
 SYS_DEF_ERREURS
 ==
-INSERT INTO SYS_DEF_ERREURS(CODERR, CODMOD, CODLANG, NIV_DEFINITION, LIBERR, TYPERR) VALUES ('UXATT01', 'UX', 'fr_fr', 0, 'Vous n''êtes pas autorisé à télécharger cette attestation', 1)
+INSERT INTO SYS_DEF_ERREURS(CODERR, CODMOD, CODLANG, NIV_DEFINITION, LIBERR, TYPERR) VALUES ('UXATT01', 'UX', 'fr_fr', 0, 'Vous n''ï¿½tes pas autorisï¿½ ï¿½ tï¿½lï¿½charger cette attestation', 1)
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'WKAUTO25' AND CODLANG = 'fr_fr' AND NIV_DEFINITION = 0 AND CODMOD ='WKF'
-'WKAUTO25', 'WKF', 'fr_fr', 0, 'Le processus est verrouillé.', 1
+'WKAUTO25', 'WKF', 'fr_fr', 0, 'Le processus est verrouillï¿½.', 1
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'ESGLAN01' AND CODLANG = 'fr_fr' AND NIV_DEFINITION = 0 AND CODMOD ='ESG'
-'ESGLAN01', 'ESG', 'fr_fr', 0, 'La donnée obligatoire prénom du contractant est manquante.', 1
+'ESGLAN01', 'ESG', 'fr_fr', 0, 'La donnï¿½e obligatoire prï¿½nom du contractant est manquante.', 1
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'ESGLAN02' AND CODLANG = 'fr_fr' AND NIV_DEFINITION = 0 AND CODMOD ='ESG'
-'ESGLAN02', 'ESG', 'fr_fr', 0, 'La donnée obligatoire nom du contractant est manquante.', 1
+'ESGLAN02', 'ESG', 'fr_fr', 0, 'La donnï¿½e obligatoire nom du contractant est manquante.', 1
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'ESGLAN03' AND CODLANG = 'fr_fr' AND NIV_DEFINITION = 0 AND CODMOD ='ESG'
-'ESGLAN03', 'ESG', 'fr_fr', 0, 'La donnée obligatoire email du contractant est manquante.', 1
+'ESGLAN03', 'ESG', 'fr_fr', 0, 'La donnï¿½e obligatoire email du contractant est manquante.', 1
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'ESGLAN04' AND CODLANG = 'fr_fr' AND NIV_DEFINITION = 0 AND CODMOD ='ESG'
-'ESGLAN04', 'ESG', 'fr_fr', 0, 'La donnée obligatoire sexe du contractant est manquante.', 1
+'ESGLAN04', 'ESG', 'fr_fr', 0, 'La donnï¿½e obligatoire sexe du contractant est manquante.', 1
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'ESGLAN05' AND CODLANG = 'fr_fr' AND NIV_DEFINITION = 0 AND CODMOD ='ESG'
-'ESGLAN05', 'ESG', 'fr_fr', 0, 'La donnée obligatoire télèphone du contractant est manquante.', 1
+'ESGLAN05', 'ESG', 'fr_fr', 0, 'La donnï¿½e obligatoire tï¿½lï¿½phone du contractant est manquante.', 1
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'ESGLAN06' AND CODLANG = 'fr_fr' AND NIV_DEFINITION = 0 AND CODMOD ='ESG'
-'ESGLAN06', 'ESG', 'fr_fr', 0, 'La donnée obligatoire prénom du mandataire # est manquante.', 1
+'ESGLAN06', 'ESG', 'fr_fr', 0, 'La donnï¿½e obligatoire prï¿½nom du mandataire # est manquante.', 1
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'ESGLAN07' AND CODLANG = 'fr_fr' AND NIV_DEFINITION = 0 AND CODMOD ='ESG'
-'ESGLAN07', 'ESG', 'fr_fr', 0, 'La donnée obligatoire nom du mandataire # est manquante.', 1
+'ESGLAN07', 'ESG', 'fr_fr', 0, 'La donnï¿½e obligatoire nom du mandataire # est manquante.', 1
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'ESGLAN08' AND CODLANG = 'fr_fr' AND NIV_DEFINITION = 0 AND CODMOD ='ESG'
-'ESGLAN08', 'ESG', 'fr_fr', 0, 'La donnée obligatoire email du mandataire # est manquante.', 1
+'ESGLAN08', 'ESG', 'fr_fr', 0, 'La donnï¿½e obligatoire email du mandataire # est manquante.', 1
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'ESGLAN09' AND CODLANG = 'fr_fr' AND NIV_DEFINITION = 0 AND CODMOD ='ESG'
-'ESGLAN09', 'ESG', 'fr_fr', 0, 'La donnée obligatoire sexe du madataire # est manquante.', 1
+'ESGLAN09', 'ESG', 'fr_fr', 0, 'La donnï¿½e obligatoire sexe du madataire # est manquante.', 1
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'ESGLAN10' AND CODLANG = 'fr_fr' AND NIV_DEFINITION = 0 AND CODMOD ='ESG'
-'ESGLAN10', 'ESG', 'fr_fr', 0, 'La donnée obligatoire télèphone du mandataire # est manquante.', 1
+'ESGLAN10', 'ESG', 'fr_fr', 0, 'La donnï¿½e obligatoire tï¿½lï¿½phone du mandataire # est manquante.', 1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'ESG' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR = 'ESGCHX02'
-'ESGCHX02','ESG','fr_fr',0,'Vous ne pouvez pas sélectionner plus de #1 signataire(s).',1
+'ESGCHX02','ESG','fr_fr',0,'Vous ne pouvez pas sï¿½lectionner plus de #1 signataire(s).',1
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'HD000015' AND CODLANG = 'fr_fr' AND NIV_DEFINITION = 0 AND CODMOD ='HDK'
-'HD000015', 'HDK', 'fr_fr', 0, 'Le bénéficiaire saisi n''existe pas.', 3
+'HD000015', 'HDK', 'fr_fr', 0, 'Le bï¿½nï¿½ficiaire saisi n''existe pas.', 3
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR in('TGERET01','TGERET02')
-'TGERET01','TGE','fr_fr','1','La période de rétroactivité maximum est dépassée','3'
-'TGERET02','TGE','fr_fr','1','La rétroactivité est impossible avant la période de début de conservation des historiques','3'
+'TGERET01','TGE','fr_fr','1','La pï¿½riode de rï¿½troactivitï¿½ maximum est dï¿½passï¿½e','3'
+'TGERET02','TGE','fr_fr','1','La rï¿½troactivitï¿½ est impossible avant la pï¿½riode de dï¿½but de conservation des historiques','3'
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'TGE' and CODLANG = 'fr_fr' and NIV_DEFINITION = '1' and CODERR in ('TGERET03')
-'TGERET03','TGE','fr_fr','1','La demande  de retour du référentiel est bloquée pour ce PAC, car il bénéficie du retour de référentiel par PMO/PPC lors des diffusions de projets.','3'
+'TGERET03','TGE','fr_fr','1','La demande  de retour du rï¿½fï¿½rentiel est bloquï¿½e pour ce PAC, car il bï¿½nï¿½ficie du retour de rï¿½fï¿½rentiel par PMO/PPC lors des diffusions de projets.','3'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR in('TGERET08','TGERET09','TGERET10')
-'TGERET08','TGE','fr_fr','1','La rétroactivité n''est pas activer sur ce PAC.','1'
-'TGERET09','TGE','fr_fr','1','Le mois de rétroactivité est obligatoire.','1'
+'TGERET08','TGE','fr_fr','1','La rï¿½troactivitï¿½ n''est pas activer sur ce PAC.','1'
+'TGERET09','TGE','fr_fr','1','Le mois de rï¿½troactivitï¿½ est obligatoire.','1'
 'TGERET10','TGE','fr_fr','1','PAC non valide.','1'
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'TGE' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('TGE00335')
-'TGE00335','TGE','fr_fr',0,'Êtes-vous sûr de vouloir annuler votre demande ?',1
+'TGE00335','TGE','fr_fr',0,'ï¿½tes-vous sï¿½r de vouloir annuler votre demande ?',1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'HDK' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('HD000001','HD000003','HD000004','HD000005','HD000006','HD000008','HD000009','HD000010','HD000011','HD000012','HD000013','HD000014')
-'HD000001','HDK','fr_fr','0','Le numéro de demande est invalide : #',3
-'HD000003','HDK','fr_fr','0','Merci de donner un titre à votre demande !',3
+'HD000001','HDK','fr_fr','0','Le numï¿½ro de demande est invalide : #',3
+'HD000003','HDK','fr_fr','0','Merci de donner un titre ï¿½ votre demande !',3
 'HD000004','HDK','fr_fr','0','Merci de saisir un descriptif pour votre demande !',3
-'HD000005','HDK','fr_fr','0','Merci de préciser le type de votre demande (Anomalie ou Evolution) !',3
-'HD000006','HDK','fr_fr','0','Merci de préciser la gravité de votre demande !',3
-'HD000008','HDK','fr_fr','0','Le code demande associé doit être vide.',3
-'HD000009','HDK','fr_fr','0','Le code demande saisi n''existe pas ou n''est pas en statut réalisé ok (on ne peut pas faire une rework sur une demande livrée)',3
-'HD000010','HDK','fr_fr','0','Le code demande saisi n''existe pas ou n''est pas dans un statut livré (on ne peut pas référencer une anomalie sur une demande non livrée)',3
+'HD000005','HDK','fr_fr','0','Merci de prï¿½ciser le type de votre demande (Anomalie ou Evolution) !',3
+'HD000006','HDK','fr_fr','0','Merci de prï¿½ciser la gravitï¿½ de votre demande !',3
+'HD000008','HDK','fr_fr','0','Le code demande associï¿½ doit ï¿½tre vide.',3
+'HD000009','HDK','fr_fr','0','Le code demande saisi n''existe pas ou n''est pas en statut rï¿½alisï¿½ ok (on ne peut pas faire une rework sur une demande livrï¿½e)',3
+'HD000010','HDK','fr_fr','0','Le code demande saisi n''existe pas ou n''est pas dans un statut livrï¿½ (on ne peut pas rï¿½fï¿½rencer une anomalie sur une demande non livrï¿½e)',3
 'HD000011','HDK','fr_fr','0','Le code demande saisi n''existe pas !',3
-'HD000012','HDK','fr_fr','0','Le champ Code demande associé est obligatoire pour le type rework',3
-'HD000013','HDK','fr_fr','0','La demande spécifiée n''existe pas.',3
-'HD000014','HDK','fr_fr','0','Demande liée inexistante.',3
+'HD000012','HDK','fr_fr','0','Le champ Code demande associï¿½ est obligatoire pour le type rework',3
+'HD000013','HDK','fr_fr','0','La demande spï¿½cifiï¿½e n''existe pas.',3
+'HD000014','HDK','fr_fr','0','Demande liï¿½e inexistante.',3
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'TGE' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('ZDV00036', 'ZDV00037', 'ZDV00066', 'ZDV00067', 'ZDV00068', 'ZDV00069', 'ZDV00070', 'TGE00336', 'TGE00337')
-'ZDV00036','TGE','fr_fr',0,'Le domaine du pourcentage ne peut excéder 1 caractères : #1.',1
-'ZDV00037','TGE','fr_fr',0,'La donnée de paie n''existe pas.',1
-'ZDV00066','TGE','fr_fr',0,'Période passée interdite sur une rubrique non rétroactive.',1
-'ZDV00067','TGE','fr_fr',0,'Les données de rappel sont interdites en rétroactivité.',1
-'ZDV00068','TGE','fr_fr',0,'Impossible de supprimer une ligne déjà supprimée.',1
-'ZDV00069','TGE','fr_fr',0,'La rubrique n''autorise pas la rétroactivité.',1
-'ZDV00070','TGE','fr_fr',0,'Pour une rubrique rétroactive, la période de paie doit correspondre au mois de la date d''effet.',1
-'TGE00336','TGE','fr_fr',0,'Rétroactivité impossible avant le début des historiques de paie #1.',1
-'TGE00337','TGE','fr_fr',0,'La rétroactivité n''est possible qu''à partir de #1.',1
+'ZDV00036','TGE','fr_fr',0,'Le domaine du pourcentage ne peut excï¿½der 1 caractï¿½res : #1.',1
+'ZDV00037','TGE','fr_fr',0,'La donnï¿½e de paie n''existe pas.',1
+'ZDV00066','TGE','fr_fr',0,'Pï¿½riode passï¿½e interdite sur une rubrique non rï¿½troactive.',1
+'ZDV00067','TGE','fr_fr',0,'Les donnï¿½es de rappel sont interdites en rï¿½troactivitï¿½.',1
+'ZDV00068','TGE','fr_fr',0,'Impossible de supprimer une ligne dï¿½jï¿½ supprimï¿½e.',1
+'ZDV00069','TGE','fr_fr',0,'La rubrique n''autorise pas la rï¿½troactivitï¿½.',1
+'ZDV00070','TGE','fr_fr',0,'Pour une rubrique rï¿½troactive, la pï¿½riode de paie doit correspondre au mois de la date d''effet.',1
+'TGE00336','TGE','fr_fr',0,'Rï¿½troactivitï¿½ impossible avant le dï¿½but des historiques de paie #1.',1
+'TGE00337','TGE','fr_fr',0,'La rï¿½troactivitï¿½ n''est possible qu''ï¿½ partir de #1.',1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'TGE' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('ZEZ00037', 'ZEZ00038', 'ZEZ00039', 'ZEZ00040', 'ZEZ00041')
-'ZEZ00037','TGE','fr_fr',0,'Période passée interdite sur un élément non rétroactif.',1
-'ZEZ00038','TGE','fr_fr',0,'Impossible de supprimer une ligne déjà supprimée.',1
-'ZEZ00039','TGE','fr_fr',0,'L''élément n''autorise pas la rétroactivité.',1
-'ZEZ00040','TGE','fr_fr',0,'Un élément supprimé #1 existe déjà pour la période #2 et l''indicatif #3. Il faut abandonner cette création et le réactiver.',1
-'ZEZ00041','TGE','fr_fr',0,'Pour un élément rétroactif, la période de paie doit correspondre au mois de la date d''effet.',1
+'ZEZ00037','TGE','fr_fr',0,'Pï¿½riode passï¿½e interdite sur un ï¿½lï¿½ment non rï¿½troactif.',1
+'ZEZ00038','TGE','fr_fr',0,'Impossible de supprimer une ligne dï¿½jï¿½ supprimï¿½e.',1
+'ZEZ00039','TGE','fr_fr',0,'L''ï¿½lï¿½ment n''autorise pas la rï¿½troactivitï¿½.',1
+'ZEZ00040','TGE','fr_fr',0,'Un ï¿½lï¿½ment supprimï¿½ #1 existe dï¿½jï¿½ pour la pï¿½riode #2 et l''indicatif #3. Il faut abandonner cette crï¿½ation et le rï¿½activer.',1
+'ZEZ00041','TGE','fr_fr',0,'Pour un ï¿½lï¿½ment rï¿½troactif, la pï¿½riode de paie doit correspondre au mois de la date d''effet.',1
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR IN ('GENPAS01','GENPAS02') AND CODLANG = 'fr_fr' AND NIV_DEFINITION = 0 AND CODMOD ='GEN'
-'GENPAS01', 'GEN', 'fr_fr', 0, 'La date de réception ne peut être postérieure à la date du jour.', 1
-'GENPAS02', 'GEN', 'fr_fr', 0, 'La date de réception n''est plus valide. Merci de récupérer un nouveau taux.', 1
+'GENPAS01', 'GEN', 'fr_fr', 0, 'La date de rï¿½ception ne peut ï¿½tre postï¿½rieure ï¿½ la date du jour.', 1
+'GENPAS02', 'GEN', 'fr_fr', 0, 'La date de rï¿½ception n''est plus valide. Merci de rï¿½cupï¿½rer un nouveau taux.', 1
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR in('TGERET04','TGERET05','TGERET06','TGERET07')
 'TGERET04','TGE','fr_fr','1','Attention le fichier diffusion.properties est absent du message PMO/PPC.','3'
-'TGERET05','TGE','fr_fr','1','Problème pour trouver le fichier pmo_to_alp.xml dans le message MQ de PMO/PPC.','3'
-'TGERET06','TGE','fr_fr','1','Problème de lecture du fichier diffusion.properties.','3'
-'TGERET07','TGE','fr_fr','1','Problème de lecture du fichier pmo_to_alp.xml.','3'
+'TGERET05','TGE','fr_fr','1','Problï¿½me pour trouver le fichier pmo_to_alp.xml dans le message MQ de PMO/PPC.','3'
+'TGERET06','TGE','fr_fr','1','Problï¿½me de lecture du fichier diffusion.properties.','3'
+'TGERET07','TGE','fr_fr','1','Problï¿½me de lecture du fichier pmo_to_alp.xml.','3'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'WKABS049' AND CODLANG = 'fr_fr' AND NIV_DEFINITION = 0 AND CODMOD ='WKF'
-'WKABS049', 'WKF', 'fr_fr', 0, 'Le placement ''#'' n''est pas autorisé.', 3
+'WKABS049', 'WKF', 'fr_fr', 0, 'Le placement ''#'' n''est pas autorisï¿½.', 3
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR ='TGERET10'
-'TGERET10','TGE','fr_fr','1','Attention la VR <#1> contient #2 ligne(s) dans le futur et la station ne les gère pas. Le jour venu, il sera nécessaire de forcer une diffusion pour prendre en compte les lignes devenues opérationnelles.','3' 
+'TGERET10','TGE','fr_fr','1','Attention la VR <#1> contient #2 ligne(s) dans le futur et la station ne les gï¿½re pas. Le jour venu, il sera nï¿½cessaire de forcer une diffusion pour prendre en compte les lignes devenues opï¿½rationnelles.','3' 
 ##
 SYS_DEF_ERREURS
 ==
@@ -167,75 +167,75 @@ DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'WKABS050' AND CODLANG = 'fr_fr' AND 
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR IN ('DELGST44', 'DELGST45', 'DELGST46') AND CODLANG = 'fr_fr' AND NIV_DEFINITION = 0 AND CODMOD ='DEL'
-'DELGST44', 'DEL', 'fr_fr', 0, 'Il est impossible de modifier le délégué d''une délégation active.', 1
-'DELGST45', 'DEL', 'fr_fr', 0, 'La délégation est active, les fonctions métiers déjà sélectionnées ne peuvent être enlevées.', 1
-'DELGST46', 'DEL', 'fr_fr', 0, 'La délégation est active, il n''est pas possible de la supprimer, ni de désélectionner les fonctions métier qui la composent.', 1
+'DELGST44', 'DEL', 'fr_fr', 0, 'Il est impossible de modifier le dï¿½lï¿½guï¿½ d''une dï¿½lï¿½gation active.', 1
+'DELGST45', 'DEL', 'fr_fr', 0, 'La dï¿½lï¿½gation est active, les fonctions mï¿½tiers dï¿½jï¿½ sï¿½lectionnï¿½es ne peuvent ï¿½tre enlevï¿½es.', 1
+'DELGST46', 'DEL', 'fr_fr', 0, 'La dï¿½lï¿½gation est active, il n''est pas possible de la supprimer, ni de dï¿½sï¿½lectionner les fonctions mï¿½tier qui la composent.', 1
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'IMPEX082' AND CODLANG = 'fr_fr' AND CODMOD ='TGE'
-'IMPEX082','TGE','fr_fr','0','Veuillez zipper votre fichier si celui-ci a une taille supérieure à 5 Mo.','1'
+'IMPEX082','TGE','fr_fr','0','Veuillez zipper votre fichier si celui-ci a une taille supï¿½rieure ï¿½ 5 Mo.','1'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'TGE00338' AND CODLANG = 'fr_fr' AND CODMOD ='TGE'
-'TGE00338', 'TGE', 'fr_fr', 0, 'La date d’effet # ne correspond à aucune période de recueil pour le matricule #/#', 1
+'TGE00338', 'TGE', 'fr_fr', 0, 'La date dï¿½effet # ne correspond ï¿½ aucune pï¿½riode de recueil pour le matricule #/#', 1
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR in('TGE00341','TGE00342')
-'TGE00341','TGE','fr_fr','0','L''absence est entièrement antérieure à la période de recueil limite de la rétroactivité. Il est peut-être nécessaire de saisir des données de rappel pour une prise en compte en paie','3'
-'TGE00342','TGE','fr_fr','0','L''absence est partiellement antérieure à la période de recueil limite de la rétroactivité. Il est peut-être nécessaire de saisir des données de rappel pour une prise en compte en paie','3'
+'TGE00341','TGE','fr_fr','0','L''absence est entiï¿½rement antï¿½rieure ï¿½ la pï¿½riode de recueil limite de la rï¿½troactivitï¿½. Il est peut-ï¿½tre nï¿½cessaire de saisir des donnï¿½es de rappel pour une prise en compte en paie','3'
+'TGE00342','TGE','fr_fr','0','L''absence est partiellement antï¿½rieure ï¿½ la pï¿½riode de recueil limite de la rï¿½troactivitï¿½. Il est peut-ï¿½tre nï¿½cessaire de saisir des donnï¿½es de rappel pour une prise en compte en paie','3'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'TGE00340' AND CODLANG = 'fr_fr' AND NIV_DEFINITION = 0 AND CODMOD ='TGE'
-'TGE00340', 'TGE', 'fr_fr', 0, 'La période de recueil est introuvable pour le numpac/paiezad : #1/#2 et le mois de paie #3 .', 1
+'TGE00340', 'TGE', 'fr_fr', 0, 'La pï¿½riode de recueil est introuvable pour le numpac/paiezad : #1/#2 et le mois de paie #3 .', 1
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'TGE00202' AND CODLANG = 'fr_fr' AND NIV_DEFINITION = 0 AND CODMOD ='TGE'
-'TGE00202','TGE', 'fr_fr', 0, 'Voulez-vous vraiment supprimer les absences sélectionnées ?', 1
+'TGE00202','TGE', 'fr_fr', 0, 'Voulez-vous vraiment supprimer les absences sï¿½lectionnï¿½es ?', 1
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'TGE00343' AND CODLANG = 'fr_fr' AND CODMOD ='TGE'
-'TGE00343','TGE','fr_fr','0','La taille de l''indicatif ne doit pas dépasser 2 caractères alphanumériques.','3'
+'TGE00343','TGE','fr_fr','0','La taille de l''indicatif ne doit pas dï¿½passer 2 caractï¿½res alphanumï¿½riques.','3'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'TGERET08' AND CODLANG = 'fr_fr' AND CODMOD ='TGE'
-'TGERET08','TGE','fr_fr','1','La rétroactivité n''est pas activée sur ce PAC.','1'
+'TGERET08','TGE','fr_fr','1','La rï¿½troactivitï¿½ n''est pas activï¿½e sur ce PAC.','1'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'TGE00344' AND CODLANG = 'fr_fr' AND CODMOD ='TGE'
-'TGE00344','TGE','fr_fr','0','- 2 absences demi-journée le #.','1'
+'TGE00344','TGE','fr_fr','0','- 2 absences demi-journï¿½e le #.','1'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'TGE00345' AND CODLANG = 'fr_fr' AND CODMOD ='TGE'
-'TGE00345','TGE','fr_fr','0','- # le # de type demi-journée.','1'
+'TGE00345','TGE','fr_fr','0','- # le # de type demi-journï¿½e.','1'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR IN ( 'IMPEX083') AND CODLANG = 'fr_fr' AND CODMOD ='TGE'
-'IMPEX083','TGE','fr_fr','0','Vous pouvez rafraîchir l''écran Import données Zadig pour suivre l''état d''avancement du traitement en cliquant sur le bouton "Afficher".','1'
+'IMPEX083','TGE','fr_fr','0','Vous pouvez rafraï¿½chir l''ï¿½cran Import donnï¿½es Zadig pour suivre l''ï¿½tat d''avancement du traitement en cliquant sur le bouton "Afficher".','1'
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODERR in ('BDG00090') and CODLANG = 'fr_fr' and CODMOD ='GTA'
-'BDG00090','GTA','fr_fr','0','Vous ne pouvez pas sélectionner plus de 1000 collaborateurs.','1'
+'BDG00090','GTA','fr_fr','0','Vous ne pouvez pas sï¿½lectionner plus de 1000 collaborateurs.','1'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'GAP00224'
-'GAP00224','GAP','fr_fr','0','Le type de contrat du salarié n''est pas CDD.','1'
+'GAP00224','GAP','fr_fr','0','Le type de contrat du salariï¿½ n''est pas CDD.','1'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'TGE00347' AND CODLANG = 'fr_fr' AND CODMOD ='TGE'
-'TGE00347','TGE','fr_fr','0','Ce collaborateur n''est pas encore présent pour la période #6. (Matricule : #1, Numéro de pac : #2, Matricule de paie : #3, Période d''emploi : #4, Date d''effet : #5).','1'
+'TGE00347','TGE','fr_fr','0','Ce collaborateur n''est pas encore prï¿½sent pour la pï¿½riode #6. (Matricule : #1, Numï¿½ro de pac : #2, Matricule de paie : #3, Pï¿½riode d''emploi : #4, Date d''effet : #5).','1'
 ##
 SYS_DEF_ERREURS
 ==
@@ -248,16 +248,16 @@ DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'TGE00348' AND CODLANG = 'fr_fr' AND 
 ##
 SYS_DEF_ERREURS
 =SQL IFEXIST=SYS_DEF_ERREURS=
-INSERT INTO SYS_DEF_ERREURS ( CODERR, CODMOD, CODLANG, NIV_DEFINITION, LIBERR, TYPERR ) VALUES ( 'TGE00348','TGE','fr_fr','0','La période de l''élément est antérieure à la profondeur maximale (MM.YYYY) # = GREATEST(DEB_HISTO_RETRO, PERIODEENCOURS - NB_MOIS_RETRO)','1' )
+INSERT INTO SYS_DEF_ERREURS ( CODERR, CODMOD, CODLANG, NIV_DEFINITION, LIBERR, TYPERR ) VALUES ( 'TGE00348','TGE','fr_fr','0','La pï¿½riode de l''ï¿½lï¿½ment est antï¿½rieure ï¿½ la profondeur maximale (MM.YYYY) # = GREATEST(DEB_HISTO_RETRO, PERIODEENCOURS - NB_MOIS_RETRO)','1' )
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR IN ('DOCSV063','DOCSV064','DOCSV065','DOCSV066', 'DOCSV067') AND CODLANG = 'fr_fr' AND CODMOD ='ADM'
 'DOCSV063','ADM','fr_fr','0','Vous n''avez pas les droits sur la maquette : #1','1'
 'DOCSV064','ADM','fr_fr','0','Vous n''avez pas les droits sur le paragraphe : #1','1'
-'DOCSV065','ADM','fr_fr','0','Vous n''avez pas les droits sur le thème : #1','1'
-'DOCSV066','ADM','fr_fr','0','Vous n''avez pas les droits sur le type d''édition : #1','1'
-'DOCSV067','ADM','fr_fr','0','Vous n''avez pas les droits sur la nature d''édition : #1','1'
+'DOCSV065','ADM','fr_fr','0','Vous n''avez pas les droits sur le thï¿½me : #1','1'
+'DOCSV066','ADM','fr_fr','0','Vous n''avez pas les droits sur le type d''ï¿½dition : #1','1'
+'DOCSV067','ADM','fr_fr','0','Vous n''avez pas les droits sur la nature d''ï¿½dition : #1','1'
 ##
 SYS_DEF_ERREURS
 ==
@@ -272,18 +272,18 @@ DELETE FROM SYS_DEF_ERREURS WHERE CODERR IN ('TGE00349','TGE00350') AND CODLANG 
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'STDTAB79' AND CODLANG = 'fr_fr' AND CODMOD ='TAB'
-'STDTAB79','TAB','fr_fr','0','Vous n''êtes pas autorisé à consulter cette table','1'
+'STDTAB79','TAB','fr_fr','0','Vous n''ï¿½tes pas autorisï¿½ ï¿½ consulter cette table','1'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR IN ('HROARB37','HROARB38') AND CODLANG = 'fr_fr' AND CODMOD = 'HRO' AND NIV_DEFINITION = '0'
-'HROARB37','HRO','fr_fr','0','Action interdite : au moins un salarié est affecté à l''entité #1 ou à l''une de ses entités filles, et #2 impacte la société juridique de rattachement de ce(s) salarié(s)','3'
-'HROARB38','HRO','fr_fr','0','Action interdite : au moins un salarié est affecté à l''une des entités fille (directe ou indirecte) de #1, et ce transfert impacte la société juridique de rattachement de ce(s) salarié(s)','3'
+'HROARB37','HRO','fr_fr','0','Action interdite : au moins un salariï¿½ est affectï¿½ ï¿½ l''entitï¿½ #1 ou ï¿½ l''une de ses entitï¿½s filles, et #2 impacte la sociï¿½tï¿½ juridique de rattachement de ce(s) salariï¿½(s)','3'
+'HROARB38','HRO','fr_fr','0','Action interdite : au moins un salariï¿½ est affectï¿½ ï¿½ l''une des entitï¿½s fille (directe ou indirecte) de #1, et ce transfert impacte la sociï¿½tï¿½ juridique de rattachement de ce(s) salariï¿½(s)','3'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'TGEST062' AND CODLANG = 'fr_fr' AND CODMOD ='GTA'
-'TGEST062', 'GTA', 'fr_fr', '0', 'Attention, vous êtes sur le point de désabonner ce login à Gestil, tous ses accès pour tous les PAC (environnements) seront coupés. Pour supprimer l’accès à un PAC Gestil particulier, veuillez retirer le profil d’accès à ce PAC uniquement. Êtes-vous sûr de vouloir désabonner ce login à Gestil ?', '3'
+'TGEST062', 'GTA', 'fr_fr', '0', 'Attention, vous ï¿½tes sur le point de dï¿½sabonner ce login ï¿½ Gestil, tous ses accï¿½s pour tous les PAC (environnements) seront coupï¿½s. Pour supprimer lï¿½accï¿½s ï¿½ un PAC Gestil particulier, veuillez retirer le profil dï¿½accï¿½s ï¿½ ce PAC uniquement. ï¿½tes-vous sï¿½r de vouloir dï¿½sabonner ce login ï¿½ Gestil ?', '3'
 ##
 SYS_DEF_ERREURS
 =SQL IFEXIST=SYS_DEF_ERREURS=
@@ -291,75 +291,75 @@ DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'TGE00351' AND CODLANG = 'fr_fr' AND 
 ##
 SYS_DEF_ERREURS
 =SQL IFEXIST=SYS_DEF_ERREURS=
-INSERT INTO SYS_DEF_ERREURS ( CODERR, CODMOD, CODLANG, NIV_DEFINITION, LIBERR, TYPERR ) VALUES ( 'TGE00351','TGE','fr_fr','0','La rétroactivité n''est pas activée, l''import est interdit sur une période de paie antérieure à la période de paie en cours','1' )
+INSERT INTO SYS_DEF_ERREURS ( CODERR, CODMOD, CODLANG, NIV_DEFINITION, LIBERR, TYPERR ) VALUES ( 'TGE00351','TGE','fr_fr','0','La rï¿½troactivitï¿½ n''est pas activï¿½e, l''import est interdit sur une pï¿½riode de paie antï¿½rieure ï¿½ la pï¿½riode de paie en cours','1' )
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'STD' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('ADMPD163')
-'ADMPD163','STD','fr_fr',0,'Le code d''édition n''existe pas.',1
+'ADMPD163','STD','fr_fr',0,'Le code d''ï¿½dition n''existe pas.',1
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR IN ('ADMPD160','ADMPD161', 'ADMPD162') AND CODLANG = 'fr_fr' AND CODMOD ='STD' and niv_definition=0
-'ADMPD160','STD','fr_fr','0','La date de suspension ne doit pas être antérieure à la limite de la rétroactivité.','1'
-'ADMPD161','STD','fr_fr','0','La situation historique modifiée est partiellement antérieure à la limite de la rétroactivité. Il est peut-être nécessaire de saisir des données de rappel pour une prise en compte en paie.','1'
-'ADMPD162','STD','fr_fr','0','La situation historique modifiée est entièrement antérieure à la limite de la rétroactivité. Il est peut-être nécessaire de saisir des données de rappel pour une prise en compte en paie.','1'
+'ADMPD160','STD','fr_fr','0','La date de suspension ne doit pas ï¿½tre antï¿½rieure ï¿½ la limite de la rï¿½troactivitï¿½.','1'
+'ADMPD161','STD','fr_fr','0','La situation historique modifiï¿½e est partiellement antï¿½rieure ï¿½ la limite de la rï¿½troactivitï¿½. Il est peut-ï¿½tre nï¿½cessaire de saisir des donnï¿½es de rappel pour une prise en compte en paie.','1'
+'ADMPD162','STD','fr_fr','0','La situation historique modifiï¿½e est entiï¿½rement antï¿½rieure ï¿½ la limite de la rï¿½troactivitï¿½. Il est peut-ï¿½tre nï¿½cessaire de saisir des donnï¿½es de rappel pour une prise en compte en paie.','1'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'ADMPD155' AND CODLANG = 'fr_fr' AND CODMOD ='STD'
-'ADMPD155','STD','fr_fr','0','Annulation impossible car la date de départ est antérieure à la limite de la rétroactivité.','1'
+'ADMPD155','STD','fr_fr','0','Annulation impossible car la date de dï¿½part est antï¿½rieure ï¿½ la limite de la rï¿½troactivitï¿½.','1'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'ADMPD156' AND CODLANG = 'fr_fr' AND CODMOD ='STD'
-'ADMPD156','STD','fr_fr','0','Modification impossible car la date de départ est antérieure à la limite de la rétroactivité.','1'
+'ADMPD156','STD','fr_fr','0','Modification impossible car la date de dï¿½part est antï¿½rieure ï¿½ la limite de la rï¿½troactivitï¿½.','1'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'ADMPD157' AND CODLANG = 'fr_fr' AND CODMOD ='STD'
-'ADMPD157','STD','fr_fr','0','Modification impossible car la date de départ est antérieure à la date de début de contrat.','1'
+'ADMPD157','STD','fr_fr','0','Modification impossible car la date de dï¿½part est antï¿½rieure ï¿½ la date de dï¿½but de contrat.','1'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'ADMPD158' AND CODLANG = 'fr_fr' AND CODMOD ='STD'
-'ADMPD158','STD','fr_fr','0','Modification impossible car la date de départ est postérieure à la date de début de la situation suivante.','1'
+'ADMPD158','STD','fr_fr','0','Modification impossible car la date de dï¿½part est postï¿½rieure ï¿½ la date de dï¿½but de la situation suivante.','1'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'ADMPD159' AND CODLANG = 'fr_fr' AND CODMOD ='STD'
-'ADMPD159','STD','fr_fr','0','Modification impossible car la date de départ est antérieure à la date d’effet de la dernière modif de contrat. ','1'
+'ADMPD159','STD','fr_fr','0','Modification impossible car la date de dï¿½part est antï¿½rieure ï¿½ la date dï¿½effet de la derniï¿½re modif de contrat. ','1'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'STDTAB79' AND CODLANG = 'fr_fr' AND CODMOD ='TAB'
-'STDTAB79','TAB','fr_fr','0','Vous n''êtes pas autorisé à consulter cette table','1'
+'STDTAB79','TAB','fr_fr','0','Vous n''ï¿½tes pas autorisï¿½ ï¿½ consulter cette table','1'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR IN ('HROARB37','HROARB38') AND CODLANG = 'fr_fr' AND CODMOD = 'HRO' AND NIV_DEFINITION = '0'
-'HROARB37','HRO','fr_fr','0','Action interdite : au moins un salarié est affecté à l''entité #1 ou à l''une de ses entités filles, et #2 impacte la société juridique de rattachement de ce(s) salarié(s)','3'
-'HROARB38','HRO','fr_fr','0','Action interdite : au moins un salarié est affecté à l''une des entités fille (directe ou indirecte) de #1, et ce transfert impacte la société juridique de rattachement de ce(s) salarié(s)','3'
+'HROARB37','HRO','fr_fr','0','Action interdite : au moins un salariï¿½ est affectï¿½ ï¿½ l''entitï¿½ #1 ou ï¿½ l''une de ses entitï¿½s filles, et #2 impacte la sociï¿½tï¿½ juridique de rattachement de ce(s) salariï¿½(s)','3'
+'HROARB38','HRO','fr_fr','0','Action interdite : au moins un salariï¿½ est affectï¿½ ï¿½ l''une des entitï¿½s fille (directe ou indirecte) de #1, et ce transfert impacte la sociï¿½tï¿½ juridique de rattachement de ce(s) salariï¿½(s)','3'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'ADMPD164' AND CODLANG = 'fr_fr' AND CODMOD ='STD'
-'ADMPD164','STD','fr_fr','0','Modification impossible car la date d''embauche est antérieure à la limite de la rétroactivité.','1'
+'ADMPD164','STD','fr_fr','0','Modification impossible car la date d''embauche est antï¿½rieure ï¿½ la limite de la rï¿½troactivitï¿½.','1'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'ADMPD165' AND CODLANG = 'fr_fr' AND CODMOD ='STD'
-'ADMPD165','STD','fr_fr','0','Modification impossible car la date d''embauche est égale à la date d''embauche initiale.','1'
+'ADMPD165','STD','fr_fr','0','Modification impossible car la date d''embauche est ï¿½gale ï¿½ la date d''embauche initiale.','1'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'ADMPD166' AND CODLANG = 'fr_fr' AND CODMOD ='STD'
-'ADMPD166','STD','fr_fr','0','Modification impossible car la date d''embauche est postérieure à la date de début de la situation suivante.','1'
+'ADMPD166','STD','fr_fr','0','Modification impossible car la date d''embauche est postï¿½rieure ï¿½ la date de dï¿½but de la situation suivante.','1'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'ADMPD167' AND CODLANG = 'fr_fr' AND CODMOD ='STD'
-'ADMPD167','STD','fr_fr','0','Modification impossible car la date d''embauche est antérieure à la date de fin de la situation précédente.','1'
+'ADMPD167','STD','fr_fr','0','Modification impossible car la date d''embauche est antï¿½rieure ï¿½ la date de fin de la situation prï¿½cï¿½dente.','1'
 ##
 SYS_DEF_ERREURS
 ==
@@ -369,7 +369,7 @@ DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'ADMPD168' AND CODLANG = 'fr_fr' AND 
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'ADMPD169' AND CODLANG = 'fr_fr' AND CODMOD ='STD'
-'ADMPD169','STD','fr_fr','0','Modification impossible car la date d''embauche est postérieure à la date d''embauche initiale et n''est pas sur le même mois.','1'
+'ADMPD169','STD','fr_fr','0','Modification impossible car la date d''embauche est postï¿½rieure ï¿½ la date d''embauche initiale et n''est pas sur le mï¿½me mois.','1'
 ##
 SYS_DEF_ERREURS
 =SQL IFEXIST=SYS_DEF_ERREURS=
@@ -377,7 +377,7 @@ DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'BDG00091' AND CODLANG = 'fr_fr' AND 
 ##
 SYS_DEF_ERREURS
 =SQL IFEXIST=SYS_DEF_ERREURS=
-INSERT INTO SYS_DEF_ERREURS ( CODERR, CODMOD, CODLANG, NIV_DEFINITION, LIBERR, TYPERR ) VALUES ( 'BDG00091', 'GTA', 'fr_fr', 0, 'Vous devez sélectionner un évènement Gestil', 1 )
+INSERT INTO SYS_DEF_ERREURS ( CODERR, CODMOD, CODLANG, NIV_DEFINITION, LIBERR, TYPERR ) VALUES ( 'BDG00091', 'GTA', 'fr_fr', 0, 'Vous devez sï¿½lectionner un ï¿½vï¿½nement Gestil', 1 )
 ##
 SYS_DEF_ERREURS
 =SQL IFEXIST=SYS_DEF_ERREURS=
@@ -385,57 +385,57 @@ DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'BDG00092' AND CODLANG = 'fr_fr' AND 
 ##
 SYS_DEF_ERREURS
 =SQL IFEXIST=SYS_DEF_ERREURS=
-INSERT INTO SYS_DEF_ERREURS ( CODERR, CODMOD, CODLANG, NIV_DEFINITION, LIBERR, TYPERR ) VALUES ( 'BDG00092', 'GTA', 'fr_fr', 0, 'Vous devez sélectionner une donnée GXP', 1 )
+INSERT INTO SYS_DEF_ERREURS ( CODERR, CODMOD, CODLANG, NIV_DEFINITION, LIBERR, TYPERR ) VALUES ( 'BDG00092', 'GTA', 'fr_fr', 0, 'Vous devez sï¿½lectionner une donnï¿½e GXP', 1 )
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR IN ('GENWKF61','GENWKF62','GENWKF63','GENWKF64','GENWKF65','GENWKF66','GENWKF67','GENWKF68','GENWKF69','GENWKF70') AND CODLANG = 'fr_fr' AND CODMOD ='GEN'
-'GENWKF61','GEN','fr_fr','0','La date du départ annulée ne peut pas être antérieure à la date limite de la rétroactivité. Vous ne pouvez pas poursuivre le workflow.','1'
-'GENWKF62','GEN','fr_fr','0','Ce contrat contient plusieurs historiques. Ils seront tous supprimés à la validation du workflow.','2'
-'GENWKF63','GEN','fr_fr','0','La date de début de contrat doit être inférieure au "#1" (Date de début du contrat suivant)','1'
-'GENWKF64','GEN','fr_fr','0','La date de début de contrat doit être supérieure au "#1" (Date limite rétro)','1'
-'GENWKF65','GEN','fr_fr','0','La date de départ ne doit pas être inférieure au ‘#1'' (Date limite rétro)','1'
-'GENWKF66','GEN','fr_fr','0','La date de départ n''est pas modifiée.','1'
-'GENWKF67','GEN','fr_fr','0','La date de départ ne peut pas être inférieure ou égale à ‘#1'' (date de début de contrat)','1'
-'GENWKF68','GEN','fr_fr','0','La date de départ ne peut pas être supérieure à ‘#1'' (date de début du contrat suivant)','1'
-'GENWKF69','GEN','fr_fr','0','La date de début de contrat doit être inférieure à "#1" (date de fin du contrat)','1'
-'GENWKF70','GEN','fr_fr','0','Le salarié est toujours présent. Vous ne pouvez pas poursuivre ce workflow.','1'
+'GENWKF61','GEN','fr_fr','0','La date du dï¿½part annulï¿½e ne peut pas ï¿½tre antï¿½rieure ï¿½ la date limite de la rï¿½troactivitï¿½. Vous ne pouvez pas poursuivre le workflow.','1'
+'GENWKF62','GEN','fr_fr','0','Ce contrat contient plusieurs historiques. Ils seront tous supprimï¿½s ï¿½ la validation du workflow.','2'
+'GENWKF63','GEN','fr_fr','0','La date de dï¿½but de contrat doit ï¿½tre infï¿½rieure au "#1" (Date de dï¿½but du contrat suivant)','1'
+'GENWKF64','GEN','fr_fr','0','La date de dï¿½but de contrat doit ï¿½tre supï¿½rieure au "#1" (Date limite rï¿½tro)','1'
+'GENWKF65','GEN','fr_fr','0','La date de dï¿½part ne doit pas ï¿½tre infï¿½rieure au ï¿½#1'' (Date limite rï¿½tro)','1'
+'GENWKF66','GEN','fr_fr','0','La date de dï¿½part n''est pas modifiï¿½e.','1'
+'GENWKF67','GEN','fr_fr','0','La date de dï¿½part ne peut pas ï¿½tre infï¿½rieure ou ï¿½gale ï¿½ ï¿½#1'' (date de dï¿½but de contrat)','1'
+'GENWKF68','GEN','fr_fr','0','La date de dï¿½part ne peut pas ï¿½tre supï¿½rieure ï¿½ ï¿½#1'' (date de dï¿½but du contrat suivant)','1'
+'GENWKF69','GEN','fr_fr','0','La date de dï¿½but de contrat doit ï¿½tre infï¿½rieure ï¿½ "#1" (date de fin du contrat)','1'
+'GENWKF70','GEN','fr_fr','0','Le salariï¿½ est toujours prï¿½sent. Vous ne pouvez pas poursuivre ce workflow.','1'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'ADMPD155' AND CODLANG = 'fr_fr' AND CODMOD ='STD'
-'ADMPD155','STD','fr_fr','0','Annulation impossible car la date de départ est antérieure à la limite de la rétroactivité, et le départ est présent dans les fichiers de paie.','1'
+'ADMPD155','STD','fr_fr','0','Annulation impossible car la date de dï¿½part est antï¿½rieure ï¿½ la limite de la rï¿½troactivitï¿½, et le dï¿½part est prï¿½sent dans les fichiers de paie.','1'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'ADMPD156' AND CODLANG = 'fr_fr' AND CODMOD ='STD'
-'ADMPD156','STD','fr_fr','0','Modification impossible car la date de départ est antérieure à la limite de la rétroactivité, et le départ est présent dans les fichiers de paie.','1'
+'ADMPD156','STD','fr_fr','0','Modification impossible car la date de dï¿½part est antï¿½rieure ï¿½ la limite de la rï¿½troactivitï¿½, et le dï¿½part est prï¿½sent dans les fichiers de paie.','1'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'ADMPD164' AND CODLANG = 'fr_fr' AND CODMOD ='STD'
-'ADMPD164','STD','fr_fr','0','Modification impossible car la date d''embauche est antérieure à la limite de la rétroactivité, et l''embauche est présente dans les fichiers de paie.','1'
+'ADMPD164','STD','fr_fr','0','Modification impossible car la date d''embauche est antï¿½rieure ï¿½ la limite de la rï¿½troactivitï¿½, et l''embauche est prï¿½sente dans les fichiers de paie.','1'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'GENWKF64' AND CODLANG = 'fr_fr' AND CODMOD ='GEN'
-'GENWKF64','GEN','fr_fr','0','L''embauche est présente dans les ficiers de paie et la date de début de contrat doit être supérieure au "#1" (Date limite rétro).','1'
+'GENWKF64','GEN','fr_fr','0','L''embauche est prï¿½sente dans les ficiers de paie et la date de dï¿½but de contrat doit ï¿½tre supï¿½rieure au "#1" (Date limite rï¿½tro).','1'
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'GEN' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('GENWKF71')
-'GENWKF71','GEN','fr_fr',0,'Ce motif de départ n''est pas autorisé pour un CDI autre que Apprenti (codes types 64, 65 et 81)',1
+'GENWKF71','GEN','fr_fr',0,'Ce motif de dï¿½part n''est pas autorisï¿½ pour un CDI autre que Apprenti (codes types 64, 65 et 81)',1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'GEN' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('GENWKF71', 'GENWKF72', 'GENWKF73', 'GENWKF74', 'GENWKF75', 'GENWKF76', 'GENWKF67')
-'GENWKF71','GEN','fr_fr',0,'La date d''embauche saisie est antérieure à la limite de la rétroactivité. Il est peut-être nécessaire de saisir des données de rappel pour une prise en compte en paie.',1
-'GENWKF72','GEN','fr_fr',0,'La date de départ saisie est antérieure à la limite de la rétroactivité. Il est peut-être nécessaire de saisir des données de rappel pour une prise en compte en paie.',1
-'GENWKF73','GEN','fr_fr',0,'Ce motif de départ n''est pas autorisé pour un CDI autre que Apprenti (codes types 64, 65 et 81).',1
-'GENWKF74','GEN','fr_fr',0,'Le lot permanent est obligatoire dans ce contexte (stagiaire non rémunéré et statut DOETH renseigné).',1
-'GENWKF75','GEN','fr_fr',0,'La nouvelle date de fin de contrat est antérieure à la date d''effet du dernier historique du contrat. Vous devez d''abord supprimer les historiques postérieurs au "#1".',1
-'GENWKF76','GEN','fr_fr',0,'Le code recours saisi n''est pas autorisé pour cette nature et/ou type de contrat (il est réservé aux contrats d''apprentissage).',1
-'GENWKF67','GEN','fr_fr',0,'La date de départ ne peut pas être inférieure à "#1" (date de début de contrat).',1
+'GENWKF71','GEN','fr_fr',0,'La date d''embauche saisie est antï¿½rieure ï¿½ la limite de la rï¿½troactivitï¿½. Il est peut-ï¿½tre nï¿½cessaire de saisir des donnï¿½es de rappel pour une prise en compte en paie.',1
+'GENWKF72','GEN','fr_fr',0,'La date de dï¿½part saisie est antï¿½rieure ï¿½ la limite de la rï¿½troactivitï¿½. Il est peut-ï¿½tre nï¿½cessaire de saisir des donnï¿½es de rappel pour une prise en compte en paie.',1
+'GENWKF73','GEN','fr_fr',0,'Ce motif de dï¿½part n''est pas autorisï¿½ pour un CDI autre que Apprenti (codes types 64, 65 et 81).',1
+'GENWKF74','GEN','fr_fr',0,'Le lot permanent est obligatoire dans ce contexte (stagiaire non rï¿½munï¿½rï¿½ et statut DOETH renseignï¿½).',1
+'GENWKF75','GEN','fr_fr',0,'La nouvelle date de fin de contrat est antï¿½rieure ï¿½ la date d''effet du dernier historique du contrat. Vous devez d''abord supprimer les historiques postï¿½rieurs au "#1".',1
+'GENWKF76','GEN','fr_fr',0,'Le code recours saisi n''est pas autorisï¿½ pour cette nature et/ou type de contrat (il est rï¿½servï¿½ aux contrats d''apprentissage).',1
+'GENWKF67','GEN','fr_fr',0,'La date de dï¿½part ne peut pas ï¿½tre infï¿½rieure ï¿½ "#1" (date de dï¿½but de contrat).',1
 ##
 SYS_DEF_ERREURS
 =SQL IFEXIST=SYS_DEF_ERREURS=
@@ -443,7 +443,7 @@ DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'GES001' AND CODLANG = 'fr_fr' AND NI
 ##
 SYS_DEF_ERREURS
 =SQL IFEXIST=SYS_DEF_ERREURS=
-INSERT INTO SYS_DEF_ERREURS ( CODERR, CODMOD, CODLANG, NIV_DEFINITION, LIBERR, TYPERR ) VALUES ( 'GES001', 'ADM', 'fr_fr', 0, 'Veuillez sélectionner le type de traitement', 1 )
+INSERT INTO SYS_DEF_ERREURS ( CODERR, CODMOD, CODLANG, NIV_DEFINITION, LIBERR, TYPERR ) VALUES ( 'GES001', 'ADM', 'fr_fr', 0, 'Veuillez sï¿½lectionner le type de traitement', 1 )
 ##
 SYS_DEF_ERREURS
 =SQL IFEXIST=SYS_DEF_ERREURS=
@@ -451,7 +451,7 @@ DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'GES002' AND CODLANG = 'fr_fr' AND NI
 ##
 SYS_DEF_ERREURS
 =SQL IFEXIST=SYS_DEF_ERREURS=
-INSERT INTO SYS_DEF_ERREURS ( CODERR, CODMOD, CODLANG, NIV_DEFINITION, LIBERR, TYPERR ) VALUES ( 'GES002', 'ADM', 'fr_fr', 0, 'Veuillez sélectionner la donnée', 1 )
+INSERT INTO SYS_DEF_ERREURS ( CODERR, CODMOD, CODLANG, NIV_DEFINITION, LIBERR, TYPERR ) VALUES ( 'GES002', 'ADM', 'fr_fr', 0, 'Veuillez sï¿½lectionner la donnï¿½e', 1 )
 ##
 SYS_DEF_ERREURS
 =SQL IFEXIST=SYS_DEF_ERREURS=
@@ -459,7 +459,7 @@ DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'GES003' AND CODLANG = 'fr_fr' AND NI
 ##
 SYS_DEF_ERREURS
 =SQL IFEXIST=SYS_DEF_ERREURS=
-INSERT INTO SYS_DEF_ERREURS ( CODERR, CODMOD, CODLANG, NIV_DEFINITION, LIBERR, TYPERR ) VALUES ( 'GES003', 'ADM', 'fr_fr', 0, 'Veuillez sélectionner au moins un matricule ou une population', 1 )
+INSERT INTO SYS_DEF_ERREURS ( CODERR, CODMOD, CODLANG, NIV_DEFINITION, LIBERR, TYPERR ) VALUES ( 'GES003', 'ADM', 'fr_fr', 0, 'Veuillez sï¿½lectionner au moins un matricule ou une population', 1 )
 ##
 SYS_DEF_ERREURS
 =SQL IFEXIST=SYS_DEF_ERREURS=
@@ -467,7 +467,7 @@ DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'GES004' AND CODLANG = 'fr_fr' AND NI
 ##
 SYS_DEF_ERREURS
 =SQL IFEXIST=SYS_DEF_ERREURS=
-INSERT INTO SYS_DEF_ERREURS ( CODERR, CODMOD, CODLANG, NIV_DEFINITION, LIBERR, TYPERR ) VALUES ( 'GES004', 'ADM', 'fr_fr', 0, 'Le traitement Gestil (#1) est lancé', 1 )
+INSERT INTO SYS_DEF_ERREURS ( CODERR, CODMOD, CODLANG, NIV_DEFINITION, LIBERR, TYPERR ) VALUES ( 'GES004', 'ADM', 'fr_fr', 0, 'Le traitement Gestil (#1) est lancï¿½', 1 )
 ##
 SYS_DEF_ERREURS
 =SQL IFEXIST=SYS_DEF_ERREURS=
@@ -475,128 +475,128 @@ DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'GES005' AND CODLANG = 'fr_fr' AND NI
 ##
 SYS_DEF_ERREURS
 =SQL IFEXIST=SYS_DEF_ERREURS=
-INSERT INTO SYS_DEF_ERREURS ( CODERR, CODMOD, CODLANG, NIV_DEFINITION, LIBERR, TYPERR ) VALUES ( 'GES005', 'ADM', 'fr_fr', 0, 'Veuillez saisir les clés composées', 1 )
+INSERT INTO SYS_DEF_ERREURS ( CODERR, CODMOD, CODLANG, NIV_DEFINITION, LIBERR, TYPERR ) VALUES ( 'GES005', 'ADM', 'fr_fr', 0, 'Veuillez saisir les clï¿½s composï¿½es', 1 )
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODERR='GENWKF64' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODMOD ='GEN' 
-'GENWKF64','GEN','fr_fr',0,'L''embauche est présente dans les fichiers de paie et la date de début de contrat doit être supérieure au "#1" (Date limite rétro).',1
+'GENWKF64','GEN','fr_fr',0,'L''embauche est prï¿½sente dans les fichiers de paie et la date de dï¿½but de contrat doit ï¿½tre supï¿½rieure au "#1" (Date limite rï¿½tro).',1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'STD' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR = 'STD00108'
-'STD00108','STD','fr_fr',0,'Les fichiers contenant des macros ne sont pas autorisés pour un dépôt de fichier.',1
+'STD00108','STD','fr_fr',0,'Les fichiers contenant des macros ne sont pas autorisï¿½s pour un dï¿½pï¿½t de fichier.',1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'GEN' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('GENWKF77','GENWKF78','GENWKF79','GENWKF80','GENWKF81','GENWKF82','GENWKF83','GENWKF84','GENWKF85','GENWKF86','GENWKF87','GENWKF88','GENWKF89')
-'GENWKF77','GEN','fr_fr','0','Il n''y a pas de période suivante à celle que vous voulez insérer. Modifiez votre saisie ou utilisez le WKF nouvelle période d''emploi.','1'
-'GENWKF78','GEN','fr_fr','0','La date de début de la période insérée ne peut pas être supérieure ou égale à la date de début de la période suivante.','1'
-'GENWKF79','GEN','fr_fr','0','La date de fin de la période insérée ne peut pas être inférieure ou égale à la date de fin de la période précédente.','1'
-'GENWKF80','GEN','fr_fr','0','Insertion de période non autorisée dans le passé.','1'
-'GENWKF81','GEN','fr_fr','0','La date de début de la période ne doit pas être antérieure à la limite de la rétroactivité. ','1'
-'GENWKF82','GEN','fr_fr','0','La date de fin de la période précédente a été ajustée à J-1 de la date de début de la période insérée.','3'
-'GENWKF83','GEN','fr_fr','0','Le type de réembauche prévisionnel de la période précédente a été modifié.','3'
-'GENWKF84','GEN','fr_fr','0','La date de début de la période suivante a été ajustée à J+1 de la date de fin de la période insérée.','3'
-'GENWKF85','GEN','fr_fr','0','Le type de réembauche réél de la période suivante a été modifié.','3'
-'GENWKF86','GEN','fr_fr','0','La période d''emploi demandée (du ''#1'' au ''#2'') est en chevauchement total avec au moins une période d''emploi : du ''#3'' au ''#4''','1'
-'GENWKF87','GEN','fr_fr','0','La période d''emploi insérée est en chevauchement avec la période précédente.','2'
-'GENWKF88','GEN','fr_fr','0','La période d''emploi insérée est en chevauchement avec la période suivante.','2'
-'GENWKF89','GEN','fr_fr','0','La période d''emploi insérée est en chevauchement avec la période précédente et la période suivante.','2'
+'GENWKF77','GEN','fr_fr','0','Il n''y a pas de pï¿½riode suivante ï¿½ celle que vous voulez insï¿½rer. Modifiez votre saisie ou utilisez le WKF nouvelle pï¿½riode d''emploi.','1'
+'GENWKF78','GEN','fr_fr','0','La date de dï¿½but de la pï¿½riode insï¿½rï¿½e ne peut pas ï¿½tre supï¿½rieure ou ï¿½gale ï¿½ la date de dï¿½but de la pï¿½riode suivante.','1'
+'GENWKF79','GEN','fr_fr','0','La date de fin de la pï¿½riode insï¿½rï¿½e ne peut pas ï¿½tre infï¿½rieure ou ï¿½gale ï¿½ la date de fin de la pï¿½riode prï¿½cï¿½dente.','1'
+'GENWKF80','GEN','fr_fr','0','Insertion de pï¿½riode non autorisï¿½e dans le passï¿½.','1'
+'GENWKF81','GEN','fr_fr','0','La date de dï¿½but de la pï¿½riode ne doit pas ï¿½tre antï¿½rieure ï¿½ la limite de la rï¿½troactivitï¿½. ','1'
+'GENWKF82','GEN','fr_fr','0','La date de fin de la pï¿½riode prï¿½cï¿½dente a ï¿½tï¿½ ajustï¿½e ï¿½ J-1 de la date de dï¿½but de la pï¿½riode insï¿½rï¿½e.','3'
+'GENWKF83','GEN','fr_fr','0','Le type de rï¿½embauche prï¿½visionnel de la pï¿½riode prï¿½cï¿½dente a ï¿½tï¿½ modifiï¿½.','3'
+'GENWKF84','GEN','fr_fr','0','La date de dï¿½but de la pï¿½riode suivante a ï¿½tï¿½ ajustï¿½e ï¿½ J+1 de la date de fin de la pï¿½riode insï¿½rï¿½e.','3'
+'GENWKF85','GEN','fr_fr','0','Le type de rï¿½embauche rï¿½ï¿½l de la pï¿½riode suivante a ï¿½tï¿½ modifiï¿½.','3'
+'GENWKF86','GEN','fr_fr','0','La pï¿½riode d''emploi demandï¿½e (du ''#1'' au ''#2'') est en chevauchement total avec au moins une pï¿½riode d''emploi : du ''#3'' au ''#4''','1'
+'GENWKF87','GEN','fr_fr','0','La pï¿½riode d''emploi insï¿½rï¿½e est en chevauchement avec la pï¿½riode prï¿½cï¿½dente.','2'
+'GENWKF88','GEN','fr_fr','0','La pï¿½riode d''emploi insï¿½rï¿½e est en chevauchement avec la pï¿½riode suivante.','2'
+'GENWKF89','GEN','fr_fr','0','La pï¿½riode d''emploi insï¿½rï¿½e est en chevauchement avec la pï¿½riode prï¿½cï¿½dente et la pï¿½riode suivante.','2'
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'GEN' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('GENWKF71', 'GENWKF72')
-'GENWKF71','GEN','fr_fr',0,'La date d''embauche saisie est antérieure à la limite de la rétroactivité. Il est peut-être nécessaire de saisir des données de rappel pour une prise en compte en paie.',2
-'GENWKF72','GEN','fr_fr',0,'La date de départ saisie est antérieure à la limite de la rétroactivité. Il est peut-être nécessaire de saisir des données de rappel pour une prise en compte en paie.',2
+'GENWKF71','GEN','fr_fr',0,'La date d''embauche saisie est antï¿½rieure ï¿½ la limite de la rï¿½troactivitï¿½. Il est peut-ï¿½tre nï¿½cessaire de saisir des donnï¿½es de rappel pour une prise en compte en paie.',2
+'GENWKF72','GEN','fr_fr',0,'La date de dï¿½part saisie est antï¿½rieure ï¿½ la limite de la rï¿½troactivitï¿½. Il est peut-ï¿½tre nï¿½cessaire de saisir des donnï¿½es de rappel pour une prise en compte en paie.',2
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'STD' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR = 'STD00109'
-'STD00109','STD','fr_fr',0,'Vous n''avez pas les droits d''accéder à ces données',1
+'STD00109','STD','fr_fr',0,'Vous n''avez pas les droits d''accï¿½der ï¿½ ces donnï¿½es',1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'STD' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('MOB00042','MOB00043','MOB00044','MOB00045','MOB00046')
-'MOB00042','STD','fr_fr',0,'#1.#2 l''orgoid #3 présent dans le header est différent de celui du client dans la VarSys NS_CLIENT_ID.',1
-'MOB00043','STD','fr_fr',0,'#1.#2 l''associateoid #3 présent dans le header n''existe pas pour le client.',1
+'MOB00042','STD','fr_fr',0,'#1.#2 l''orgoid #3 prï¿½sent dans le header est diffï¿½rent de celui du client dans la VarSys NS_CLIENT_ID.',1
+'MOB00043','STD','fr_fr',0,'#1.#2 l''associateoid #3 prï¿½sent dans le header n''existe pas pour le client.',1
 'MOB00044','STD','fr_fr',0,'#1.#2  l''associateoid #3  n''existe pas pour le client .',1
-'MOB00045','STD','fr_fr',0,'#1.#2  la liste demandée est vide.',1
+'MOB00045','STD','fr_fr',0,'#1.#2  la liste demandï¿½e est vide.',1
 'MOB00046','STD','fr_fr',0,'#1 est un email non valide.',1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'HRO' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR = 'HROCTL95'
-'HROCTL95','HRO','fr_fr',0,'Propagation de la suppression impossible : cette entité a des entités qui lui sont rattachées ou des collaborateurs affectés ou un changement d''entité mère.',1
+'HROCTL95','HRO','fr_fr',0,'Propagation de la suppression impossible : cette entitï¿½ a des entitï¿½s qui lui sont rattachï¿½es ou des collaborateurs affectï¿½s ou un changement d''entitï¿½ mï¿½re.',1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'GEN' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR = 'GENHOR47'
-'GENHOR47','GEN','fr_fr','0','Le taux employeur multiple doit être inférieur à 100',1
+'GENHOR47','GEN','fr_fr','0','Le taux employeur multiple doit ï¿½tre infï¿½rieur ï¿½ 100',1
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'STD00110' AND CODMOD = 'STD' AND CODLANG = 'fr_fr' AND NIV_DEFINITION = '0'
-'STD00110','STD','fr_fr','0','Une incohérence dans les données du collaborateur sélectionné est survenue, veuillez interroger l''écran.','1'
+'STD00110','STD','fr_fr','0','Une incohï¿½rence dans les donnï¿½es du collaborateur sï¿½lectionnï¿½ est survenue, veuillez interroger l''ï¿½cran.','1'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODMOD = 'DEL' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('DELGST46','DELGST47','DELGST48','DELGST49','DELGST50')
-'DELGST46','DEL','fr_fr',0,'Le délégateur est de type T3. Le délégué doit être  abonné au service  Gestil pour déléguer la fonction métier gestion de temps UX.',1
-'DELGST47','DEL','fr_fr',0,'Un erreur se produit lors  de l''ajout d''une délagtion dans gestil : #1 ',1
-'DELGST48','DEL','fr_fr',0,'Un erreur se produit lors  de modification d''une délagtion dans gestil : #1 ',1
-'DELGST49','DEL','fr_fr',0,'Un erreur se produit lors  de suppression  d''une délagtion dans gestil : #1 ',1
-'DELGST50','DEL','fr_fr',0,'Un erreur se produit lors  de recherche  d''une délagtion dans gestil : #1 ',1
+'DELGST46','DEL','fr_fr',0,'Le dï¿½lï¿½gateur est de type T3. Le dï¿½lï¿½guï¿½ doit ï¿½tre  abonnï¿½ au service  Gestil pour dï¿½lï¿½guer la fonction mï¿½tier gestion de temps UX.',1
+'DELGST47','DEL','fr_fr',0,'Un erreur se produit lors  de l''ajout d''une dï¿½lagtion dans gestil : #1 ',1
+'DELGST48','DEL','fr_fr',0,'Un erreur se produit lors  de modification d''une dï¿½lagtion dans gestil : #1 ',1
+'DELGST49','DEL','fr_fr',0,'Un erreur se produit lors  de suppression  d''une dï¿½lagtion dans gestil : #1 ',1
+'DELGST50','DEL','fr_fr',0,'Un erreur se produit lors  de recherche  d''une dï¿½lagtion dans gestil : #1 ',1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'HRO' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('HROARB39', 'HROARB40')
-'HROARB39','HRO','fr_fr',0,'Action interdite : vous n''avez pas les autorisations pour exécuter cette fonctionnalité.',1
-'HROARB40','HRO','fr_fr',0,'Vous ne disposez pas des habilitation nécessaires sur au moins une des filles de l''entité #1 dans la structure #2.',1
+'HROARB39','HRO','fr_fr',0,'Action interdite : vous n''avez pas les autorisations pour exï¿½cuter cette fonctionnalitï¿½.',1
+'HROARB40','HRO','fr_fr',0,'Vous ne disposez pas des habilitation nï¿½cessaires sur au moins une des filles de l''entitï¿½ #1 dans la structure #2.',1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'HRO' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('HROCTL54')
-'HROCTL54','HRO','fr_fr',0,'Vous ne disposez pas des habilitations nécessaires pour l''entité #1 dans la structure #2.',1
+'HROCTL54','HRO','fr_fr',0,'Vous ne disposez pas des habilitations nï¿½cessaires pour l''entitï¿½ #1 dans la structure #2.',1
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODMOD = 'DEL' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('DELGST46','DELGST47','DELGST48','DELGST49','DELGST50')
-'DELGST46','DEL','fr_fr',0,'Le délégateur est de type T3. Le délégué doit être  abonné au service  Gestil pour déléguer la fonction métier gestion de temps UX.',1
-'DELGST47','DEL','fr_fr',0,'Une erreur s''est produite lors de l''ajout d''une délégation dans gestil : #1 ',1
-'DELGST48','DEL','fr_fr',0,'Une erreur s''est produite lors de la modification d''une délégation dans gestil : #1 ',1
-'DELGST49','DEL','fr_fr',0,'Une erreur s''est produite lors de la suppression d''une délégation dans gestil : #1 ',1
-'DELGST50','DEL','fr_fr',0,'Une erreur s''est produite lors de la recherche d''une délégation dans gestil : #1 ',1
+'DELGST46','DEL','fr_fr',0,'Le dï¿½lï¿½gateur est de type T3. Le dï¿½lï¿½guï¿½ doit ï¿½tre  abonnï¿½ au service  Gestil pour dï¿½lï¿½guer la fonction mï¿½tier gestion de temps UX.',1
+'DELGST47','DEL','fr_fr',0,'Une erreur s''est produite lors de l''ajout d''une dï¿½lï¿½gation dans gestil : #1 ',1
+'DELGST48','DEL','fr_fr',0,'Une erreur s''est produite lors de la modification d''une dï¿½lï¿½gation dans gestil : #1 ',1
+'DELGST49','DEL','fr_fr',0,'Une erreur s''est produite lors de la suppression d''une dï¿½lï¿½gation dans gestil : #1 ',1
+'DELGST50','DEL','fr_fr',0,'Une erreur s''est produite lors de la recherche d''une dï¿½lï¿½gation dans gestil : #1 ',1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'GEN' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('GENWKF90','GENWKF91','GENWKF92')
-'GENWKF90','GEN','fr_fr',0,'Avec la période insérée, les types de réembauche ne sont plus valides. Veuillez vous assurer de la cohérence des informations (types de réembauche, report et liquidation des familles de données…)',2
-'GENWKF91','GEN','fr_fr',0,'Avec la période insérée, le type de réembauche n''est plus valide. Veuillez vous assurer de la cohérence des informations (type de réembauche, report des familles de données…)',2
-'GENWKF92','GEN','fr_fr',0,'Avec la période insérée, le type de réembauche prévisionnelle n''est plus valide. Veuillez vous assurer de la cohérence des informations (type de réembauche, liquidation des familles de données…)',2
+'GENWKF90','GEN','fr_fr',0,'Avec la pï¿½riode insï¿½rï¿½e, les types de rï¿½embauche ne sont plus valides. Veuillez vous assurer de la cohï¿½rence des informations (types de rï¿½embauche, report et liquidation des familles de donnï¿½esï¿½)',2
+'GENWKF91','GEN','fr_fr',0,'Avec la pï¿½riode insï¿½rï¿½e, le type de rï¿½embauche n''est plus valide. Veuillez vous assurer de la cohï¿½rence des informations (type de rï¿½embauche, report des familles de donnï¿½esï¿½)',2
+'GENWKF92','GEN','fr_fr',0,'Avec la pï¿½riode insï¿½rï¿½e, le type de rï¿½embauche prï¿½visionnelle n''est plus valide. Veuillez vous assurer de la cohï¿½rence des informations (type de rï¿½embauche, liquidation des familles de donnï¿½esï¿½)',2
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'GEN' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('GENWKF96','GENWKF97')
-'GENWKF96','GEN','fr_fr',0,'Cette entrée rétroactive nécessite de saisir sur le mois de paie en cours le nombre de jours de plafond SS (élément P311) à ajouter au titre des mois antérieurs au mois de paie en cours.',2
-'GENWKF97','GEN','fr_fr',0,'Cette sortie rétroactive nécessite de saisir sur le mois de paie en cours le nombre de jours de plafond SS (élément P311) à déduire (sens "moins") au titre des mois antérieurs au mois de paie en cours.',2
+'GENWKF96','GEN','fr_fr',0,'Cette entrï¿½e rï¿½troactive nï¿½cessite de saisir sur le mois de paie en cours le nombre de jours de plafond SS (ï¿½lï¿½ment P311) ï¿½ ajouter au titre des mois antï¿½rieurs au mois de paie en cours.',2
+'GENWKF97','GEN','fr_fr',0,'Cette sortie rï¿½troactive nï¿½cessite de saisir sur le mois de paie en cours le nombre de jours de plafond SS (ï¿½lï¿½ment P311) ï¿½ dï¿½duire (sens "moins") au titre des mois antï¿½rieurs au mois de paie en cours.',2
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'GEN' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR = 'GENMAN05'
-'GENMAN05','GEN','fr_fr',0,'Le code mandat saisi est interdit depuis le 01/01/2020 suite à la mise en place du C.S.E. (Comité Social et Economique)',1
+'GENMAN05','GEN','fr_fr',0,'Le code mandat saisi est interdit depuis le 01/01/2020 suite ï¿½ la mise en place du C.S.E. (Comitï¿½ Social et Economique)',1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'GEN' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('GENWKF93','GENWKF94','GENWKF95')
-'GENWKF93','GEN','fr_fr',0,'Le salarié sélectionné n''a pas de période d''emploi correspondant à la demande car l''embauche est présente dans les fichiers de paie.',1
-'GENWKF94','GEN','fr_fr',0,'Le salarié sélectionné n''a pas de période d''emploi correspondant à la demande car soit l''embauche est présente dans les fichiers de paie, soit elle n''est pas incluse dans la profondeur de rétro.',1
-'GENWKF95','GEN','fr_fr',0,'Le salarié sélectionné n''a pas de période d''emploi correspondant à la demande car soit le départ est présent dans les fichiers de paie, soit il n''est pas inclus dans la profondeur de rétro, soit le type de réembauche est consécutif',2
+'GENWKF93','GEN','fr_fr',0,'Le salariï¿½ sï¿½lectionnï¿½ n''a pas de pï¿½riode d''emploi correspondant ï¿½ la demande car l''embauche est prï¿½sente dans les fichiers de paie.',1
+'GENWKF94','GEN','fr_fr',0,'Le salariï¿½ sï¿½lectionnï¿½ n''a pas de pï¿½riode d''emploi correspondant ï¿½ la demande car soit l''embauche est prï¿½sente dans les fichiers de paie, soit elle n''est pas incluse dans la profondeur de rï¿½tro.',1
+'GENWKF95','GEN','fr_fr',0,'Le salariï¿½ sï¿½lectionnï¿½ n''a pas de pï¿½riode d''emploi correspondant ï¿½ la demande car soit le dï¿½part est prï¿½sent dans les fichiers de paie, soit il n''est pas inclus dans la profondeur de rï¿½tro, soit le type de rï¿½embauche est consï¿½cutif',2
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'GEN' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR = 'GENWKF99'
-'GENWKF99','GEN','fr_fr',0,'Ce salarié n''a aucune période fermée. Vous ne pouvez pas poursuivre ce workflow.',1
+'GENWKF99','GEN','fr_fr',0,'Ce salariï¿½ n''a aucune pï¿½riode fermï¿½e. Vous ne pouvez pas poursuivre ce workflow.',1
 ##
 SYS_DEF_ERREURS
 ==
@@ -606,28 +606,28 @@ DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'GTA00134' AND CODLANG = 'fr_fr' AND 
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'STD00111' AND CODMOD = 'STD' AND CODLANG = 'fr_fr' AND NIV_DEFINITION = '0'
-'STD00111','STD','fr_fr','0','Inscription impossible car aucun train de paie n''est planifié.','1'
+'STD00111','STD','fr_fr','0','Inscription impossible car aucun train de paie n''est planifiï¿½.','1'
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('ADMPD170','ADMPD171','ADMPD172','ADMPD173','ADMPD174')
-'ADMPD170','STD','fr_fr',0,'Vérifiez que les boutons du tableau multiple sont renseignés.',1
-'ADMPD171','STD','fr_fr',0,'Le libellé bouton est obligatoire.',1
-'ADMPD172','STD','fr_fr',0,'Le code opération est obligatoire.',1
-'ADMPD173','STD','fr_fr',0,'Le code opération ne doit contenir que des chiffres, des lettres (majuscules ou minuscules) et des underscores.',1
-'ADMPD174','STD','fr_fr',0,'Le même libellé bouton ou code opération est utilisé plus qu''une fois.',1
+'ADMPD170','STD','fr_fr',0,'Vï¿½rifiez que les boutons du tableau multiple sont renseignï¿½s.',1
+'ADMPD171','STD','fr_fr',0,'Le libellï¿½ bouton est obligatoire.',1
+'ADMPD172','STD','fr_fr',0,'Le code opï¿½ration est obligatoire.',1
+'ADMPD173','STD','fr_fr',0,'Le code opï¿½ration ne doit contenir que des chiffres, des lettres (majuscules ou minuscules) et des underscores.',1
+'ADMPD174','STD','fr_fr',0,'Le mï¿½me libellï¿½ bouton ou code opï¿½ration est utilisï¿½ plus qu''une fois.',1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('GENWKF64','GENWKF94','GENWKF95')
-'GENWKF64','GEN','fr_fr',0,'L''embauche étant présente dans les fichiers paie, la date de début de contrat doit être supérieure ou égale au "#1" (Date limite rétro).',1
-'GENWKF94','GEN','fr_fr',0,'Le salarié sélectionné n''a pas de période d''emploi correspondant à la demande car l''embauche n''est pas incluse dans la profondeur de rétro.',1
-'GENWKF95','GEN','fr_fr',0,'Le salarié sélectionné n''a pas de période d''emploi correspondant à la demande car soit le départ est présent dans les fichiers de paie et il n''est pas inclus dans la profondeur de rétro, soit le type de réembauche est consécutif.',1
+'GENWKF64','GEN','fr_fr',0,'L''embauche ï¿½tant prï¿½sente dans les fichiers paie, la date de dï¿½but de contrat doit ï¿½tre supï¿½rieure ou ï¿½gale au "#1" (Date limite rï¿½tro).',1
+'GENWKF94','GEN','fr_fr',0,'Le salariï¿½ sï¿½lectionnï¿½ n''a pas de pï¿½riode d''emploi correspondant ï¿½ la demande car l''embauche n''est pas incluse dans la profondeur de rï¿½tro.',1
+'GENWKF95','GEN','fr_fr',0,'Le salariï¿½ sï¿½lectionnï¿½ n''a pas de pï¿½riode d''emploi correspondant ï¿½ la demande car soit le dï¿½part est prï¿½sent dans les fichiers de paie et il n''est pas inclus dans la profondeur de rï¿½tro, soit le type de rï¿½embauche est consï¿½cutif.',1
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'MOB00049' AND CODLANG = 'fr_fr' AND NIV_DEFINITION = 0
-'MOB00049','STD','fr_fr',0,'Cette URI n''est pas autorisée pour votre application.',1
+'MOB00049','STD','fr_fr',0,'Cette URI n''est pas autorisï¿½e pour votre application.',1
 ##
 SYS_DEF_ERREURS
 ==
@@ -636,23 +636,23 @@ DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'WKABS049' AND CODLANG = 'fr_fr' AND 
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'ADM00014' AND CODLANG = 'fr_fr' AND NIV_DEFINITION = 0
-'ADM00014','STD','fr_fr',0,'Problème lors du déchiffrement.',1
+'ADM00014','STD','fr_fr',0,'Problï¿½me lors du dï¿½chiffrement.',1
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'TGE00352' AND CODLANG = 'fr_fr' AND NIV_DEFINITION = 0
-'TGE00352','TGE','fr_fr',0,'Une paie est en cours d''exécution.',1
+'TGE00352','TGE','fr_fr',0,'Une paie est en cours d''exï¿½cution.',1
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE  CODLANG = 'fr_fr' AND NIV_DEFINITION = 0 AND CODERR in ('MOB00052', 'MOB00053')
 'MOB00052','STD','fr_fr',0,'Le code origine est obligatoire.',1
-'MOB00053','STD','fr_fr',0,'Erreur de paramétrage: le code origine n''est pas renseigné pour votre application .',1
+'MOB00053','STD','fr_fr',0,'Erreur de paramï¿½trage: le code origine n''est pas renseignï¿½ pour votre application .',1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'TGE' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('TGE00353')
-'TGE00353','TGE','fr_fr',0,'Êtes-vous sûr de vouloir escalader votre demande ?',1
+'TGE00353','TGE','fr_fr',0,'ï¿½tes-vous sï¿½r de vouloir escalader votre demande ?',1
 ##
 SYS_DEF_ERREURS
 ==
@@ -665,25 +665,25 @@ INSERT INTO SYS_DEF_ERREURS(CODERR, CODMOD, CODLANG, NIV_DEFINITION, LIBERR, TYP
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where  CODLANG = 'fr_fr'  and CODERR in ('GENCNT77','GENWKF95')
-'GENCNT77','GEN','fr_fr',0,'Il existe une date de fin de contrat pour ce salarié. La date de fin prévue du CDD ne peut pas être postérieure à cette fin de contrat.',1
-'GENWKF95','GEN','fr_fr',0,'Le salarié sélectionné n''a pas de période d''emploi correspondant à la demande car le départ est présent dans les fichiers de paie et il n''est pas inclus dans la profondeur de rétro.',1
+'GENCNT77','GEN','fr_fr',0,'Il existe une date de fin de contrat pour ce salariï¿½. La date de fin prï¿½vue du CDD ne peut pas ï¿½tre postï¿½rieure ï¿½ cette fin de contrat.',1
+'GENWKF95','GEN','fr_fr',0,'Le salariï¿½ sï¿½lectionnï¿½ n''a pas de pï¿½riode d''emploi correspondant ï¿½ la demande car le dï¿½part est prï¿½sent dans les fichiers de paie et il n''est pas inclus dans la profondeur de rï¿½tro.',1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where  CODLANG = 'fr_fr'  and CODERR in ('STD00049','STD00014','STD00072') 
-'STD00049','STD','fr_fr',0,'Vous n''avez pas les autorisations nécessaires pour utiliser la période d''emploi #1 du PAC #2.',1
-'STD00014','STD','fr_fr',0,'Vous n''avez pas les autorisations nécessaires pour utiliser l''identifiant RH #',1
-'STD00072','STD','fr_fr',0,'Vous n''avez pas les autorisations nécessaires pour utiliser le matricule #1 du PAC #2.',1
+'STD00049','STD','fr_fr',0,'Vous n''avez pas les autorisations nï¿½cessaires pour utiliser la pï¿½riode d''emploi #1 du PAC #2.',1
+'STD00014','STD','fr_fr',0,'Vous n''avez pas les autorisations nï¿½cessaires pour utiliser l''identifiant RH #',1
+'STD00072','STD','fr_fr',0,'Vous n''avez pas les autorisations nï¿½cessaires pour utiliser le matricule #1 du PAC #2.',1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('ADMAC001')
-'ADMAC001','ADM','fr_fr',0,'La modification de la sécurité a été validée avec succès.',3
+'ADMAC001','ADM','fr_fr',0,'La modification de la sï¿½curitï¿½ a ï¿½tï¿½ validï¿½e avec succï¿½s.',3
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('GENWK103')
-'GENWK103','GEN','fr_fr','0','Vous venez de mettre à jour une mutuelle avec une date antérieure au mois de paie en cours. Des rappels de paie sont peut-être à saisir pour régulariser les cotisations.','2'
+'GENWK103','GEN','fr_fr','0','Vous venez de mettre ï¿½ jour une mutuelle avec une date antï¿½rieure au mois de paie en cours. Des rappels de paie sont peut-ï¿½tre ï¿½ saisir pour rï¿½gulariser les cotisations.','2'
 ##
 SYS_DEF_ERREURS
 ==
@@ -692,30 +692,30 @@ delete from SYS_DEF_ERREURS where coderr = 'FORDIP06'
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where coderr in ('GENDIP06','GENDIP07')
-'GENDIP06','GEN','fr_fr','0','La donnée ''Niveau de formation de plus élevé obtenu'' est obligatoire pour ce salarié.','1'
-'GENDIP07','GEN','fr_fr','0','La donnée ''Niveau de diplôme préparé'' est obligatoire pour ce salarié.','1'
+'GENDIP06','GEN','fr_fr','0','La donnï¿½e ''Niveau de formation de plus ï¿½levï¿½ obtenu'' est obligatoire pour ce salariï¿½.','1'
+'GENDIP07','GEN','fr_fr','0','La donnï¿½e ''Niveau de diplï¿½me prï¿½parï¿½'' est obligatoire pour ce salariï¿½.','1'
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('ESGGPS01', 'ESGGPS02', 'ESGGPS03', 'ESGGPS04', 'ESGGPS05', 'ESGGPS06', 'ESGGPS07', 'ESGGPS08', 'ESGGPS09', 'ESGGPS10', 'ESGGPS11', 'ESGGPS12', 'ESGGPS13', 'ESGGPS14', 'ESGGPS15', 'ESGGPS16', 'ESGGPS17', 'ESGGPS18')
-'ESGGPS01','ESG','fr_fr','0','Veuillez sélectionner un groupe de signataires.','3'
+'ESGGPS01','ESG','fr_fr','0','Veuillez sï¿½lectionner un groupe de signataires.','3'
 'ESGGPS02','ESG','fr_fr','0','Voulez-vous supprimer ce(s) signataire(s) ?','3'
-'ESGGPS03','ESG','fr_fr','0','Veuillez sélectionner au moins un signataire.','3'
-'ESGGPS04','ESG','fr_fr','0','Problème lors de l''ajout des signataires au groupe de signataires.','1'
+'ESGGPS03','ESG','fr_fr','0','Veuillez sï¿½lectionner au moins un signataire.','3'
+'ESGGPS04','ESG','fr_fr','0','Problï¿½me lors de l''ajout des signataires au groupe de signataires.','1'
 'ESGGPS05','ESG','fr_fr','0','Le code groupe signataires est obligatoire.','1'
-'ESGGPS06','ESG','fr_fr','0','Le signataire #1 existe déjà dans le groupe de signataires #2.','3'
-'ESGGPS07','ESG','fr_fr','0','Problème lors de la suppression du/des signataire(s) appartenant au groupe de signataires.','1'
-'ESGGPS08','ESG','fr_fr','0','Problème lors de l''ajout du groupe de signataires.','1'
-'ESGGPS09','ESG','fr_fr','0','Le groupe signataires #1 existe déjà.','1'
+'ESGGPS06','ESG','fr_fr','0','Le signataire #1 existe dï¿½jï¿½ dans le groupe de signataires #2.','3'
+'ESGGPS07','ESG','fr_fr','0','Problï¿½me lors de la suppression du/des signataire(s) appartenant au groupe de signataires.','1'
+'ESGGPS08','ESG','fr_fr','0','Problï¿½me lors de l''ajout du groupe de signataires.','1'
+'ESGGPS09','ESG','fr_fr','0','Le groupe signataires #1 existe dï¿½jï¿½.','1'
 'ESGGPS10','ESG','fr_fr','0','Le groupe signataires #1 n''existe pas.','1'
-'ESGGPS11','ESG','fr_fr','0','Voulez-vous supprimer ce groupe de signataires. Ceci va supprimer ce groupe de signataires sur toutes les entités qui lui sont associées.','3'
-'ESGGPS12','ESG','fr_fr','0','Problème lors de la suppression du groupe de signataires.','3'
-'ESGGPS13','ESG','fr_fr','0','Attention, la taille de l''écran empêche l''affichage des tableaux.','3'
-'ESGGPS14','ESG','fr_fr','0','Les signataires suivants (#1) existent déjà dans le groupe de signataires : #2.','3'
-'ESGGPS15','ESG','fr_fr','0','Ce groupe de signataires n''est associé à aucune entité d''un arbre HRO.','3'
-'ESGGPS16','ESG','fr_fr','0','Etes-vous sûr de vouloir désigner ce signataire comme signataire par défaut ? Un seul signataire peut être désigné à la fois.','3'
-'ESGGPS17','ESG','fr_fr','0','Problème lors de la désignation du signataire par défaut.','3'
-'ESGGPS18','ESG','fr_fr','0','Ce groupe de signataires n''a pas encore de signataire par défaut désigné.','3'
+'ESGGPS11','ESG','fr_fr','0','Voulez-vous supprimer ce groupe de signataires. Ceci va supprimer ce groupe de signataires sur toutes les entitï¿½s qui lui sont associï¿½es.','3'
+'ESGGPS12','ESG','fr_fr','0','Problï¿½me lors de la suppression du groupe de signataires.','3'
+'ESGGPS13','ESG','fr_fr','0','Attention, la taille de l''ï¿½cran empï¿½che l''affichage des tableaux.','3'
+'ESGGPS14','ESG','fr_fr','0','Les signataires suivants (#1) existent dï¿½jï¿½ dans le groupe de signataires : #2.','3'
+'ESGGPS15','ESG','fr_fr','0','Ce groupe de signataires n''est associï¿½ ï¿½ aucune entitï¿½ d''un arbre HRO.','3'
+'ESGGPS16','ESG','fr_fr','0','Etes-vous sï¿½r de vouloir dï¿½signer ce signataire comme signataire par dï¿½faut ? Un seul signataire peut ï¿½tre dï¿½signï¿½ ï¿½ la fois.','3'
+'ESGGPS17','ESG','fr_fr','0','Problï¿½me lors de la dï¿½signation du signataire par dï¿½faut.','3'
+'ESGGPS18','ESG','fr_fr','0','Ce groupe de signataires n''a pas encore de signataire par dï¿½faut dï¿½signï¿½.','3'
 ##
 SYS_DEF_ERREURS
 ==
@@ -725,42 +725,42 @@ delete from SYS_DEF_ERREURS where CODMOD = 'HRO' and CODLANG = 'fr_fr' and NIV_D
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('ESGGPS19', 'ESGGPS20', 'ESGGPS21')
-'ESGGPS19','ESG','fr_fr','0','Les signataires suivants ne sont plus présents (#1), ils ne peuvent pas être ajoutés au groupe de signataires #2.','1'
-'ESGGPS20','ESG','fr_fr','0','Le signataire suivant n''est plus présent (#1), il ne peut pas être ajouté au groupe de signataires #2.','1'
-'ESGGPS21','ESG','fr_fr','0','Tous les signataires du groupe de signataires #1 ne sont plus présents.','1'
+'ESGGPS19','ESG','fr_fr','0','Les signataires suivants ne sont plus prï¿½sents (#1), ils ne peuvent pas ï¿½tre ajoutï¿½s au groupe de signataires #2.','1'
+'ESGGPS20','ESG','fr_fr','0','Le signataire suivant n''est plus prï¿½sent (#1), il ne peut pas ï¿½tre ajoutï¿½ au groupe de signataires #2.','1'
+'ESGGPS21','ESG','fr_fr','0','Tous les signataires du groupe de signataires #1 ne sont plus prï¿½sents.','1'
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('ESGCHX04', 'ESGCHX05')
-'ESGCHX04','ESG','fr_fr','0','Problème lors de la récupération de l''entité du salarié.','1'
-'ESGCHX05','ESG','fr_fr','0','Pas de groupe de signataires associé à l''entité juridique du salarié ou bien le groupe est vide.','1'
+'ESGCHX04','ESG','fr_fr','0','Problï¿½me lors de la rï¿½cupï¿½ration de l''entitï¿½ du salariï¿½.','1'
+'ESGCHX05','ESG','fr_fr','0','Pas de groupe de signataires associï¿½ ï¿½ l''entitï¿½ juridique du salariï¿½ ou bien le groupe est vide.','1'
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where coderr in ('ABS00069','ABS00070')
-'ABS00069','GTA','fr_fr','0','Vous ne pouvez pas modifier le statut de cette pièce justificative','1'
+'ABS00069','GTA','fr_fr','0','Vous ne pouvez pas modifier le statut de cette piï¿½ce justificative','1'
 'ABS00070','GTA','fr_fr','0','Le statut est invalide','1'
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('IMPGR044')
-'IMPGR044','TGE','fr_fr',0,'La ligne du fichier excel est incomplète.',3
+'IMPGR044','TGE','fr_fr',0,'La ligne du fichier excel est incomplï¿½te.',3
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR = 'GENPRE10'
-'GENPRE10','GEN','fr_fr','0','Pour information, mail et téléphone professionnels ou personnels sont obligatoires en cas de signature électronique. Veuillez compléter votre saisie, le cas échéant.','2'
+'GENPRE10','GEN','fr_fr','0','Pour information, mail et tï¿½lï¿½phone professionnels ou personnels sont obligatoires en cas de signature ï¿½lectronique. Veuillez complï¿½ter votre saisie, le cas ï¿½chï¿½ant.','2'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR ='GENWK105' AND CODMOD ='GEN' AND CODLANG = 'fr_fr' AND NIV_DEFINITION = 0
-'GENWK105','GEN','fr_fr','0','La date d''attribution du véhicule ne peut pas être antérieure à celle du contrat. Veuillez corriger votre saisie.','1'
+'GENWK105','GEN','fr_fr','0','La date d''attribution du vï¿½hicule ne peut pas ï¿½tre antï¿½rieure ï¿½ celle du contrat. Veuillez corriger votre saisie.','1'
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('IMPEX084', 'IMPEX034')
-'IMPEX084','TGE','fr_fr','0','Une erreur s''est produite pendant la suppression de la ligne d''annulation importée.','1'
-'IMPEX034','TGE','fr_fr','0','Le type de l''import n''est pas correct : #1 (DV -> #2, Elément -> #3, DR -> #4, DR cotis. -> #5, Incident -> #6, Absence -> #7, GAP -> #8, GAP RETRO -> #9, Annulation -> #10).','1'
+'IMPEX084','TGE','fr_fr','0','Une erreur s''est produite pendant la suppression de la ligne d''annulation importï¿½e.','1'
+'IMPEX034','TGE','fr_fr','0','Le type de l''import n''est pas correct : #1 (DV -> #2, Elï¿½ment -> #3, DR -> #4, DR cotis. -> #5, Incident -> #6, Absence -> #7, GAP -> #8, GAP RETRO -> #9, Annulation -> #10).','1'
 ##
 SYS_DEF_ERREURS
 ==
@@ -770,27 +770,27 @@ delete from SYS_DEF_ERREURS where CODMOD = 'STD' and CODLANG = 'fr_fr' and NIV_D
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODLANG = 'fr_fr' and  CODERR in ('GENWK100', 'GENWK101','GENWK102','GENCNT78')
-'GENWK100','GEN','fr_fr','0','Pour information, il y a une suspension de contrat toujours en cours pour ce salarié. Assurez-vous que votre action est justifiée.','2'
-'GENWK101','GEN','fr_fr','0','Pour information, la période insérée est en chevauchement partiel ou total avec une période de suspension pour ce salarié.  Assurez-vous que votre action est justifiée.','2'
+'GENWK100','GEN','fr_fr','0','Pour information, il y a une suspension de contrat toujours en cours pour ce salariï¿½. Assurez-vous que votre action est justifiï¿½e.','2'
+'GENWK101','GEN','fr_fr','0','Pour information, la pï¿½riode insï¿½rï¿½e est en chevauchement partiel ou total avec une pï¿½riode de suspension pour ce salariï¿½.  Assurez-vous que votre action est justifiï¿½e.','2'
 'GENWK102','GEN','fr_fr','0','Il y a une suspension de contrat en cours sur votre dossier, votre demande ne peut aboutir.','1'
-'GENCNT78','GEN','fr_fr','0','Attention, la date de fin prévue du CDD est antérieure à la date de fin prévue de la suspension de contrat. Assurez-vous de la cohérence et faites les modifications nécessaires.','2'
+'GENCNT78','GEN','fr_fr','0','Attention, la date de fin prï¿½vue du CDD est antï¿½rieure ï¿½ la date de fin prï¿½vue de la suspension de contrat. Assurez-vous de la cohï¿½rence et faites les modifications nï¿½cessaires.','2'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR ='GENWKF13' AND CODMOD ='GEN' AND CODLANG = 'fr_fr' AND NIV_DEFINITION = 0
-'GENWKF13','GEN','fr_fr','0','La date d''effet est antérieure à la date de paie en cours. Il est peut-être nécessaire de saisir des données de rappels.','2'
+'GENWKF13','GEN','fr_fr','0','La date d''effet est antï¿½rieure ï¿½ la date de paie en cours. Il est peut-ï¿½tre nï¿½cessaire de saisir des donnï¿½es de rappels.','2'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR IN ('STDTAB80','STDTAB81') AND CODMOD ='TAB' AND CODLANG = 'fr_fr' AND NIV_DEFINITION = 0
 'STDTAB80','TAB','fr_fr','0','L''alias # n''est plus consultable depuis les API Marketplace','2'
-'STDTAB81','TAB','fr_fr','0','Cet id Marketplace est déjà associé à l''alias ','2'
+'STDTAB81','TAB','fr_fr','0','Cet id Marketplace est dï¿½jï¿½ associï¿½ ï¿½ l''alias ','2'
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('EDI00098', 'EDI00099')
-'EDI00098','EDI','fr_fr','0','La génération se terminera dans quelques instants. Vous serez averti lorsque le fichier sera prêt. Il sera accessible depuis l''écran Fichiers disponibles.','1'
-'EDI00099','EDI','fr_fr','0','La génération est en cours, merci de patienter. Vous pouvez fermer ce slide-in, vous serez averti lorsque le fichier sera disponible','1'
+'EDI00098','EDI','fr_fr','0','La gï¿½nï¿½ration se terminera dans quelques instants. Vous serez averti lorsque le fichier sera prï¿½t. Il sera accessible depuis l''ï¿½cran Fichiers disponibles.','1'
+'EDI00099','EDI','fr_fr','0','La gï¿½nï¿½ration est en cours, merci de patienter. Vous pouvez fermer ce slide-in, vous serez averti lorsque le fichier sera disponible','1'
 ##
 SYS_DEF_ERREURS
 ==
@@ -800,13 +800,13 @@ delete from SYS_DEF_ERREURS where CODMOD = 'STD' and CODLANG = 'fr_fr' and NIV_D
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODMOD IN ('WKF','GEN') and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and coderr = 'GENWKF49'
-'GENWKF49','WKF','fr_fr','0','Le salarié partant est manager hiérarchique, merci de prévoir le nom de son remplaçant sur sa structure hiérarchique #','1'
+'GENWKF49','WKF','fr_fr','0','Le salariï¿½ partant est manager hiï¿½rarchique, merci de prï¿½voir le nom de son remplaï¿½ant sur sa structure hiï¿½rarchique #','1'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('EDI00098', 'EDI00099')
-'EDI00098','EDI','fr_fr','0','La génération se terminera dans quelques instants. Vous serez averti.e lorsque le fichier sera prêt. Il sera accessible depuis l''écrans Fichiers disponible.','2'
-'EDI00099','EDI','fr_fr','0','La génération est en cours, merci de patienter. Vous pouvez fermer ce slide-in, vous serez averti.e lorsque le fichier sera disponible','2'
+'EDI00098','EDI','fr_fr','0','La gï¿½nï¿½ration se terminera dans quelques instants. Vous serez averti.e lorsque le fichier sera prï¿½t. Il sera accessible depuis l''ï¿½crans Fichiers disponible.','2'
+'EDI00099','EDI','fr_fr','0','La gï¿½nï¿½ration est en cours, merci de patienter. Vous pouvez fermer ce slide-in, vous serez averti.e lorsque le fichier sera disponible','2'
 ##
 SYS_DEF_ERREURS
 ==
@@ -826,177 +826,177 @@ DELETE FROM SYS_DEF_ERREURS WHERE CODMOD = 'HRO' and CODLANG = 'fr_fr'  and CODE
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODMOD = 'ADM' and CODLANG = 'fr_fr'  and CODERR='ADMUSR06' and NIV_DEFINITION = 0
-'ADMUSR06','ADM','fr_fr',0,'L''adresse email ''#'' n''est pas conforme. Il faut la changer dans son écran d''origine.',1
+'ADMUSR06','ADM','fr_fr',0,'L''adresse email ''#'' n''est pas conforme. Il faut la changer dans son ï¿½cran d''origine.',1
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODMOD = 'ADM' and CODLANG = 'fr_fr'  and CODERR='ADMUSR05' and NIV_DEFINITION = 0
-'ADMUSR05','ADM','fr_fr',0,'L''adresse email ''#'' n''est pas conforme. Il faut la changer dans son écran d''origine.',1
+'ADMUSR05','ADM','fr_fr',0,'L''adresse email ''#'' n''est pas conforme. Il faut la changer dans son ï¿½cran d''origine.',1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and  CODERR = 'GENPRE11' 
-'GENPRE11','GEN','fr_fr','0','Il y a déjà 3 contacts d''urgence saisis pour ce collaborateur.','1'
+'GENPRE11','GEN','fr_fr','0','Il y a dï¿½jï¿½ 3 contacts d''urgence saisis pour ce collaborateur.','1'
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'HRO' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and  CODERR in ('HROCTL96', 'HROCTL97') 
-'HROCTL96','HRO','fr_fr','0','L''entité #1 de la structure #2 est rattachée au moins à un dossier à partir de la date du #3.','1'
-'HROCTL97','HRO','fr_fr','0','Au moins une entité fille de l''entité mère #1 de la structure #2 est rattachée à un dossier à partir de la date du #3.','1'
+'HROCTL96','HRO','fr_fr','0','L''entitï¿½ #1 de la structure #2 est rattachï¿½e au moins ï¿½ un dossier ï¿½ partir de la date du #3.','1'
+'HROCTL97','HRO','fr_fr','0','Au moins une entitï¿½ fille de l''entitï¿½ mï¿½re #1 de la structure #2 est rattachï¿½e ï¿½ un dossier ï¿½ partir de la date du #3.','1'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODMOD = 'TAB' AND CODLANG = 'fr_fr' AND CODERR = 'STDTAB82' AND NIV_DEFINITION = 0
-'STDTAB82','TAB','fr_fr',0,'Veuillez d''abord définir au moins une clé pour cette table.',1
+'STDTAB82','TAB','fr_fr',0,'Veuillez d''abord dï¿½finir au moins une clï¿½ pour cette table.',1
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODMOD = 'TAB' AND CODLANG = 'fr_fr' AND CODERR = 'STDTAB83' AND NIV_DEFINITION = 0
-'STDTAB83','TAB','fr_fr',0,'La zone #1 doit être au format date (format : #2).',1
+'STDTAB83','TAB','fr_fr',0,'La zone #1 doit ï¿½tre au format date (format : #2).',1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'EDI' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and  CODERR in ('EDI00098', 'EDI00099') 
-'EDI00098','EDI','fr_fr','0','La génération se terminera dans quelques instants. Vous verrez le fichier apparaître dans "Mes fichiers récents". Il sera accessible depuis l''écran Fichiers disponibles.','2'
-'EDI00099','EDI','fr_fr','0','La génération est en cours, merci de patienter. Vous pouvez fermer ce slide-in, vous verrez le fichier apparaître dans "Mes fichiers récents".','2'
+'EDI00098','EDI','fr_fr','0','La gï¿½nï¿½ration se terminera dans quelques instants. Vous verrez le fichier apparaï¿½tre dans "Mes fichiers rï¿½cents". Il sera accessible depuis l''ï¿½cran Fichiers disponibles.','2'
+'EDI00099','EDI','fr_fr','0','La gï¿½nï¿½ration est en cours, merci de patienter. Vous pouvez fermer ce slide-in, vous verrez le fichier apparaï¿½tre dans "Mes fichiers rï¿½cents".','2'
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'STD' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and  CODERR in ('ADMWE004') 
-'ADMWE004','STD','fr_fr','0','Ce matricule a déjà été attribué au login suivant : #1, qui n''est pas déclaré dans l''application. Merci de l''importer pour pouvoir le mettre à jour.','4'
+'ADMWE004','STD','fr_fr','0','Ce matricule a dï¿½jï¿½ ï¿½tï¿½ attribuï¿½ au login suivant : #1, qui n''est pas dï¿½clarï¿½ dans l''application. Merci de l''importer pour pouvoir le mettre ï¿½ jour.','4'
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and  CODERR = 'GENHOZ02' 
-'GENHOZ02','GEN','fr_fr','0','Le nombre de jours hebdo de TAD ne peut pas être supérieur à 6 jours. Veuillez corriger votre saisie;','1'
+'GENHOZ02','GEN','fr_fr','0','Le nombre de jours hebdo de TAD ne peut pas ï¿½tre supï¿½rieur ï¿½ 6 jours. Veuillez corriger votre saisie;','1'
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'TGE' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('TGE00354')
-'TGE00354','TGE','fr_fr',0,'Êtes-vous sûr de vouloir changer le statut de votre demande à ',1
+'TGE00354','TGE','fr_fr',0,'ï¿½tes-vous sï¿½r de vouloir changer le statut de votre demande ï¿½ ',1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'ADM' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and  CODERR in ('DOCSV068','DOCSV069','DOCSV070') 
-'DOCSV068','ADM','fr_fr','0','La conversion  est en cours de traitement, veuillez rafraîchir l''écran','1'
-'DOCSV069','ADM','fr_fr','0','Le pdf chargé n''est pas valide','1'
-'DOCSV070','ADM','fr_fr','0','La conversion par docserver a échouée','1'
+'DOCSV068','ADM','fr_fr','0','La conversion  est en cours de traitement, veuillez rafraï¿½chir l''ï¿½cran','1'
+'DOCSV069','ADM','fr_fr','0','Le pdf chargï¿½ n''est pas valide','1'
+'DOCSV070','ADM','fr_fr','0','La conversion par docserver a ï¿½chouï¿½e','1'
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'TGE' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('TGE00355','TGE00356','TGE00357')
-'TGE00355','TGE','fr_fr',0,'Impossible de modifier le PAC associé à cette entité, car un ou plusieurs collaborateurs y sont affectés',1
-'TGE00356','TGE','fr_fr',0,'Impossible de supprimer le(s) PAC(s) suivant(s) de la liste des PACs de l''entité, car un ou plusieurs collaborateurs y sont affectés : # ',1
-'TGE00357','TGE','fr_fr',0,'Cette entité a été supprimée des VR pour le(s) PAC(s) suivant(s) : # ',1
+'TGE00355','TGE','fr_fr',0,'Impossible de modifier le PAC associï¿½ ï¿½ cette entitï¿½, car un ou plusieurs collaborateurs y sont affectï¿½s',1
+'TGE00356','TGE','fr_fr',0,'Impossible de supprimer le(s) PAC(s) suivant(s) de la liste des PACs de l''entitï¿½, car un ou plusieurs collaborateurs y sont affectï¿½s : # ',1
+'TGE00357','TGE','fr_fr',0,'Cette entitï¿½ a ï¿½tï¿½ supprimï¿½e des VR pour le(s) PAC(s) suivant(s) : # ',1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'STD' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('ADMPD175','ADMPD176','ADMPD177','ADMPD178')
 'ADMPD175','STD','fr_fr',0,'La valeur # n''existe pas pour le champ #',1
 'ADMPD176','STD','fr_fr',0,'Au moins l''une des valeurs de la liste # n''existe pas pour le champ #',1
-'ADMPD177','STD','fr_fr',0,'Le nombre maximum de valeurs que vous pouvez sélectionner pour la donnée # est : #',1
+'ADMPD177','STD','fr_fr',0,'Le nombre maximum de valeurs que vous pouvez sï¿½lectionner pour la donnï¿½e # est : #',1
 'ADMPD178','STD','fr_fr',0,'Les valeurs # n''existent pas pour le champ #',1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'TGE' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR = 'TGE00358'
-'TGE00358','TGE','fr_fr',0,'La date de début de l''incident n''est pas cohérente avec la période d''emploi.',1
+'TGE00358','TGE','fr_fr',0,'La date de dï¿½but de l''incident n''est pas cohï¿½rente avec la pï¿½riode d''emploi.',1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR = 'ADMPD040'
-'ADMPD040','STD','fr_fr',0,'Ce dictionnaire existe déjà.',1
+'ADMPD040','STD','fr_fr',0,'Ce dictionnaire existe dï¿½jï¿½.',1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('ADMGP001', 'ADMGP002', 'ADMGP003','ADMGP004','ADMGP005','ADMGP006','ADMGP007')
-'ADMGP001','ADM','fr_fr',0,'Veuillez sélectionner un projet.',1
-'ADMGP002','ADM','fr_fr',0,'Problème lors de l''ajout des intervenants au projet.',1
+'ADMGP001','ADM','fr_fr',0,'Veuillez sï¿½lectionner un projet.',1
+'ADMGP002','ADM','fr_fr',0,'Problï¿½me lors de l''ajout des intervenants au projet.',1
 'ADMGP003','ADM','fr_fr',0,'Voulez-vous supprimer ce(s) intervenant(s) ?',3
-'ADMGP004','ADM','fr_fr',0,'Veuillez sélectionner au moins un intervenant.',3
-'ADMGP005','ADM','fr_fr',0,'L''intervenant #1 ne peut pas être supprimé.',	3
-'ADMGP006','ADM','fr_fr',0,'Les intervenants (#1) ne peuvent pas  être supprimés.', 3
+'ADMGP004','ADM','fr_fr',0,'Veuillez sï¿½lectionner au moins un intervenant.',3
+'ADMGP005','ADM','fr_fr',0,'L''intervenant #1 ne peut pas ï¿½tre supprimï¿½.',	3
+'ADMGP006','ADM','fr_fr',0,'Les intervenants (#1) ne peuvent pas  ï¿½tre supprimï¿½s.', 3
 'ADMGP007','ADM','fr_fr',0,'Vous ne pouvez pas travailler sur un projet sur lequel vous n''intervenez pas',3
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR = 'ADMPD179'
-'ADMPD179','ADM','fr_fr',0,'L''identifiant du groupe a été modifié, vous devez interroger avant de supprimer',1
+'ADMPD179','ADM','fr_fr',0,'L''identifiant du groupe a ï¿½tï¿½ modifiï¿½, vous devez interroger avant de supprimer',1
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODLANG = 'fr_fr' AND NIV_DEFINITION = '0' AND CODERR IN ('ADMPD180', 'ADMPD181', 'ADMPD182', 'ADMPD183', 'ADMPD184', 'ADMPD185' )
-'ADMPD180','ADM','fr_fr',0,'Voulez vous supprimer la donnée #1 ?',1
-'ADMPD181','ADM','fr_fr',0,'La suppression de la donnée #1 a été effectuée avec succès.', 3
-'ADMPD182','ADM','fr_fr',0,'La donnée #1 a été #2', 3
-'ADMPD183','ADM','fr_fr',0,'La suppression de la donnée #1 est interdite car elle est mise au produit.', 3
+'ADMPD180','ADM','fr_fr',0,'Voulez vous supprimer la donnï¿½e #1 ?',1
+'ADMPD181','ADM','fr_fr',0,'La suppression de la donnï¿½e #1 a ï¿½tï¿½ effectuï¿½e avec succï¿½s.', 3
+'ADMPD182','ADM','fr_fr',0,'La donnï¿½e #1 a ï¿½tï¿½ #2', 3
+'ADMPD183','ADM','fr_fr',0,'La suppression de la donnï¿½e #1 est interdite car elle est mise au produit.', 3
 'ADMPD184','ADM','fr_fr',0,'La suppression du dictionnaire #1 est interdite.', 2
 'ADMPD185','ADM','fr_fr',0,'Voulez vous supprimer le dictionnaire ? ', 3
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODLANG = 'fr_fr' AND NIV_DEFINITION = '0' AND CODERR IN ('ADMPD186','ADMPD187')
-'ADMPD186','ADM','fr_fr',0,'L''identifiant du groupe a été modifié, vous devez interroger avant de modifier',1
-'ADMPD187','ADM','fr_fr',0,'Vous ne pouvez pas modifier ce groupe de données',1
+'ADMPD186','ADM','fr_fr',0,'L''identifiant du groupe a ï¿½tï¿½ modifiï¿½, vous devez interroger avant de modifier',1
+'ADMPD187','ADM','fr_fr',0,'Vous ne pouvez pas modifier ce groupe de donnï¿½es',1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'GEN' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR = 'GENMUT10'
-'GENMUT10','GEN','fr_fr',0,'Une période dans contrat courant postérieure à la date de mise à jour existe et empêche la validation. Merci de supprimer l''occurence dans contrat courant',1
+'GENMUT10','GEN','fr_fr',0,'Une pï¿½riode dans contrat courant postï¿½rieure ï¿½ la date de mise ï¿½ jour existe et empï¿½che la validation. Merci de supprimer l''occurence dans contrat courant',1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'GEN' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('GENCHS13','GENCHS14','GENCHS15')
-'GENCHS13','GEN','fr_fr','0','Si le code statut BOETH est 02 (bénéficiaire AT/MP) alors le taux d''IPP doit être supérieur ou égal à 10%. Si le taux IPP est inférieur, le code statut DOETH 02 ne peut pas être déclaré en DSN.','2'
-'GENCHS14','GEN','fr_fr','0','Si le code statut BOETH est 02 (bénéficiaire AT/MP) alors la rente doit être cochée à Oui. S''il n''y a pas de rente, le code statut DOETH 02 ne peut pas être déclaré en DSN.','2'
-'GENCHS15','GEN','fr_fr','0','Les types de reconnaissance doivent être différents ou différent du statut OETH. Veuillez corriger votre saisie.','1'
+'GENCHS13','GEN','fr_fr','0','Si le code statut BOETH est 02 (bï¿½nï¿½ficiaire AT/MP) alors le taux d''IPP doit ï¿½tre supï¿½rieur ou ï¿½gal ï¿½ 10%. Si le taux IPP est infï¿½rieur, le code statut DOETH 02 ne peut pas ï¿½tre dï¿½clarï¿½ en DSN.','2'
+'GENCHS14','GEN','fr_fr','0','Si le code statut BOETH est 02 (bï¿½nï¿½ficiaire AT/MP) alors la rente doit ï¿½tre cochï¿½e ï¿½ Oui. S''il n''y a pas de rente, le code statut DOETH 02 ne peut pas ï¿½tre dï¿½clarï¿½ en DSN.','2'
+'GENCHS15','GEN','fr_fr','0','Les types de reconnaissance doivent ï¿½tre diffï¿½rents ou diffï¿½rent du statut OETH. Veuillez corriger votre saisie.','1'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM sys_def_erreurs WHERE CODMOD = 'TGE' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR = 'ZPP00026'
-'ZPP00026','TGE','fr_fr','0','Confirmez-vous l''arrêt de ce traitement ?','3'
+'ZPP00026','TGE','fr_fr','0','Confirmez-vous l''arrï¿½t de ce traitement ?','3'
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'TGE' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR = 'ZPP00027'
-'ZPP00027','TGE','fr_fr',0,'Demande d''interruption du traitement effectuée',2
+'ZPP00027','TGE','fr_fr',0,'Demande d''interruption du traitement effectuï¿½e',2
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'TGE' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR = 'ZPP00028'
-'ZPP00028','TGE','fr_fr',0,'Ce traitement n''est plus en cours d''exécution',2
+'ZPP00028','TGE','fr_fr',0,'Ce traitement n''est plus en cours d''exï¿½cution',2
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'GEN' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR = 'GENAPP08'
-'GENAPP08','GEN','fr_fr',0,'Pour un mode de rémunération au taux horaire, le code catégorie professionnelle doit être 40-employés horaire ou 41-ouvriers horaire. Veuillez corriger votre saisie.',1
+'GENAPP08','GEN','fr_fr',0,'Pour un mode de rï¿½munï¿½ration au taux horaire, le code catï¿½gorie professionnelle doit ï¿½tre 40-employï¿½s horaire ou 41-ouvriers horaire. Veuillez corriger votre saisie.',1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'ADM' and CODLANG = 'fr_fr' and NIV_DEFINITION = 0 and CODERR in ('DOCSV071','DOCSV072','DOCSV073','DOCSV074','DOCSV075')
 'DOCSV071','ADM','fr_fr',0,'Le paragraphe #1 (#2) n''est pas dans le DSF.',1
-'DOCSV072','ADM','fr_fr',0,'La maquette #1 n''a pas de paragraphes associés.',1
-'DOCSV073','ADM','fr_fr',0,'Le paragraphe #1 a été rejeté par Docserv3.',1
-'DOCSV074','ADM','fr_fr',0,'La maquette n''a pas été traitée.',1
-'DOCSV075','ADM','fr_fr',0,'Certains paragraphes de la maquette #1 n''ont pas pu être publiés.',1
+'DOCSV072','ADM','fr_fr',0,'La maquette #1 n''a pas de paragraphes associï¿½s.',1
+'DOCSV073','ADM','fr_fr',0,'Le paragraphe #1 a ï¿½tï¿½ rejetï¿½ par Docserv3.',1
+'DOCSV074','ADM','fr_fr',0,'La maquette n''a pas ï¿½tï¿½ traitï¿½e.',1
+'DOCSV075','ADM','fr_fr',0,'Certains paragraphes de la maquette #1 n''ont pas pu ï¿½tre publiï¿½s.',1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODLANG = 'fr_fr' and NIV_DEFINITION = 0 and CODERR in ('GENWK106','GENWK107','GENWK108','GENWK109','GENFCN43','GENFCN44','GENFCN45','GENFCN46','GENFCN47','GENFCN48')
-'GENFCN43','GEN','fr_fr','0','La date du dernier jour travaillé doit être supérieure ou égale à la date de début de contrat.','1'
-'GENFCN44','GEN','fr_fr','0','La date du dernier jour travaillé doit être inférieure ou égale à la date de fin de contrat.','1'
-'GENFCN45','GEN','fr_fr','0','La date du dernier jour travaillé doit être inférieure à la date de début de la suspension du contrat.','1'
-'GENFCN46','GEN','fr_fr','0','La date d''engagement de la procédure de licenciement doit être au moins égale au début de préavis','1'
-'GENFCN47','GEN','fr_fr','0','La période de préavis est renseignée et elle est comprise dans la période contractuelle : il faut préciser s''il s''agit d''un préavis effectué payé ou d''un préavis non effectué payé. Veuillez compléter votre saisie.','1'
-'GENWK106','GEN','fr_fr','0','La date de notification du départ ne peut pas être antérieure à celle du contrat. Veuillez corriger votre saisie.','1'
-'GENWK107','GEN','fr_fr','0','La date de notification du départ ne peut pas être postérieure à celle de la fin du contrat. Veuillez corriger votre saisie.','1'
-'GENWK108','GEN','fr_fr','0','La date d''engagement de la procédure de licenciement  ne peut être antérieure à celle du contrat. Veuillez corriger votre saisie.','1'
-'GENWK109','GEN','fr_fr','0','La date d''engagement de la procédure de licenciement ne peut être postérieure à celle de la fin du contrat. Veuillez corriger votre saisie.','1'
+'GENFCN43','GEN','fr_fr','0','La date du dernier jour travaillï¿½ doit ï¿½tre supï¿½rieure ou ï¿½gale ï¿½ la date de dï¿½but de contrat.','1'
+'GENFCN44','GEN','fr_fr','0','La date du dernier jour travaillï¿½ doit ï¿½tre infï¿½rieure ou ï¿½gale ï¿½ la date de fin de contrat.','1'
+'GENFCN45','GEN','fr_fr','0','La date du dernier jour travaillï¿½ doit ï¿½tre infï¿½rieure ï¿½ la date de dï¿½but de la suspension du contrat.','1'
+'GENFCN46','GEN','fr_fr','0','La date d''engagement de la procï¿½dure de licenciement doit ï¿½tre au moins ï¿½gale au dï¿½but de prï¿½avis','1'
+'GENFCN47','GEN','fr_fr','0','La pï¿½riode de prï¿½avis est renseignï¿½e et elle est comprise dans la pï¿½riode contractuelle : il faut prï¿½ciser s''il s''agit d''un prï¿½avis effectuï¿½ payï¿½ ou d''un prï¿½avis non effectuï¿½ payï¿½. Veuillez complï¿½ter votre saisie.','1'
+'GENWK106','GEN','fr_fr','0','La date de notification du dï¿½part ne peut pas ï¿½tre antï¿½rieure ï¿½ celle du contrat. Veuillez corriger votre saisie.','1'
+'GENWK107','GEN','fr_fr','0','La date de notification du dï¿½part ne peut pas ï¿½tre postï¿½rieure ï¿½ celle de la fin du contrat. Veuillez corriger votre saisie.','1'
+'GENWK108','GEN','fr_fr','0','La date d''engagement de la procï¿½dure de licenciement  ne peut ï¿½tre antï¿½rieure ï¿½ celle du contrat. Veuillez corriger votre saisie.','1'
+'GENWK109','GEN','fr_fr','0','La date d''engagement de la procï¿½dure de licenciement ne peut ï¿½tre postï¿½rieure ï¿½ celle de la fin du contrat. Veuillez corriger votre saisie.','1'
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR = 'DOCSV076'
-'DOCSV076','ADM','fr_fr',0,'Le document n''est plus compatible docserv v2 si elle est publié sans style.',2
+'DOCSV076','ADM','fr_fr',0,'Le document n''est plus compatible docserv v2 si elle est publiï¿½ sans style.',2
 ##
 SYS_DEF_ERREURS
 ==
@@ -1015,56 +1015,56 @@ delete from SYS_DEF_ERREURS where CODMOD = 'DEL' and CODLANG = 'fr_fr' and NIV_D
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODLANG = 'fr_fr' AND NIV_DEFINITION = '0' AND CODERR IN ('ADMPD188', 'ADMPD189', 'ADMPD190', 'ADMPD191', 'ADMPD192', 'ADMPD193','ADMPD194','ADMPD195' )
-'ADMPD188','ADM','fr_fr',0,'La validation de l''ergonomie de l''écran #1 a été effectuée avec succès.',3
-'ADMPD189','ADM','fr_fr',0,'L''annulation de l''ergonomie de l''écran #1 a été effectuée avec succès.',3
+'ADMPD188','ADM','fr_fr',0,'La validation de l''ergonomie de l''ï¿½cran #1 a ï¿½tï¿½ effectuï¿½e avec succï¿½s.',3
+'ADMPD189','ADM','fr_fr',0,'L''annulation de l''ergonomie de l''ï¿½cran #1 a ï¿½tï¿½ effectuï¿½e avec succï¿½s.',3
 'ADMPD190','ADM','fr_fr',0,'Le dictionnaire est obligatoire.',2
-'ADMPD191','ADM','fr_fr',0,'Aucun groupe de présentation pour l''écran #1 .',1
-'ADMPD192','ADM','fr_fr',0,'Veuillez sélectionner une règle de gestion.',3
-'ADMPD193','ADM','fr_fr',0,'Veuillez sélectionner un appel table.',3
-'ADMPD194','ADM','fr_fr',0,'Vous devez saisir le paramétrage du composant Recherche Structure.',1
-'ADMPD195','ADM','fr_fr',0,'Aucun écran n''est sélectionné.',3
+'ADMPD191','ADM','fr_fr',0,'Aucun groupe de prï¿½sentation pour l''ï¿½cran #1 .',1
+'ADMPD192','ADM','fr_fr',0,'Veuillez sï¿½lectionner une rï¿½gle de gestion.',3
+'ADMPD193','ADM','fr_fr',0,'Veuillez sï¿½lectionner un appel table.',3
+'ADMPD194','ADM','fr_fr',0,'Vous devez saisir le paramï¿½trage du composant Recherche Structure.',1
+'ADMPD195','ADM','fr_fr',0,'Aucun ï¿½cran n''est sï¿½lectionnï¿½.',3
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODLANG = 'fr_fr' AND NIV_DEFINITION = '0' AND CODERR IN ('ADMPD196','ADMPD197','ADMPD198','ADMPD199','ADMPD200','ADMPD201','ADMPD202','ADMPD203','ADMPD204','ADMPD205')
-'ADMPD196','ADM','fr_fr',0,'Le nom de l''écran est requis pour cette action.',3
-'ADMPD197','ADM','fr_fr',0,'Vous devez sélectionner un projet dans un premier temps.',3
-'ADMPD198','ADM','fr_fr',0,'Veuillez saisir les données des pièces jointes UX.',3
-'ADMPD199','ADM','fr_fr',0,'Le module sélectionné n''existe pas.',3
-'ADMPD200','ADM','fr_fr',0,'La validation a été effectuée avec succès.',3
-'ADMPD201','ADM','fr_fr',0,'Êtes vous sûr de bien vouloir supprimer ?',3
-'ADMPD202','ADM','fr_fr',0,'Création de l''écran réussie.',3
-'ADMPD203','ADM','fr_fr',0,'Duplication de l''écran réussie.',3
-'ADMPD204','ADM','fr_fr',0,'Veuillez saisir les données des pièces jointes UX.',3
-'ADMPD205','ADM','fr_fr',0,'La donnée sélectionnée n''est pas mappée avec UX.',3
+'ADMPD196','ADM','fr_fr',0,'Le nom de l''ï¿½cran est requis pour cette action.',3
+'ADMPD197','ADM','fr_fr',0,'Vous devez sï¿½lectionner un projet dans un premier temps.',3
+'ADMPD198','ADM','fr_fr',0,'Veuillez saisir les donnï¿½es des piï¿½ces jointes UX.',3
+'ADMPD199','ADM','fr_fr',0,'Le module sï¿½lectionnï¿½ n''existe pas.',3
+'ADMPD200','ADM','fr_fr',0,'La validation a ï¿½tï¿½ effectuï¿½e avec succï¿½s.',3
+'ADMPD201','ADM','fr_fr',0,'ï¿½tes vous sï¿½r de bien vouloir supprimer ?',3
+'ADMPD202','ADM','fr_fr',0,'Crï¿½ation de l''ï¿½cran rï¿½ussie.',3
+'ADMPD203','ADM','fr_fr',0,'Duplication de l''ï¿½cran rï¿½ussie.',3
+'ADMPD204','ADM','fr_fr',0,'Veuillez saisir les donnï¿½es des piï¿½ces jointes UX.',3
+'ADMPD205','ADM','fr_fr',0,'La donnï¿½e sï¿½lectionnï¿½e n''est pas mappï¿½e avec UX.',3
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODLANG = 'fr_fr' AND NIV_DEFINITION = '0' AND CODERR IN ('ADMPD206', 'ADMPD207')
-'ADMPD206','ADM','fr_fr',0,'Veuillez choisir un fichier à importer.',3
-'ADMPD207','ADM','fr_fr',0,'L''import du fichier a été réalisé avec succès.',3
+'ADMPD206','ADM','fr_fr',0,'Veuillez choisir un fichier ï¿½ importer.',3
+'ADMPD207','ADM','fr_fr',0,'L''import du fichier a ï¿½tï¿½ rï¿½alisï¿½ avec succï¿½s.',3
 ##
 sys_def_erreurs
 ==
 DELETE FROM sys_def_erreurs WHERE coderr IN ('GAP00225', 'GAP00226') AND codlang = 'fr_fr' AND niv_definition = 0
 'GAP00225','GAP','fr_fr','0','Veuillez entrer un fichier avec une extension valide (png, jpg, jpeg, pdf, gif)','1'
-'GAP00226','GAP','fr_fr','0','La résolution du document n''a pas permis l''extraction de toutes les données. Si nécessaire, veuillez compléter le formulaire.','2'
+'GAP00226','GAP','fr_fr','0','La rï¿½solution du document n''a pas permis l''extraction de toutes les donnï¿½es. Si nï¿½cessaire, veuillez complï¿½ter le formulaire.','2'
 ##
 sys_def_erreurs
 ==
 DELETE FROM sys_def_erreurs WHERE CODERR = 'GAP00227' AND codlang = 'fr_fr' and niv_definition = 0
-'GAP00227','GAP','fr_fr','0','Erreur de paramétrage, veuillez contacter votre administrateur.','1'
+'GAP00227','GAP','fr_fr','0','Erreur de paramï¿½trage, veuillez contacter votre administrateur.','1'
 ##
 sys_def_erreurs
 ==
 DELETE FROM sys_def_erreurs WHERE coderr = 'GAP00228' AND codlang = 'fr_fr' and niv_definition = 0
-'GAP00228','GAP','fr_fr','0','Les données ont été extraites du document avec succès.','3'
+'GAP00228','GAP','fr_fr','0','Les donnï¿½es ont ï¿½tï¿½ extraites du document avec succï¿½s.','3'
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'API' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('API00001', 'API00002')
-'API00001', 'API', 'fr_fr', 0, 'La personnalisation du mapping de #1 pour le numéro de pac #2 n''existe pas.', 1
-'API00002', 'API', 'fr_fr', 0, 'Le mapping #1 pour le numéro de pac #2 n''existe pas.', 1
+'API00001', 'API', 'fr_fr', 0, 'La personnalisation du mapping de #1 pour le numï¿½ro de pac #2 n''existe pas.', 1
+'API00002', 'API', 'fr_fr', 0, 'Le mapping #1 pour le numï¿½ro de pac #2 n''existe pas.', 1
 ##
 SYS_DEF_ERREURS
 ==
@@ -1080,22 +1080,22 @@ delete from SYS_DEF_ERREURS where CODMOD = 'GEN' and CODLANG = 'fr_fr' and NIV_D
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'GEN' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('GENAPP11','GENAPP12','GENWK111')
-'GENAPP11','GEN','fr_fr',0,'Le code catégorie professionnelle 40 -employé horaire ou 41-ouvrier horaire est interdit pour un autre mode de rémunération que taux horaire. Veuillez corriger votre saisie.',1
-'GENAPP12','GEN','fr_fr',0,'Veuillez noter que pour un mode de rémunération au taux horaire, le code catégorie professionnelle doit être 40-employés horaire ou 41-ouvriers horaire.',2
-'GENWK111','GEN','fr_fr',0,'Les données de mobilité internationale ne sont accessibles que pour les types de contrat EXPATRIES ou DETACHES. Veuillez au préalable modifier le type de contrat en sélectionnant l''évènement ''Avenant CDI'' ou ''Avenant CDD'' puis l''acte de gestion ''Modification du type de contrat''.',1
+'GENAPP11','GEN','fr_fr',0,'Le code catï¿½gorie professionnelle 40 -employï¿½ horaire ou 41-ouvrier horaire est interdit pour un autre mode de rï¿½munï¿½ration que taux horaire. Veuillez corriger votre saisie.',1
+'GENAPP12','GEN','fr_fr',0,'Veuillez noter que pour un mode de rï¿½munï¿½ration au taux horaire, le code catï¿½gorie professionnelle doit ï¿½tre 40-employï¿½s horaire ou 41-ouvriers horaire.',2
+'GENWK111','GEN','fr_fr',0,'Les donnï¿½es de mobilitï¿½ internationale ne sont accessibles que pour les types de contrat EXPATRIES ou DETACHES. Veuillez au prï¿½alable modifier le type de contrat en sï¿½lectionnant l''ï¿½vï¿½nement ''Avenant CDI'' ou ''Avenant CDD'' puis l''acte de gestion ''Modification du type de contrat''.',1
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR IN ('ESGLAN05','ESGLAN10','ESGSGN22') AND CODLANG = 'fr_fr' AND NIV_DEFINITION = 0 AND CODMOD ='ESG'
-'ESGLAN05', 'ESG', 'fr_fr', 0, 'La donnée obligatoire téléphone du contractant est manquante.', 1
-'ESGLAN10', 'ESG', 'fr_fr', 0, 'La donnée obligatoire téléphone du mandataire # est manquante.', 1
-'ESGSGN22', 'ESG', 'fr_fr', 0, 'Les paramètres ont bien été enregistrés.', 4
+'ESGLAN05', 'ESG', 'fr_fr', 0, 'La donnï¿½e obligatoire tï¿½lï¿½phone du contractant est manquante.', 1
+'ESGLAN10', 'ESG', 'fr_fr', 0, 'La donnï¿½e obligatoire tï¿½lï¿½phone du mandataire # est manquante.', 1
+'ESGSGN22', 'ESG', 'fr_fr', 0, 'Les paramï¿½tres ont bien ï¿½tï¿½ enregistrï¿½s.', 4
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR IN ('ESGSGN23','ESGSGN24') AND CODLANG = 'fr_fr' AND NIV_DEFINITION = 0 AND CODMOD ='ESG'
-'ESGSGN23', 'ESG', 'fr_fr', 0, 'Vous n''êtes pas autorisé à # cette procédure', 1
-'ESGSGN24', 'ESG', 'fr_fr', 0, 'Vous n''êtes pas autorisé à # ce signataire', 1
+'ESGSGN23', 'ESG', 'fr_fr', 0, 'Vous n''ï¿½tes pas autorisï¿½ ï¿½ # cette procï¿½dure', 1
+'ESGSGN24', 'ESG', 'fr_fr', 0, 'Vous n''ï¿½tes pas autorisï¿½ ï¿½ # ce signataire', 1
 ##
 SYS_DEF_ERREURS
 ==
@@ -1105,46 +1105,46 @@ delete from SYS_DEF_ERREURS where CODMOD = 'API' and CODLANG = 'fr_fr' and NIV_D
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'GEN' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('GENAPP07')
-'GENAPP07', 'GEN', 'fr_fr', 0, 'Quand le salarie est diminué, le type d''évolution "collectif" n''est pas cohérent. Si le type d''évolution est "individuel", alors le motif doit être soit un changement d''horaire, soit un déclassement. Veuillez corriger votre saisie.', 1
+'GENAPP07', 'GEN', 'fr_fr', 0, 'Quand le salarie est diminuï¿½, le type d''ï¿½volution "collectif" n''est pas cohï¿½rent. Si le type d''ï¿½volution est "individuel", alors le motif doit ï¿½tre soit un changement d''horaire, soit un dï¿½classement. Veuillez corriger votre saisie.', 1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'GEN' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('GENAPP03', 'GENWK116')
-'GENAPP03', 'GEN', 'fr_fr', 0, 'Quand la date d''effet est égale à la date de début de contrat, vous ne devez modifier que le salaire car ce n''est pas une augmentation. Veuillez corriger votre saisie : pas de motif d''augmentation et pas de type d''évolution de rémunération. ', 1
-'GENWK116', 'GEN', 'fr_fr', 0, 'La date d''effet de la modification est égale à la date de début du contrat. Dans ce cas, il ne peut pas y avoir d''augmentation de rémunération mais juste une modification du salaire. Cette action n''est pas possible via le WKF. Elle doit être réalisée sur contrat courant.', 1
+'GENAPP03', 'GEN', 'fr_fr', 0, 'Quand la date d''effet est ï¿½gale ï¿½ la date de dï¿½but de contrat, vous ne devez modifier que le salaire car ce n''est pas une augmentation. Veuillez corriger votre saisie : pas de motif d''augmentation et pas de type d''ï¿½volution de rï¿½munï¿½ration. ', 1
+'GENWK116', 'GEN', 'fr_fr', 0, 'La date d''effet de la modification est ï¿½gale ï¿½ la date de dï¿½but du contrat. Dans ce cas, il ne peut pas y avoir d''augmentation de rï¿½munï¿½ration mais juste une modification du salaire. Cette action n''est pas possible via le WKF. Elle doit ï¿½tre rï¿½alisï¿½e sur contrat courant.', 1
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR IN ('IMPGR039') AND CODLANG = 'fr_fr' AND NIV_DEFINITION = 0 AND CODMOD ='TGE'
-'IMPGR039', 'TGE', 'fr_fr', 0, 'La propagation n''a pas été effectuée : <br>', 1
+'IMPGR039', 'TGE', 'fr_fr', 0, 'La propagation n''a pas ï¿½tï¿½ effectuï¿½e : <br>', 1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'GEN' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('GENHOR49','GENHOR50','GENHOR51')
-'GENHOR49','GEN','fr_fr','0','Pour un salarié à temps partiel avec maintien de cotisations à temps plein, veuillez renseigner le motif du maintien.','1'
-'GENHOR50','GEN','fr_fr','0','Pour un salarié à temps partiel,  veuillez vous assurer que les options de  maintien des cotisations à temps plein doivent être cochées ou non. Si oui, vous devrez également renseigner le motif de ce maintien.','2'
-'GENHOR51','GEN','fr_fr','0','Si les options de maintien de cotisations sont cochées, le salarié doit être à temps partiel et le motif du maintien est obligatoire, veuillez corriger vos saisies.','1'
+'GENHOR49','GEN','fr_fr','0','Pour un salariï¿½ ï¿½ temps partiel avec maintien de cotisations ï¿½ temps plein, veuillez renseigner le motif du maintien.','1'
+'GENHOR50','GEN','fr_fr','0','Pour un salariï¿½ ï¿½ temps partiel,  veuillez vous assurer que les options de  maintien des cotisations ï¿½ temps plein doivent ï¿½tre cochï¿½es ou non. Si oui, vous devrez ï¿½galement renseigner le motif de ce maintien.','2'
+'GENHOR51','GEN','fr_fr','0','Si les options de maintien de cotisations sont cochï¿½es, le salariï¿½ doit ï¿½tre ï¿½ temps partiel et le motif du maintien est obligatoire, veuillez corriger vos saisies.','1'
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('IMPEX085', 'IMPEX034')
-'IMPEX085','TGE','fr_fr','0','Une erreur s''est produite pendant la suppression de la ligne d''imputation importée.','1'
-'IMPEX034','TGE','fr_fr','0','Le type de l''import n''est pas correct : #1 (DV -> #2, Elément -> #3, DR -> #4, DR cotis. -> #5, Incident -> #6, Absence -> #7, GAP -> #8, GAP RETRO -> #9, Annulation -> #10, Imputation -> #11).','1'
+'IMPEX085','TGE','fr_fr','0','Une erreur s''est produite pendant la suppression de la ligne d''imputation importï¿½e.','1'
+'IMPEX034','TGE','fr_fr','0','Le type de l''import n''est pas correct : #1 (DV -> #2, Elï¿½ment -> #3, DR -> #4, DR cotis. -> #5, Incident -> #6, Absence -> #7, GAP -> #8, GAP RETRO -> #9, Annulation -> #10, Imputation -> #11).','1'
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('IMPEX086', 'IMPEX087')
-'IMPEX086','TGE','fr_fr','0','L''imputation a été modifiée depuis l''import, impossible de la supprimer.','1'
-'IMPEX087','TGE','fr_fr','0','L''imputation n''a pas été créée, elle ne peut donc pas être supprimée.','1'
+'IMPEX086','TGE','fr_fr','0','L''imputation a ï¿½tï¿½ modifiï¿½e depuis l''import, impossible de la supprimer.','1'
+'IMPEX087','TGE','fr_fr','0','L''imputation n''a pas ï¿½tï¿½ crï¿½ï¿½e, elle ne peut donc pas ï¿½tre supprimï¿½e.','1'
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('TGE003HS', 'TGE003DS', 'TGE003NU','ZIM000NU','ZIM00015')
 'TGE003HS','TGE','fr_fr','0','L''heure de saisie n''est pas correcte #1 .','1'
 'TGE003DS','TGE','fr_fr','0','La date de saisie n''est pas correcte #1 .','1'
-'TGE003NU','TGE','fr_fr','0','Le nombre d''unités n''est pas valide #1 .','1'
-'ZIM000NU','TGE','fr_fr','0','Le nombre d''unités n''est pas un nombre valide : #1 .','1'
-'ZIM00015','TGE','fr_fr','0','Le nombre d''unités n''est pas un nombre valide : #1 (11 entiers et 4 décimaux).','1'
+'TGE003NU','TGE','fr_fr','0','Le nombre d''unitï¿½s n''est pas valide #1 .','1'
+'ZIM000NU','TGE','fr_fr','0','Le nombre d''unitï¿½s n''est pas un nombre valide : #1 .','1'
+'ZIM00015','TGE','fr_fr','0','Le nombre d''unitï¿½s n''est pas un nombre valide : #1 (11 entiers et 4 dï¿½cimaux).','1'
 ##
 SYS_DEF_ERREURS
 ==
@@ -1154,89 +1154,89 @@ delete from SYS_DEF_ERREURS where CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'DOCSE101' AND CODLANG = 'fr_fr' AND NIV_DEFINITION = 0 AND CODMOD ='ADM'
-'DOCSE101','ADM','fr_fr','0','Une maquette ne peut pas contenir plusieurs paragraphes ''Style'' si ceux-ci ne sont pas tous conditionnés.','1'
+'DOCSE101','ADM','fr_fr','0','Une maquette ne peut pas contenir plusieurs paragraphes ''Style'' si ceux-ci ne sont pas tous conditionnï¿½s.','1'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'GENWK116' AND CODLANG = 'fr_fr' AND CODMOD ='GEN'
-'GENWK116','GEN','fr_fr','0','Seule la dernière occurrence de la période d''emploi peut être supprimée.','1'
+'GENWK116','GEN','fr_fr','0','Seule la derniï¿½re occurrence de la pï¿½riode d''emploi peut ï¿½tre supprimï¿½e.','1'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODLANG = 'fr_fr' AND NIV_DEFINITION = '0' AND CODERR IN ('ADMPD218','ADMPD219','ADMPD220','ADMPD221','ADMPD222')
-'ADMPD218','ADM','fr_fr',0,'Veuillez sélectionner une donnée',1
-'ADMPD219','ADM','fr_fr',0,'Vous devez d''abord interroger une donnée',1
-'ADMPD220','ADM','fr_fr',0,'Veuillez sélectionner un dictionnaire',1
-'ADMPD221','ADM','fr_fr',0,'La validation des caractéristiques générales a été effectuée avec succès',1
-'ADMPD222','ADM','fr_fr',0,'Le nom de la donnée a été modifié : veuillez d''abord interroger',1
+'ADMPD218','ADM','fr_fr',0,'Veuillez sï¿½lectionner une donnï¿½e',1
+'ADMPD219','ADM','fr_fr',0,'Vous devez d''abord interroger une donnï¿½e',1
+'ADMPD220','ADM','fr_fr',0,'Veuillez sï¿½lectionner un dictionnaire',1
+'ADMPD221','ADM','fr_fr',0,'La validation des caractï¿½ristiques gï¿½nï¿½rales a ï¿½tï¿½ effectuï¿½e avec succï¿½s',1
+'ADMPD222','ADM','fr_fr',0,'Le nom de la donnï¿½e a ï¿½tï¿½ modifiï¿½ : veuillez d''abord interroger',1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODERR = 'ADMPD123' AND CODLANG = 'fr_fr' AND CODMOD ='STD'
-'ADMPD123','STD','fr_fr','0','La suppression d''une période d''emploi qui n''est pas la dernière est interdite.','1'
+'ADMPD123','STD','fr_fr','0','La suppression d''une pï¿½riode d''emploi qui n''est pas la derniï¿½re est interdite.','1'
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'API' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('API00003', 'API00004', 'API00005', 'API00006', 'API00007', 'API00008')
-'API00003', 'API', 'fr_fr', 0, 'Veuillez indiquer l''identifiant de l''application consommatrice à interroger.', 1
+'API00003', 'API', 'fr_fr', 0, 'Veuillez indiquer l''identifiant de l''application consommatrice ï¿½ interroger.', 1
 'API00004', 'API', 'fr_fr', 0, 'Cette application consommatrice n''existe pas.', 1
-'API00005', 'API', 'fr_fr', 0, 'L''export du fichier a été réalisé avec succès.', 3
+'API00005', 'API', 'fr_fr', 0, 'L''export du fichier a ï¿½tï¿½ rï¿½alisï¿½ avec succï¿½s.', 3
 'API00006', 'API', 'fr_fr', 0, 'Veuillez renseigner le code origine.', 1
-'API00007', 'API', 'fr_fr', 0, 'La sécurité a été enregistrée avec succès', 3
-'API00008', 'API', 'fr_fr', 0, 'La sécurité n''a pas été enregistrée.', 1
+'API00007', 'API', 'fr_fr', 0, 'La sï¿½curitï¿½ a ï¿½tï¿½ enregistrï¿½e avec succï¿½s', 3
+'API00008', 'API', 'fr_fr', 0, 'La sï¿½curitï¿½ n''a pas ï¿½tï¿½ enregistrï¿½e.', 1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'GEN' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR = 'GENCHS16'
-'GENCHS16','GEN','fr_fr','0','Veuillez noter qu''en cas de contrôle, vous devez pouvoir justifier de cette incapacité d''au moins 10%.','2'
+'GENCHS16','GEN','fr_fr','0','Veuillez noter qu''en cas de contrï¿½le, vous devez pouvoir justifier de cette incapacitï¿½ d''au moins 10%.','2'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'RECY0001' AND CODLANG = 'fr_fr' AND NIV_DEFINITION = '0' AND CODMOD ='TGE'
-'RECY0001','TGE','fr_fr','0','Le dernier rafraichissement a eu lieu il y a moins de 2 minutes. Veuillez réessayer plus tard.','1'
+'RECY0001','TGE','fr_fr','0','Le dernier rafraichissement a eu lieu il y a moins de 2 minutes. Veuillez rï¿½essayer plus tard.','1'
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'GEN' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('GENWK116','GENWK117','GENWK118')
-'GENWK116', 'GEN', 'fr_fr', 0, 'La date d''effet de la modification est égale à la date de début du contrat. Dans ce cas, il ne peut pas y avoir d''augmentation de rémunération mais juste une modification du salaire. Cette action n''est pas possible via le WKF. Elle doit être réalisée sur contrat courant.', 1
-'GENWK117', 'GEN', 'fr_fr', 0, 'Seule la dernière occurrence de la période d''emploi peut être supprimée.','1'
-'GENWK118', 'GEN', 'fr_fr', 0, 'Vous ne pouvez pas supprimer la première occurrence #', 1
+'GENWK116', 'GEN', 'fr_fr', 0, 'La date d''effet de la modification est ï¿½gale ï¿½ la date de dï¿½but du contrat. Dans ce cas, il ne peut pas y avoir d''augmentation de rï¿½munï¿½ration mais juste une modification du salaire. Cette action n''est pas possible via le WKF. Elle doit ï¿½tre rï¿½alisï¿½e sur contrat courant.', 1
+'GENWK117', 'GEN', 'fr_fr', 0, 'Seule la derniï¿½re occurrence de la pï¿½riode d''emploi peut ï¿½tre supprimï¿½e.','1'
+'GENWK118', 'GEN', 'fr_fr', 0, 'Vous ne pouvez pas supprimer la premiï¿½re occurrence #', 1
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODLANG = 'fr_fr' AND NIV_DEFINITION = '0' AND CODERR IN ('GENAPP13','GENWK115')
-'GENAPP13','GEN','fr_fr','0','Les codes rubriques doivent être différents. Veuillez corriger votre saisie.','1'
-'GENWK115','GEN','fr_fr','0','La date d''effet saisie n''est pas cohérente avec la date de fin prévue de la suspension précédente. En effet, en cas de prolongation avec changement de motif, la date de début de suspension doit être à J+1 de la date de fin prévue précédente.','1'
+'GENAPP13','GEN','fr_fr','0','Les codes rubriques doivent ï¿½tre diffï¿½rents. Veuillez corriger votre saisie.','1'
+'GENWK115','GEN','fr_fr','0','La date d''effet saisie n''est pas cohï¿½rente avec la date de fin prï¿½vue de la suspension prï¿½cï¿½dente. En effet, en cas de prolongation avec changement de motif, la date de dï¿½but de suspension doit ï¿½tre ï¿½ J+1 de la date de fin prï¿½vue prï¿½cï¿½dente.','1'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS where CODMOD = 'GEN' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('GENWKF77','GENWKF86','GENWKF87','GENWKF88','GENWKF89','GENWKF93','GENWKF94','GENWKF95')
-'GENWKF77','GEN','fr_fr','0','Il n''y a pas de contrat suivant à celui que vous voulez insérer. Modifiez votre saisie ou utilisez le WKF ouverture et/ou fermeture de contrat.','1'
-'GENWKF86','GEN','fr_fr','0','Le contrat demandé (du ''#1'' au ''#2'') est en chevauchement total avec au moins un autre contrat : du ''#3'' au ''#4''','1'
-'GENWKF87','GEN','fr_fr','0','Le contrat inséré est en chevauchement avec le contrat précédent.','2'
-'GENWKF88','GEN','fr_fr','0','Le contrat inséré est en chevauchement avec le contrat suivant.','2'
-'GENWKF89','GEN','fr_fr','0','Le contrat inséré est en chevauchement avec le contrat précédent et le contrat suivant.','2'
-'GENWKF93','GEN','fr_fr','0','Le salarié sélectionné n''a pas de contrat correspondant à la demande car l''embauche est présente dans les fichiers de paie.','1'
-'GENWKF94','GEN','fr_fr','0','Le salarié sélectionné n''a pas de contrat correspondant à la demande car l''embauche n''est pas incluse dans la profondeur de rétro.','1'
-'GENWKF95','GEN','fr_fr','0','Le salarié sélectionné n''a pas de contrat correspondant à la demande car le départ est présent dans les fichiers de paie et il n''est pas inclus dans la profondeur de rétro.','1'
+'GENWKF77','GEN','fr_fr','0','Il n''y a pas de contrat suivant ï¿½ celui que vous voulez insï¿½rer. Modifiez votre saisie ou utilisez le WKF ouverture et/ou fermeture de contrat.','1'
+'GENWKF86','GEN','fr_fr','0','Le contrat demandï¿½ (du ''#1'' au ''#2'') est en chevauchement total avec au moins un autre contrat : du ''#3'' au ''#4''','1'
+'GENWKF87','GEN','fr_fr','0','Le contrat insï¿½rï¿½ est en chevauchement avec le contrat prï¿½cï¿½dent.','2'
+'GENWKF88','GEN','fr_fr','0','Le contrat insï¿½rï¿½ est en chevauchement avec le contrat suivant.','2'
+'GENWKF89','GEN','fr_fr','0','Le contrat insï¿½rï¿½ est en chevauchement avec le contrat prï¿½cï¿½dent et le contrat suivant.','2'
+'GENWKF93','GEN','fr_fr','0','Le salariï¿½ sï¿½lectionnï¿½ n''a pas de contrat correspondant ï¿½ la demande car l''embauche est prï¿½sente dans les fichiers de paie.','1'
+'GENWKF94','GEN','fr_fr','0','Le salariï¿½ sï¿½lectionnï¿½ n''a pas de contrat correspondant ï¿½ la demande car l''embauche n''est pas incluse dans la profondeur de rï¿½tro.','1'
+'GENWKF95','GEN','fr_fr','0','Le salariï¿½ sï¿½lectionnï¿½ n''a pas de contrat correspondant ï¿½ la demande car le dï¿½part est prï¿½sent dans les fichiers de paie et il n''est pas inclus dans la profondeur de rï¿½tro.','1'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS where CODMOD = 'TGE' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('ZDV00058','ZOP00024','ZOP00026','ZPR00020')
-'ZDV00058','TGE','fr_fr','0','La période d''affectation doit être comprise dans la période contractuelle.','1'
+'ZDV00058','TGE','fr_fr','0','La pï¿½riode d''affectation doit ï¿½tre comprise dans la pï¿½riode contractuelle.','1'
 'ZOP00024','TGE','fr_fr','0','Il ne peut exister au maximum que 10 oppositions par contrat.','3'
-'ZOP00026','TGE','fr_fr','0','La date de début doit être comprise dans la période contractuelle (#1 - #2).','3'
-'ZPR00020','TGE','fr_fr','0','Il ne peut exister au maximum que 20 prêts par contrat.','3'
+'ZOP00026','TGE','fr_fr','0','La date de dï¿½but doit ï¿½tre comprise dans la pï¿½riode contractuelle (#1 - #2).','3'
+'ZPR00020','TGE','fr_fr','0','Il ne peut exister au maximum que 20 prï¿½ts par contrat.','3'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'FDSP0001'
-'FDSP0001','STD','fr_fr','0','Tous les fichiers n''ont pas pu être téléchargés. Le(s) fichier(s) suivant(s) sont introuvables : ','1'
+'FDSP0001','STD','fr_fr','0','Tous les fichiers n''ont pas pu ï¿½tre tï¿½lï¿½chargï¿½s. Le(s) fichier(s) suivant(s) sont introuvables : ','1'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'FDSP0002'
-'FDSP0002','STD','fr_fr','0','Aucun fichier n''a pu être téléchargé. Le(s) fichier(s) suivant(s) sont introuvables : ','1'
+'FDSP0002','STD','fr_fr','0','Aucun fichier n''a pu ï¿½tre tï¿½lï¿½chargï¿½. Le(s) fichier(s) suivant(s) sont introuvables : ','1'
 ##
 SYS_DEF_ERREURS
 ==
@@ -1251,12 +1251,12 @@ delete from SYS_DEF_ERREURS where CODERR = 'ESGSGN26' AND CODLANG = 'fr_fr' AND 
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODERR = 'ESGSGN27' AND CODLANG = 'fr_fr' AND CODMOD ='ESG'
-'ESGSGN27','ESG','fr_fr','0','Document bien chargé.','1'
+'ESGSGN27','ESG','fr_fr','0','Document bien chargï¿½.','1'
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'GEN' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR = 'GENMED04'
-'GENMED04','GEN','fr_fr','0','En cas de suivi renforcé, le code de la visite ne peut pas être "Visite initiale" ou "Visite périodique". Veuillez corriger votre saisie.','1'
+'GENMED04','GEN','fr_fr','0','En cas de suivi renforcï¿½, le code de la visite ne peut pas ï¿½tre "Visite initiale" ou "Visite pï¿½riodique". Veuillez corriger votre saisie.','1'
 ##
 SYS_DEF_ERREURS
 ==
@@ -1265,7 +1265,7 @@ delete from SYS_DEF_ERREURS where CODMOD = 'TGE' and CODLANG = 'fr_fr' and NIV_D
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODLANG = 'fr_fr' AND NIV_DEFINITION = '0' AND CODERR = 'ADMPD223'
-'ADMPD223','ADM','fr_fr',0,'Une donnée ALP doit avoir un appel table renseigné sur son ergonomie par défaut pour qu''il y ait un intérêt à la mapper avec un custom field de type ''Code''',1
+'ADMPD223','ADM','fr_fr',0,'Une donnï¿½e ALP doit avoir un appel table renseignï¿½ sur son ergonomie par dï¿½faut pour qu''il y ait un intï¿½rï¿½t ï¿½ la mapper avec un custom field de type ''Code''',1
 ##
 SYS_DEF_ERREURS
 ==
@@ -1275,14 +1275,14 @@ delete from SYS_DEF_ERREURS where CODERR = 'ESGSGN25' AND CODLANG = 'fr_fr' AND 
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODLANG = 'fr_fr' AND NIV_DEFINITION = '0' AND CODERR IN ('GENSCT01','GENSCT02','GENSCT03')
-'GENSCT01','GEN','fr_fr',0,'Pour information, la date de début de la sanction ne peut intervenir moins de deux jours ouvrables, ni plus d''un mois après le jour fixé pour l''entretien.',2
-'GENSCT02','GEN','fr_fr',0,'La date de fin de la sanction ne peut pas être postérieure à la date de fin du contrat.',1
-'GENSCT03','GEN','fr_fr',0,'La date de début de la sanction ne peut pas être antérieure à la date de début du contrat.',1
+'GENSCT01','GEN','fr_fr',0,'Pour information, la date de dï¿½but de la sanction ne peut intervenir moins de deux jours ouvrables, ni plus d''un mois aprï¿½s le jour fixï¿½ pour l''entretien.',2
+'GENSCT02','GEN','fr_fr',0,'La date de fin de la sanction ne peut pas ï¿½tre postï¿½rieure ï¿½ la date de fin du contrat.',1
+'GENSCT03','GEN','fr_fr',0,'La date de dï¿½but de la sanction ne peut pas ï¿½tre antï¿½rieure ï¿½ la date de dï¿½but du contrat.',1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'GEN' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR = 'GENWK117'
-'GENWK117', 'GEN', 'fr_fr', 0, 'La suppression d''un historique, qui n''est pas le plus récent d''une période d''emploi, est interdite. ', 1
+'GENWK117', 'GEN', 'fr_fr', 0, 'La suppression d''un historique, qui n''est pas le plus rï¿½cent d''une pï¿½riode d''emploi, est interdite. ', 1
 ##
 SYS_DEF_ERREURS
 ==
@@ -1296,29 +1296,29 @@ DELETE FROM SYS_DEF_ERREURS where CODMOD = 'ADM' and CODLANG = 'fr_fr' and NIV_D
 ##
 SYS_DEF_ERREURS (CODERR,CODMOD,CODLANG,NIV_DEFINITION,LIBERR,TYPERR)
 =IF_ROW_NOTEXIST=
-'GENWK119', 'GEN', 'fr_fr', 0, 'Pour un "contrat vendanges", la date de fin prévue ne peut pas être au delà d''un mois. Veuillez modifier la date de fin prévue du contrat.', 1
+'GENWK119', 'GEN', 'fr_fr', 0, 'Pour un "contrat vendanges", la date de fin prï¿½vue ne peut pas ï¿½tre au delï¿½ d''un mois. Veuillez modifier la date de fin prï¿½vue du contrat.', 1
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'GAP00229'
-'GAP00229','GAP','fr_fr','0','Attention, le thème est utilisé dans le processus libre "#1".','2'
+'GAP00229','GAP','fr_fr','0','Attention, le thï¿½me est utilisï¿½ dans le processus libre "#1".','2'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'GAP00230'
-'GAP00230','GAP','fr_fr','0','Une erreur de paramétrage est survenue. Veuillez contacter votre administrateur.','1'
+'GAP00230','GAP','fr_fr','0','Une erreur de paramï¿½trage est survenue. Veuillez contacter votre administrateur.','1'
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'EDI' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('EDICND01', 'EDICND02', 'EDICND03', 'EDICND04', 'EDICND05', 'EDICND06', 'EDICND07', 'EDICND08', 'EDICND09')
 'EDICND01','EDI','fr_fr','0','Souhaitez-vous supprimer la condition ?','1'
-'EDICND02','EDI','fr_fr','0','Le code de la condition n''est pas valorisé.','3'
-'EDICND03','EDI','fr_fr','0','Veuillez sélectionner une condition.','3'
-'EDICND04','EDI','fr_fr','0','Une erreur est survenue sur l''écran. ','3'
-'EDICND05','EDI','fr_fr','0','Erreur lors de la suppression de la règle.','3'
-'EDICND06','EDI','fr_fr','0','La condition n''a pu être déterminée.','3'
+'EDICND02','EDI','fr_fr','0','Le code de la condition n''est pas valorisï¿½.','3'
+'EDICND03','EDI','fr_fr','0','Veuillez sï¿½lectionner une condition.','3'
+'EDICND04','EDI','fr_fr','0','Une erreur est survenue sur l''ï¿½cran. ','3'
+'EDICND05','EDI','fr_fr','0','Erreur lors de la suppression de la rï¿½gle.','3'
+'EDICND06','EDI','fr_fr','0','La condition n''a pu ï¿½tre dï¿½terminï¿½e.','3'
 'EDICND07','EDI','fr_fr','0','Erreur lors de la validation de la condition.','3'
-'EDICND08','EDI','fr_fr','0','Le code de la condition existe déjà sur cette édition.','3'
+'EDICND08','EDI','fr_fr','0','Le code de la condition existe dï¿½jï¿½ sur cette ï¿½dition.','3'
 'EDICND09','EDI','fr_fr','0','Une erreur est survenue lors de l''enregistrement de la condition.','3'
 ##
 SYS_DEF_ERREURS
@@ -1329,7 +1329,7 @@ delete from SYS_DEF_ERREURS where CODMOD = 'EDI' and CODLANG = 'fr_fr' and NIV_D
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'EDI' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and  CODERR in ('EDI00099') 
-'EDI00099','EDI','fr_fr','0','La génération est en cours, merci de patienter. Vous pouvez fermer cette fenêtre, vous verrez le fichier apparaître dans "Mes fichiers récents".','2'
+'EDI00099','EDI','fr_fr','0','La gï¿½nï¿½ration est en cours, merci de patienter. Vous pouvez fermer cette fenï¿½tre, vous verrez le fichier apparaï¿½tre dans "Mes fichiers rï¿½cents".','2'
 ##
 SYS_DEF_ERREURS
 ==
@@ -1339,46 +1339,46 @@ DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'FDSP0003' AND CODLANG = 'fr_fr' AND 
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR IN ('GENMAN01','GENMAN02','GENMAN03') AND CODLANG = 'fr_fr' AND NIV_DEFINITION = 0
-'GENMAN01','GEN','fr_fr','0','La date de fin du mandat est postérieure à la date de fin prévue du CDD.¿Veuillez modifier la date de début du mandat.','1'
-'GENMAN02','GEN','fr_fr','0','La date de début du mandat ne peut pas être antérieure à la date de début du contrat.','1'
-'GENMAN03','GEN','fr_fr','0','La date de fin du mandat ne peut pas être postérieure à la date de fin du contrat.','1'
+'GENMAN01','GEN','fr_fr','0','La date de fin du mandat est postï¿½rieure ï¿½ la date de fin prï¿½vue du CDD.ï¿½Veuillez modifier la date de dï¿½but du mandat.','1'
+'GENMAN02','GEN','fr_fr','0','La date de dï¿½but du mandat ne peut pas ï¿½tre antï¿½rieure ï¿½ la date de dï¿½but du contrat.','1'
+'GENMAN03','GEN','fr_fr','0','La date de fin du mandat ne peut pas ï¿½tre postï¿½rieure ï¿½ la date de fin du contrat.','1'
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'TGE' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('GAPMG01', 'GAPMG02','GAPMG03')
-'GAPMG01','TGE','fr_fr','0','Suppression des matricules réalisée avec succès','1'
+'GAPMG01','TGE','fr_fr','0','Suppression des matricules rï¿½alisï¿½e avec succï¿½s','1'
 'GAPMG02','TGE','fr_fr','0','Erreur lors de la suppression des matricules.','3'
-'GAPMG03','TGE','fr_fr','0','Aucun matricule séléctionné','3'
+'GAPMG03','TGE','fr_fr','0','Aucun matricule sï¿½lï¿½ctionnï¿½','3'
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'HRO' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and  CODERR in ('HRO00035', 'HRO00036', 'HRO00009') 
-'HRO00035','HRO','fr_fr','0','Le cid n''est pas renseigné.','1'
-'HRO00036','HRO','fr_fr','0','Le cid ne peut excéder 32 caractères.','1'
-'HRO00009','HRO','fr_fr','0','La valeur de ce champ est invalide, elle doit être au format : #1.','1'
+'HRO00035','HRO','fr_fr','0','Le cid n''est pas renseignï¿½.','1'
+'HRO00036','HRO','fr_fr','0','Le cid ne peut excï¿½der 32 caractï¿½res.','1'
+'HRO00009','HRO','fr_fr','0','La valeur de ce champ est invalide, elle doit ï¿½tre au format : #1.','1'
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'API' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR IN ('API00003','API00010','API00011','API00012','API00013','API00014','API00015','API00016','API00017','API00018','API00019','API00020','API00021')
-'API00003', 'API', 'fr_fr', 0, 'Veuillez indiquer l''identifiant de l''application consommatrice à #.', 1
-'API00010', 'API', 'fr_fr', 0, 'Cet utilisateur n''existe pas, ou n''est pas associé à une application consommatrice.', 1
-'API00011', 'API', 'fr_fr', 0, 'Impossible de déterminer le client.', 1
+'API00003', 'API', 'fr_fr', 0, 'Veuillez indiquer l''identifiant de l''application consommatrice ï¿½ #.', 1
+'API00010', 'API', 'fr_fr', 0, 'Cet utilisateur n''existe pas, ou n''est pas associï¿½ ï¿½ une application consommatrice.', 1
+'API00011', 'API', 'fr_fr', 0, 'Impossible de dï¿½terminer le client.', 1
 'API00012', 'API', 'fr_fr', 0, 'L''id de l''application est obligatoire.', 1
-'API00013', 'API', 'fr_fr', 0, 'Cet id d''application existe déjà dans la base.', 1
+'API00013', 'API', 'fr_fr', 0, 'Cet id d''application existe dï¿½jï¿½ dans la base.', 1
 'API00014', 'API', 'fr_fr', 0, 'L''application ''#'' n''existe pour aucun partenaire.', 1
-'API00015', 'API', 'fr_fr', 0, 'Le libellé de l''application est obligatoire.', 1
-'API00016', 'API', 'fr_fr', 0, 'Une application d''un partenaire porte le même libellé.', 1
-'API00017', 'API', 'fr_fr', 0, 'Il existe une application portant le même libellé.', 1
+'API00015', 'API', 'fr_fr', 0, 'Le libellï¿½ de l''application est obligatoire.', 1
+'API00016', 'API', 'fr_fr', 0, 'Une application d''un partenaire porte le mï¿½me libellï¿½.', 1
+'API00017', 'API', 'fr_fr', 0, 'Il existe une application portant le mï¿½me libellï¿½.', 1
 'API00018', 'API', 'fr_fr', 0, 'Erreur lors de l''enregistrement de l''application consommatrice.', 1
-'API00019', 'API', 'fr_fr', 0, 'L''origine est obligatoire pour utiliser les URIs de l''API Pay Data Input. Les autres URIs ont été enregistrées.', 1
-'API00020', 'API', 'fr_fr', 0, 'L''id de l''application ne doit pas contenir plus de 50 caractères.', 1
-'API00021', 'API', 'fr_fr', 0, 'Le libellé de l''application ne doit pas contenir plus de 250 caractères.', 1
+'API00019', 'API', 'fr_fr', 0, 'L''origine est obligatoire pour utiliser les URIs de l''API Pay Data Input. Les autres URIs ont ï¿½tï¿½ enregistrï¿½es.', 1
+'API00020', 'API', 'fr_fr', 0, 'L''id de l''application ne doit pas contenir plus de 50 caractï¿½res.', 1
+'API00021', 'API', 'fr_fr', 0, 'Le libellï¿½ de l''application ne doit pas contenir plus de 250 caractï¿½res.', 1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'GEN' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR IN ('GENWK126','GENWK127')
-'GENWK126','GEN','fr_fr','0','L''embauche étant présente dans les fichiers paie, il est peut-être nécessaire de saisir des rappels de paie.','2'
-'GENWK127','GEN','fr_fr','0','Modification impossible car la date d''embauche est postérieure à la date initiale et n''est pas sur le même mois de paie.','1'
+'GENWK126','GEN','fr_fr','0','L''embauche ï¿½tant prï¿½sente dans les fichiers paie, il est peut-ï¿½tre nï¿½cessaire de saisir des rappels de paie.','2'
+'GENWK127','GEN','fr_fr','0','Modification impossible car la date d''embauche est postï¿½rieure ï¿½ la date initiale et n''est pas sur le mï¿½me mois de paie.','1'
 ##
 SYS_DEF_ERREURS
 ==
@@ -1388,80 +1388,80 @@ DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'STDNULL' AND CODLANG = 'fr_fr' AND N
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'GEN' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR IN ('GENWK120','GENWK121','GENWK122','GENWK123','GENWK124','GENWK125')
-'GENWK120','GEN','fr_fr','0','Les choix renouvellement de télétravail et fin de télétravail ne sont pas compatibles.','1'
-'GENWK121','GEN','fr_fr','0','Un des deux choix renouvellement de télétravail ou fin de télétravail est obligatoire.','1'
-'GENWK122','GEN','fr_fr','0','Pour une fin de TAD, la date d''effet doit obligatoirement être égale à la date de fin de TAD + 1 jour. Vous devez abandonner et recommencer le processus à la bonne date d''effet.','1'
-'GENWK123','GEN','fr_fr','0','La date de fin de télétravail doit être comprise dans les dates du contrat.','1'
-'GENWK124','GEN','fr_fr','0','La date de fin de télétravail saisie doit être supérieure à la date de début de télétravail et à la date de fin précédente.','1'
-'GENWK125','GEN','fr_fr','0','Le nombre de jours de télétravail étant renseigné, vous devez sélectionner le(s) jour(s) ou 1/2 journée(s) de TAD.','1'
+'GENWK120','GEN','fr_fr','0','Les choix renouvellement de tï¿½lï¿½travail et fin de tï¿½lï¿½travail ne sont pas compatibles.','1'
+'GENWK121','GEN','fr_fr','0','Un des deux choix renouvellement de tï¿½lï¿½travail ou fin de tï¿½lï¿½travail est obligatoire.','1'
+'GENWK122','GEN','fr_fr','0','Pour une fin de TAD, la date d''effet doit obligatoirement ï¿½tre ï¿½gale ï¿½ la date de fin de TAD + 1 jour. Vous devez abandonner et recommencer le processus ï¿½ la bonne date d''effet.','1'
+'GENWK123','GEN','fr_fr','0','La date de fin de tï¿½lï¿½travail doit ï¿½tre comprise dans les dates du contrat.','1'
+'GENWK124','GEN','fr_fr','0','La date de fin de tï¿½lï¿½travail saisie doit ï¿½tre supï¿½rieure ï¿½ la date de dï¿½but de tï¿½lï¿½travail et ï¿½ la date de fin prï¿½cï¿½dente.','1'
+'GENWK125','GEN','fr_fr','0','Le nombre de jours de tï¿½lï¿½travail ï¿½tant renseignï¿½, vous devez sï¿½lectionner le(s) jour(s) ou 1/2 journï¿½e(s) de TAD.','1'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODLANG = 'fr_fr' AND NIV_DEFINITION = '0' AND CODERR IN ('ADMPD208', 'ADMPD209','ADMPD210','ADMPD211','ADMPD212','ADMPD213','ADMPD214','ADMPD215','ADMPD216','ADMPD217')
-'ADMPD208','ADM','fr_fr',0,'La suppression de l''écran a été effectuée avec succès.',3
-'ADMPD209','ADM','fr_fr',0,'La validation de l''écran a été effectuée avec succès.',3
-'ADMPD210','ADM','fr_fr',0,'Etes-vous sûr de vouloir supprimer cet écran ?',3
-'ADMPD211','ADM','fr_fr',0,'Attention, après suppression, en cas d''ajout d''un nouvel écran récapitulatif, le paramétrage de l''ergonomie de cet écran ne sera pas repris sur le nouveau. Il faut modifier cet écran pour conserver le paramétrage existant.',3
-'ADMPD212','ADM','fr_fr',0,'Veuillez sélectionnez une opération.',3
-'ADMPD213','ADM','fr_fr',0,'Le code retour du #1 est obligatoire si un libellé est saisi',1
-'ADMPD214','ADM','fr_fr',0,'La mise à jour des écrans a été effectuée avec succès.',3
-'ADMPD215','ADM','fr_fr',0,'Vous ne pouvez pas modifier l''ordre de cet écran.',1
-'ADMPD216','ADM','fr_fr',0,'Veuillez sélectionner un groupe de données.',3
-'ADMPD217','ADM','fr_fr',0,'Veuillez sélectionner une donnée.',3
+'ADMPD208','ADM','fr_fr',0,'La suppression de l''ï¿½cran a ï¿½tï¿½ effectuï¿½e avec succï¿½s.',3
+'ADMPD209','ADM','fr_fr',0,'La validation de l''ï¿½cran a ï¿½tï¿½ effectuï¿½e avec succï¿½s.',3
+'ADMPD210','ADM','fr_fr',0,'Etes-vous sï¿½r de vouloir supprimer cet ï¿½cran ?',3
+'ADMPD211','ADM','fr_fr',0,'Attention, aprï¿½s suppression, en cas d''ajout d''un nouvel ï¿½cran rï¿½capitulatif, le paramï¿½trage de l''ergonomie de cet ï¿½cran ne sera pas repris sur le nouveau. Il faut modifier cet ï¿½cran pour conserver le paramï¿½trage existant.',3
+'ADMPD212','ADM','fr_fr',0,'Veuillez sï¿½lectionnez une opï¿½ration.',3
+'ADMPD213','ADM','fr_fr',0,'Le code retour du #1 est obligatoire si un libellï¿½ est saisi',1
+'ADMPD214','ADM','fr_fr',0,'La mise ï¿½ jour des ï¿½crans a ï¿½tï¿½ effectuï¿½e avec succï¿½s.',3
+'ADMPD215','ADM','fr_fr',0,'Vous ne pouvez pas modifier l''ordre de cet ï¿½cran.',1
+'ADMPD216','ADM','fr_fr',0,'Veuillez sï¿½lectionner un groupe de donnï¿½es.',3
+'ADMPD217','ADM','fr_fr',0,'Veuillez sï¿½lectionner une donnï¿½e.',3
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'STD' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('STDPLR09', 'STDPLR10','STDPLR11')
-'STDPLR09','STD','fr_fr','0','Il faut appliquer la sécurité pac en ajoutant le mot clé CL_SECU_PAC.','2'
-'STDPLR10','STD','fr_fr','0','Il faut appliquer la sécurité pac.','2'
-'STDPLR11','STD','fr_fr','0','Il faut renvoyer la colonne NUMPAC pour appliquer la sécurité de pac.','2'
+'STDPLR09','STD','fr_fr','0','Il faut appliquer la sï¿½curitï¿½ pac en ajoutant le mot clï¿½ CL_SECU_PAC.','2'
+'STDPLR10','STD','fr_fr','0','Il faut appliquer la sï¿½curitï¿½ pac.','2'
+'STDPLR11','STD','fr_fr','0','Il faut renvoyer la colonne NUMPAC pour appliquer la sï¿½curitï¿½ de pac.','2'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODLANG = 'fr_fr' AND NIV_DEFINITION = '0' AND CODERR IN ('ADMPD208','ADMPD209','ADMPD210','ADMPD211','ADMPD212')
-'ADMPD208','ADM','fr_fr',0,'Veuillez sélectionner une donnée',1
-'ADMPD209','ADM','fr_fr',0,'Vous devez d''abord interroger une donnée',1
-'ADMPD210','ADM','fr_fr',0,'Veuillez sélectionner un dictionnaire',1
-'ADMPD211','ADM','fr_fr',0,'La validation des caractéristiques générales a été effectuée avec succès',1
-'ADMPD212','ADM','fr_fr',0,'Le nom de la donnée a été modifié : veuillez d''abord interroger',1
+'ADMPD208','ADM','fr_fr',0,'Veuillez sï¿½lectionner une donnï¿½e',1
+'ADMPD209','ADM','fr_fr',0,'Vous devez d''abord interroger une donnï¿½e',1
+'ADMPD210','ADM','fr_fr',0,'Veuillez sï¿½lectionner un dictionnaire',1
+'ADMPD211','ADM','fr_fr',0,'La validation des caractï¿½ristiques gï¿½nï¿½rales a ï¿½tï¿½ effectuï¿½e avec succï¿½s',1
+'ADMPD212','ADM','fr_fr',0,'Le nom de la donnï¿½e a ï¿½tï¿½ modifiï¿½ : veuillez d''abord interroger',1
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODLANG = 'fr_fr' AND NIV_DEFINITION = '0' AND CODERR IN ('ADMPD213', 'ADMPD214','ADMPD215','ADMPD216','ADMPD217','ADMPD218','ADMPD219','ADMPD220','ADMPD221','ADMPD222')
-'ADMPD213','ADM','fr_fr',0,'La suppression de l''écran a été effectuée avec succès.',3
-'ADMPD214','ADM','fr_fr',0,'La validation de l''écran a été effectuée avec succès.',3
-'ADMPD215','ADM','fr_fr',0,'Etes-vous sûr de vouloir supprimer cet écran ?',3
-'ADMPD216','ADM','fr_fr',0,'Attention, après suppression, en cas d''ajout d''un nouvel écran récapitulatif, le paramétrage de l''ergonomie de cet écran ne sera pas repris sur le nouveau. Il faut modifier cet écran pour conserver le paramétrage existant.',3
-'ADMPD217','ADM','fr_fr',0,'Veuillez sélectionnez une opération.',3
-'ADMPD218','ADM','fr_fr',0,'Le code retour du #1 est obligatoire si un libellé est saisi',1
-'ADMPD219','ADM','fr_fr',0,'La mise à jour des écrans a été effectuée avec succès.',3
-'ADMPD220','ADM','fr_fr',0,'Vous ne pouvez pas modifier l''ordre de cet écran.',1
-'ADMPD221','ADM','fr_fr',0,'Veuillez sélectionner un groupe de données.',3
-'ADMPD222','ADM','fr_fr',0,'Veuillez sélectionner une donnée.',3
+'ADMPD213','ADM','fr_fr',0,'La suppression de l''ï¿½cran a ï¿½tï¿½ effectuï¿½e avec succï¿½s.',3
+'ADMPD214','ADM','fr_fr',0,'La validation de l''ï¿½cran a ï¿½tï¿½ effectuï¿½e avec succï¿½s.',3
+'ADMPD215','ADM','fr_fr',0,'Etes-vous sï¿½r de vouloir supprimer cet ï¿½cran ?',3
+'ADMPD216','ADM','fr_fr',0,'Attention, aprï¿½s suppression, en cas d''ajout d''un nouvel ï¿½cran rï¿½capitulatif, le paramï¿½trage de l''ergonomie de cet ï¿½cran ne sera pas repris sur le nouveau. Il faut modifier cet ï¿½cran pour conserver le paramï¿½trage existant.',3
+'ADMPD217','ADM','fr_fr',0,'Veuillez sï¿½lectionnez une opï¿½ration.',3
+'ADMPD218','ADM','fr_fr',0,'Le code retour du #1 est obligatoire si un libellï¿½ est saisi',1
+'ADMPD219','ADM','fr_fr',0,'La mise ï¿½ jour des ï¿½crans a ï¿½tï¿½ effectuï¿½e avec succï¿½s.',3
+'ADMPD220','ADM','fr_fr',0,'Vous ne pouvez pas modifier l''ordre de cet ï¿½cran.',1
+'ADMPD221','ADM','fr_fr',0,'Veuillez sï¿½lectionner un groupe de donnï¿½es.',3
+'ADMPD222','ADM','fr_fr',0,'Veuillez sï¿½lectionner une donnï¿½e.',3
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODLANG = 'fr_fr' AND NIV_DEFINITION = '0' AND CODERR IN ('ADMPD223','ADMPD224','ADMPD225','ADMPD226','ADMPD227','ADMPD228','ADMPD229','ADMPD230')
-'ADMPD223','ADM','fr_fr',0,'La #1 de l''écran a été effectuée avec succès.',3
-'ADMPD224','ADM','fr_fr',0,'Veuillez sélectionner un écran.',3
-'ADMPD225','ADM','fr_fr',0,'Veuillez sélectionner une règle de gestion.',3
-'ADMPD226','ADM','fr_fr',0,'La #1 de l''écran a été effectuée avec succès.',3
+'ADMPD223','ADM','fr_fr',0,'La #1 de l''ï¿½cran a ï¿½tï¿½ effectuï¿½e avec succï¿½s.',3
+'ADMPD224','ADM','fr_fr',0,'Veuillez sï¿½lectionner un ï¿½cran.',3
+'ADMPD225','ADM','fr_fr',0,'Veuillez sï¿½lectionner une rï¿½gle de gestion.',3
+'ADMPD226','ADM','fr_fr',0,'La #1 de l''ï¿½cran a ï¿½tï¿½ effectuï¿½e avec succï¿½s.',3
 'ADMPD227','ADM','fr_fr',0,'Le champ #1 est obligatoire.',1
-'ADMPD228','ADM','fr_fr',0,'Pour le type d''écran #1, le champ #2 est obligatoire',1
-'ADMPD229','ADM','fr_fr',0,'Pour le type d''écran #1 ou #2, le champ #3 est obligatoire',1
-'ADMPD230','ADM','fr_fr',0,'Numéro d''opération absent',1
+'ADMPD228','ADM','fr_fr',0,'Pour le type d''ï¿½cran #1, le champ #2 est obligatoire',1
+'ADMPD229','ADM','fr_fr',0,'Pour le type d''ï¿½cran #1 ou #2, le champ #3 est obligatoire',1
+'ADMPD230','ADM','fr_fr',0,'Numï¿½ro d''opï¿½ration absent',1
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODLANG = 'fr_fr' AND NIV_DEFINITION = '0' AND CODERR IN ('ADMPD231','ADMPD232','ADMPD233','ADMPD234','ADMPD235','ADMPD236','ADMPD237','ADMPD238','ADMPD239','ADMPD240')
-'ADMPD231','ADM','fr_fr',0,'Vous devez sélectionner un projet.',1
-'ADMPD232','ADM','fr_fr',0,'Etes-vous sûr de vouloir supprimer cette règle de gestion ?',3
-'ADMPD233','ADM','fr_fr',0,'Cette règle n''existe pas dans le système.',1
-'ADMPD234','ADM','fr_fr',0,'La règle #1 a bien été supprimée.',3
-'ADMPD235','ADM','fr_fr',0,'Vous devez sélectionner une règle.',1
-'ADMPD236','ADM','fr_fr',0,'La règle a été enregistrée avec succès',3
-'ADMPD237','ADM','fr_fr',0,'Attention, le déverrouillage de l''onglet Tableau regénère le contenu de l''onglet Source : tout le formatage et les commentaires seront perdus. Continuer ?',3
-'ADMPD238','ADM','fr_fr',0,'Attention, l''onglet Tableau va être regénéré à partir de l''onglet Source : toutes les modifications effectuées dans cet onglet seront perdues. Continuer ?',3
+'ADMPD231','ADM','fr_fr',0,'Vous devez sï¿½lectionner un projet.',1
+'ADMPD232','ADM','fr_fr',0,'Etes-vous sï¿½r de vouloir supprimer cette rï¿½gle de gestion ?',3
+'ADMPD233','ADM','fr_fr',0,'Cette rï¿½gle n''existe pas dans le systï¿½me.',1
+'ADMPD234','ADM','fr_fr',0,'La rï¿½gle #1 a bien ï¿½tï¿½ supprimï¿½e.',3
+'ADMPD235','ADM','fr_fr',0,'Vous devez sï¿½lectionner une rï¿½gle.',1
+'ADMPD236','ADM','fr_fr',0,'La rï¿½gle a ï¿½tï¿½ enregistrï¿½e avec succï¿½s',3
+'ADMPD237','ADM','fr_fr',0,'Attention, le dï¿½verrouillage de l''onglet Tableau regï¿½nï¿½re le contenu de l''onglet Source : tout le formatage et les commentaires seront perdus. Continuer ?',3
+'ADMPD238','ADM','fr_fr',0,'Attention, l''onglet Tableau va ï¿½tre regï¿½nï¿½rï¿½ ï¿½ partir de l''onglet Source : toutes les modifications effectuï¿½es dans cet onglet seront perdues. Continuer ?',3
 'ADMPD239','ADM','fr_fr',0,'Erreur de conversion.',1
 'ADMPD240','ADM','fr_fr',0,'Il y a #1 erreur(s) dans la regle.',1
 ##
@@ -1473,82 +1473,82 @@ DELETE FROM SYS_DEF_ERREURS WHERE CODLANG = 'fr_fr' AND NIV_DEFINITION = '0' AND
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODLANG = 'fr_fr' AND NIV_DEFINITION = '0' AND CODERR IN ('ADMZE241','ADMZE242')
-'ADMZE241','ADM','fr_fr',0,'La création pour le dictionnaire #1 est déjà activée dans l''écran #2',1
-'ADMZE242','ADM','fr_fr',0,'La suppression pour le dictionnaire #1 est déjà activée dans l''écran #2',1
+'ADMZE241','ADM','fr_fr',0,'La crï¿½ation pour le dictionnaire #1 est dï¿½jï¿½ activï¿½e dans l''ï¿½cran #2',1
+'ADMZE242','ADM','fr_fr',0,'La suppression pour le dictionnaire #1 est dï¿½jï¿½ activï¿½e dans l''ï¿½cran #2',1
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS where CODMOD = 'STD' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR = 'STDPLR12'
-'STDPLR12','STD','fr_fr','0','Il faut obligatoirement sélectionner la colonne NUMPAC pour appliquer la sécurité PAC.','1'
+'STDPLR12','STD','fr_fr','0','Il faut obligatoirement sï¿½lectionner la colonne NUMPAC pour appliquer la sï¿½curitï¿½ PAC.','1'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS where CODMOD = 'STD' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR = 'STDPLR13'
-'STDPLR13','STD','fr_fr','0','Il faut obligatoirement sélectionner la colonne COMPANY_ID pour appliquer la sécurité.','1'
+'STDPLR13','STD','fr_fr','0','Il faut obligatoirement sï¿½lectionner la colonne COMPANY_ID pour appliquer la sï¿½curitï¿½.','1'
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODLANG = 'fr_fr' AND NIV_DEFINITION = '0' AND CODERR IN ('ADMZE243','ADMZE244')
-'ADMZE243','ADM','fr_fr',0,'Vous devez sélectionner un écran.',1
-'ADMZE244','ADM','fr_fr',0,'Vous devez sélectionner au moins un collaborateur.',1
+'ADMZE243','ADM','fr_fr',0,'Vous devez sï¿½lectionner un ï¿½cran.',1
+'ADMZE244','ADM','fr_fr',0,'Vous devez sï¿½lectionner au moins un collaborateur.',1
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODLANG = 'fr_fr' AND NIV_DEFINITION = '0' AND CODERR ='ADMPD99'
-'ADMPD99','HRO','fr_fr',0,'Veuillez sélectionner une régle d''affichage existante.',1
+'ADMPD99','HRO','fr_fr',0,'Veuillez sï¿½lectionner une rï¿½gle d''affichage existante.',1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'TGE' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('TGE00360')
-'TGE00360', 'TGE', 'fr_fr', 0, 'Les modifications effectuées concernent l''élément #1 de la famille #2 qui participe à la rétroactivité. Veuillez vérifier si la date de profondeur de rétroactivité #3 (élément WG94) est toujours d''actualité pour ce dossier.', 1
+'TGE00360', 'TGE', 'fr_fr', 0, 'Les modifications effectuï¿½es concernent l''ï¿½lï¿½ment #1 de la famille #2 qui participe ï¿½ la rï¿½troactivitï¿½. Veuillez vï¿½rifier si la date de profondeur de rï¿½troactivitï¿½ #3 (ï¿½lï¿½ment WG94) est toujours d''actualitï¿½ pour ce dossier.', 1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'TGE' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('TGE00361')
-'TGE00361', 'TGE', 'fr_fr', 0, 'Les modifications effectuées concernent les éléments #1 de la famille #2 qui participent à la rétroactivité. Veuillez vérifier si la date de profondeur de rétroactivité #3 (élément WG94) est toujours d''actualité pour ce dossier.', 1
+'TGE00361', 'TGE', 'fr_fr', 0, 'Les modifications effectuï¿½es concernent les ï¿½lï¿½ments #1 de la famille #2 qui participent ï¿½ la rï¿½troactivitï¿½. Veuillez vï¿½rifier si la date de profondeur de rï¿½troactivitï¿½ #3 (ï¿½lï¿½ment WG94) est toujours d''actualitï¿½ pour ce dossier.', 1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'TGE' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('TGE00362')
-'TGE00362', 'TGE', 'fr_fr', 0, 'Les modifications effectuées concernent les éléments #1 qui participent à la rétroactivité. Veuillez vérifier si les dates de profondeur de rétroactivité #3 (élément WG94) des familles #2  sont toujours d''actualité pour ce dossier.', 1
+'TGE00362', 'TGE', 'fr_fr', 0, 'Les modifications effectuï¿½es concernent les ï¿½lï¿½ments #1 qui participent ï¿½ la rï¿½troactivitï¿½. Veuillez vï¿½rifier si les dates de profondeur de rï¿½troactivitï¿½ #3 (ï¿½lï¿½ment WG94) des familles #2  sont toujours d''actualitï¿½ pour ce dossier.', 1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'HRO' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR = 'HROENT19'
-'HROENT19','HRO','fr_fr',0,'Le champ libre "#1" de l''entité ne peut excéder #2 caractères.',1
+'HROENT19','HRO','fr_fr',0,'Le champ libre "#1" de l''entitï¿½ ne peut excï¿½der #2 caractï¿½res.',1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'STD' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR = 'STD00032'
-'STD00032','STD','fr_fr',0,'Vous ne pouvez pas saisir plus de #1 caractères.',1
+'STD00032','STD','fr_fr',0,'Vous ne pouvez pas saisir plus de #1 caractï¿½res.',1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'TGE' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('TGE00360')
-'TGE00360','TGE','fr_fr',0,'Voulez-vous que la pièce jointe #1 soit visible au collaborateur ?',1
+'TGE00360','TGE','fr_fr',0,'Voulez-vous que la piï¿½ce jointe #1 soit visible au collaborateur ?',1
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'TGEST062' AND CODLANG = 'fr_fr' AND CODMOD ='GTA'
-'TGEST062', 'GTA', 'fr_fr', '0', 'Attention, vous êtes sur le point de désabonner ce login à Gestil, tous ses accès pour tous les PAC (environnements) seront coupés.<br />Pour supprimer l’accès à un PAC Gestil particulier, veuillez retirer le profil d’accès à ce PAC uniquement.<br />Êtes-vous sûr de vouloir désabonner ce login à Gestil ?', '3'
+'TGEST062', 'GTA', 'fr_fr', '0', 'Attention, vous ï¿½tes sur le point de dï¿½sabonner ce login ï¿½ Gestil, tous ses accï¿½s pour tous les PAC (environnements) seront coupï¿½s.<br />Pour supprimer lï¿½accï¿½s ï¿½ un PAC Gestil particulier, veuillez retirer le profil dï¿½accï¿½s ï¿½ ce PAC uniquement.<br />ï¿½tes-vous sï¿½r de vouloir dï¿½sabonner ce login ï¿½ Gestil ?', '3'
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'TGE' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('TGE00360')
-'TGE00360','TGE','fr_fr',0,'Voulez-vous que la pièce jointe "#1" soit visible par le collaborateur ?',1
+'TGE00360','TGE','fr_fr',0,'Voulez-vous que la piï¿½ce jointe "#1" soit visible par le collaborateur ?',1
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'GEN' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('GENWK128', 'GENWK129')
-'GENWK128','GEN','fr_fr',0,'Vous ne pouvez pas effectuer cette opération, veuillez utiliser le processus d''annulation d''embauche.',1
-'GENWK129','GEN','fr_fr',0,'Aucun historique n''est éligible à la suppression pour ce salarié.',2
+'GENWK128','GEN','fr_fr',0,'Vous ne pouvez pas effectuer cette opï¿½ration, veuillez utiliser le processus d''annulation d''embauche.',1
+'GENWK129','GEN','fr_fr',0,'Aucun historique n''est ï¿½ligible ï¿½ la suppression pour ce salariï¿½.',2
 ##
 SYS_DEF_ERREURS
 ==
 delete from SYS_DEF_ERREURS where CODMOD = 'TGE' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR in ('TGE00360')
-'TGE00360', 'TGE', 'fr_fr', 0, 'Les modifications effectuées concernent l''élément #1 de la famille #2 qui participe à la rétroactivité. Veuillez vérifier si la date de profondeur de rétroactivité #3 (élément WG94) est toujours d''actualité pour ce dossier.', 1
+'TGE00360', 'TGE', 'fr_fr', 0, 'Les modifications effectuï¿½es concernent l''ï¿½lï¿½ment #1 de la famille #2 qui participe ï¿½ la rï¿½troactivitï¿½. Veuillez vï¿½rifier si la date de profondeur de rï¿½troactivitï¿½ #3 (ï¿½lï¿½ment WG94) est toujours d''actualitï¿½ pour ce dossier.', 1
 ##
 SYS_DEF_ERREURS
 ==
 DELETE FROM SYS_DEF_ERREURS WHERE CODLANG = 'fr_fr' AND NIV_DEFINITION = '0' AND CODERR IN ('ADMPD241')
-'ADMPD241','ADM','fr_fr',0,'Vous avez sélectionné le client ',3
+'ADMPD241','ADM','fr_fr',0,'Vous avez sï¿½lectionnï¿½ le client ',3
