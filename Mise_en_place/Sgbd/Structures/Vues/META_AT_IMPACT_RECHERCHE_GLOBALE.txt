@@ -1,0 +1,185 @@
+##
+TAG_CHARSET=@€éèç
+##
+META_AT_IMPACT_RECHERCHE_GLOBALE
+=SQL=
+BEGIN
+  EXECUTE_IMMEDIATE_STRING('DROP MATERIALIZED VIEW "META_AT_IMPACT_RECHERCHE_GLOBALE"',0);
+EXCEPTION WHEN OTHERS THEN NULL;
+END;
+##
+META_AT_IMPACT_RECHERCHE_GLOBALE
+=SQL=
+CREATE MATERIALIZED VIEW "META_AT_IMPACT_RECHERCHE_GLOBALE" ("DATE_MAJ", "THEME", "TYPE_OBJ", "OBJ", "DATA")
+BUILD IMMEDIATE
+REFRESH FORCE ON DEMAND START WITH sysdate+5/1400 NEXT SYSDATE + 1
+AS 
+  select 
+    * 
+  from (
+    select SYSDATE DATE_MAJ, 
+      THEME, 
+      TYPE_OBJ, 
+      UPPER(obj) OBJ, 
+      TO_CLOB(regexp_replace(DATA, '\s', ' ')) DATA 
+    from (
+      select 
+        'Tools Ecran' THEME, 
+        'META_ECRAN' TYPE_OBJ, 
+        NOM_PAGE OBJ, 
+        TO_CLOB(COMPANY_ID || ' | ' || NOM_PAGE || ' | ' || LIBELLE_PAGE || ' | ' || CODE_DESTINATION || ' | ' || ROLE_ECRAN || ' | ' || NOM_DICTIONNAIRE || ' | ' || MODULE_ECRAN || ' | ' || BOUTONS_ECRAN || ' | ' || ID_GROUPE_DONNEES || ' | ' || TYPE_ECRAN || ' | ' || NOM_SERVICELET || ' | ' || ID_PROJET || ' | ' || NUM_VERSION_RD || ' | ' || EST_SUPPRIME || ' | ' || PERSONNALISE || ' | ' || ID_REGLEGESTION_AUT_RD || ' | ' || ID_REGLEGESTION_AUT_CLI || ' | ' || TYPE_REGLEGESTION_AUT_CLI || ' | ' || ID_REGLEGESTION_CTL_RD || ' | ' || ID_REGLEGESTION_CTL_CLI || ' | ' || TYPE_REGLEGESTION_CTL_CLI || ' | ' || CODEDI || ' | ' || TOUTES_PERIODES_EMPLOI || ' | ' || SURCHARGE_EDITION || ' | ' || PERSO_PJ_UX || ' | ' || DESCRIPTION_DA) DATA  
+      from 
+        META_ECRAN 
+      where 
+        company_id='*'
+      UNION ALL
+      select 
+        'Tools Donnée', 
+        'META_DONNEE_GENERALE', 
+        NOM_DONNEE, 
+        TO_CLOB(COMPANY_ID || ' | ' || NOM_DONNEE || ' | ' || LIBELLE_DONNEE || ' | ' || NOM_DICTIONNAIRE || ' | ' || TYPE_DONNEE || ' | ' || LONGUEUR_MASQUE_NB_ENTIERS || ' | ' || NB_DECIMAUX || ' | ' || CHECKBOX_VALEUR_ON || ' | ' || CHECKBOX_VALEUR_OFF || ' | ' || MODELE || ' | ' || UTILISATION || ' | ' || ACTIF || ' | ' || ID_PROJET || ' | ' || NUM_VERSION_RD || ' | ' || EST_SUPPRIME || ' | ' || PERSONNALISE || ' | ' || MINUSCULES_AUTORISEES || ' | ' || NOM_DONNEE_CLE_DIC_REFERENCE || ' | ' || PROPAGER_TOUTES_OCCURRENCES) DATA  
+      from 
+        META_DONNEE_GENERALE 
+      where 
+        company_id='*'
+      UNION ALL
+      select 
+        'Tools Donnée', 
+        'META_DONNEE_ECRAN', 
+        NOM_DONNEE, 
+        TO_CLOB(COMPANY_ID||' | ' || NOM_DONNEE||' | ' || NOM_PAGE||' | ' || LIBELLE_DONNEE||' | ' || EST_OBLIGATOIRE||' | ' || MODE_SAISIE||' | ' || APPELTABLE_NOMPAGE||' | ' || APPELTABLE_IDREQUETE||' | ' || APPELTABLE_LISTELIBELLE||' | ' || APPELTABLE_LISTECHAMPS||' | ' || APPELTABLE_PARAMETRES||' | ' || AFFICHE_CHOIX_VIDE_SELECT||' | ' || VALEUR_DEFAUT||' | ' || ID_REGLEGESTION_AUT_RD||' | ' || ID_REGLEGESTION_AUT_CLI||' | ' || TYPE_REGLEGESTION_AUT_CLI||' | ' || ID_REGLEGESTION_AFF_RD||' | ' || ID_REGLEGESTION_AFF_CLI||' | ' || TYPE_REGLEGESTION_AFF_CLI||' | ' || ID_REGLEGESTION_CTL_RD||' | ' || ID_REGLEGESTION_CTL_CLI||' | ' || TYPE_REGLEGESTION_CTL_CLI||' | ' || SEARCH_STRUCTURE_PARAM||' | ' || REFRESH_AFTER_CHANGE||' | ' || SPAN_CHECK_VALUE||' | ' || LIB_ALIGN_TOP||' | ' || NB_LIGNE_TEXTEAREA||' | ' || NB_COLONNE_TEXTEAREA) DATA  
+      from 
+        META_DONNEE_ECRAN 
+      where 
+        company_id='*'
+      UNION ALL
+      select
+         'Appel Table/Tableau', 
+        'SYS_REQUETES_JSP', 
+        NOMPAGE||' | ' || IDREQUETE, 
+        TO_CLOB(NOMPAGE||' | ' || IDREQUETE||' | ' || NOMBASE||' | ' || NOMTABLE||' | ' || LISTCOLAFF) || TO_CLOB(' | ' || LISTCOLSET||' | ' || CLAUSEWHERE) ||TO_CLOB(' | ' || CLAUSEMAX||' | ' || CLAUSEDISTINCT||' | ' || CLAUSEORDRE||' | ' || DESCREQ||' | ' || LIBREQ||' | ' || LISTLIBCOLAFF) 
+      from 
+        SYS_REQUETES_JSP
+      UNION ALL
+      select 
+        'Règle gestion', 
+        'META_REGLEGESTION_DESC', 
+        ID_REGLEGESTION, 
+        TO_CLOB(REGLE_SYNTHETIQUE||' | ' || COMPANY_ID||' | ' || ID_REGLEGESTION||' | ' || TYPE_REGLE||' | ' || LIBELLE||' | ' || ID_PROJET||' | ' || NUM_VERSION_RD||' | ' || EST_SUPPRIME||' | ' || REGLES_ECR||' | ' || DESCRIPTION||' | ' || FLAG_SPECIF_TYPE_REGLE||' | ' || PERSONNALISE||' | ' || REGLES_ALGO)  
+      from 
+        META_REGLEGESTION_DESC 
+      where 
+        company_id='*'
+      UNION ALL
+      select 
+        'Groupe donnée', 
+        'META_GROUPE_DONNEES_INFO', 
+        ID_GROUPE, 
+        TO_CLOB(COMPANY_ID||' | ' || ID_GROUPE||' | ' || ID_REGLEGESTION_AFF_RD||' | ' || ID_REGLEGESTION_AFF_CLI||' | ' || TYPE_REGLEGESTION_AFF_CLI||' | ' || EST_ONGLET||' | ' || ID_PROJET||' | ' || NUM_VERSION_RD||' | ' || EST_SUPPRIME||' | ' || LIBELLE_GROUPE||' | ' || DESCRIPTION_GROUPE||' | ' || PERSONNALISE) 
+      from 
+        META_GROUPE_DONNEES_INFO 
+      where 
+        company_id='*'
+      UNION ALL
+      select 
+        'Groupe donnée', 
+        'META_GROUPE_DONNEES', 
+        ID_GROUPE, 
+        TO_CLOB(DONNEE_CODE_EDITION ||' | ' || MESSAGE_CONFIRMATION||' | ' || BOUTONS_TABLEAU_MULTIPLE||' | ' || COMPANY_ID||' | ' || ID_GROUPE||' | ' || NOM_DONNEE||' | ' || ORDRE||' | ' || A_COTE_DONNEE_PRECEDENTE||' | ' || SUFFIXE_OU_LIBELLE||' | ' || TABLEAU_REQUETE_NOMPAGE||' | ' || TABLEAU_REQUETE_IDREQUETE||' | ' || NOM_PAGE_AJOUT||' | ' || NOM_PAGE_MODIF||' | ' || ID_REGLEGESTION_CTL_RD_SUPP||' | ' || ID_REGLEGESTION_CTL_CLI_SUPP||' | ' || TYPE_REGLEGESTION_CTL_CLI_SUPP||' | ' || MASQUER_LE_LIBELLE)  
+      from 
+        META_GROUPE_DONNEES 
+      where 
+        company_id='*'
+      UNION ALL
+      select 
+        'Msg Erreurs', 
+        'SYS_DEF_ERREURS', 
+        CODERR, 
+        TO_CLOB(CODERR ||' | ' || CODMOD ||' | ' || LIBERR ||' | ' || TYPERR) 
+      from 
+        SYS_DEF_ERREURS
+      UNION ALL
+      select 
+        'Requête fusion', 
+        'EDI_REQ_SQL', 
+        NOMREQ, 
+        TO_CLOB(NOMREQ || DELIMITEUR_TEXT || ' | ' || SEPAR_CHAMP || ' | ' || SEPAR_CHAMP_SR || ' | ' || AFFICHE_SR_VIDE || ' | ' || SANSDOUBLONS || ' | ' || PROPRIETAIRE) || ' | ' || FINREQ  DATA  
+      from 
+        EDI_REQ_SQL
+      UNION ALL
+      select 
+        'Requête fusion', 
+        'EDI_REQ_SQL_CF', 
+        NOMREQ, 
+        TO_CLOB(NOMREQ || ' | ' || NOMCHAMPFUSION || ' | ' || VALEURSELECT || ' | ' || SEPAR_CHAMP || ' | ' || ORDRE || ' | ' || TYPEDATA || ' | ' || LIBCHAMPFUSION || ' | ' || TAILLE)   DATA  
+      from 
+        EDI_REQ_SQL_CF
+      UNION ALL
+      select 
+        'Alerte portail', 
+        'ALERT_TREE', 
+        ALERT_ID, 
+        TO_CLOB(ALERT_ID || ' | ' || ALERT_LEAF || ' | ' || ALERT_TITLE || ' | ' || ALERT_PARENT_ID || ' | ' || ALERT_ORDER)   DATA  
+      from 
+        ALERT_TREE
+      UNION ALL
+      select 
+        'Alerte portail', 
+        'ALERT_PROP', 
+        ALERT_ID, 
+        TO_CLOB(ALERT_ID || ' | ' || ALERT_ORDER || ' | ' || ALERT_DESC || ' | ' || PAGE_REDIRECT || ' | ' || INDEX_SQL || ' | ' || ALERT_ACTIVATE || ' | ' || ALERT_WKF || ' | ' || SQL_SELECT || ' | ' || SQL_FROM || ' | ' || SQL_WHERE_1 || ' | ' || SQL_WHERE_2 || ' | ' || PEOPLE_ID || ' | ' || STR_ID || ' | ' || PACMAT_ID)   DATA  
+      from 
+        ALERT_PROP
+      UNION ALL
+      select 
+        'Mapdo', 
+        'TGE_REF_MAPDO', 
+        NUMPAC || ' - ' || ELEMENT, 
+        TO_CLOB(NUMPAC || ' - ' || ELEMENT ||' - ' || OCCURENCE || ' | ' || DONNEEGXP || ' | ' || TABLEGXP || ' | ' || DONNFILTRE || ' | ' || OPERFILTRE || ' | ' || VALFILTRE || ' | ' || TRTPARTICULIER || ' | ' || ENVOI_SYSTEMATIQUE || ' | ' || FORCABLE_ECRAN_GENERE)   DATA  
+      from 
+        TGE_REF_MAPDO
+      UNION ALL
+      select 
+        'Structure table', 
+        'TABLE', 
+        table_name, 
+        TO_CLOB(table_name) 
+      from 
+        user_tables
+      UNION ALL
+      select 
+        'Structure table', 
+        'COLONNE', 
+        table_name || '.' ||column_name, 
+        TO_CLOB(table_name || '.' ||column_name) 
+      from 
+        user_tab_cols
+      UNION ALL
+      select 
+        'Sources', 
+        type, 
+        name, 
+        linearisereq('select substr(text, 0, 2000) from user_source where name=''' || name || ''' order by line', ' ') 
+      from 
+        user_source 
+      group by type, name
+    )
+  UNION ALL
+    select 
+      SYSDATE, 
+      'Sources', 
+      'VIEW', 
+      VIEW_NAME, 
+      TO_LOB(TEXT) 
+    from 
+      user_views
+  union all
+    select 
+      SYSDATE, 
+      'Sources', 
+      'MVIEW', 
+      MVIEW_NAME, 
+      TO_LOB(QUERY) 
+    from 
+      user_mviews
+)

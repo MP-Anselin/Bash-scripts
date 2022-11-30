@@ -1,0 +1,27 @@
+<interface idInterface="SYNCHRONS">
+	<nomInterface>Realignement des utilisateurs experts NS et gestion acces collaboratif</nomInterface>
+	<descriptionInterface></descriptionInterface>
+	<alerteSiFichierNonDisponible>OUI</alerteSiFichierNonDisponible>
+	<listeDependancesFichiers>
+	</listeDependancesFichiers>
+	<traitements>
+		<traitement>
+			<descriptionTraitement>Extraction pour injecter les users a creer</descriptionTraitement>
+			<actifSiEnv>P</actifSiEnv>
+			<typeTraitement>RAPPORT</typeTraitement>
+			<nomreq>USER_NS_EXP</nomreq>
+			<fichierOUT>USERS_NS.dat</fichierOUT>
+			<encapsuleurChamp></encapsuleurChamp>
+		</traitement>
+		<traitement>
+			<descriptionTraitement>Creation User NS</descriptionTraitement>
+			<actifSiEnv>P</actifSiEnv>
+			<typeTraitement>InterfaceUserNS</typeTraitement>
+			<modeDebug>true</modeDebug>
+			<versionTraitement>V2</versionTraitement>
+			<fichierUsers>USERS_NS.dat</fichierUsers>
+			<continueSiErreur>OUI</continueSiErreur>
+			<activerMail>NON</activerMail>
+		</traitement>
+	</traitements>
+</interface>

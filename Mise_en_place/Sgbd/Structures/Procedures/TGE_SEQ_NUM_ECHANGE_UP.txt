@@ -1,0 +1,28 @@
+##
+TGE_SEQ_NUM_ECHANGE_UP
+=SQL=
+CREATE OR REPLACE
+PROCEDURE TGE_SEQ_NUM_ECHANGE_UP(
+    p_NUMPAC         IN VARCHAR2 ,
+    p_PERIODEENCOURS IN VARCHAR2 ,
+    num_echange_str OUT VARCHAR2 )
+AS
+  PRAGMA AUTONOMOUS_TRANSACTION;
+  num_echange NUMBER;
+BEGIN
+  SELECT DERNIER_NUM_ECHANGE
+  INTO num_echange
+  FROM TGE_REF_PER
+  WHERE numpac      =p_NUMPAC
+  AND PERIODEENCOURS=p_PERIODEENCOURS FOR UPDATE ;
+  IF num_echange   IS NULL OR num_echange=9999 THEN
+    num_echange    :=0;
+  END IF;
+  num_echange    :=num_echange+1;
+  num_echange_str:=LPAD(TO_CHAR(num_echange),4,'0');
+  UPDATE TGE_REF_PER
+  SET DERNIER_NUM_ECHANGE=num_echange_str
+  WHERE numpac           =p_NUMPAC
+  AND PERIODEENCOURS     =p_PERIODEENCOURS;
+  COMMIT;
+END TGE_SEQ_NUM_ECHANGE_UP;

@@ -1,0 +1,18 @@
+##
+TAG_CHARSET=@€ιθη
+##
+STD_STRUC_INDEX
+=SQL IFNOTEXIST=STD_STRUC_INDEX=CID=
+alter table STD_STRUC_INDEX add CID varchar2(32)
+##
+STD_STRUC_INDEX
+=SQL=
+update STD_STRUC_INDEX set CID = nvl((select VALVAR from SYS_VARSYS where CODVAR = 'NS_CLIENT_ID'), '*') where CID is null
+##
+STD_STRUC_INDEX
+=SQL=
+alter table STD_STRUC_INDEX drop primary key drop index
+##
+STD_STRUC_INDEX
+=SQL=
+alter table STD_STRUC_INDEX add constraint STD_STRUC_INDEX_PK primary key (CODTS, LAST_ENTITE, DATE_EFF, CID)

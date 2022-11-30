@@ -1,0 +1,75 @@
+##
+PHOTO_CONFORME
+=SQL=
+CREATE OR REPLACE FUNCTION PHOTO_CONFORME RETURN TAB_ERR AS 
+	retour TAB_ERR := TAB_ERR();
+	libelle_erreur VARCHAR2(50);
+	nb_photo INTEGER;
+	nb INTEGER;
+BEGIN
+	FOR une_ligne IN (SELECT DISTINCT TABLE_NAME, COLUMN_NAME, DATA_TYPE, DATA_LENGTH
+					FROM USER_TAB_COLS
+                    WHERE COLUMN_NAME != 'TYPE_WRITER'
+                    AND ( TABLE_NAME NOT LIKE 'PH_PH_%'
+                    OR TABLE_NAME NOT LIKE 'PHOTO_%'))
+	LOOP
+		SELECT DISTINCT count(*) INTO nb_photo FROM USER_TAB_COLS WHERE TABLE_NAME = 'PHOTO_'||une_ligne.TABLE_NAME;
+		IF nb_photo != 0 THEN
+			SELECT DISTINCT count(*) INTO nb 
+			FROM USER_TAB_COLS 
+			WHERE TABLE_NAME = 'PHOTO_'||une_ligne.TABLE_NAME 
+			AND COLUMN_NAME = une_ligne.COLUMN_NAME;
+			
+			IF nb = 0 THEN
+				libelle_erreur := 'Colonne manquante';
+				retour.extend;
+				retour(retour.count) := TYP_ERR(une_ligne.TABLE_NAME, une_ligne.COLUMN_NAME, libelle_erreur);
+			ELSE
+				SELECT DISTINCT count(*) INTO nb 
+				FROM USER_TAB_COLS 
+				WHERE TABLE_NAME = 'PHOTO_'||une_ligne.TABLE_NAME 
+				AND COLUMN_NAME = une_ligne.COLUMN_NAME
+				AND DATA_TYPE = une_ligne.DATA_TYPE;
+				IF nb = 0 THEN
+					libelle_erreur := 'Type incohérent';
+					retour.extend;
+					retour(retour.count) := TYP_ERR(une_ligne.TABLE_NAME, une_ligne.COLUMN_NAME, libelle_erreur);
+				ELSE
+					SELECT DISTINCT count(*) INTO nb
+					FROM USER_TAB_COLS 
+					WHERE TABLE_NAME = 'PHOTO_'||une_ligne.TABLE_NAME 
+					AND COLUMN_NAME = une_ligne.COLUMN_NAME
+					AND DATA_TYPE = une_ligne.DATA_TYPE
+					AND DATA_LENGTH = une_ligne.DATA_LENGTH;
+					IF nb = 0 THEN
+						libelle_erreur := 'Taille différente';
+						retour.extend;
+					retour(retour.count) := TYP_ERR(une_ligne.TABLE_NAME, une_ligne.COLUMN_NAME, libelle_erreur);
+					END IF;
+				END IF;
+			END IF;
+		END IF;
+	END LOOP;
+	
+	FOR une_table IN (SELECT tablephy FROM TGE_REF_MAPTA TA WHERE 1=1 AND TA.allerretour in ('A','2') 
+	and 'PHOTO_'||tablephy not in (select table_name from user_tables))
+	LOOP 
+	    IF nb > 0 THEN
+	       libelle_erreur := 'Table PHOTO inexistante';
+	       retour.extend;
+	       retour(retour.count) := TYP_ERR(une_table.tablephy, 'ALL', libelle_erreur);
+	    END IF; 
+	END LOOP;
+	
+	FOR une_table IN (SELECT tablephy FROM TGE_REF_MAPTA TA WHERE 1=1 AND TA.allerretour in ('A','2') 
+	and 'PH_PH_'||tablephy not in (select table_name from user_tables))
+	LOOP 
+	    IF nb > 0 THEN
+	       libelle_erreur := 'Table PH_PH inexistante';
+	       retour.extend;
+	       retour(retour.count) := TYP_ERR(une_table.tablephy, 'ALL', libelle_erreur);
+	    END IF; 
+	END LOOP;
+	
+	RETURN retour;
+END PHOTO_CONFORME;

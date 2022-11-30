@@ -1,0 +1,491 @@
+##
+TAG_CHARSET=@€ιθη
+##
+SYS_SCH_JSON
+=SQL IFEXIST=SYS_SCH_JSON=
+delete SYS_SCH_JSON where nom_json='HistorySlideJsonServlet' and NOM_PAGE='Ext.adp.Workbox.Workbox'
+##
+SYS_SCH_JSON
+=SQL IFEXIST=SYS_SCH_JSON=
+delete SYS_SCH_JSON where nom_json='InscrireRetroJsonServlet' and NOM_PAGE='Ext.adp.ZPaie.RETRO.INSCRIRETRO'
+Insert into SYS_SCH_JSON values('Ext.adp.ZPaie.RETRO.INSCRIRETRO','InscrireRetroJsonServlet')
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Ext.adp.ZPaie.RETRO.MatricInscritRetro'
+##
+SYS_SCH_JSON (NOM_PAGE,NOM_JSON)
+'Ext.adp.ZPaie.RETRO.MatricInscritRetro','MatricInscritRetroJsonServlet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Ext.adp.Modules.ZPaie.DonneesElementPaie'
+'Ext.adp.Modules.ZPaie.DonneesElementPaie','DonneesElementPaieJsonServLet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Ext.adp.Modules.ZPaie.ElementsPaie'
+'Ext.adp.Modules.ZPaie.ElementsPaie','ElementsPaieJsonServLet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Moteur.Comp.WebAdmin.Image.GestionPhotoMatricule'
+'Ext.adp.Moteur.Comp.WebAdmin.Image.GestionPhotoMatricule','GestionPhotoMatriculeJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Modules.DEX.GestionPartenairesAPI'
+'Ext.adp.Modules.DEX.GestionPartenairesAPI', 'GestionPartenairesAPIJsonServicelet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Moteur.Std.GestionMotDePasseExpertLsprh'
+'Ext.adp.Moteur.Std.GestionMotDePasseExpertLsprh','GestionMotDePasseExpertJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Moteur.ADP_ONLY.varSys.VarSys'
+'Ext.adp.Moteur.ADP_ONLY.varSys.VarSys','VarSysJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE in ('Ext.adp.Moteur.Comp.WebAdmin.GestionWebDir.GestionUserWebDir', 'Ext.adp.Moteur.Comp.WebAdmin.GestionWebDir.GestionUserWebDirCDF')
+'Ext.adp.Moteur.Comp.WebAdmin.GestionWebDir.GestionUserWebDir','GestionUserWDJsonServlet'
+'Ext.adp.Moteur.Comp.WebAdmin.GestionWebDir.GestionUserWebDirCDF','GestionUserWDJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Moteur.Comp.WebAdmin.GestionWebDir.GestionWebDir'
+'Ext.adp.Moteur.Comp.WebAdmin.GestionWebDir.GestionWebDir','GestionWebDirJsonServlet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Ext.adp.Modules.Structures.Parametrage.GestionArbreEntites.ArbreEntitesDecentralise' and NOM_JSON in ('ArbreEntiteCMJsonServlet', 'ArbreEntiteSuppJsonServlet')
+'Ext.adp.Modules.Structures.Parametrage.GestionArbreEntites.ArbreEntitesDecentralise', 'ArbreEntiteCMJsonServlet'
+'Ext.adp.Modules.Structures.Parametrage.GestionArbreEntites.ArbreEntitesDecentralise', 'ArbreEntiteSuppJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Modules.ADP_ONLY.Workflow.admin.WkfProcessus'
+'Ext.adp.Modules.ADP_ONLY.Workflow.admin.WkfProcessus','WkfProcessusJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Modules.ADP_ONLY.Workflow.admin.WkfOperations'
+'Ext.adp.Modules.ADP_ONLY.Workflow.admin.WkfOperations','WkfOperationJsonServlet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Ext.adp.Modules.ADP_ONLY.Messagerie.DefBranchMailGen'
+'Ext.adp.Modules.ADP_ONLY.Messagerie.DefBranchMailGen', 'DefBranchMailGenJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Modules.ADP_ONLY.Workflow.admin.WkfBranches'
+'Ext.adp.Modules.ADP_ONLY.Workflow.admin.WkfBranches','WkfBranchesJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE in ('Modules/ZPaie/GestionThemesGAP.jsp','Ext.adp.ZPaie.GestionThemeGap')
+'Ext.adp.ZPaie.GestionThemeGap','DonneesJspJsonServlet'
+'Ext.adp.ZPaie.GestionThemeGap','GestionThemesGapJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Moteur.Comp.WebAdmin.Gestil.GestionTraitementGestil'
+'Ext.adp.Moteur.Comp.WebAdmin.Gestil.GestionTraitementGestil','GestionTraitementGestilJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Modules/ZPaie/GestionFeuillesImportExportSansGAP.jsp'
+'Modules/ZPaie/GestionFeuillesImportExportSansGAP.jsp','ZTGEExportAbsencesJsonServlet'
+'Modules/ZPaie/GestionFeuillesImportExportSansGAP.jsp','ZTGEExportElementsJsonServlet'
+'Modules/ZPaie/GestionFeuillesImportExportSansGAP.jsp','ZTGEExportIncidentsJsonServlet'
+'Modules/ZPaie/GestionFeuillesImportExportSansGAP.jsp','ZTGEExportJsonServlet'
+'Modules/ZPaie/GestionFeuillesImportExportSansGAP.jsp','ZTGEExportImputationsJsonServlet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE in ('Ext.adp.Modules.Structures.Parametrage.GestionTypesEntite.TypeEntiteCM', 'Ext.adp.Modules.Structures.Parametrage.ArbreEntitesDecentralise.ArbreEntites')
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.ZPaie.RETRO.MatricInscritRetroInfoComp'
+'Ext.adp.ZPaie.RETRO.MatricInscritRetroInfoComp','MatricInscritRetroJsonServlet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Ext.adp.Moteur.Aide.GestionAideEnLigne'
+'Ext.adp.Moteur.Aide.GestionAideEnLigne', 'GestionAideEnLigneJsonServlet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Ext.adp.Administration.ImportUsersNS'
+'Ext.adp.Administration.ImportUsersNS', 'ImportUsersFromNSJsonServlet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Ext.adp.Modules.Structures.Parametrage.GestionArbreEntites.ArbreEntitesDecentralise' and NOM_JSON in ('ArbreEntiteSuppJsonServlet')
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Ext.adp.Modules.Structures.Parametrage.GestionArbreEntites.ArbreEntitesDecentralise' and NOM_JSON in ('RechercheEntiteArbreJsonServlet')
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Ext.adp.Modules.Structures.Parametrage.GestionArbreEntites.ArbreEntitesAvecSecuStructure' and NOM_JSON in ('ArbreEntitesAvecSecuStructureJsonServlet', 'ArbreEntiteCMJsonServlet', 'ArbreEntiteSuppJsonServlet', 'EntiteVJsonServlet', 'RechercheEntitesArbreJsonServlet')
+'Ext.adp.Modules.Structures.Parametrage.GestionArbreEntites.ArbreEntitesAvecSecuStructure', 'ArbreEntitesAvecSecuStructureJsonServlet'
+'Ext.adp.Modules.Structures.Parametrage.GestionArbreEntites.ArbreEntitesAvecSecuStructure', 'ArbreEntiteCMJsonServlet'
+'Ext.adp.Modules.Structures.Parametrage.GestionArbreEntites.ArbreEntitesAvecSecuStructure', 'ArbreEntiteSuppJsonServlet'
+'Ext.adp.Modules.Structures.Parametrage.GestionArbreEntites.ArbreEntitesAvecSecuStructure', 'EntiteVJsonServlet'
+'Ext.adp.Modules.Structures.Parametrage.GestionArbreEntites.ArbreEntitesAvecSecuStructure', 'RechercheEntitesArbreJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE SYS_SCH_JSON WHERE NOM_JSON = 'GestionDesTypesDeTraitementJsonServlet' AND NOM_PAGE = 'Ext.adp.Moteur.Traitement.GestionDesTypesDeTraitements'
+##
+SYS_SCH_JSON
+==
+INSERT INTO SYS_SCH_JSON(NOM_PAGE, NOM_JSON) VALUES('Ext.adp.Moteur.Traitement.GestionDesTypesDeTraitements', 'GestionDesTypesDeTraitementJsonServlet') 
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Modules.GTA.Expert.EvenementsGTA'
+'Ext.adp.Modules.GTA.Expert.EvenementsGTA','EvenementsGTAJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE SYS_SCH_JSON WHERE NOM_JSON = 'GestionDesTypesDeTraitementJsonServlet' AND NOM_PAGE in ('Ext.adp.Moteur.Comp.WebAdmin.Traitement.GestionDesTypesDeTraitements', 'Ext.adp.Moteur.Traitement.GestionDesTypesDeTraitements')
+##
+SYS_SCH_JSON
+==
+INSERT INTO SYS_SCH_JSON(NOM_PAGE, NOM_JSON) VALUES('Ext.adp.Moteur.Comp.WebAdmin.Traitement.GestionDesTypesDeTraitements', 'GestionDesTypesDeTraitementJsonServlet') 
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Modules.Gap.GestionLHW'
+'Ext.adp.Modules.Gap.GestionLHW','GestionLHWJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE in ('Ext.adp.Moteur.ADP_ONLY.GestionProfil', 'Moteur/ADP_ONLY/Comp/WebAdmin/GestionProfil.jsp')
+'Ext.adp.Moteur.ADP_ONLY.GestionProfil','GestionProfilJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Moteur.Comp.WebAdmin.Traitement.GestionDesTraitementsMVVMExtJS' AND NOM_JSON = 'GestionDesTraitementsJsonServlet'
+'Ext.adp.Moteur.Comp.WebAdmin.Traitement.GestionDesTraitementsMVVMExtJS','GestionDesTraitementsJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Modules.DEX.GestionApplicationConsommatricesAPI'
+'Ext.adp.Modules.DEX.GestionApplicationConsommatricesAPI', 'GestionApplicationConsommatriceAPIJsonServicelet'
+##
+SYS_SCH_JSON
+=SQL=
+DELETE SYS_SCH_JSON WHERE NOM_JSON = 'OptionSignatureJsonServlet' AND NOM_PAGE = 'Ext.adp.Modules.Signature.OptionSignatureExtjs'
+##
+SYS_SCH_JSON
+=SQL=
+INSERT INTO SYS_SCH_JSON(NOM_PAGE, NOM_JSON) VALUES('Ext.adp.Modules.Signature.OptionSignatureExtjs', 'OptionSignatureJsonServlet')
+##
+SYS_SCH_JSON
+=SQL=
+DELETE SYS_SCH_JSON WHERE NOM_JSON = 'SignataireJsonServlet' AND NOM_PAGE = 'Ext.adp.Modules.Signature.SignataireMVVM'
+##
+SYS_SCH_JSON
+=SQL=
+INSERT INTO SYS_SCH_JSON(NOM_PAGE, NOM_JSON) VALUES('Ext.adp.Modules.Signature.SignataireMVVM', 'SignataireJsonServlet')
+##
+SYS_SCH_JSON (NOM_PAGE, NOM_JSON)
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_JSON = 'SuiviDocumentsEtSignaturesJsonServlet' AND NOM_PAGE = 'Ext.adp.Modules.Signature.SuiviDocumentsEtSignatures'
+'Ext.adp.Modules.Signature.SuiviDocumentsEtSignatures', 'SuiviDocumentsEtSignaturesJsonServlet'
+##
+SYS_SCH_JSON
+=SQL=
+DELETE SYS_SCH_JSON WHERE NOM_JSON = 'SignataireCMJsonServlet' AND NOM_PAGE = 'Ext.adp.Modules.Signature.SignataireMVVM'
+##
+SYS_SCH_JSON
+=SQL=
+INSERT INTO SYS_SCH_JSON(NOM_PAGE, NOM_JSON) VALUES('Ext.adp.Modules.Signature.SignataireMVVM', 'SignataireCMJsonServlet') 
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Ext.adp.Modules.Signature.SuiviDocumentsEtSignatures' 
+'Ext.adp.Modules.Signature.SuiviDocumentsEtSignatures', 'SuiviDocumentsEtSignaturesJsonServlet' 
+'Ext.adp.Modules.Signature.SuiviDocumentsEtSignatures', 'DetailSignatureJsonServlet'
+'Ext.adp.Modules.Signature.SuiviDocumentsEtSignatures', 'SignataireCMJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON where nom_page  = 'Ext.adp.Modules.GTA.CAD.ForcageCompteurs'
+'Ext.adp.Modules.GTA.CAD.ForcageCompteurs','ForcageCompteursJsonServlet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Ext.adp.Modules.Structures.Parametrage.GestionArbreEntites.ArbreEntitesDecentralise' and NOM_JSON in ('RechercheEntiteArbreJsonServlet')
+##
+SYS_SCH_JSON
+==
+DELETE SYS_SCH_JSON WHERE NOM_JSON = 'TelechargementsJsonServelet' AND NOM_PAGE = 'Ext.adp.Moteur.Comp.WebAdmin.Telechargements'
+##
+SYS_SCH_JSON
+==
+INSERT INTO SYS_SCH_JSON(NOM_PAGE, NOM_JSON) VALUES('Ext.adp.Moteur.Comp.WebAdmin.Telechargements', 'TelechargementsJsonServelet')
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Moteur.Charts.GestionCharts'
+'Ext.adp.Moteur.Charts.GestionCharts','GestionChartsJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Moteur/Trace/TracesInterpreterExpert.jsp'
+'Moteur/Trace/TracesInterpreterExpert.jsp','TracesInterpreterJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Modules.DEX.GestionApplicationConsommatricesAPI'
+'Ext.adp.Modules.DEX.GestionApplicationConsommatricesAPI', 'GestionApplicationConsommatriceAPIJsonServlet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Ext.adp.Modules.Signature.GroupeSignataires'
+'Ext.adp.Modules.Signature.GroupeSignataires', 'GroupeSignatairesJsonServlet'
+'Ext.adp.Modules.Signature.GroupeSignataires', 'GroupeSignatairesCMJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Modules/ZPaie/SaisieAbsencesZPaieIndExpert.jsp' AND NOM_JSON = 'SlideInGestionPJAbsJsonServlet'
+'Modules/ZPaie/SaisieAbsencesZPaieIndExpert.jsp', 'SlideInGestionPJAbsJsonServlet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Ext.adp.Moteur.Delegation.DelegationCMD.ChoixDelegationSortieManager'
+'Ext.adp.Moteur.Delegation.DelegationCMD.ChoixDelegationSortieManager', 'CreationDelegationSortieManagerJsonServlet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Ext.adp.Modules.Signature.slide.DetailSignature'
+'Ext.adp.Modules.Signature.slide.DetailSignature', 'DetailSignatureJsonServlet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Modules/Parametrage/EtatsDeSortie.jsp'
+'Modules/Parametrage/EtatsDeSortie.jsp','EtatsDeSortieAdmJsonServiceLet'
+'Modules/Parametrage/EtatsDeSortie.jsp','EtatsDeSortieROJsonServiceLet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Modules/Parametrage/EtatsDeSortie_CDF.jsp'
+'Modules/Parametrage/EtatsDeSortie_CDF.jsp','EtatsDeSortieROJsonServiceLet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Modules/Parametrage/EtatsDeSortie_CDF_RW.jsp'
+'Modules/Parametrage/EtatsDeSortie_CDF_RW.jsp','EtatsDeSortieRWJsonServiceLet'
+'Modules/Parametrage/EtatsDeSortie_CDF_RW.jsp','EtatsDeSortieROJsonServiceLet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Modules/Parametrage/EtatsDeSortie_Expert.jsp'
+'Modules/Parametrage/EtatsDeSortie_Expert.jsp','EtatsDeSortieROJsonServiceLet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Modules/Parametrage/EtatsDeSortie_Expert_RW.jsp'
+'Modules/Parametrage/EtatsDeSortie_Expert_RW.jsp','EtatsDeSortieRWJsonServiceLet'
+'Modules/Parametrage/EtatsDeSortie_Expert_RW.jsp','EtatsDeSortieROJsonServiceLet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Modules/Parametrage/EtatsDeSortie_HR.jsp'
+'Modules/Parametrage/EtatsDeSortie_HR.jsp','EtatsDeSortieROJsonServiceLet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Modules/Parametrage/EtatsDeSortie_HR_RW.jsp'
+'Modules/Parametrage/EtatsDeSortie_HR_RW.jsp','EtatsDeSortieROJsonServiceLet'
+'Modules/Parametrage/EtatsDeSortie_HR_RW.jsp','EtatsDeSortieRWJsonServiceLet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Modules/Parametrage/EtatsDeSortie_RRH.jsp'
+'Modules/Parametrage/EtatsDeSortie_RRH.jsp','EtatsDeSortieROJsonServiceLet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Modules/Parametrage/EtatsDeSortie_RRH_RW.jsp'
+'Modules/Parametrage/EtatsDeSortie_RRH_RW.jsp','EtatsDeSortieRWJsonServiceLet'
+'Modules/Parametrage/EtatsDeSortie_RRH_RW.jsp','EtatsDeSortieROJsonServiceLet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Modules/Parametrage/EtatsDeSortieRO.jsp'
+'Modules/Parametrage/EtatsDeSortieRO.jsp','EtatsDeSortieROJsonServiceLet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Modules/Parametrage/EtatsDeSortieRW.jsp'
+'Modules/Parametrage/EtatsDeSortieRW.jsp','EtatsDeSortieRWJsonServiceLet'
+'Modules/Parametrage/EtatsDeSortieRW.jsp','EtatsDeSortieROJsonServiceLet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Ext.adp.Modules.ZPaie.gta.TestBandeauProjet'
+'Ext.adp.Modules.ZPaie.gta.TestBandeauProjet','TestBandeauProjetJsonServlet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.AppelsTableAdmin'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.AppelsTableAdmin','AppelTableAdminJsonServlet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.AppelsTableTools'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.AppelsTableTools','AppelTableToolsJsonServlet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageDictionnairesExtjs'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageDictionnairesExtjs','ParametrageDictionnaireJsonServlet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.HistoriquesDesProjetsMVVM'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.HistoriquesDesProjetsMVVM','HistoriquesDesProjetsJsonServiceLet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Ext.adp.Moteur.ParamEcranDyn.GestionDesProjetsMVVM'
+'Ext.adp.Moteur.ParamEcranDyn.GestionDesProjetsMVVM','GestionProjetJsonServlet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageEcransExtjs'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageEcransExtjs','ParametrageEcransJsonServlet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.GestionDesLivrablesMVVM'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.GestionDesLivrablesMVVM','GestionDesLivrablesJsonServlet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageGroupesDonneesExtjs'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageGroupesDonneesExtjs','ParametrageGroupesDonneesJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageDonneesExtjs'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageDonneesExtjs','ParametrageDonneesJsonServlet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Ext.adp.Modules.TraceApi.TraceAppelsAPI'
+'Ext.adp.Modules.TraceApi.TraceAppelsAPI','TraceAppelsAPIJsonServlet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Modules/Workflow/MesDemandesWkfExpert.jsp'
+'Modules/Workflow/MesDemandesWkfExpert.jsp','MesDemandesAdminJsonServlet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Ext.adp.Modules.DEX.PersonnalisationUsesCase'
+'Ext.adp.Modules.DEX.PersonnalisationUsesCase','PersonnalisationUsesCaseJsonServlet'
+##
+SYS_SCH_JSON
+=SQL=
+DELETE SYS_SCH_JSON WHERE NOM_JSON = 'ParamSignatureJsonServlet' AND NOM_PAGE = 'Ext.adp.Modules.Signature.OptionSignatureExtjs'
+##
+SYS_SCH_JSON
+=SQL=
+INSERT INTO SYS_SCH_JSON(NOM_PAGE, NOM_JSON) VALUES('Ext.adp.Modules.Signature.OptionSignatureExtjs', 'ParamSignatureJsonServlet') 
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Ext.adp.Modules.Signature.SuiviDocumentsEtSignaturesAdmin' 
+'Ext.adp.Modules.Signature.SuiviDocumentsEtSignaturesAdmin', 'SuiviDocumentsEtSignaturesJsonServlet' 
+'Ext.adp.Modules.Signature.SuiviDocumentsEtSignaturesAdmin', 'DetailSignatureJsonServlet'
+'Ext.adp.Modules.Signature.SuiviDocumentsEtSignaturesAdmin', 'SignataireCMJsonServlet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE IN ( 'Ext.adp.Modules.Signature.SuiviDocumentsEtSignatures', 'Ext.adp.Modules.Signature.SuiviDocumentsEtSignaturesAdmin') and NOM_JSON = 'SlideUploadDocumentExterneJsonServlet'
+'Ext.adp.Modules.Signature.SuiviDocumentsEtSignaturesAdmin','SlideUploadDocumentExterneJsonServlet'
+'Ext.adp.Modules.Signature.SuiviDocumentsEtSignatures','SlideUploadDocumentExterneJsonServlet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE IN ( 'Ext.adp.Modules.Structures.Parametrage.GestionArbreEntites.ArbreEntites', 'Ext.adp.Modules.Structures.Parametrage.GestionArbreEntites.ArbreEntitesAvecSecuStructure','Ext.adp.Modules.Structures.Parametrage.GestionArbreEntites.ArbreEntitesDecentralise') and NOM_JSON = 'GestionValideursJsonServlet'
+'Ext.adp.Modules.Structures.Parametrage.GestionArbreEntites.ArbreEntites','GestionValideursJsonServlet'
+'Ext.adp.Modules.Structures.Parametrage.GestionArbreEntites.ArbreEntitesAvecSecuStructure','GestionValideursJsonServlet'
+'Ext.adp.Modules.Structures.Parametrage.GestionArbreEntites.ArbreEntitesDecentralise','GestionValideursJsonServlet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageEcransExtjs' and NOM_JSON='BridgingJsonServlet' 
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageEcransExtjs','BridgingJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE nom_page = 'Moteur/Delegation/AdministrationDelegationRestriction.jsp'
+'Moteur/Delegation/AdministrationDelegationRestriction.jsp','AdministrationDelegationJsonServlet'
+'Moteur/Delegation/AdministrationDelegationRestriction.jsp','CreationDelegationJsonServlet'
+'Moteur/Delegation/AdministrationDelegationRestriction.jsp','DetailsDelegationJsonServlet'
+'Moteur/Delegation/AdministrationDelegationRestriction.jsp','DuplicationDelegationJsonServlet'
+'Moteur/Delegation/AdministrationDelegationRestriction.jsp','ModificationDelegationJsonServlet'
+'Moteur/Delegation/AdministrationDelegationRestriction.jsp','ValidationDelegationJsonServlet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE IN ('Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionConditions.ConditionsDocserver','Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionConditions.ConditionsDocserver')
+'Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionConditions.ConditionsDocserver','ConditionDocserverCMJsonServlet'
+'Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionConditions.ConditionsDocserver','ConditionsDocserverJsonServlet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionChampsFusion.ExportChampsFusionDocserver'
+'Ext.adp.Moteur.Comp.WebAdmin.DocServer.GestionChampsFusion.ExportChampsFusionDocserver','ExportChampsFusionDocserverServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.MainDesk.view.eastregion.theme.Theme'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','ThemeJsonServlet'
+##
+SYS_SCH_JSON
+==
+DELETE FROM SYS_SCH_JSON WHERE NOM_PAGE = 'Ext.adp.MainDesk.view.eastregion.theme.Logo'
+'Ext.adp.MainDesk.view.eastregion.theme.Logo','LogoJsonServlet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Ext.adp.Tests.Accessibilite.AccessibiliteExemple' and NOM_JSON = 'AccessibiliteExempleJsonServlet'
+'Ext.adp.Tests.Accessibilite.AccessibiliteExemple', 'AccessibiliteExempleJsonServlet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Ext.adp.Tests.Accessibilite.AccessibiliteExemple' and NOM_JSON = 'AccessibiliteExempleCJsonServlet'
+'Ext.adp.Tests.Accessibilite.AccessibiliteExemple', 'AccessibiliteExempleCJsonServlet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Ext.adp.Tests.Accessibilite.AccessibiliteExemple' and NOM_JSON = 'AccessibiliteExempleMJsonServlet'
+'Ext.adp.Tests.Accessibilite.AccessibiliteExemple', 'AccessibiliteExempleMJsonServlet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Moteur/ADP_ONLY/ParamEcranDyn/WkfOperationEcrans.jsp' and NOM_JSON = 'BridgingJsonServlet'
+'Moteur/ADP_ONLY/ParamEcranDyn/WkfOperationEcrans.jsp', 'BridgingJsonServlet'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Ext.adp.ZPaie.ExportDonneesEcran' 
+'Ext.adp.ZPaie.ExportDonneesEcran', 'ExportDonneesEcranJsonServlet' 
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.WkfOperationEcransMVVM' 
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.WkfOperationEcransMVVM', 'WkfOperationEcransJsonServlet' 

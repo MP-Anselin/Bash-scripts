@@ -1,0 +1,45 @@
+##
+ALERTE_PARCOURS
+=SQL=
+CREATE OR REPLACE
+  FUNCTION ALERTE_PARCOURS(
+      p1 IN VARCHAR2,
+      p2 IN VARCHAR2,
+      p3 IN VARCHAR2,
+      p4 IN VARCHAR2 ,
+      p5 IN VARCHAR2 ,
+      p6 IN VARCHAR2 )
+    RETURN VARCHAR2
+  IS
+    LR$ALERTE FOR_ALERTE_PARCOURS%RowType ;
+    LN$RETOUR VARCHAR2(500)                 := '';
+    LC$NUM    NUMBER                        := 0;
+    LN$REQ FOR_ALERTE_PARCOURS.REQUETE%type := '';
+    CURSOR C_ALERTE
+    IS
+      SELECT * FROM FOR_ALERTE_PARCOURS WHERE ACTIVE = 1 ORDER BY ORDRE ;
+  BEGIN
+    OPEN C_ALERTE ;
+    LOOP
+      FETCH C_ALERTE INTO LR$ALERTE ;
+      EXIT
+    WHEN C_ALERTE%NOTFOUND ;
+      --dbms_output.put_line( 'requete=' || LR$ALERTE.REQUETE ) ;
+      --FIXME utiliser la procédure trace_dbms_output()
+      LN$REQ := LR$ALERTE.REQUETE;
+      LN$REQ := REPLACE(LN$REQ,'#1',p1);
+      LN$REQ := REPLACE(LN$REQ,'#2',p2);
+      LN$REQ := REPLACE(LN$REQ,'#3',p3);
+      LN$REQ := REPLACE(LN$REQ,'#4',p4);
+      LN$REQ := REPLACE(LN$REQ,'#5',p5);
+      LN$REQ := REPLACE(LN$REQ,'#6',p6);
+      --dbms_output.put_line( 'apres=' || LN$REQ ) ;
+      --FIXME utiliser la procédure trace_dbms_output()
+      LC$NUM      := ALERTE_UNITAIRE('select count(*) from ('|| LN$REQ ||')');
+      IF (LC$NUM   >0) THEN
+        LN$RETOUR := LN$RETOUR || LR$ALERTE.CODEALERTE || ';' ;
+      END IF;
+    END LOOP ;
+    CLOSE C_ALERTE ;
+    RETURN( LN$RETOUR ) ;
+  END;

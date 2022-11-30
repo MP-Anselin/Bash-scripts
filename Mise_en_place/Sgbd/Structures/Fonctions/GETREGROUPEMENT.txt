@@ -1,0 +1,62 @@
+##
+GETREGROUPEMENT
+=SQL=
+CREATE OR REPLACE
+  FUNCTION GETREGROUPEMENT(
+      p_code_element IN SYS_SCH_ELEMENT.CODE_ELEMENT%Type,
+      p_code_schema  IN SYS_SCHEMAS.CODE_SCHEMA%Type )
+    RETURN VARCHAR2
+  IS
+    retour SYS_SCH_ELEMENT.LIBELLE%Type ;
+  BEGIN
+    IF (p_code_element IS NULL OR p_code_schema IS NULL) THEN
+      RETURN NULL;
+    END IF;
+    SELECT libelle
+    INTO retour
+    FROM
+      ( WITH regroupement(code_element, libelle, niveau, code_role, code_schema, code_asso, code_asso_pere) AS
+      (SELECT e.code_element,
+        e.libelle,
+        e.niveau,
+        e.code_role,
+        s.code_schema,
+        s.code_asso,
+        S.code_asso_pere
+      FROM SYS_SCHEMAS s,
+        SYS_SCH_ELEMENT e
+      WHERE s.code_elt  = e.code_element
+      AND s.code_elt    = p_code_element
+      AND s.niveau      = e.niveau
+      AND s.niveau      = 99
+      AND s.code_schema = p_code_schema
+      UNION ALL
+      SELECT e.code_element,
+        e.libelle,
+        e.niveau,
+        e.code_role,
+        s.code_schema,
+        S.code_asso,
+        s.code_asso_pere
+      FROM SYS_SCHEMAS s,
+        SYS_SCH_ELEMENT e,
+        regroupement r
+      WHERE r.code_asso_pere = s.code_asso
+      AND s.code_elt         = e.code_element
+      AND s.niveau           = e.niveau
+      AND s.niveau          <= 99
+      AND s.code_schema      = p_code_schema
+      )
+    SELECT code_element,
+      libelle,
+      niveau,
+      code_role,
+      code_schema,
+      code_asso,
+      code_asso_pere
+    FROM regroupement
+    WHERE niveau = 2
+      );
+    RETURN retour;
+  END GETREGROUPEMENT;
+  

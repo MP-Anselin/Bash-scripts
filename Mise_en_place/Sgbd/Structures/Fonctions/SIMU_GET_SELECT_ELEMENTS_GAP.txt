@@ -1,0 +1,99 @@
+##
+SIMU_GET_SELECT_ELEMENTS_GAP
+=SQL=
+create or replace FUNCTION SIMU_GET_SELECT_ELEMENTS_GAP(
+    p_numpac          IN VARCHAR2,
+    p_nomTable        IN VARCHAR2,
+    p_listeDonneesGxp IN VARCHAR2)
+  RETURN CLOB
+AS
+  --curseur sur MAPDO
+  CURSOR cur_mapdo
+  IS
+    SELECT a.*,
+      b.*,
+      c.type AS typeZADIG,
+      c.longueur,
+      c.MASQUE
+    FROM
+      (SELECT *
+      FROM tge_ref_mapdo
+      WHERE numpac =p_numpac
+      AND INSTR(p_listeDonneesGxp,','
+        ||donneegxp
+        ||',')     >0
+      AND tablegxp =
+        (SELECT tableparam
+        FROM tge_ref_mapta
+        WHERE tablephy=p_nomTable
+        AND (numpac   =p_numpac
+        OR (numpac    ='*'
+        AND NOT EXISTS
+          (SELECT *
+          FROM tge_ref_mapta z
+          WHERE numpac  =p_numpac
+          AND tableparam=tge_ref_mapta.tableparam
+          )))
+        )
+      UNION ALL
+      SELECT *
+      FROM tge_ref_mapdo
+      WHERE numpac ='*'
+      AND INSTR(p_listeDonneesGxp,','
+        ||donneegxp
+        ||',')     >0
+      AND tablegxp =
+        (SELECT tableparam
+        FROM tge_ref_mapta
+        WHERE tablephy=p_nomTable
+        AND (numpac   =p_numpac
+        OR (numpac    ='*'
+        AND NOT EXISTS
+          (SELECT *
+          FROM tge_ref_mapta z
+          WHERE numpac  =p_numpac
+          AND tableparam=tge_ref_mapta.tableparam
+          )))
+        )
+      AND element NOT IN
+        (SELECT element FROM tge_ref_mapdo WHERE numpac=p_numpac
+        )
+      ) a,
+      (SELECT column_name,
+        data_type
+      FROM user_tab_columns
+      WHERE table_name = p_nomTable
+      ) b,
+      (SELECT *
+      FROM TGE_REF_DICOZ
+      WHERE numpac=p_numpac
+      ) C
+    WHERE donneegxp  = column_name
+    AND c.element    =a.element
+    AND (donnfiltre IS NULL
+    OR donnfiltre   IN
+      (SELECT c.column_name
+      FROM user_tab_columns c
+      WHERE c.table_name = p_nomTable
+      ))
+    AND occurence NOT LIKE '%!%'
+    ORDER BY a.element,
+      a.occurence;
+    lig_mapdo cur_mapdo%rowtype;
+    clselect CLOB;
+BEGIN
+  clselect :=NULL;
+  OPEN cur_mapdo;
+  LOOP
+    FETCH cur_mapdo INTO lig_mapdo;
+    EXIT
+  WHEN cur_mapdo%NOTFOUND ;
+    clselect :=clselect||fsed.getClauseSelect(p_numpac, p_nomTable, lig_mapdo.DONNEEGXP, lig_mapdo.DONNFILTRE, lig_mapdo.OPERFILTRE, lig_mapdo.VALFILTRE, lig_mapdo.TRTPARTICULIER, lig_mapdo.ENVOI_SYSTEMATIQUE, lig_mapdo.data_type, lig_mapdo.typeZADIG, lig_mapdo.MASQUE, lig_mapdo.OCCURENCE, FALSE);
+    clselect :=clselect||' as E_'||lig_mapdo.ELEMENT||',';
+  END LOOP;
+  CLOSE cur_mapdo;
+  IF clselect IS NOT NULL THEN
+    clselect  := SUBSTR(clselect,1,LENGTH(clselect)-1);
+  END IF;
+  RETURN clselect;
+END SIMU_GET_SELECT_ELEMENTS_GAP;

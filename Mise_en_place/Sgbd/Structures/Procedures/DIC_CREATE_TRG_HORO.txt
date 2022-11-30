@@ -1,0 +1,44 @@
+##
+DIC_CREATE_TRG_HORO
+=SQL=
+CREATE OR REPLACE PROCEDURE DIC_CREATE_TRG_HORO (nomTable VARCHAR2) AS
+  existeColonnesHORO NUMBER; -- Les colonnes d'horodatage existent-elles ?
+  reqTrgHoro VARCHAR2(4000);
+BEGIN
+  SELECT count(*) INTO existeColonnesHORO FROM user_tab_columns WHERE table_name= nomTable and column_name in ('DATE_CREATION','DATE_DERNIERE_MODIF');
+  IF existeColonnesHORO=2 AND nomTable <> 'SECUPACMAT' THEN
+    reqTrgHoro := '
+CREATE OR REPLACE TRIGGER HORO_'|| nomTable ||' 
+BEFORE INSERT OR UPDATE ON '|| nomTable ||' 
+FOR EACH ROW 
+BEGIN ';
+    IF nomTable = 'DIC_ADM_PERSO' THEN
+      reqTrgHoro := reqTrgHoro || '
+  IF INSERTING OR (UPDATING AND NOT UPDATING(''DATE_EFF_PERSO'') AND NOT UPDATING(''CURRENT_NUMPAC'') AND NOT UPDATING(''CURRENT_PACMAT'') AND NOT UPDATING(''CURRENT_NUMCNT'') AND NOT UPDATING(''DATE_EFF_CONTRAT'')) THEN ';
+    ELSIF nomTable = 'DIC_ADM_CONTRAT' THEN
+      reqTrgHoro := reqTrgHoro || '
+  IF INSERTING OR (UPDATING AND NOT UPDATING(''DATE_EFF_CONTRAT'') AND NOT UPDATING(''CURRENT_PAIEZAD'')) THEN ';
+    END IF;
+    reqTrgHoro := reqTrgHoro || '
+  IF UPDATING AND NVL(:NEW.DATE_DERNIERE_MODIF,SYSDATE)=TO_DATE(''19010101'',''yyyymmdd'') THEN
+    :NEW.DATE_DERNIERE_MODIF := :OLD.DATE_DERNIERE_MODIF;
+  ELSE
+    :NEW.DATE_DERNIERE_MODIF := SYSDATE; 
+  END IF;
+  IF INSERTING THEN 
+    :NEW.DATE_CREATION := SYSDATE; 
+  END IF; ';
+    IF nomTable = 'DIC_ADM_PERSO' OR nomTable = 'DIC_ADM_CONTRAT' THEN
+      reqTrgHoro := reqTrgHoro || '
+  END IF;';
+    END IF;
+    reqTrgHoro := reqTrgHoro || '
+END;';
+    EXECUTE_IMMEDIATE_STRING(reqTrgHoro,0);
+  END IF;
+  BEGIN
+    TGE_CREATE_TRIGGER(nomTable);
+  EXCEPTION
+    WHEN OTHERS THEN NULL;
+  END;
+END DIC_CREATE_TRG_HORO;

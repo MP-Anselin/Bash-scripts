@@ -1,0 +1,26 @@
+<interface idInterface="PDC">
+	<nomInterface>POSTE_DE_CONTROLE</nomInterface>
+	<descriptionInterface>Chargement des tables du poste de controle</descriptionInterface>
+	<alerteSiFichierNonDisponible>OUI</alerteSiFichierNonDisponible>
+	<listeDependancesFichiers>
+		<nomFichierDep>PDC.TXT</nomFichierDep>
+	</listeDependancesFichiers>
+	<traitements>
+		<traitement>
+			<descriptionTraitement>Chargement des donnees</descriptionTraitement>
+			<typeTraitement>CHARGEMENT</typeTraitement>
+			<nbcommit>1000</nbcommit>
+			<nomFichier>PDC.TXT</nomFichier>
+			<typeFichier>MAJBASE</typeFichier>
+			<modeChargement>AER</modeChargement>
+			<continueSiErreur>OUI</continueSiErreur>
+		</traitement>
+		<traitement>
+			<descriptionTraitement>Script SQL standard apres chargement du fichier PDC</descriptionTraitement>
+			<typeTraitement>SCRIPT</typeTraitement>
+			<nomFichier>sql_RD_apres_PDC.sql</nomFichier>
+			<typeFichier>SQL</typeFichier>
+			<continueSiErreur>OUI</continueSiErreur>
+		</traitement>
+	</traitements>
+</interface>

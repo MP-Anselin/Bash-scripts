@@ -1,0 +1,80 @@
+##
+TGE_GAP_DO_PRE_CONTROLE
+=SQL=
+CREATE OR REPLACE PROCEDURE TGE_GAP_DO_PRE_CONTROLE(
+    P_LOGIN       IN VARCHAR2 ,
+    P_DATE_IMPORT IN VARCHAR2 ,
+    P_REQUETES    IN VARCHAR2 )
+AS
+  v_temp_Request VARCHAR2(4000);
+  CURSOR v_lignes_gap_data
+  IS
+    /* Toutes les lignes à controler */
+    SELECT *
+    FROM TGE_IMPORT_GAP_RETRO_DATA
+    WHERE login     = P_LOGIN
+    AND date_import = P_DATE_IMPORT
+    AND statut     IS NULL;
+  v_ligne_gap_data v_lignes_gap_data%ROWTYPE;
+  v_ligne_en_erreur_msg VARCHAR2(1000);
+  v_nb_all_occs         NUMBER;
+BEGIN
+  OPEN v_lignes_gap_data;
+  LOOP
+    FETCH v_lignes_gap_data INTO v_ligne_gap_data;
+    EXIT
+  WHEN v_lignes_gap_data%NOTFOUND;
+    v_ligne_en_erreur_msg := '';
+    v_temp_Request        := 'select count(*) from ('||P_REQUETES||')';
+    v_temp_Request        := REPLACE(v_temp_Request,'##MATRICULE##',''''||v_ligne_gap_data.matricule||'''');
+    v_temp_Request        := REPLACE(v_temp_Request,'##NUMPAC##',''''||v_ligne_gap_data.NUMPAC||'''');
+    v_temp_Request        := REPLACE(v_temp_Request,'##PACMAT##',''''||v_ligne_gap_data.PACMAT||'''');
+    v_temp_Request        := REPLACE(v_temp_Request,'##NUMCNT##',''''||v_ligne_gap_data.NUMCNT||'''');
+    v_temp_Request        := REPLACE(v_temp_Request,'##DATE_PROPAGATION##',''''||v_ligne_gap_data.DATE_PROPAGATION||'''');
+    BEGIN
+      EXECUTE immediate v_temp_Request INTO v_nb_all_occs;
+    EXCEPTION
+    WHEN OTHERS THEN
+      BEGIN
+        v_ligne_en_erreur_msg := GET_MESSAGE_ERREUR('TGE','IMPGR036','fr_fr');
+        v_nb_all_occs         := -1;
+      END;
+    END;
+    IF v_nb_all_occs      > 1 THEN
+      v_ligne_en_erreur_msg := GET_MESSAGE_ERREUR('TGE','IMPGR043','fr_fr');
+    END IF;
+    IF LENGTH(v_ligne_en_erreur_msg) > 0 THEN
+      /*** Si le le nombre de lignes dans la requete simple est different de celui dans la requete avec group by c'est qu'il y au moins une rupture **/
+      UPDATE TGE_IMPORT_GAP_RETRO_DATA D
+      SET D.statut        = 'KO'
+      WHERE D.date_import = v_ligne_gap_data.date_import
+      AND D.login         = v_ligne_gap_data.login
+      AND d.numligne      = v_ligne_gap_data.numligne;
+      INSERT
+      INTO TGE_IMPORT_GAP_ERREURS VALUES
+        (
+          v_ligne_gap_data.login,
+          v_ligne_gap_data.date_import,
+          v_ligne_gap_data.NUMLIGNE,
+          (SELECT NVL(MAX(occerr),0)
+          FROM TGE_IMPORT_GAP_ERREURS Err
+          WHERE Err.login     = v_ligne_gap_data.login
+          AND err.date_import = v_ligne_gap_data.DATE_IMPORT
+          AND err.NUMLIGNE    = v_ligne_gap_data.NUMLIGNE
+          ) + 1,
+          v_ligne_gap_data.MATRICULE,
+          v_ligne_gap_data.NUMPAC,
+          v_ligne_gap_data.PACMAT,
+          v_ligne_gap_data.PAIEZAD,
+          v_ligne_gap_data.NUMCNT,
+          v_ligne_gap_data.DATE_EFFET,
+          NULL ,
+          NULL,
+          'P',
+          v_ligne_en_erreur_msg,
+          NULL
+        );
+    END IF;
+  END LOOP;
+  CLOSE v_lignes_gap_data;
+END TGE_GAP_DO_PRE_CONTROLE;

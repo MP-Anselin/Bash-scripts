@@ -1,0 +1,20 @@
+##
+TAG_CHARSET=@€ιθη
+##
+SEQ_CODE_DELEGATION
+=SQL=
+DECLARE
+    lastSeq number;
+    exist_seq number;
+BEGIN
+    SELECT COUNT(*) INTO exist_seq FROM USER_SEQUENCES WHERE SEQUENCE_NAME = 'SEQ_CODE_DELEGATION';
+    IF exist_seq = 1 then
+        RETURN;
+    END IF;
+
+    SELECT MAX(CODE_DELEGATION) INTO lastSeq FROM DEL_DELEGATION;
+    if lastSeq IS NULL then
+      lastSeq := 1;
+    end if;
+    execute immediate 'CREATE SEQUENCE SEQ_CODE_DELEGATION MINVALUE 1 MAXVALUE 9999999999 INCREMENT BY 1 START WITH ' || lastSeq || ' NOCACHE NOORDER NOCYCLE';
+END;

@@ -1,0 +1,169 @@
+##
+TAG_CHARSET=@€éèç
+##
+TRG_DIC_ADM_CONTRAT_SITU
+=SQL=
+CREATE OR REPLACE TRIGGER TRG_DIC_ADM_CONTRAT_SITU FOR INSERT OR UPDATE OR DELETE ON DIC_ADM_CONTRAT_SITU COMPOUND TRIGGER 
+  codeChrono NUMBER;
+  TYPE T_MPE_BY_NUMPAC IS TABLE OF TGE_REF_PAC.MPE%TYPE INDEX BY TGE_REF_PAC.NUMPAC%TYPE;
+  tabMpeByNumpac T_MPE_BY_NUMPAC;
+  
+  TYPE T_TRAITEMENT_PERIODES_INDIV IS TABLE OF VARCHAR2(100) INDEX BY VARCHAR2(100);
+  -- Ce tableau indexé contient plusieurs chose :
+  -- + Une entrée avec un code PAC + un PAIEZAD --> Un flag permettant de savoir si le couple NUMPAC/PAIEZAD a déjà été traité
+  -- + Une entrée avec un code PAC --> La période en cours du PAC
+  tabTrtPeriodesIndividuelles T_TRAITEMENT_PERIODES_INDIV;
+  
+  v_numpac DIC_ADM_CONTRAT_SITU.NUMPAC%TYPE;
+  v_pacmat DIC_ADM_CONTRAT_SITU.PACMAT%TYPE;
+  v_numcnt DIC_ADM_CONTRAT_SITU.NUMCNT%TYPE;
+  v_paiezad DIC_ADM_CONTRAT_SITU.PAIEZAD%TYPE;
+  v_codeChrono DIC_ADM_CONTRAT_SITU.CODE_CHRONO%TYPE;
+  V_DE_SSAAMM VARCHAR2(6);
+  periode_deb_histo_retro VARCHAR2(6);
+  periode_paie_en_cours   VARCHAR2(6);
+  periode_deb_retro       VARCHAR2(6);
+  nb_mois_retro           NUMBER;
+  TYPE paiezadTabType is table of DIC_ADM_CONTRAT_SITU.PAIEZAD%TYPE ;
+  TYPE numpacTabType is  table of DIC_ADM_CONTRAT_SITU.NUMPAC%TYPE ;
+  paiezadTab paiezadTabType := paiezadTabType();
+  numpacTab numpacTabType := numpacTabType();
+  mpe TGE_REF_PAC.MPE%TYPE;
+  auMoinsUnPacMpe BOOLEAN;
+  v_countSecNav    NUMBER := -1;
+  prefixeCodeChrono VARCHAR2(5);
+  quantiemeCodeChrono NUMBER;
+  suffixeCodeChrono NUMBER;
+  existeCodeChrono NUMBER;
+   v_jobIdx          NUMBER;
+  BEFORE STATEMENT IS BEGIN
+    SELECT COUNT(*) INTO v_countSecNav FROM SECUPACMAT_TMP WHERE MATRIC='SECNAV';
+    IF v_countSecNav>0 THEN
+      RAISE_APPLICATION_ERROR(-20000,'CODERR=GENREC03');
+    END IF;
+  END BEFORE STATEMENT;
+  BEFORE EACH ROW IS BEGIN
+    v_numpac := NVL(:NEW.NUMPAC,:OLD.NUMPAC);
+    v_pacmat := NVL(:NEW.PACMAT,:OLD.PACMAT);
+    v_numcnt := NVL(:NEW.NUMCNT,:OLD.NUMCNT);
+    IF NOT tabMpeByNumpac.exists(v_numpac) THEN
+      BEGIN
+        SELECT NVL(MPE,'N') INTO mpe FROM TGE_REF_PAC WHERE NUMPAC=v_numpac;
+      EXCEPTION WHEN OTHERS THEN mpe := 'N'; END;
+      tabMpeByNumpac(v_numpac) := mpe;
+    END IF; 
+    -- On vérifie qu'on ne modifie ni le NUMPAC, ni le PACMAT, ni le NUMCNT, ni le PAIEZAD
+    IF UPDATING AND (NOT :OLD.NUMPAC=:NEW.NUMPAC OR NOT :OLD.PACMAT=:NEW.PACMAT OR NOT :OLD.NUMCNT=:NEW.NUMCNT OR NOT :OLD.PAIEZAD=:NEW.PAIEZAD) THEN
+      -- Message d'erreur --> On interdit la mise à jour du NUMPAC, du PACMAT, du NUMCNT et du PAIEZAD : il faut faire un delete puis un insert
+      RAISE_APPLICATION_ERROR(-20000,'La mise à jour des colonnes NUMPAC, PACMAT, NUMCNT et PAIEZAD n''est pas autorisée : vous devez supprimer puis recréer la situation');
+    END IF;
+    -- On vérifie qu'on ne modifie pas le RHID et qu'il n'est pas vide
+    IF (INSERTING OR UPDATING) AND :NEW.MATRIC IS NULL THEN
+      RAISE_APPLICATION_ERROR(-20000,'La colonne MATRIC doit être renseignée dans DIC_ADM_CONTRAT_SITU');
+    END IF;
+    IF UPDATING AND NOT :OLD.MATRIC=:NEW.MATRIC THEN
+      RAISE_APPLICATION_ERROR(-20000,'La mise à jour de la colonne MATRIC n''est pas autorisée');
+    END IF;
+    -- On vérifie qu'on ne modifie pas le RHID et qu'il n'est pas vide
+    IF (INSERTING OR UPDATING) AND :NEW.DSDSC IS NULL THEN
+      RAISE_APPLICATION_ERROR(-20000,'La colonne DSDSC doit être renseignée dans DIC_ADM_CONTRAT_SITU');
+    END IF;
+    IF UPDATING AND NOT :OLD.DSDSC=:NEW.DSDSC THEN
+      RAISE_APPLICATION_ERROR(-20000,'La mise à jour de la colonne DSDSC n''est pas autorisée');
+    END IF;
+    
+    IF INSERTING AND :NEW.CODE_CHRONO IS NULL THEN
+      IF tabMpeByNumpac(v_numpac)='N' THEN
+        -- CODE CHRONO à 000000 si pac non mpe
+        :NEW.CODE_CHRONO := '000000';
+      ELSE
+        -- si pac en MPE CODE_CHRONO calculée à partir de la date de début de situation : Année (sans le siècle) + quantième de jour (3 caractères) + '0'
+        prefixeCodeChrono := SUBSTR(TO_CHAR(:NEW.DSDSC,'yyyy'),3);
+        quantiemeCodeChrono := :NEW.DSDSC- trunc(:NEW.DSDSC,'yyyy')+1;
+        -- Le suffix est toujours à 0
+        suffixeCodeChrono := 0;
+        -- On va vérifier que le code chrono n'existe pas pour le PACMAT (cas d'une modification de date d'embauche qui aurait gardé le même code chrono)
+        -- ou bien d'autres cas, voir la fonction EXISTS_CODE_CHRONO
+        LOOP
+          :NEW.CODE_CHRONO := prefixeCodeChrono || LPAD(quantiemeCodeChrono,3,'0') || suffixeCodeChrono;
+          existeCodeChrono := EXISTS_CODE_CHRONO(:NEW.NUMPAC, :NEW.PACMAT, :NEW.CODE_CHRONO);
+          EXIT WHEN existeCodeChrono=0;
+          quantiemeCodeChrono := quantiemeCodeChrono + 1;
+          EXIT WHEN quantiemeCodeChrono=1000;
+        END LOOP;
+        IF quantiemeCodeChrono=1000 THEN
+          -- On ne peut plus créer de CODE_CHRONO pour cette date de début de situation : on lance une erreur
+          RAISE_APPLICATION_ERROR(-20000,'Nombre maximum de codes chrono atteint pour une situation de contrat débutant le '||TO_CHAR(:NEW.DSDSC,'dd.mm.yyyy')||' pour le matricule paie '||:NEW.PACMAT||' du PAC '||:NEW.NUMPAC);
+        END IF;
+        auMoinsUnPacMpe := TRUE;
+      END IF;
+    ELSE
+      IF UPDATING AND NOT :OLD.CODE_CHRONO=:NEW.CODE_CHRONO THEN
+        RAISE_APPLICATION_ERROR(-20000,'La mise à jour de la colonne CODE_CHRONO n''est pas autorisée');
+      END IF;
+      IF DELETING AND NOT tabMpeByNumpac(v_numpac)='N' THEN
+        auMoinsUnPacMpe := TRUE;
+        MERGE INTO DELETED_PAIEZAD C USING (SELECT :OLD.NUMPAC AS NUMPAC, :OLD.PACMAT AS PACMAT, :OLD.NUMCNT AS NUMCNT, :OLD.PAIEZAD AS PAIEZAD, :OLD.CODE_CHRONO as CODE_CHRONO FROM DUAL) Z ON (C.NUMPAC=Z.NUMPAC AND C.PACMAT=Z.PACMAT AND C.NUMCNT=Z.NUMCNT AND C.PAIEZAD=Z.PAIEZAD)
+        WHEN NOT MATCHED THEN INSERT (NUMPAC, PACMAT, NUMCNT, MATRIC, PAIEZAD, DATE_SUPPRESSION, CODE_CHRONO) VALUES (:OLD.NUMPAC, :OLD.PACMAT, :OLD.NUMCNT, :OLD.MATRIC, :OLD.PAIEZAD, SYSDATE, :OLD.CODE_CHRONO);
+      END IF;
+    END IF;
+    UPDATE DIC_ADM_CONTRAT SET TYPE_WRITER='N', CURRENT_PAIEZAD=(SELECT PAIEZAD FROM DIC_ADM_CONTRAT_HISTO WHERE DIC_ADM_CONTRAT_HISTO.NUMPAC=DIC_ADM_CONTRAT.NUMPAC AND DIC_ADM_CONTRAT_HISTO.PACMAT=DIC_ADM_CONTRAT.PACMAT AND DIC_ADM_CONTRAT_HISTO.NUMCNT=DIC_ADM_CONTRAT.NUMCNT AND DIC_ADM_CONTRAT_HISTO.DATE_EFF=DIC_ADM_CONTRAT.DATE_EFF_CONTRAT) WHERE NUMPAC=v_numpac AND PACMAT=v_pacmat AND NUMCNT=v_numcnt;
+  END BEFORE EACH ROW;
+  
+  AFTER EACH ROW IS BEGIN
+    v_numpac := NVL(:NEW.NUMPAC,:OLD.NUMPAC);
+    v_paiezad :=NVL(:NEW.paiezad,:OLD.paiezad);
+    -- On ne traite chaque couple NUMPAC/PAIEZAD qu'une seule fois
+    IF (INSERTING OR DELETING OR (UPDATING('DSFSC') AND NOT :NEW.DSFSC=:OLD.DSFSC)) AND NOT tabTrtPeriodesIndividuelles.exists(v_numpac||v_paiezad) THEN
+        SELECT  GREATEST (NVL( s.PREMIERE_PAIE, '190101'),z.DEB_HISTO_RETRO )AS DEB_HISTO_RETRO,
+	      z.PERIODEENCOURS,
+	      z.DEB_RETRO,
+	      z.NB_MOIS_RETRO
+	    INTO periode_deb_histo_retro,
+	      periode_paie_en_cours,
+	      periode_deb_retro, 
+	      nb_mois_retro
+	    FROM TGE_REF_PAC z LEFT JOIN secupacmat s
+        ON s.numpac=z.numpac AND s.pacmat = v_pacmat
+	    WHERE z.NUMPAC = v_numpac  ;
+	    tabTrtPeriodesIndividuelles(v_numpac||v_paiezad) := periode_paie_en_cours;
+	    IF(periode_deb_histo_retro IS NOT NULL AND periode_paie_en_cours >= periode_deb_histo_retro) THEN
+	      tabTrtPeriodesIndividuelles(v_numpac||v_paiezad) := TO_CHAR(NVL(:NEW.dsdsc,:OLD.dsdsc), 'YYYYMM');
+	    END IF;
+      IF DELETING THEN
+        -- Suppression : on supprime de la table des périodes individuelles
+        DELETE FROM TGE_PERIODE_RECUEIL_PAIEZAD WHERE NUMPAC = v_numpac AND PAIEZAD = v_paiezad;
+        -- Inscription Retro
+        IF(periode_paie_en_cours >= periode_deb_retro AND periode_deb_retro IS NOT NULL) THEN
+        	-- La période rétro doit être >= à :
+            -- - La date de début des histos de rétro
+            -- - La période en cours - le nombre de mois de rétro
+            -- On prend donc la plus grande de ces 2 dates + la date d'effet
+            V_DE_SSAAMM := GREATEST(TO_CHAR(LEAST(NVL(:NEW.DSDSC,:OLD.DSDSC), NVL(:OLD.DSDSC,:NEW.DSDSC)) ,'YYYYMM'),periode_deb_histo_retro,TO_CHAR(ADD_MONTHS(to_date(periode_paie_en_cours,'YYYYMM'),-nb_mois_retro),'YYYYMM'));
+            IF(V_DE_SSAAMM < periode_paie_en_cours) THEN
+    			v_pacmat := NVL(:NEW.PACMAT,:OLD.PACMAT);
+            	v_codeChrono := NVL(:NEW.CODE_CHRONO,:OLD.CODE_CHRONO);
+            	
+            	TGE_RETRO_INSCRIPTION(v_numpac, v_pacmat, V_DE_SSAAMM, v_codeChrono, v_paiezad, 'DIC_ADM_CONTRAT_SITU');
+            END IF;
+        END IF;
+      ELSE
+        -- Création ou modification de la date de fin : on met à jour la table des périodes individuelles
+        paiezadTab.EXTEND ;
+        paiezadTab(paiezadTab.LAST) := v_paiezad;
+        numpacTab.EXTEND ;
+        numpacTab(numpacTab.LAST) :=v_numpac;
+      END IF;
+    END IF;
+  END AFTER EACH ROW;
+
+  AFTER STATEMENT IS BEGIN
+    IF (INSERTING OR DELETING) AND auMoinsUnPacMpe THEN
+      -- On supprime de la table DELETED_PAIEZAD les situations qui n'ont pas lieu d'y être (situations recréés avec le même PAIEZAD)
+      DELETE FROM DELETED_PAIEZAD WHERE (NUMPAC,PACMAT,CODE_CHRONO) IN (SELECT NUMPAC,PACMAT,CODE_CHRONO FROM DIC_ADM_CONTRAT_SITU);
+    END IF;
+    FOR i IN 1..numpacTab.count LOOP
+    	DBMS_JOB.SUBMIT(v_jobIdx , 'TGE_ALIM_PERIODE_INDIV(0, '''||numpacTab(i)||''', '''|| tabTrtPeriodesIndividuelles(numpacTab(i)||paiezadTab(i)) ||''', '''|| paiezadTab(i) ||''');' , sysdate-1);
+   END LOOP ;
+  END AFTER STATEMENT;
+END;

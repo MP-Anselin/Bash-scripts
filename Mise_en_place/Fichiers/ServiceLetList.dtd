@@ -1,0 +1,19 @@
+<!ELEMENT All (ServiceLetList+,JSONServiceLetList+,ExterneModulDescriptors*,Jsp_Tag_OK_List+)>
+<!ELEMENT ServiceLetList (ServiceLet+)>
+<!ELEMENT ServiceLet (Synonyme)>
+<!ELEMENT Synonyme (#PCDATA)>
+<!ATTLIST ServiceLet Name CDATA #REQUIRED>
+
+<!ELEMENT JSONServiceLetList (JSONServiceLet+)>
+<!ELEMENT JSONServiceLet (JSONSynonyme)>
+<!ELEMENT JSONSynonyme (#PCDATA)>
+<!ATTLIST JSONServiceLet Name CDATA #REQUIRED>
+
+<!ELEMENT ExterneModulDescriptors (ExterneModulDescriptor+)>
+<!ATTLIST ExterneModulDescriptor name CDATA #REQUIRED>
+<!ATTLIST ExterneModulDescriptor vesrionWeb CDATA #REQUIRED>
+
+<!ELEMENT Jsp_Tag_OK_List (Jsp_Tag_OK+)>
+<!ELEMENT Jsp_Tag_OK (#PCDATA)>
+<!ATTLIST Jsp_Tag_OK Name CDATA #REQUIRED>
+<!ATTLIST Jsp_Tag_OK FieldName CDATA #REQUIRED>

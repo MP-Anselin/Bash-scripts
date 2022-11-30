@@ -1,0 +1,4 @@
+##
+SYS_COLLABORATEURS
+==
+CREATE OR REPLACE FORCE VIEW "SYS_COLLABORATEURS" ("MATRIC", "NOM", "PRENOM", "EMAIL", "TYPE") AS   (SELECT s.matric,s.nom,s.prenom , '' AS email, 'I' AS TYPE FROM secuPACMAT s WHERE priorite_situation=0  UNION  SELECT e.login AS matric ,    e.nomfam     AS nom ,    e.prenom ,    e.email, 'E'  FROM sys_usr_externe e  )

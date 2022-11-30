@@ -1,0 +1,26 @@
+##
+HELPDESK_LINEARISE_DEV
+=SQL=
+CREATE OR REPLACE
+  FUNCTION HELPDESK_LINEARISE_DEV(
+      pcodfiche IN VARCHAR2 )
+    RETURN VARCHAR2
+  IS
+  type tcur
+IS
+  ref
+  CURSOR;
+    cur tcur;
+    retourselect VARCHAR2(2000);
+    retour CLOB;
+  BEGIN
+    OPEN cur FOR SELECT CODEUSER FROM HELPDESK_FICHE_INTERVENANT WHERE CODFICHE = pcodfiche order by CODEUSER ASC ;
+    LOOP
+      FETCH cur INTO retourselect;
+    EXIT
+  WHEN cur % NOTFOUND;
+    retour := retour||retourselect||';';
+  END LOOP ;
+  CLOSE cur;
+  RETURN SUBSTR(retour, 0, LENGTH(retour)-1);
+END;

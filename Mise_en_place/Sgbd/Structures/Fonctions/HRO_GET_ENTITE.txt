@@ -1,0 +1,72 @@
+##
+TAG_CHARSET=@€éèç
+##
+HRO_GET_ENTITE
+=SQL=
+CREATE OR REPLACE FUNCTION HRO_GET_ENTITE(
+    p_codts  IN std_struc_arbre.codts%TYPE,
+    p_niv    IN std_struc_niv.niveau%TYPE,
+    p_entite IN std_struc_entite.code_entite%TYPE,
+    p_date   IN std_struc_entite.date_eff%TYPE,
+    p_cid    IN std_struc_entite.cid%TYPE default null)
+  RETURN std_struc_entite.code_entite%TYPE
+IS
+  v_cid std_struc_entite.cid%TYPE;
+  v_retour VARCHAR2(25);
+BEGIN
+  v_cid := p_cid;
+  IF (v_cid IS NULL) THEN
+  	BEGIN
+  		SELECT VALVAR INTO v_cid FROM SYS_VARSYS where CODVAR = 'NS_CLIENT_ID';
+  	EXCEPTION
+  	WHEN NO_DATA_FOUND THEN
+  		v_cid := null;
+  	END;
+  END IF;
+  IF (v_cid IS NULL) THEN
+  	-- En mode multiclient, la varsys peut être null et le passage du paramètre pCid est obligatoire
+  	RETURN null;
+  END IF;
+	
+	
+	
+  SELECT code_entite
+  INTO v_retour
+  FROM
+    ( WITH entitepere ( code_entite, code_ent_mere, codts ) AS
+    (SELECT a.code_entite,
+      a.code_ent_mere,
+      a.codts
+    FROM std_struc_arbre a
+    WHERE a.code_entite =p_entite
+    AND a.cid = v_cid
+    AND a.codts         =p_codts
+    AND p_date BETWEEN a.date_eff AND a.date_fin
+    AND statut = '1'
+    UNION ALL
+    SELECT a.code_entite,
+      a.code_ent_mere,
+      a.codts
+    FROM std_struc_arbre a,
+      entitepere f
+    WHERE f.code_ent_mere = a.code_entite
+    AND a.cid = v_cid
+    AND a.codts           =p_codts
+    AND p_date BETWEEN a.date_eff AND a.date_fin
+    AND statut = '1'
+    )
+  SELECT a.code_entite
+  FROM entitepere a,
+    std_struc_entite e,
+  	std_struc_index idx
+  WHERE a.code_entite = e.code_entite
+  AND e.cid = v_cid
+  AND idx.cid = v_cid
+  AND a.codts = idx.codts 
+  AND a.code_entite = idx.last_entite
+  AND p_date BETWEEN e.date_eff AND e.date_fin
+  AND p_date BETWEEN idx.date_eff AND idx.date_fin
+  AND idx.niv_tech = p_niv
+    ) ;
+  RETURN v_retour ;
+END HRO_GET_ENTITE;

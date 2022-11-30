@@ -1,0 +1,47 @@
+##
+CREATE_TABLE_DIC_ADM_CONTRAT_PIVOT
+=SQL=
+CREATE OR REPLACE PROCEDURE CREATE_TABLE_DIC_ADM_CONTRAT_PIVOT IS
+    v_count        NUMBER;
+    nbtabledach    NUMBER;
+    insertclause   VARCHAR(1000);
+    reqsql         VARCHAR(1000);
+BEGIN 
+  /*récupération de la varsys NB_EXTENSION_DACH*/
+    SELECT
+        to_number(valvar)
+    INTO nbtabledach
+    FROM
+        sys_varsys
+    WHERE
+        codvar = 'NB_EXTENSION_DACH'
+        AND module = 'SYS';
+
+    IF ( nbtabledach > 0 AND nbtabledach < 6 ) THEN
+        v_count := 1;
+        insertclause := '';
+        WHILE ( v_count <= nbtabledach ) LOOP
+            insertclause := insertclause
+                            || ',DATE_EFF_DACH'
+                            || v_count
+                            || ' DATE';
+            v_count := v_count + 1;
+        END LOOP;
+    /* Création de la table DIC_ADM_CONTRAT_PIVOT*/
+
+        reqsql := 'CREATE TABLE DIC_ADM_CONTRAT_PIVOT (NUMPAC VARCHAR2(6), PACMAT	VARCHAR2(8),NUMCNT	NUMBER(9,0),PAIEZAD	VARCHAR2(8),DATE_EFF DATE, DATE_FIN	DATE, PRIMARY KEY (NUMPAC, PACMAT, NUMCNT, PAIEZAD, DATE_EFF) '
+                  || insertclause
+                  || ')PARTITION BY RANGE (DATE_EFF) INTERVAL (NUMTOYMINTERVAL(1, ''MONTH''))
+    SUBPARTITION BY HASH(NUMPAC)
+    SUBPARTITIONS 8 (PARTITION BEFORE_2013 VALUES LESS THAN (TO_DATE(''01-01-2013'', ''dd-MM-yyyy'')))'
+                  ;
+        EXECUTE IMMEDIATE reqsql;
+        
+        EXECUTE IMMEDIATE 'ALTER TABLE DIC_ADM_CONTRAT_PIVOT ENABLE ROW MOVEMENT';
+        COMMIT;
+    END IF;
+
+EXCEPTION
+    WHEN OTHERS THEN
+       RAISE;
+END ;

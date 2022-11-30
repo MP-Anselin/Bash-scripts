@@ -1,0 +1,61 @@
+##
+TAG_CHARSET=@€ιθη
+##
+MAJ_TABLES_REF_A_PARTIR_DE_HIS
+==
+CALL REF_MISAJOUR('')
+##
+REF_MISAJOUR
+=SQL=
+create or replace PROCEDURE REF_MISAJOUR(p_company_id VARCHAR2) AS BEGIN
+  if p_company_id is not null then
+    delete ref_ecran;
+    insert into ref_ecran select * from meta_ecran where company_id=p_company_id;
+    update ref_ecran set company_id='*';
+    delete ref_dictionnaire;
+    insert into ref_dictionnaire select * from meta_dictionnaire where company_id=p_company_id;
+    update ref_dictionnaire set company_id='*';
+    delete  ref_donnee_generale;
+    insert into ref_donnee_generale select * from meta_donnee_generale where company_id=p_company_id;
+    update ref_donnee_generale set company_id='*';
+    delete ref_donnee_ecran;
+    insert into ref_donnee_ecran select * from meta_donnee_ecran where company_id=p_company_id;
+    update ref_donnee_ecran set company_id='*';
+    delete  ref_destination_ecran;
+    insert into ref_destination_ecran select * from meta_destination_ecran where company_id=p_company_id;
+    update ref_destination_ecran set company_id='*';
+    delete  ref_groupe_donnees_info;
+    insert into ref_groupe_donnees_info  select * from meta_groupe_donnees_info where company_id=p_company_id;
+    update ref_groupe_donnees_info set company_id='*';
+    delete ref_groupe_donnees;
+    insert into ref_groupe_donnees  select * from meta_groupe_donnees where company_id=p_company_id;
+    update ref_groupe_donnees set company_id='*';
+    delete ref_reglegestion_desc;
+    insert into ref_reglegestion_desc select * from meta_reglegestion_desc where company_id=p_company_id;
+    update ref_reglegestion_desc set company_id='*';
+    delete ref_reglegestion;
+    insert into ref_reglegestion  select * from meta_reglegestion where company_id=p_company_id;
+    update ref_reglegestion set company_id='*';
+    delete ref_wkf_operation_ecrans_info;
+    insert into ref_wkf_operation_ecrans_info  select * from meta_wkf_operation_ecrans_info where company_id=p_company_id;
+    update ref_wkf_operation_ecrans_info set company_id='*';
+    delete ref_wkf_operation_ecrans;
+    insert into ref_wkf_operation_ecrans  select * from meta_wkf_operation_ecrans where company_id=p_company_id;
+    update ref_wkf_operation_ecrans set company_id='*';
+    delete ref_donnee_mapping_ux;
+ 	insert into ref_donnee_mapping_ux  select * from meta_donnee_mapping_ux where company_id=p_company_id;
+ 	update ref_donnee_mapping_ux set company_id='*';
+ 	delete ref_groupe_donnees_tableaux;
+ 	insert into ref_groupe_donnees_tableaux  select * from meta_groupe_donnees_tableaux where company_id=p_company_id;
+ 	update ref_groupe_donnees_tableaux set company_id='*';
+ 	
+ 	BEGIN
+ 	  DBMS_MVIEW.REFRESH('META_AT_IMPACT_ERREURS_PARAMETRAGES');
+ 	  DBMS_MVIEW.REFRESH('META_AT_IMPACT_MODELE_DONNEES');
+ 	  DBMS_MVIEW.REFRESH('META_AT_IMPACT_RECHERCHE_GLOBALE');
+ 	  DBMS_MVIEW.REFRESH('META_AT_IMPACT_VAL_ZONE');
+ 	  DBMS_MVIEW.REFRESH('META_AT_IMPACT_WORKFLOWS');
+ 	  DBMS_MVIEW.REFRESH('META_AT_IMPACT_WORKFLOWS_DETAILS_ECRANS');
+ 	EXCEPTION WHEN OTHERS THEN NULL; END;
+  end if;
+END REF_MISAJOUR;

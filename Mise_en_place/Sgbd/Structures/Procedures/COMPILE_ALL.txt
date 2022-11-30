@@ -1,0 +1,110 @@
+##
+COMPILE_ALL
+=SQL=
+create or replace PROCEDURE COMPILE_ALL
+AS
+BEGIN
+  --DBMS_OUTPUT.Put_Line(' View ');
+  --FIXME utiliser la procédure trace_dbms_output()
+  FOR cur IN
+  (SELECT OBJECT_NAME,
+    OBJECT_TYPE
+  FROM user_objects
+  WHERE object_type = 'VIEW'
+  AND status        = 'INVALID'
+  )
+  LOOP
+    BEGIN
+      EXECUTE_IMMEDIATE_STRING('alter VIEW ' || cur.OBJECT_NAME || ' compile',0);
+      --DBMS_OUTPUT.Put_Line('Vue '|| cur.OBJECT_NAME || ' is compiled');
+      --FIXME utiliser la procédure trace_dbms_output()
+    EXCEPTION
+    WHEN OTHERS THEN
+      --DBMS_OUTPUT.Put_Line('Vue '|| cur.OBJECT_NAME || ' is not compiled');
+      --FIXME utiliser la procédure trace_dbms_output()
+      NULL;
+    END;
+  END LOOP;
+  --DBMS_OUTPUT.Put_Line(' Fonction ');
+  --FIXME utiliser la procédure trace_dbms_output()
+  FOR cur IN
+  (SELECT OBJECT_NAME,
+    OBJECT_TYPE
+  FROM user_objects
+  WHERE object_type = 'FUNCTION'
+  AND status        = 'INVALID'
+  )
+  LOOP
+    BEGIN
+      EXECUTE_IMMEDIATE_STRING( 'alter FUNCTION ' || cur.OBJECT_NAME || ' compile',0);
+      --DBMS_OUTPUT.Put_Line('Fonction '|| cur.OBJECT_NAME || ' is compiled');
+      --FIXME utiliser la procédure trace_dbms_output()
+    EXCEPTION
+    WHEN OTHERS THEN
+      --DBMS_OUTPUT.Put_Line('Fonction '|| cur.OBJECT_NAME || ' is not compiled');
+      --FIXME utiliser la procédure trace_dbms_output()
+      NULL;
+    END;
+  END LOOP;
+  --DBMS_OUTPUT.Put_Line(' Procédure ');
+  FOR cur IN
+  (SELECT OBJECT_NAME,
+    OBJECT_TYPE
+  FROM user_objects
+  WHERE object_type = 'PROCEDURE'
+  AND status        = 'INVALID'
+  )
+  LOOP
+    BEGIN
+      EXECUTE_IMMEDIATE_STRING('alter PROCEDURE ' || cur.OBJECT_NAME || ' compile',0);
+      --DBMS_OUTPUT.Put_Line('Procedure '|| cur.OBJECT_NAME || ' is compiled');
+    EXCEPTION
+    WHEN OTHERS THEN
+      --DBMS_OUTPUT.Put_Line('Procedure '|| cur.OBJECT_NAME || ' is not compiled');
+      --FIXME utiliser la procédure trace_dbms_output()
+      NULL;
+    END;
+  END LOOP;
+  --DBMS_OUTPUT.Put_Line(' Package ');
+  FOR cur IN
+  (SELECT OBJECT_NAME,
+    OBJECT_TYPE
+  FROM user_objects
+  WHERE object_type IN ('PACKAGE','PACKAGE BODY')
+  AND status         = 'INVALID'
+  )
+  LOOP
+    BEGIN
+      IF cur.OBJECT_TYPE = 'PACKAGE BODY' THEN
+        EXECUTE_IMMEDIATE_STRING('alter PACKAGE ' || cur.OBJECT_NAME || ' compile body',0);
+      ELSE
+        EXECUTE_IMMEDIATE_STRING('alter PACKAGE ' || cur.OBJECT_NAME || ' compile',0);
+      END IF;
+    EXCEPTION
+    WHEN OTHERS THEN
+      --DBMS_OUTPUT.Put_Line('Package '|| cur.OBJECT_NAME || ' is not compiled');
+      --FIXME utiliser la procédure trace_dbms_output()
+      NULL;
+    END;
+  END LOOP;
+  --DBMS_OUTPUT.Put_Line(' Trigger ');
+  FOR cur IN
+  (SELECT OBJECT_NAME,
+    OBJECT_TYPE
+  FROM user_objects
+  WHERE object_type = 'TRIGGER'
+  AND status        = 'INVALID'
+  )
+  LOOP
+    BEGIN
+      EXECUTE_IMMEDIATE_STRING('alter TRIGGER ' || cur.OBJECT_NAME || ' compile',0);
+      --DBMS_OUTPUT.Put_Line('Trigger '|| cur.OBJECT_NAME || ' is compiled');
+      --FIXME utiliser la procédure trace_dbms_output()
+    EXCEPTION
+    WHEN OTHERS THEN
+      --DBMS_OUTPUT.Put_Line('Trigger '|| cur.OBJECT_NAME || ' is not compiled');
+      --FIXME utiliser la procédure trace_dbms_output()
+      NULL;
+    END;
+  END LOOP;
+END;

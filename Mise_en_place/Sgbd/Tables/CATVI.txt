@@ -1,0 +1,14 @@
+##
+TAG_CHARSET=@€éèç
+##
+CATVI
+=SQL IFNOTEXIST=CATVI=
+CREATE TABLE "CATVI" (	"CODE" VARCHAR2(1) NOT NULL ENABLE, "LIBELLE" VARCHAR2(32) NOT NULL ENABLE, PRIMARY KEY(CODE))		 
+##
+CATVI
+==
+DELETE FROM CATVI WHERE CODE IN ('1', '2', '3','4')
+'1','Ressources annuelles >= 1PASS'
+'2','Ress.ann. < 1PASS et >= 1/2 PASS'
+'3','Ressources annuelles < 1/2 PASS'
+'4','Salarié de moins de 22 ans'

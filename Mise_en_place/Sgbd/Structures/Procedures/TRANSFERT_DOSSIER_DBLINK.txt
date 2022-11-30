@@ -1,0 +1,280 @@
+##
+TRANSFERT_DOSSIER_DBLINK
+=SQL=
+create or replace PROCEDURE TRANSFERT_DOSSIER_DBLINK (DbLinkSource VARCHAR2,dernierMoisPaieOnly varchar2) AS
+ v_requete CLOB; 
+ v_requeteTempo CLOB;
+ v_requeteTempoSelect CLOB;
+ v_requeteInsert CLOB; 
+ v_requeteSelect CLOB;
+ v_requeteDelete CLOB;
+ v_requeteDeleteSuppl CLOB;
+ v_nbColonneKO number;
+ v_nbMAPTA number;
+ v_nbColonneFormatKO number;
+ v_aliasDBlink varchar2(6);
+ v_colonneDTDEBHist varchar2(50);
+ v_cleMatric varchar2(1);
+ v_cleNumpacPacmat varchar2(1);
+ v_cleNumpacPaiezad varchar2(1);
+ v_moisPaie varchar2(10);
+ TYPE TcolonneList is table of varchar2(30);
+ v_colonneKO TcolonneList;
+ v_colonneTable TcolonneList;
+ v_colonnePK TcolonneList;
+ DbLinkCible varchar2(30);
+ DbLinkCibleBis varchar2(30);
+ v_nbMatricToTransf number;
+ 
+ CURSOR c_triggers IS SELECT object_name FROM user_objects WHERE lower(object_type)='trigger' and (lower(object_name) like 'horo%' or lower(object_name) like 'crf%' or lower(object_name) like 'trg_sec%' or lower(object_name) like 'trg_dic%'); nom_obj VARCHAR(500);
+ CURSOR c_triggers_crf IS SELECT object_name FROM user_objects WHERE lower(object_type)='trigger' and (lower(object_name) like 'crf%'); nom_obj_crf VARCHAR(500);
+ BEGIN
+ v_requete := 'select sys_context( ''userenv'', ''current_schema'' ) from dual';
+ EXECUTE IMMEDIATE v_requete into DbLinkCible;
+ 
+ v_requete := 'TRUNCATE TABLE DBL_TRANSFERT_DOSSIER_LOG';
+  EXECUTE_IMMEDIATE_STRING ( v_requete,0);
+ 
+ v_requete := 'SELECT COUNT(*) from DIC_DBL_TRANSDOSS_MATRIC';
+ EXECUTE IMMEDIATE v_requete into v_nbMatricToTransf;
+ -- Cette procédure a pour but de transférer les matricules provenant d'une base source via DbLink
+ -- La liste des matricules à transférer est dans la table DIC_DBL_TRANSDOSS_MATRIC
+ -- La liste des tables à transférer est dans la table DIC_DBL_TRANSDOSS_TABLE
+ -- Le suivi de la procédure se trouve dans la table DBL_TRANSFERT_DOSSIER_LOG
+ INSERT INTO DBL_TRANSFERT_DOSSIER_LOG (DATE_EXEC,MESSAGE) values (sysdate, 'Début du transfert des dossiers à partir de '|| DbLinkSource );
+ select count(*) into v_nbMAPTA from DIC_DBL_TRANSDOSS_TABLE, tge_ref_mapta where tge_ref_mapta.tableparam = dic_dbl_transdoss_table.transdoss_nom_table and dic_dbl_transdoss_table.transdoss_actif = 'O' and tge_ref_mapta.allerretour in ('A','2');
+ if v_nbMatricToTransf > '50' and v_nbMAPTA > 0 THEN
+ INSERT INTO DBL_TRANSFERT_DOSSIER_LOG (DATE_EXEC,MESSAGE) values (sysdate, 'Désactivation des triggers');
+ -- on désactive les triggers avant le transfert
+ FOR curs_trigger IN c_triggers
+ LOOP
+ nom_obj:=curs_trigger.object_name;
+  EXECUTE_IMMEDIATE_STRING  ('ALTER TRIGGER ' || nom_obj ||' DISABLE ',0);
+ END LOOP;
+ ELSE
+ -- on désactive les triggers avant le transfert
+ FOR curs_trigger IN c_triggers_crf
+ LOOP
+ nom_obj:=curs_trigger.object_name;
+  EXECUTE_IMMEDIATE_STRING  ('ALTER TRIGGER ' || nom_obj ||' DISABLE ',0);
+ END LOOP;
+ END IF;
+ -- on récupère les tables à transférer
+ FOR uneTableATranferer IN (SELECT TRANSDOSS_NOM_TABLE from DIC_DBL_TRANSDOSS_TABLE where TRANSDOSS_ACTIF = 'O')
+ LOOP
+ INSERT INTO DBL_TRANSFERT_DOSSIER_LOG (DATE_EXEC,MESSAGE) values (sysdate, 'Traitement table ' || uneTableATranferer.TRANSDOSS_NOM_TABLE);
+ -- On contrôle que la table peut être transférée sans erreurs, toutes les colonnes existantes sur la base cible doivent exister dans la source
+ v_requete := 'select count(column_name) from all_tab_columns@' || DbLinkSource || ' where owner = upper(''' || DbLinkSource || ''') and table_name = upper(''' || uneTableATranferer.TRANSDOSS_NOM_TABLE || ''') and column_name not in (select column_name from user_tab_columns where table_name = upper(''' || uneTableATranferer.TRANSDOSS_NOM_TABLE || '''))';
+ EXECUTE IMMEDIATE v_requete into v_nbColonneKO;
+ 
+ -- ETAPE I : Contrôle des colonne des tables
+ ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ -- Si une colonne est manquante dans la source
+ IF v_nbColonneKO > 0 THEN
+ v_requete := 'select column_name from all_tab_columns@' || DbLinkSource || ' where owner = upper(''' || DbLinkSource || ''') and table_name = upper(''' || uneTableATranferer.TRANSDOSS_NOM_TABLE || ''') and column_name not in (select column_name from user_tab_columns where table_name = upper(''' || uneTableATranferer.TRANSDOSS_NOM_TABLE || '''))';
+ EXECUTE IMMEDIATE v_requete BULK COLLECT into v_colonneKO ;
+ FOR i IN 1 .. v_colonneKO.COUNT
+ LOOP
+ -- On indique la colonne ko dans la table de log
+ insert into DBL_TRANSFERT_DOSSIER_LOG (DATE_EXEC,MESSAGE) values (sysdate,'Attention !!, pour la table  ' || uneTableATranferer.TRANSDOSS_NOM_TABLE || ', la colonne ' || v_colonneKO(i) || ' n''existe pas dans la base mais existe dans ' || DbLinkSource || ' cette colonne n''est donc pas transférée');
+ END LOOP;
+ END IF;
+ -- si pas de colonnes manquantes, on contrôle que les colonnes ont bien le même format entre la source uneTableATranferer.TRANSDOSS_NOM_TABLE la cible
+ v_requete :=  'select count(column_name) from user_tab_columns cible where table_name = upper(''' || uneTableATranferer.TRANSDOSS_NOM_TABLE || ''') and column_name in (select dblink.column_name from all_tab_columns@' || DbLinkSource || ' dblink where dblink.owner = upper(''' || DbLinkSource || ''') and dblink.table_name = cible.table_name and dblink.column_name = cible.column_name and
+ (dblink.data_type <> cible.data_type or (dblink.data_type = cible.data_type and dblink.data_length > cible.data_length)
+ or (dblink.data_type = cible.data_type and dblink.data_type = ''NUMBER'' and (nvl(dblink.data_precision,''99'') > nvl(cible.data_precision,''99'') or nvl(dblink.data_scale,''99'') > nvl(cible.data_scale,''99'')))))';
+ EXECUTE IMMEDIATE v_requete into v_nbColonneFormatKO;
+ -- Si une colonne n'est pas au même format dans la source
+ IF v_nbColonneFormatKO > 0 THEN
+ v_requete :=  'select column_name from user_tab_columns cible where table_name = upper(''' || uneTableATranferer.TRANSDOSS_NOM_TABLE || ''') and column_name in (select dblink.column_name from all_tab_columns@' || DbLinkSource || ' dblink where dblink.owner = upper(''' || DbLinkSource || ''') and dblink.table_name = cible.table_name and dblink.column_name = cible.column_name and
+ (dblink.data_type <> cible.data_type or (dblink.data_type = cible.data_type and dblink.data_length > cible.data_length)
+ or (dblink.data_type = cible.data_type and dblink.data_type = ''NUMBER'' and (nvl(dblink.data_precision,''99'') > nvl(cible.data_precision,''99'') or nvl(dblink.data_scale,''99'') > nvl(cible.data_scale,''99'')))))';
+ 
+ EXECUTE IMMEDIATE v_requete BULK COLLECT into v_colonneKO ;
+ FOR i IN 1 .. v_colonneKO.COUNT
+ LOOP
+ -- On indique la colonne ko dans la table de log
+ INSERT INTO DBL_TRANSFERT_DOSSIER_LOG (DATE_EXEC,MESSAGE) values (sysdate, 'Attention !!, pour la table  ' || uneTableATranferer.TRANSDOSS_NOM_TABLE || ', la colonne ' || v_colonneKO(i) || ' a un format différent avec ' || DbLinkSource);
+ END LOOP;
+ END IF;
+ 
+ -- ETAPE II : Transfert de table
+ ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ INSERT INTO DBL_TRANSFERT_DOSSIER_LOG (DATE_EXEC,MESSAGE) values (sysdate, 'Préparation requête de la table ' || uneTableATranferer.TRANSDOSS_NOM_TABLE);
+ -- EVOL 07/03/2017 on utilise maintenant des temporary tables pour améliorer les perfs
+ begin
+  EXECUTE_IMMEDIATE_STRING ( 'DROP TABLE TRANSFERT_DOSS_TMP ',0);
+ EXCEPTION WHEN OTHERS THEN
+ dbms_output.put_line ('Temporary inexistante ok TRANSFERT_DOSS_TMP');
+ END;
+ begin
+ v_requeteTempo := 'CREATE GLOBAL TEMPORARY TABLE TRANSFERT_DOSS_TMP on commit delete rows as select * from ' || DbLinkSource || '.' || uneTableATranferer.TRANSDOSS_NOM_TABLE || '@' || DbLinkSource || ' where 0=1';
+  EXECUTE_IMMEDIATE_STRING ( v_requeteTempo,0);
+ EXCEPTION WHEN OTHERS THEN
+ INSERT INTO DBL_TRANSFERT_DOSSIER_LOG (DATE_EXEC,MESSAGE) values (sysdate, 'Temporary mal créée TRANSFERT_DOSS_TMP');
+ dbms_output.put_line ('Temporary mal créée TRANSFERT_DOSS_TMP');
+ END; 
+ commit;
+ -- on prépare la requête d'insert, sans idpacmat et avec transco du numpac
+ -- insert into DIC_ENFANT@ZTGECARPRDFR01 () select * from dic_enfant;
+ v_requete :=  'select s.column_name from all_tab_columns@' || DbLinkSource || ' s, all_tab_columns c  where s.owner = upper(''' || DbLinkSource || ''') and  s.table_name = upper(''' || uneTableATranferer.TRANSDOSS_NOM_TABLE || ''') and s.column_name not in (select column_name from all_tab_cols where owner = (select sys_context(''USERENV'',''SESSION_SCHEMA'') from dual) and virtual_column = ''YES'' and table_name = upper(''' || uneTableATranferer.TRANSDOSS_NOM_TABLE || ''')) and c.owner = upper(''' || DbLinkCible || ''') and c.table_name = s.table_name and c.column_name = s.column_name ';
+ 
+ EXECUTE IMMEDIATE v_requete BULK COLLECT into v_colonneTable;
+ v_requeteTempo := 'INSERT INTO TRANSFERT_DOSS_TMP (';
+ v_requeteTempoSelect := 'SELECT ';
+ v_requeteInsert := 'INSERT INTO ' || uneTableATranferer.TRANSDOSS_NOM_TABLE || '(';
+ v_requeteSelect := 'SELECT ';
+ 
+ FOR i IN 1 .. v_colonneTable.COUNT
+ LOOP
+ -- Si c'est la dernière colonne de la table
+ IF i = v_colonneTable.COUNT THEN
+ v_requeteInsert := v_requeteInsert || v_colonneTable(i) || ') ';
+ v_requeteTempo := v_requeteTempo || v_colonneTable(i) || ') ';
+ v_requeteTempoSelect := v_requeteTempoSelect || v_colonneTable(i);
+ IF v_colonneTable(i) IN ('NUMPAC','CURRENT_NUMPAC') THEN
+ -- on fait la transco du pac
+ v_requeteSelect := v_requeteSelect || '(select min(TRANSDOSS_PAC_CIBLE) from DIC_DBL_TRANSDOSS_MATRIC a where a.TRANSDOSS_PAC_SOURCE = sel.' || v_colonneTable(i) || ')';
+ ELSE
+ v_requeteSelect := v_requeteSelect || CRF_TRANSFERT_CAST_COLUMN(DbLinkSource, uneTableATranferer.TRANSDOSS_NOM_TABLE, v_colonneTable(i));
+ END IF;
+ -- Sinon on boucle sur la liste des colonnes pour préaprer le insert select
+ ELSE
+ v_requeteInsert := v_requeteInsert || v_colonneTable(i) || ',';
+ v_requeteTempo := v_requeteTempo || v_colonneTable(i) || ',';
+ v_requeteTempoSelect := v_requeteTempoSelect || v_colonneTable(i) || ',';
+ -- on fait la transco du pac
+ IF v_colonneTable(i) IN ('NUMPAC','CURRENT_NUMPAC') THEN
+ v_requeteSelect := v_requeteSelect || '(select min(TRANSDOSS_PAC_CIBLE) from DIC_DBL_TRANSDOSS_MATRIC a where a.TRANSDOSS_PAC_SOURCE = sel.' || v_colonneTable(i) || ' ),';
+ ELSE
+ v_requeteSelect := v_requeteSelect || CRF_TRANSFERT_CAST_COLUMN(DbLinkSource, uneTableATranferer.TRANSDOSS_NOM_TABLE, v_colonneTable(i)) || ',';
+ END IF;
+ END IF;
+ END LOOP;
+ 
+ v_requeteInsert := v_requeteInsert || v_requeteSelect || ' FROM TRANSFERT_DOSS_TMP sel ';
+ 
+ -- on prépare la clause where
+ -- on récupère les clés primaires pour voir si on requête sur matric, ou numpac pacmat, ou numpac paiezad
+ v_requete := 'SELECT cols.column_name FROM user_constraints cons, user_cons_columns cols WHERE cols.table_name = ''' || uneTableATranferer.TRANSDOSS_NOM_TABLE || ''' AND cons.constraint_type = ''P'' AND cons.constraint_name = cols.constraint_name';
+ EXECUTE IMMEDIATE v_requete BULK COLLECT into v_colonnePK;
+ -- initialisation des flags
+ v_cleMatric := 'N';
+ v_cleNumpacPacmat := 'N';
+ v_cleNumpacPaiezad := 'N';
+ FOR i IN 1 .. v_colonnePK.COUNT
+ LOOP
+ -- Si une des colonnes clé est Matric alors c'est le matric la clé
+ IF v_colonnePK(i) = 'MATRIC' THEN
+ v_cleMatric := 'O';
+ v_cleNumpacPacmat := 'N';
+ v_cleNumpacPaiezad := 'N';
+ END IF;
+ -- Si une des colonnes clé est PACMAT alors c'est le numpac pacmat la clé
+ IF v_colonnePK(i) = 'PACMAT' THEN
+ v_cleMatric := 'N';
+ v_cleNumpacPacmat := 'O';
+ v_cleNumpacPaiezad := 'N';
+ END IF;
+ -- Si une des colonnes clé est PAIEZAD alors c'est le numpac paiezad la clé
+ IF v_colonnePK(i) = 'PAIEZAD' AND uneTableATranferer.TRANSDOSS_NOM_TABLE <> 'DIC_ADM_CONTRAT_HISTO' THEN
+ v_cleMatric := 'N';
+ v_cleNumpacPacmat := 'N';
+ v_cleNumpacPaiezad := 'O';
+ END IF;
+ END LOOP;
+ 
+ -- En fonction de la clé, on construit la clause where et le delete pour faire l'annul et remplace
+ IF v_cleMatric = 'O' THEN
+ v_requeteDelete := 'DELETE FROM ' || uneTableATranferer.TRANSDOSS_NOM_TABLE || ' sel WHERE EXISTS (select TRANSDOSS_MATRIC from DIC_DBL_TRANSDOSS_MATRIC a where a.TRANSDOSS_MATRIC = sel.matric)';
+ v_requeteInsert := v_requeteInsert || ' WHERE EXISTS (select TRANSDOSS_MATRIC from DIC_DBL_TRANSDOSS_MATRIC a where a.TRANSDOSS_MATRIC = sel.matric)';
+ END IF;
+ v_requeteDeleteSuppl := '';
+ IF v_cleNumpacPacmat = 'O' THEN
+ IF uneTableATranferer.TRANSDOSS_NOM_TABLE in ('DIC_ADM_CONTRAT','DIC_ADM_CONTRAT_HISTO') THEN
+	v_requeteDeleteSuppl := 'DELETE FROM ' || uneTableATranferer.TRANSDOSS_NOM_TABLE || ' sel WHERE EXISTS (select TRANSDOSS_MATRIC from DIC_DBL_TRANSDOSS_MATRIC a where a.TRANSDOSS_PAC_CIBLE = sel.numpac and a.TRANSDOSS_PACMAT = sel.pacmat)';
+	IF uneTableATranferer.TRANSDOSS_NOM_TABLE = 'DIC_ADM_CONTRAT' THEN
+		v_requeteDelete := 'DELETE FROM ' || uneTableATranferer.TRANSDOSS_NOM_TABLE || ' sel WHERE EXISTS (select TRANSDOSS_MATRIC from DIC_DBL_TRANSDOSS_MATRIC a where a.TRANSDOSS_MATRIC = sel.matric)';
+	ELSE 
+		v_requeteDelete := 'DELETE FROM ' || uneTableATranferer.TRANSDOSS_NOM_TABLE || ' sel WHERE NOT EXISTS (select a.MATRIC from DIC_ADM_CONTRAT a where a.numpac = sel.numpac and a.pacmat = sel.pacmat and a.matric = sel.matric and a.numcnt = sel.numcnt) AND EXISTS (select TRANSDOSS_MATRIC from DIC_DBL_TRANSDOSS_MATRIC a where a.TRANSDOSS_PAC_CIBLE = sel.numpac and a.TRANSDOSS_PACMAT = sel.pacmat)';
+	END IF;
+	v_requeteInsert := v_requeteInsert || ' WHERE EXISTS (select TRANSDOSS_MATRIC from DIC_DBL_TRANSDOSS_MATRIC a where a.TRANSDOSS_PAC_SOURCE = sel.numpac and a.TRANSDOSS_PACMAT = sel.pacmat)';
+ ELSE
+	v_requeteDelete := 'DELETE FROM ' || uneTableATranferer.TRANSDOSS_NOM_TABLE || ' sel WHERE EXISTS (select TRANSDOSS_MATRIC from DIC_DBL_TRANSDOSS_MATRIC a where a.TRANSDOSS_PAC_CIBLE = sel.numpac and a.TRANSDOSS_PACMAT = sel.pacmat)';
+	v_requeteInsert := v_requeteInsert || ' WHERE EXISTS (select TRANSDOSS_MATRIC from DIC_DBL_TRANSDOSS_MATRIC a where a.TRANSDOSS_PAC_SOURCE = sel.numpac and a.TRANSDOSS_PACMAT = sel.pacmat)';
+ END IF;
+ END IF;
+ IF v_cleNumpacPaiezad = 'O' THEN
+ v_requeteDelete := 'DELETE FROM ' || uneTableATranferer.TRANSDOSS_NOM_TABLE || ' sel WHERE EXISTS (select TRANSDOSS_MATRIC from DIC_DBL_TRANSDOSS_MATRIC a where a.TRANSDOSS_PAC_CIBLE = sel.numpac and a.TRANSDOSS_PAIEZAD = sel.paiezad)';
+ v_requeteInsert := v_requeteInsert || ' WHERE EXISTS (select TRANSDOSS_MATRIC from DIC_DBL_TRANSDOSS_MATRIC a where a.TRANSDOSS_PAC_SOURCE = sel.numpac and a.TRANSDOSS_PAIEZAD = sel.paiezad)';
+ -- pour les tables de retour de paie, la clé est forcément paiezad, on peut ne transférer que le dernier mois de paie
+ IF dernierMoisPaieOnly = 'O' and uneTableATranferer.TRANSDOSS_NOM_TABLE in ('DIC_TGE_RESPAIE_RUBRIQUE','DIC_TGE_RESPAIE_CUMCOT','DIC_TGE_RESPAIE_CUMCOTM','DIC_TGE_RESPAIE_HISTO','DIC_TGE_RESPAIE_JRSIND','DIC_TGE_RESPAIE_CUMASO','DIC_TGE_RESPAIE_CUMIPA','DIC_TGE_RESPAIE_CL_CONGE','DIC_TGE_RESPAIE_CL_HIST1') THEN
+ v_requete := 'SELECT to_char(MAX(DTDEB_HISTO),''dd.mm.yyyy'') from ' || DbLinkSource || '.DIC_TGE_RESPAIE_HISTO@' || DbLinkSource || ' ';
+ EXECUTE IMMEDIATE v_requete into v_moisPaie;
+ v_requete := 'SELECT cols.column_name FROM user_constraints cons, user_cons_columns cols WHERE cols.table_name = ''' || uneTableATranferer.TRANSDOSS_NOM_TABLE || ''' AND cons.constraint_type = ''P'' AND cons.constraint_name = cols.constraint_name and (cols.column_name like ''%DTDEB%'' OR cols.column_name like ''%PERIODEPAIE%'')';
+ EXECUTE IMMEDIATE v_requete into v_colonneDTDEBHist;
+ v_requeteDelete := v_requeteDelete || ' and ' || v_colonneDTDEBHist || ' = to_date(''' || v_moisPaie || ''',''dd.mm.yyyy'')';
+ v_requeteInsert := v_requeteInsert || ' and ' || v_colonneDTDEBHist || ' = to_date(''' || v_moisPaie || ''',''dd.mm.yyyy'')';
+ END IF;
+ END IF;
+ 
+ IF v_cleMatric <> 'O' and v_cleNumpacPacmat <> 'O' and v_cleNumpacPaiezad <> 'O' THEN
+ INSERT INTO DBL_TRANSFERT_DOSSIER_LOG (DATE_EXEC,MESSAGE) values (sysdate, 'La table ' || uneTableATranferer.TRANSDOSS_NOM_TABLE || ' n''a pas été traitée car elle ne contient ni matric, ou pacmat ou paiezad en clé');
+ ELSE
+ --dbms_output.put_line(v_requeteInsert);
+ -- on insère ensuite dans la table définitive
+  EXECUTE_IMMEDIATE_STRING  (v_requeteDelete,0);
+ IF uneTableATranferer.TRANSDOSS_NOM_TABLE in ('DIC_ADM_CONTRAT','DIC_ADM_CONTRAT_HISTO') THEN
+  EXECUTE_IMMEDIATE_STRING ( v_requeteDeleteSuppl,0);
+ END IF;
+ -- on fait un premier commit pour les rubriques après le delete
+ IF uneTableATranferer.TRANSDOSS_NOM_TABLE = 'DIC_TGE_RESPAIE_RUBRIQUE' THEN
+ commit;
+ END IF;
+  -- on remplie la table temporary 
+ v_requeteTempo :=  v_requeteTempo || v_requeteTempoSelect || ' FROM ' || DbLinkSource || '.' || uneTableATranferer.TRANSDOSS_NOM_TABLE || '@' || DbLinkSource || '';
+  EXECUTE_IMMEDIATE_STRING ( v_requeteTempo,0);
+ 
+ EXECUTE_IMMEDIATE_STRING  (v_requeteInsert,0);
+ -- si table DIC_ADM_PERSO, on purge melpro pour éviter les envois de mail en RC sauf si on est en prod
+ v_requete := 'select count(*) from dual where sys_context( ''userenv'', ''current_schema'' ) like ''%PRD%'' ';
+ EXECUTE IMMEDIATE v_requete into DbLinkCibleBis;
+ IF uneTableATranferer.TRANSDOSS_NOM_TABLE = 'DIC_ADM_PERSO' and DbLinkCibleBis = 0 THEN
+ 	update dic_adm_perso set melpro = '';
+ END IF;
+ END IF;
+ begin
+  EXECUTE_IMMEDIATE_STRING  ('DROP TABLE TRANSFERT_DOSS_TMP ',0);
+ EXCEPTION WHEN OTHERS THEN
+ dbms_output.put_line ('Temporary inexistante ok TRANSFERT_DOSS_TMP');
+ END;
+ INSERT INTO DBL_TRANSFERT_DOSSIER_LOG (DATE_EXEC,MESSAGE) values (sysdate, 'Fin du transfert de la table ' || uneTableATranferer.TRANSDOSS_NOM_TABLE);
+ commit;
+ END LOOP;
+ if v_nbMatricToTransf > '50' THEN
+ INSERT INTO DBL_TRANSFERT_DOSSIER_LOG (DATE_EXEC,MESSAGE) values (sysdate, 'Réactivation des triggers');
+ -- on active les triggers à la fin du transfert
+ FOR curs_trigger IN c_triggers
+ LOOP
+ nom_obj:=curs_trigger.object_name;
+  EXECUTE_IMMEDIATE_STRING ( 'ALTER TRIGGER ' || nom_obj ||' ENABLE ',0);
+ END LOOP;
+ INSERT INTO DBL_TRANSFERT_DOSSIER_LOG (DATE_EXEC,MESSAGE) values (sysdate, 'Fin du traitement lancement du recalcul des stats');
+ commit;
+ FOR uneTableATranferer IN (SELECT TRANSDOSS_NOM_TABLE from DIC_DBL_TRANSDOSS_TABLE where TRANSDOSS_ACTIF = 'O')
+ LOOP
+ v_requete := 'CALL SYS_RECALCUL_STATS(''' || uneTableATranferer.TRANSDOSS_NOM_TABLE || ''')';
+  EXECUTE_IMMEDIATE_STRING ( v_requete,0);
+ END LOOP;
+ INSERT INTO DBL_TRANSFERT_DOSSIER_LOG (DATE_EXEC,MESSAGE) values (sysdate, 'Fin du recalcul des stats');
+ ELSE
+ -- on active les triggers à la fin du transfert
+ FOR curs_trigger IN c_triggers_crf
+ LOOP
+ nom_obj:=curs_trigger.object_name;
+  EXECUTE_IMMEDIATE_STRING ( 'ALTER TRIGGER ' || nom_obj ||' ENABLE ',0);
+ END LOOP;
+ END IF;
+ commit;
+ end TRANSFERT_DOSSIER_DBLINK;
+ 

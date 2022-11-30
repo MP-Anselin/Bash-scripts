@@ -1,0 +1,47 @@
+##
+SYS_TRACE_MODIF
+=SQL=
+CREATE OR REPLACE PROCEDURE SYS_TRACE_MODIF(
+    P_LOGIN                     VARCHAR2,
+    P_DATEMAJ                   SYS_TRC_MODIF.DATEMAJ%type,
+    P_ROLE                      VARCHAR2,
+    P_FUNCTIONNALITY            VARCHAR2,
+    P_KEYS_VALUES               VARCHAR2,
+    P_SHORT_NAME                VARCHAR2,
+    P_ACTION                    VARCHAR2,
+    P_NAMES_VALUES_HAVE_CHANGED VARCHAR2,
+    P_BEFORE_CHANGE             VARCHAR2,
+    P_AFTER_CHANGE              VARCHAR2,
+    P_FILTRE                    VARCHAR2)
+AS
+BEGIN
+  INSERT
+  INTO SYS_TRC_MODIF
+    (
+      LOGIN ,
+      DATEMAJ ,
+      ROLE ,
+      FUNCTIONNALITY,
+      KEYS_VALUES ,
+      SHORT_NAME ,
+      ACTION ,
+      NAMES_VALUES_HAVE_CHANGED ,
+      BEFORE_CHANGE ,
+      AFTER_CHANGE ,
+      FILTRE
+    )
+    VALUES
+    (
+      P_LOGIN ,
+      P_DATEMAJ ,
+      P_ROLE ,
+      P_FUNCTIONNALITY,
+      P_KEYS_VALUES ,
+      P_SHORT_NAME ,
+      P_ACTION ,
+      P_NAMES_VALUES_HAVE_CHANGED ,
+      P_BEFORE_CHANGE ,
+      P_AFTER_CHANGE ,
+      P_FILTRE
+    );
+END SYS_TRACE_MODIF;

@@ -1,0 +1,26 @@
+##
+HRGP_SALAIRE_MENSUEL_MOIS
+=SQL=
+CREATE OR REPLACE
+  FUNCTION HRGP_SALAIRE_MENSUEL_MOIS(
+      p_matric IN DONPAIE.MATRIC%Type ,
+      p_annee  IN DONPAIE.AN%Type)
+    RETURN NUMBER
+  IS
+    le_salaire NUMBER;
+  BEGIN
+    SELECT MBRUT
+    INTO le_salaire
+    FROM donpaie
+    WHERE mois=
+      (SELECT MAX(mois)
+      FROM DONPAIE
+      WHERE NOT mois='A'
+      AND an        = p_annee
+      AND matric    = p_matric
+      )
+    AND matric = p_matric
+    AND an     = p_annee;
+    RETURN le_salaire;
+  END hrgp_salaire_mensuel_mois ; 
+  

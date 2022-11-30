@@ -1,0 +1,10 @@
+<interface idInterface="FSD">
+	<nomInterface>Chargement des FSED</nomInterface>
+	<descriptionInterface>Chargement des FSED</descriptionInterface>
+	<traitements>
+		<traitement>
+			<descriptionTraitement>Appel a l'interface</descriptionTraitement>
+			<typeTraitement>FSED</typeTraitement>
+		</traitement>
+	</traitements>
+</interface>

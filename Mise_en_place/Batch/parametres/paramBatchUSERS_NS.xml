@@ -1,0 +1,18 @@
+<interface idInterface="USERS_NS">
+   <nomInterface>USERS_NS</nomInterface>
+   <descriptionInterface>Batch de creation d'utilisateurs</descriptionInterface>
+   <SupprimerFichier>NON</SupprimerFichier>
+   <listeDependancesFichiers>
+		<nomFichierDep>USERS_NS.dat</nomFichierDep>
+	</listeDependancesFichiers>
+	<traitement>
+		<descriptionTraitement>Creation User</descriptionTraitement>
+		<typeTraitement>InterfaceUserNS</typeTraitement>
+		<modeDebug>true</modeDebug>
+		<versionTraitement>V2</versionTraitement>
+		<fichierUsers>USERS_NS.dat</fichierUsers>
+		<activerMail>NON</activerMail>
+		<continueSiErreur>OUI</continueSiErreur>
+    </traitement>
+
+</interface>

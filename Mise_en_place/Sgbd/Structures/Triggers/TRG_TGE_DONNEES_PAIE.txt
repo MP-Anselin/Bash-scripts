@@ -1,0 +1,198 @@
+##
+TAG_CHARSET=@€éèç
+##
+TRG_TGE_DONNEES_PAIE
+=SQL=
+create or replace trigger trg_tge_donnees_paie FOR
+  insert or
+  update or
+  delete on tge_donnees_paie COMPOUND TRIGGER
+  
+  v_recycl           varchar2(1);
+  v_retro            varchar2(1);
+  v_periode_recycl   number;
+  v_numpac           varchar2(6);
+  v_pacmat           varchar2(8);
+  v_type_writer      varchar2(1);
+  v_paiezad          varchar2(8);
+  V_CODE_RUBRIQUE    varchar2(6);
+  V_OPTION_RETRO     varchar2(1);
+  V_PERIODE          varchar2(6);
+  V_DEB_RETRO        varchar2(6);
+  V_DEB_HISTO_RETRO  varchar2(6);
+  V_PERIODEENCOURS   varchar2(6);
+  V_CODE_CHRONO      varchar2(6);
+  v_bypass_trigger   number;
+  V_NB_MOIS_RETRO    number;
+  TYPE T_PERIODE_BY_NUMPAC IS TABLE OF TGE_REF_PAC.PERIODEENCOURS%TYPE INDEX BY TGE_REF_PAC.NUMPAC%TYPE;
+  tabPeriodeByNumpac T_PERIODE_BY_NUMPAC;
+  date_test_recycl   varchar2(6);
+BEFORE EACH ROW
+IS
+begin
+  -- action de 'bypass' le trigger 
+  select count(*) into v_bypass_trigger from bypass_trg_recycl_on_session;
+  if (v_bypass_trigger = 0) then
+    -- s'il y a une ligne dans la table temporaire, alors il n'y a pas de recyclage ni de rétroactivité
+
+  if deleting then
+    v_type_writer := nvl(:old.type_writer, 'O');
+  else
+    v_type_writer := nvl(:new.type_writer, 'O');
+    -- On remet TYPE_WRITER à NULL pour qu'il ne soit pas considéré comme 'N' lors des futurs update n'incluant pas cette colonne
+    :new.type_writer := null;
+  end if;
+
+  if (v_type_writer <> 'N' AND v_type_writer <> 'M') then
+    v_numpac       := nvl(:new.numpac, :old.numpac);
+    v_paiezad      := nvl(:new.paiezad, :old.paiezad);
+    
+    BEGIN
+	    SELECT t.pacmat,nvl(t.periode_recyclage,1),CODE_CHRONO
+	    INTO v_pacmat,v_periode_recycl,V_CODE_CHRONO
+	    from dic_adm_contrat_situ d, secupacmat t
+	    where d.numpac = v_numpac 
+	    and d.paiezad  = v_paiezad
+	    and d.numpac   = t.numpac
+	    and d.pacmat   = t.pacmat
+	    and nvl(:new.DATE_EFFET,:old.DATE_EFFET) BETWEEN d.DSDSC AND NVL(d.DSFSC,to_date('31122099','DDMMYYYY'));
+	EXCEPTION
+ 	WHEN OTHERS THEN
+ 		-- Trop souvent cette requête plante (surtout en environnement de dev, on catche l'erreur et on écrit une log)
+ 		trace_dbms_output( 'TRG_TGE_DONNEES_PAIE', 'Erreur avec le collaborateur : problème avec DIC_ADM_CONTRAT_SITU ou SECUPACMAT.');
+ 	END;
+ 	
+ 	-- S'il y a eu un souci avec la requête précédente, on n'exécute pas la suite
+ 	if v_pacmat is not null then
+ 	    if v_periode_recycl = 3 then
+	      raise_application_error(-20001, 'CODERR=GENREC02');
+	    elsif v_periode_recycl >= 10 then
+	      raise_application_error(-20001, 'CODERR=GENREC01');
+	    elsif v_periode_recycl = 1 then
+	      v_recycl            := 'N';
+	      IF NOT tabPeriodeByNumpac.exists(v_numpac) THEN
+	        select periodeencours into tabPeriodeByNumpac(v_numpac) from tge_ref_pac where numpac = v_numpac;
+	      END IF;
+	      IF DELETING THEN
+	        date_test_recycl := :old.periode;
+	      ELSE
+	        date_test_recycl := :new.periode;
+	      END IF;
+	      if (NVL(date_test_recycl,'000000') <= tabPeriodeByNumpac(v_numpac)) then
+	        if inserting or deleting then
+	          v_recycl := 'O';
+	        elsif updating then
+	          if :new.code_caisse            <> :old.code_caisse or (:new.code_caisse is not null and :old.code_caisse is null) or (:new.code_caisse is null and :old.code_caisse is not null) then
+	            v_recycl                     := 'O';
+	          elsif :new.code_imputation     <> :old.code_imputation or (:new.code_imputation is not null and :old.code_imputation is null) or (:new.code_imputation is null and :old.code_imputation is not null) then
+	            v_recycl                     := 'O';
+	          elsif :new.code_rubrique       <> :old.code_rubrique or (:new.code_rubrique is not null and :old.code_rubrique is null) or (:new.code_rubrique is null and :old.code_rubrique is not null) then
+	            v_recycl                     := 'O';
+	          elsif :new.date_deb_arret      <> :old.date_deb_arret or (:new.date_deb_arret is not null and :old.date_deb_arret is null) or (:new.date_deb_arret is null and :old.date_deb_arret is not null) then
+	            v_recycl                     := 'O';
+	          elsif :new.domaine_prcte       <> :old.domaine_prcte or (:new.domaine_prcte is not null and :old.domaine_prcte is null) or (:new.domaine_prcte is null and :old.domaine_prcte is not null) then
+	            v_recycl                     := 'O';
+	          elsif :new.montant             <> :old.montant or (:new.montant is not null and :old.montant is null) or (:new.montant is null and :old.montant is not null) then
+	            v_recycl                     := 'O';
+	          elsif :new.nombre              <> :old.nombre or (:new.nombre is not null and :old.nombre is null) or (:new.nombre is null and :old.nombre is not null) then
+	            v_recycl                     := 'O';
+	          elsif :new.no_sequence         <> :old.no_sequence or (:new.no_sequence is not null and :old.no_sequence is null) or (:new.no_sequence is null and :old.no_sequence is not null) then
+	            v_recycl                     := 'O';
+	          elsif :new.origine             <> :old.origine or (:new.origine is not null and :old.origine is null) or (:new.origine is null and :old.origine is not null) then
+	            v_recycl                     := 'O';
+	          elsif :new.periode_affectation <> :old.periode_affectation or (:new.periode_affectation is not null and :old.periode_affectation is null) or (:new.periode_affectation is null and :old.periode_affectation is not null) then
+	            v_recycl                     := 'O';
+	          elsif :new.periode_rattach_deb <> :old.periode_rattach_deb or (:new.periode_rattach_deb is not null and :old.periode_rattach_deb is null) or (:new.periode_rattach_deb is null and :old.periode_rattach_deb is not null) then
+	            v_recycl                     := 'O';
+	          elsif :new.periode_rattach_fin <> :old.periode_rattach_fin or (:new.periode_rattach_fin is not null and :old.periode_rattach_fin is null) or (:new.periode_rattach_fin is null and :old.periode_rattach_fin is not null) then
+	            v_recycl                     := 'O';
+	          elsif :new.pourcentage         <> :old.pourcentage or (:new.pourcentage is not null and :old.pourcentage is null) or (:new.pourcentage is null and :old.pourcentage is not null) then
+	            v_recycl                     := 'O';
+	          elsif :new.sens                <> :old.sens or (:new.sens is not null and :old.sens is null) or (:new.sens is null and :old.sens is not null) then
+	            v_recycl                     := 'O';
+	          elsif :new.taux                <> :old.taux or (:new.taux is not null and :old.taux is null) or (:new.taux is null and :old.taux is not null) then
+	            v_recycl                     := 'O';
+	          elsif :new.type_donnee         <> :old.type_donnee or (:new.type_donnee is not null and :old.type_donnee is null) or (:new.type_donnee is null and :old.type_donnee is not null) then
+	            v_recycl                     := 'O';
+	          elsif :new.type_traitement     <> :old.type_traitement or (:new.type_traitement is not null and :old.type_traitement is null) or (:new.type_traitement is null and :old.type_traitement is not null) then
+	            v_recycl                     := 'O';
+	          elsif :new.periode             <> :old.periode or (:new.periode is not null and :old.periode is null) or (:new.periode is null and :old.periode is not null) then
+	            v_recycl                     := 'O';
+	          elsif :new.code_remplacement   <> :old.code_remplacement or (:new.code_remplacement is not null and :old.code_remplacement is null) or (:new.code_remplacement is null and :old.code_remplacement is not null) then
+	            v_recycl                     := 'O';
+	          elsif :new.action_retro        <> :old.action_retro or (:new.action_retro is not null and :old.action_retro is null) or (:new.action_retro is null and :old.action_retro is not null) then
+	            v_recycl                     := 'O';
+	          end if;
+	        end if;
+	        if v_recycl = 'O' then
+	          begin
+	            merge into gap_recycl_matric a using (select v_numpac as numpac, v_pacmat as pacmat from dual) b on (a.pacmat = b.pacmat and a.numpac = b.numpac)
+	          when not matched then
+	            insert (a.numpac, a.pacmat) values (b.numpac, b.pacmat);
+	          exception
+	          when others then 
+	            --dbms_output.put_line('Collaborateur déjà en recyclage ' || v_numpac || '/' || v_pacmat);
+	            --FIXME utiliser la procédure trace_dbms_output()
+	            NULL;
+	          end;
+	        end if;
+	      end if;
+	    end if;
+	    /** Test de mise en rétro **/
+	    v_retro            := 'N';
+	    if inserting or deleting then
+	      v_retro := 'O';
+	    elsif updating then
+	      if :new.code_caisse            <> :old.code_caisse or (:new.code_caisse is not null and :old.code_caisse is null) or (:new.code_caisse is null and :old.code_caisse is not null) then
+	        v_retro                     := 'O';
+	      elsif :new.code_imputation     <> :old.code_imputation or (:new.code_imputation is not null and :old.code_imputation is null) or (:new.code_imputation is null and :old.code_imputation is not null) then
+	        v_retro                     := 'O';
+	      elsif :new.code_rubrique       <> :old.code_rubrique or (:new.code_rubrique is not null and :old.code_rubrique is null) or (:new.code_rubrique is null and :old.code_rubrique is not null) then
+	        v_retro                     := 'O';
+	      elsif :new.date_deb_arret      <> :old.date_deb_arret or (:new.date_deb_arret is not null and :old.date_deb_arret is null) or (:new.date_deb_arret is null and :old.date_deb_arret is not null) then
+	        v_retro                     := 'O';
+	      elsif :new.domaine_prcte       <> :old.domaine_prcte or (:new.domaine_prcte is not null and :old.domaine_prcte is null) or (:new.domaine_prcte is null and :old.domaine_prcte is not null) then
+	        v_retro                     := 'O';
+	      elsif :new.montant             <> :old.montant or (:new.montant is not null and :old.montant is null) or (:new.montant is null and :old.montant is not null) then
+	        v_retro                     := 'O';
+	      elsif :new.nombre              <> :old.nombre or (:new.nombre is not null and :old.nombre is null) or (:new.nombre is null and :old.nombre is not null) then
+	        v_retro                     := 'O';
+	      elsif :new.no_sequence         <> :old.no_sequence or (:new.no_sequence is not null and :old.no_sequence is null) or (:new.no_sequence is null and :old.no_sequence is not null) then
+	        v_retro                     := 'O';
+	      elsif :new.origine             <> :old.origine or (:new.origine is not null and :old.origine is null) or (:new.origine is null and :old.origine is not null) then
+	        v_retro                     := 'O';
+	      elsif :new.periode_affectation <> :old.periode_affectation or (:new.periode_affectation is not null and :old.periode_affectation is null) or (:new.periode_affectation is null and :old.periode_affectation is not null) then
+	        v_retro                     := 'O';
+	      elsif :new.periode_rattach_deb <> :old.periode_rattach_deb or (:new.periode_rattach_deb is not null and :old.periode_rattach_deb is null) or (:new.periode_rattach_deb is null and :old.periode_rattach_deb is not null) then
+	        v_retro                     := 'O';
+	      elsif :new.periode_rattach_fin <> :old.periode_rattach_fin or (:new.periode_rattach_fin is not null and :old.periode_rattach_fin is null) or (:new.periode_rattach_fin is null and :old.periode_rattach_fin is not null) then
+	        v_retro                     := 'O';
+	      elsif :new.pourcentage         <> :old.pourcentage or (:new.pourcentage is not null and :old.pourcentage is null) or (:new.pourcentage is null and :old.pourcentage is not null) then
+	        v_retro                     := 'O';
+	      elsif :new.sens                <> :old.sens or (:new.sens is not null and :old.sens is null) or (:new.sens is null and :old.sens is not null) then
+	        v_retro                     := 'O';
+	      elsif :new.taux                <> :old.taux or (:new.taux is not null and :old.taux is null) or (:new.taux is null and :old.taux is not null) then
+	        v_retro                     := 'O';
+	      elsif :new.type_donnee         <> :old.type_donnee or (:new.type_donnee is not null and :old.type_donnee is null) or (:new.type_donnee is null and :old.type_donnee is not null) then
+	        v_retro                     := 'O';
+	      elsif :new.type_traitement     <> :old.type_traitement or (:new.type_traitement is not null and :old.type_traitement is null) or (:new.type_traitement is null and :old.type_traitement is not null) then
+	        v_retro                     := 'O';
+	      elsif :new.periode             <> :old.periode or (:new.periode is not null and :old.periode is null) or (:new.periode is null and :old.periode is not null) then
+	        v_retro                     := 'O';
+	      elsif :new.code_remplacement   <> :old.code_remplacement or (:new.code_remplacement is not null and :old.code_remplacement is null) or (:new.code_remplacement is null and :old.code_remplacement is not null) then
+	        v_retro                     := 'O';
+	      elsif :new.action_retro        <> :old.action_retro or (:new.action_retro is not null and :old.action_retro is null) or (:new.action_retro is null and :old.action_retro is not null) then
+	        v_retro                     := 'O';
+	      end if;
+	    end if;
+	    if v_retro = 'O' then
+	      V_PERIODE := NVL(:NEW.PERIODE,:OLD.PERIODE);
+	      V_CODE_RUBRIQUE := NVL(:OLD.CODE_RUBRIQUE,:NEW.CODE_RUBRIQUE);
+	      TGE_RETRO_INSCRIPT_WITH_CHECK(V_NUMPAC, V_PACMAT, V_PERIODE, V_CODE_CHRONO, V_PAIEZAD, 'TGE_DONNEES_PAIE', 'SELECT COUNT(*) FROM TGE_REF_RUBRIQUE WHERE TGE_REF_RUBRIQUE.CODERUB = '''||V_CODE_RUBRIQUE||''' AND NUMPAC = '''||V_NUMPAC||''' AND NVL(OPTION_RETRO,''N'') <> ''N''');
+	    END IF;
+	  /** Fin test de mise en rétro **/
+	end if;
+  end if;
+  end if;
+END BEFORE EACH ROW;
+end trg_tge_donnees_paie;

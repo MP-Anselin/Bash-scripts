@@ -1,0 +1,47 @@
+##
+TAG_CHARSET=@€ιθη
+##
+HRORG_SIGNATAIRE_ENTITE
+=SQL=
+create or replace FUNCTION HRORG_SIGNATAIRE_ENTITE(
+    p_codts          IN std_struc_arbre.codts%TYPE,
+    p_codeEntite     IN std_struc_arbre.code_entite%TYPE,
+    p_date           IN std_struc_entite.date_eff%TYPE)
+  RETURN std_struc_arbre.aoid_signataire%TYPE
+IS
+  v_retour std_struc_arbre.aoid_signataire%TYPE;
+  v_req VARCHAR2(4000);
+BEGIN
+ -- Recherche du signataire sur la branche de l'arbre  
+  v_req := 'SELECT aoid_signataire';
+  v_req := v_req||' FROM (';
+  v_req := v_req||'   SELECT code_entite, code_ent_mere, codTs, aoid_signataire';  
+  v_req := v_req||'   FROM std_struc_arbre';
+  v_req := v_req||'   START WITH'; 
+  v_req := v_req||'     code_entite = :1'; 
+  v_req := v_req||'     AND codTs = :2';
+  v_req := v_req||'     AND :3 BETWEEN date_eff AND date_fin';
+  v_req := v_req||'     AND statut = ''1'''; 
+  v_req := v_req||'   CONNECT BY'; 
+  v_req := v_req||'   PRIOR code_ent_mere = code_entite';
+  v_req := v_req||'   AND PRIOR codTs = codTs';
+  v_req := v_req||'   AND :4 BETWEEN date_eff AND date_fin';
+  v_req := v_req||')'; 
+  v_req := v_req||' WHERE';
+  v_req := v_req||'   1=1';
+  v_req := v_req||'   AND aoid_signataire IS NOT NULL';
+  v_req := v_req||'   AND ROWNUM = 1';
+  
+  BEGIN
+    EXECUTE IMMEDIATE v_req INTO v_retour USING p_codeEntite, p_codts, p_date, p_date;
+    
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      v_retour := '';
+  END;
+  RETURN v_retour;
+END;
+##
+HRORG_SIGNATAIRE_ENTITE
+=SQL=
+drop function HRORG_SIGNATAIRE_ENTITE

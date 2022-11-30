@@ -1,0 +1,254 @@
+##
+TAG_CHARSET=@€éèç
+##
+SYS_PAGES_MODAL
+==
+delete from SYS_PAGES_MODAL where NOM_PAGE in('Moteur/Comp/WebAdmin/Valideurs/GestionValideursCM.js#C', 'Moteur/Comp/WebAdmin/Valideurs/GestionValideursCM.js#M')
+##
+SYS_PAGES_MODAL
+==
+delete from SYS_PAGES_MODAL where NOM_PAGE in('Ext.adp.Moteur.Comp.WebAdmin.Valideurs.slide.GestionValideursCM#C', 'Ext.adp.Moteur.Comp.WebAdmin.Valideurs.slide.GestionValideursCM#M')
+'Ext.adp.Moteur.Comp.WebAdmin.Valideurs.slide.GestionValideursCM#C', 'Ajout d''un groupe de valideurs'
+'Ext.adp.Moteur.Comp.WebAdmin.Valideurs.slide.GestionValideursCM#M', 'Modification d''un groupe de valideurs'
+##
+SYS_PAGES_MODAL
+==
+delete from SYS_PAGES_MODAL where NOM_PAGE in('Modules/Structures/Parametrage/GestionArbreEntites/ArbreEntCM.js', 'Modules/Structures/Parametrage/GestionArbreEntites/ArbreEntiteCM.js#C', 'Modules/Structures/Parametrage/GestionArbreEntites/ArbreEntiteCM.js#M', 'Modules/Structures/Parametrage/GestionArbreEntites/ArbreEntiteCM.js#V', 'Ext.adp.Modules.Structures.Parametrage.GestionArbreEntites.slide.ArbreEntiteCM#V')
+##
+SYS_PAGES_MODAL
+==
+delete from SYS_PAGES_MODAL where NOM_PAGE in ('Modules/HelpDesk/modal/HelpDesk_Fiche.jsp','Modules/HelpDesk/modal/HelpDesk_FicheModif.jsp','Modules/HelpDesk/modal/HelpDesk_Suivi.jsp')
+'Modules/HelpDesk/modal/HelpDesk_Fiche.jsp','Saisie d''une demande HelpDesk'
+'Modules/HelpDesk/modal/HelpDesk_FicheModif.jsp','Modification d''une demande Helpdesk'
+'Modules/HelpDesk/modal/HelpDesk_Suivi.jsp','Suivi d''une demande HelpDesk'
+##
+SYS_PAGES_MODAL
+==
+delete from SYS_PAGES_MODAL where NOM_PAGE IN ('Modules/ZPaie/modal/DonneeElementPaieAjout.jsp','Modules/ZPaie/modal/DonneeElementPaieCotisAjout.jsp','Modules/ZPaie/modal/DonneeElementPaieModif.jsp')
+'Modules/ZPaie/modal/DonneeElementPaieAjout.jsp','Ajout d''une '
+'Modules/ZPaie/modal/DonneeElementPaieCotisAjout.jsp','Ajout d''une DR cotis.'
+'Modules/ZPaie/modal/DonneeElementPaieModif.jsp','Modification d''une '
+##
+SYS_PAGES_MODAL
+==
+DELETE FROM SYS_PAGES_MODAL WHERE NOM_PAGE = 'Modules/Gta/CAD/Param/CreationEvtDeclenchCMS.jsp'
+'Modules/Gta/CAD/Param/CreationEvtDeclenchCMS.jsp','Paramétrage des bascules pour un évènement'
+##
+SYS_PAGES_MODAL
+==
+DELETE FROM SYS_PAGES_MODAL WHERE NOM_PAGE='Modules/Gta/CAD/Param/CreationBascule.jsp'
+'Modules/Gta/CAD/Param/CreationBascule.jsp','Création d''une bascule'
+##
+SYS_PAGES_MODAL
+==
+DELETE FROM SYS_PAGES_MODAL WHERE NOM_PAGE = 'Ext.adp.Moteur.Comp.WebAdmin.Image.GestionPhotoMatriculeParam'
+'Ext.adp.Moteur.Comp.WebAdmin.Image.GestionPhotoMatriculeParam','Paramétrage'
+##
+SYS_PAGES_MODAL
+==
+DELETE FROM SYS_PAGES_MODAL WHERE NOM_PAGE IN ('Ext.adp.Moteur.ADP_ONLY.varSys.AjoutModifVarSys', 'Ext.adp.Moteur.ADP_ONLY.varSys.AjoutModifVarSysUser', 'Moteur/Comp/WebAdmin/GestionVarSys/VarSysReload.jsp', 'Moteur/Comp/WebAdmin/GestionVarSys/VarSysUser.jsp')
+'Ext.adp.Moteur.ADP_ONLY.varSys.AjoutModifVarSys','Ajout d''une variable'
+'Ext.adp.Moteur.ADP_ONLY.varSys.AjoutModifVarSysUser','Ajout d''une variable'
+##
+SYS_PAGES_MODAL
+==
+delete from SYS_PAGES_MODAL where NOM_PAGE = 'Ext.adp.Moteur.Comp.WebAdmin.Valideurs.slide.GestionValideursCM#D'
+'Ext.adp.Moteur.Comp.WebAdmin.Valideurs.slide.GestionValideursCM#D', 'Duplication d''un groupe de valideurs'
+##
+SYS_PAGES_MODAL
+==
+DELETE FROM SYS_PAGES_MODAL WHERE NOM_PAGE in ('Ext.adp.Moteur.Comp.WebAdmin.GestionWebDir.AjoutUserWebDir', 'Ext.adp.Moteur.Comp.WebAdmin.GestionWebDir.DupliquerUserWebDir')
+'Ext.adp.Moteur.Comp.WebAdmin.GestionWebDir.AjoutUserWebDir','Affecter des répertoires à un utilisateur'
+'Ext.adp.Moteur.Comp.WebAdmin.GestionWebDir.DupliquerUserWebDir','Dupliquer les répertoires d''un utilisateur'
+##
+SYS_PAGES_MODAL
+==
+DELETE FROM SYS_PAGES_MODAL WHERE NOM_PAGE = 'Ext.adp.Moteur.Comp.WebAdmin.GestionWebDir.AjoutModifWebDir'
+'Ext.adp.Moteur.Comp.WebAdmin.GestionWebDir.AjoutModifWebDir','Ajouter ou modifier un répertoire web'
+##
+SYS_PAGES_MODAL
+==
+DELETE FROM SYS_PAGES_MODAL WHERE NOM_PAGE = 'Ext.adp.Modules.ADP_ONLY.Workflow.admin.AjoutModifProcessus'
+'Ext.adp.Modules.ADP_ONLY.Workflow.admin.AjoutModifProcessus','Ajouter ou modifier un processus'
+##
+SYS_PAGES_MODAL
+==
+DELETE FROM SYS_PAGES_MODAL WHERE NOM_PAGE in ('Ext.adp.Modules.ADP_ONLY.Workflow.admin.AjoutModifWkfOperation', 'Ext.adp.Modules.ADP_ONLY.Workflow.admin.AjoutRole', 'Ext.adp.Modules.ADP_ONLY.Workflow.admin.AjoutStatutDecision')
+'Ext.adp.Modules.ADP_ONLY.Workflow.admin.AjoutModifWkfOperation','Ajouter ou modifier une opération'
+'Ext.adp.Modules.ADP_ONLY.Workflow.admin.AjoutRole','Ajouter un role à une opération'
+'Ext.adp.Modules.ADP_ONLY.Workflow.admin.AjoutStatutDecision','Ajouter un statut de décision à une opération'
+##
+SYS_PAGES_MODAL
+==
+DELETE FROM SYS_PAGES_MODAL WHERE NOM_PAGE in ('Ext.adp.Modules.ADP_ONLY.Messagerie.AjoutMailing', 'Ext.adp.Modules.ADP_ONLY.Messagerie.DetailMailing')
+'Ext.adp.Modules.ADP_ONLY.Messagerie.AjoutMailing','Ajouter un mailing'
+'Ext.adp.Modules.ADP_ONLY.Messagerie.DetailMailing','Consulter les détails d''un mailing'
+##
+SYS_PAGES_MODAL
+==
+DELETE FROM SYS_PAGES_MODAL WHERE NOM_PAGE = 'Ext.adp.Modules.ADP_ONLY.Workflow.admin.AjoutModifBranche'
+'Ext.adp.Modules.ADP_ONLY.Workflow.admin.AjoutModifBranche','Ajouter ou modifier une branche'
+##
+SYS_PAGES_MODAL
+==
+DELETE FROM SYS_PAGES_MODAL WHERE NOM_PAGE in ('Ext.adp.ZPaie.AjoutThemeGap', 'Ext.adp.ZPaie.AppelTableDonneesJsp')
+'Ext.adp.ZPaie.AjoutThemeGap','Ajouter un thème GAP'
+'Ext.adp.ZPaie.AppelTableDonneesJsp','Ajouter des données écran'
+##
+SYS_PAGES_MODAL
+==
+DELETE FROM SYS_PAGES_MODAL WHERE NOM_PAGE in ('Ext.adp.Moteur.Comp.WebAdmin.Gestil.CreerTraitementGestil', 'Ext.adp.Moteur.Comp.WebAdmin.Gestil.CreerTraitementGestilEtape1', 'Ext.adp.Moteur.Comp.WebAdmin.Gestil.CreerTraitementGestilEtape2')
+'Ext.adp.Moteur.Comp.WebAdmin.Gestil.CreerTraitementGestil','Lancer un traitement Gestil'
+'Ext.adp.Moteur.Comp.WebAdmin.Gestil.CreerTraitementGestilEtape1','Lancer un traitement Gestil'
+'Ext.adp.Moteur.Comp.WebAdmin.Gestil.CreerTraitementGestilEtape2','Lancer un traitement Gestil'
+##
+SYS_PAGES_MODAL
+==
+delete from SYS_PAGES_MODAL where NOM_PAGE = 'Ext.adp.Modules.Structures.Affectations.RechercheEntite'
+'Ext.adp.Modules.Structures.Affectations.RechercheEntite','Recherche d''une entité'
+##
+SYS_PAGES_MODAL
+=SQL IFEXIST=SYS_PAGES_MODAL=
+DELETE FROM SYS_PAGES_MODAL WHERE NOM_PAGE = 'Ext.adp.ZPaie.RETRO.MatricInscritRetroInfoComp'
+##
+SYS_PAGES_MODAL
+=SQL IFEXIST=SYS_PAGES_MODAL=
+INSERT INTO SYS_PAGES_MODAL ( NOM_PAGE, LIBELLE ) VALUES ( 'Ext.adp.ZPaie.RETRO.MatricInscritRetroInfoComp', 'Liste des inscriptions d''un matricule en retroactivité' )
+##
+SYS_PAGES_MODAL
+==
+DELETE FROM SYS_PAGES_MODAL WHERE nom_page = 'Modules/ZPaie/modal/PilotageOpePaieSupp.jsp'
+'Modules/ZPaie/modal/PilotageOpePaieSupp.jsp','Suppression de traitement planifié'
+##
+SYS_PAGES_MODAL
+==
+DELETE FROM SYS_PAGES_MODAL WHERE nom_page = 'Moteur/Comp/WebAdmin/visuDetailUserMonoPac.jsp'
+'Moteur/Comp/WebAdmin/visuDetailUserMonoPac.jsp','Informations sur l''utilisateur'
+##
+SYS_PAGES_MODAL
+==
+delete from SYS_PAGES_MODAL where NOM_PAGE in('Ext.adp.Modules.Signature.slide.GroupeSignatairesCM#C', 'Ext.adp.Modules.Signature.slide.GroupeSignatairesCM#M', 'Ext.adp.Modules.Signature.slide.GroupeSignatairesCM#D')
+'Ext.adp.Modules.Signature.slide.GroupeSignatairesCM#C', 'Ajout d''un groupe de signataires'
+'Ext.adp.Modules.Signature.slide.GroupeSignatairesCM#M', 'Modification d''un groupe de signataires'
+'Ext.adp.Modules.Signature.slide.GroupeSignatairesCM#D', 'Duplication d''un groupe de signataires'
+##
+SYS_PAGES_MODAL
+==
+delete from SYS_PAGES_MODAL where NOM_PAGE = 'Modules/ZPaie/SlideInGestionPJAbs.js'
+'Modules/ZPaie/SlideInGestionPJAbs.js', 'Gérer les pièces justificatives'
+##
+SYS_PAGES_MODAL
+==
+delete from SYS_PAGES_MODAL where NOM_PAGE in ('Ext.adp.Moteur.Delegation.DelegationCMD.ChoixDelegationSortieManager')
+'Ext.adp.Moteur.Delegation.DelegationCMD.ChoixDelegationSortieManager','Créer une délégation'
+##
+SYS_PAGES_MODAL
+==
+delete from SYS_PAGES_MODAL where NOM_PAGE = 'Modules/ZPaie/modal/ConsultationFeuilleChargeeAnnulation.jsp'
+'Modules/ZPaie/modal/ConsultationFeuilleChargeeAnnulation.jsp','Consultation d''une feuille chargée de ligne d''annulation'
+##
+SYS_PAGES_MODAL
+==
+delete from SYS_PAGES_MODAL where NOM_PAGE = 'Ext.adp.Modules.Signature.slide.ChoixSignataires'
+'Ext.adp.Modules.Signature.slide.ChoixSignataires','Paramétrer la transaction'
+##
+SYS_PAGES_MODAL
+==
+delete from SYS_PAGES_MODAL where NOM_PAGE in('Ext.adp.MainDesk.view.eastregion.gestionProjet.GestionProjetCM#C', 'Ext.adp.MainDesk.view.eastregion.gestionProjet.GestionProjetCM#M')
+'Ext.adp.MainDesk.view.eastregion.gestionProjet.GestionProjetCM#C', 'Création d''un nouveau projet'
+'Ext.adp.MainDesk.view.eastregion.gestionProjet.GestionProjetCM#M', 'Modification d''un projet'
+##
+SYS_PAGES_MODAL
+==
+delete from SYS_PAGES_MODAL where NOM_PAGE in('Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.MiseEnBacASableSlide', 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.RapportProjetSlide')
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.MiseEnBacASableSlide', 'Bac à sable'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.RapportProjetSlide', 'Rapport'
+##
+SYS_PAGES_MODAL
+==
+delete from SYS_PAGES_MODAL where NOM_PAGE in('Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.RapportLivrableSlide','Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.CreationModifLivrableSlide','Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.ObjetsComplementairesALivrerSlide')
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.RapportLivrableSlide', 'Rapport'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.CreationModifLivrableSlide', 'Ajout / modification d''un livrable'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.ObjetsComplementairesALivrerSlide', 'Objets complèmentaire à livrer'
+##
+SYS_PAGES_MODAL
+==
+DELETE FROM SYS_PAGES_MODAL WHERE NOM_PAGE  = 'Modules/ZPaie/modal/PilotageOpePaieStop.jsp'
+'Modules/ZPaie/modal/PilotageOpePaieStop.jsp','Arrêter un traitement de paie'
+##
+SYS_PAGES_MODAL
+==
+delete from SYS_PAGES_MODAL where NOM_PAGE in('Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideParamDonErgonomieEcran')
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideParamDonErgonomieEcran', 'Ergonomie de la donnée pour cet écran'
+##
+SYS_PAGES_MODAL
+==
+delete from SYS_PAGES_MODAL where NOM_PAGE in('Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.ParametrageDonneeCopieEcran','Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideParamRechercheStructure')
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.ParametrageDonneeCopieEcran', ''
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideParamRechercheStructure',''
+##
+SYS_PAGES_MODAL
+==
+delete from SYS_PAGES_MODAL where NOM_PAGE = 'Ext.adp.MainDesk.view.eastregion.slideDateEffet.DateEffetDetails'
+'Ext.adp.MainDesk.view.eastregion.slideDateEffet.DateEffetDetails', 'Détails des données modifiées'
+##
+SYS_PAGES_MODAL
+==
+DELETE FROM SYS_PAGES_MODAL WHERE NOM_PAGE  = 'Modules/ZPaie/modal/ConsultationFeuilleChargeeImputations.jsp'
+'Modules/ZPaie/modal/ConsultationFeuilleChargeeImputations.jsp','Consulter une feuille chargée d''imputations'
+##
+SYS_PAGES_MODAL
+==
+delete from SYS_PAGES_MODAL where NOM_PAGE = 'Ext.adp.Modules.ZPaie.modal.ExportImputations'
+'Ext.adp.Modules.ZPaie.modal.ExportImputations', 'Génération d''une feuille de travail d''imputations'
+##
+SYS_PAGES_MODAL
+==
+delete from SYS_PAGES_MODAL where NOM_PAGE = 'Ext.adp.Modules.Signature.slide.SlideUploadDocumentExterne'
+'Ext.adp.Modules.Signature.slide.SlideUploadDocumentExterne', 'Charger un document externe'
+##
+SYS_PAGES_MODAL
+==
+delete from SYS_PAGES_MODAL where NOM_PAGE = 'Ext.adp.MainDesk.view.eastregion.slideDateEffet.DateEffetDetails'
+'Ext.adp.MainDesk.view.eastregion.slideDateEffet.DateEffetDetails', 'Détails des données modifiées'
+##
+SYS_PAGES_MODAL
+==
+DELETE FROM SYS_PAGES_MODAL WHERE NOM_PAGE = 'Ext.adp.MainDesk.view.eastregion.theme.Theme'
+'Ext.adp.MainDesk.view.eastregion.theme.Theme','Gestion du look & feel'
+##
+SYS_PAGES_MODAL
+==
+DELETE FROM SYS_PAGES_MODAL WHERE NOM_PAGE = 'Ext.adp.MainDesk.view.eastregion.theme.Logo'
+'Ext.adp.MainDesk.view.eastregion.theme.Logo','Personnalisation du logo'
+##
+SYS_PAGES_MODAL
+==
+delete from SYS_PAGES_MODAL where NOM_PAGE in('Ext.adp.Tests.Accessibilite.AccessibiliteExempleC', 'Ext.adp.Tests.Accessibilite.AccessibiliteExempleM')
+'Ext.adp.Tests.Accessibilite.AccessibiliteExempleC', 'Ajout Accessibilite Exemple'
+'Ext.adp.Tests.Accessibilite.AccessibiliteExempleM', 'Modification Accessibilite Exemple'
+##
+SYS_PAGES_MODAL
+==
+DELETE FROM SYS_PAGES_MODAL WHERE nom_page = 'Moteur/Comp/WebAdmin/Purge/ParametragePurgeTablesAjoutModif.jsp'
+'Moteur/Comp/WebAdmin/Purge/ParametragePurgeTablesAjoutModif.jsp','Ajout et modification d''un paramétrage de purge'
+##
+SYS_PAGES_MODAL
+==
+DELETE FROM SYS_PAGES_MODAL WHERE nom_page = 'Moteur/Comp/WebAdmin/Purge/ParametragePurgeTablesAjoutModifTableLiee.jsp'
+'Moteur/Comp/WebAdmin/Purge/ParametragePurgeTablesAjoutModifTableLiee.jsp','Ajout et modification d''un paramétrage de purge liée'
+##
+SYS_PAGES_MODAL
+==
+delete from SYS_PAGES_MODAL where NOM_PAGE = 'Ext.adp.MainDesk.view.eastregion.multiGestionnaires.MultiGestListePacmat'
+'Ext.adp.MainDesk.view.eastregion.multiGestionnaires.MultiGestListePacmat', 'Autres gestionnaires'
+##
+SYS_PAGES_MODAL
+==
+delete from SYS_PAGES_MODAL where NOM_PAGE in('Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.GenerationEcransDASlide')
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.GenerationEcransDASlide', 'Génération des dossiers d''analyse'
+##
+SYS_PAGES_MODAL
+==
+delete from SYS_PAGES_MODAL where NOM_PAGE = 'Ext.adp.MainDesk.view.eastregion.traces.Traces'
+'Ext.adp.MainDesk.view.eastregion.traces.Traces', 'Traces des mises à jour'

@@ -1,0 +1,35 @@
+<interface idInterface="EPS">
+	<nomInterface>CHARGEMENT_STD_EPS</nomInterface>
+	<descriptionInterface>Chargement des tables STD_EPS_PERIODE et STD_EPS</descriptionInterface>
+	<alerteSiFichierNonDisponible>OUI</alerteSiFichierNonDisponible>
+	<listeDependancesFichiers>
+		<nomFichierDep>STDPER.TXT</nomFichierDep>
+	</listeDependancesFichiers>
+	<purge>
+		<NbFichierConservationFichier>1</NbFichierConservationFichier>
+	</purge>
+	<traitements>
+		<traitement>
+			<descriptionTraitement>Chargement de la table STD_EPS_PERIODE</descriptionTraitement>
+			<typeTraitement>STD_EPS_PERIODE</typeTraitement>
+			<nomFichier>STDPER.TXT</nomFichier>
+			<continueSiErreur>NON</continueSiErreur>
+		</traitement>
+		<traitement>
+			<descriptionTraitement>Chargement de fichiers</descriptionTraitement>
+			<typeTraitement>SQLLDR</typeTraitement>
+			<fichiers>
+				<fichier>
+					<data>STDEPS.TXT</data>
+					<ctl>STD_EPS.ctl</ctl>
+				</fichier>
+			</fichiers>
+		</traitement>
+		<traitement>
+			<descriptionTraitement>Script SQL reconstruction index</descriptionTraitement>
+			<typeTraitement>SCRIPT</typeTraitement>
+			<nomFichier>sql_RD_apres_EPS.sql</nomFichier>
+			<typeFichier>SQL</typeFichier>
+		</traitement>
+	</traitements>
+</interface>

@@ -1,0 +1,405 @@
+##
+TAG_CHARSET=@€éèç
+##
+META_AT_IMPACT_VAL_ZONE
+=SQL=
+BEGIN
+  EXECUTE_IMMEDIATE_STRING('DROP MATERIALIZED VIEW "META_AT_IMPACT_VAL_ZONE"',0);
+EXCEPTION WHEN OTHERS THEN NULL;
+END;
+##
+META_AT_IMPACT_VAL_ZONE
+=SQL=
+CREATE MATERIALIZED VIEW "META_AT_IMPACT_VAL_ZONE" ("DATE_MAJ", "NOM_DONNEE", "LIBELLE_DONNEE", "TYPE", "ID", "ORIGINE", "PORTEE", "APERCU")
+BUILD IMMEDIATE
+USING INDEX 
+REFRESH FORCE ON DEMAND START WITH sysdate+5/1400 NEXT SYSDATE + 1
+AS 
+  select 
+    SYSDATE DATE_MAJ, 
+    "NOM_DONNEE",
+    "LIBELLE_DONNEE",
+    "TYPE",
+    NVL(ID_REGLEGESTION, APPELTABLE_NOMPAGE || ' - ' || APPELTABLE_IDREQUETE) ID,
+    "ORIGINE",
+    "PORTEE",
+    "APERCU" 
+  from (
+    with "META_AT_IMPACT_REGLEGESTION" (
+      "ID_REGLEGESTION", 
+      "TYPE_APPEL", 
+      "ID_OBJET", 
+      "PORTEE"
+    ) AS  (
+      select ID_REGLEGESTION, "TYPE_APPEL","ID_OBJET","PORTEE" 
+      from (
+        select 
+          'DONNEE_AUT_RD' TYPE_APPEL, 
+          NOM_DONNEE ID_OBJET, 
+          NOM_PAGE PORTEE, 
+          ID_REGLEGESTION_AUT_RD ID_REGLEGESTION 
+        from 
+          META_DONNEE_ECRAN 
+        where 
+          ID_REGLEGESTION_AUT_RD IS NOT NULL 
+          and COMPANY_ID='*'
+        union
+        select 
+          'DONNEE_AUT_CLI', 
+          NOM_DONNEE, 
+          NOM_PAGE, 
+          ID_REGLEGESTION_AUT_CLI 
+        from 
+          META_DONNEE_ECRAN 
+        where 
+          ID_REGLEGESTION_AUT_CLI IS NOT NULL 
+          and COMPANY_ID='*'
+        union
+        select 
+          'DONNEE_CTL_RD', 
+          NOM_DONNEE, 
+          NOM_PAGE, 
+          ID_REGLEGESTION_CTL_RD 
+        from 
+          META_DONNEE_ECRAN 
+        where 
+          ID_REGLEGESTION_CTL_RD IS NOT NULL 
+          and COMPANY_ID='*'
+        union
+        select 
+          'DONNEE_CTL_CLI', 
+          NOM_DONNEE, 
+          NOM_PAGE, 
+          ID_REGLEGESTION_CTL_CLI 
+        from 
+          META_DONNEE_ECRAN 
+        where 
+          ID_REGLEGESTION_CTL_CLI IS NOT NULL 
+          and COMPANY_ID='*'
+        union
+        select 
+          'DONNEE_AFF_RD', 
+          NOM_DONNEE, 
+          NOM_PAGE, 
+          ID_REGLEGESTION_AFF_RD 
+        from 
+          META_DONNEE_ECRAN 
+        where 
+          ID_REGLEGESTION_AFF_RD IS NOT NULL 
+          and COMPANY_ID='*'
+        union
+        select 
+          'DONNEE_AFF_CLI', 
+          NOM_DONNEE, 
+          NOM_PAGE, 
+          ID_REGLEGESTION_AFF_CLI 
+        from 
+          META_DONNEE_ECRAN 
+        where 
+          ID_REGLEGESTION_AFF_CLI IS NOT NULL 
+          and COMPANY_ID='*'
+        union
+        select 
+          'REGLE_DEFAUT_CLI', 
+          NOM_DONNEE, 
+          NOM_PAGE, 
+          REPLACE(VALEUR_DEFAUT, 'ID_REGLE=', '') 
+        from 
+          META_DONNEE_ECRAN 
+        where 
+          VALEUR_DEFAUT IS NOT NULL 
+          and COMPANY_ID='*' 
+          and VALEUR_DEFAUT like 'ID_REGLE=%'
+        union
+        select 
+          'EST_OBLIGATOIRE_CLI', 
+          NOM_DONNEE, 
+          NOM_PAGE, 
+          SUBSTR(EST_OBLIGATOIRE, 3) 
+        from 
+          META_DONNEE_ECRAN 
+        where 
+          EST_OBLIGATOIRE IS NOT NULL 
+          and COMPANY_ID='*' 
+          and EST_OBLIGATOIRE like 'R_%'
+        union
+        select 
+          'GRP_ID_REGLEGESTION_CTL_CLI_SUPP', 
+          ID_GROUPE, 
+          '', 
+          ID_REGLEGESTION_CTL_CLI_SUPP 
+        from 
+          META_GROUPE_DONNEES 
+        where 
+          ID_REGLEGESTION_CTL_CLI_SUPP IS NOT NULL 
+          and COMPANY_ID='*'
+        union
+        select 
+          'GRP_ID_REGLEGESTION_AFF_RD', 
+          ID_GROUPE, 
+          '',     
+          ID_REGLEGESTION_AFF_RD 
+        from 
+          META_GROUPE_DONNEES_INFO 
+        where 
+          ID_REGLEGESTION_AFF_RD IS NOT NULL 
+          and COMPANY_ID='*'
+        union
+        select 
+          'GRP_ID_REGLEGESTION_AFF_CLI', 
+          ID_GROUPE, 
+          '',     
+          ID_REGLEGESTION_AFF_CLI 
+        from 
+          META_GROUPE_DONNEES_INFO 
+        where 
+          ID_REGLEGESTION_AFF_CLI IS NOT NULL 
+          and COMPANY_ID='*'
+        union
+        select 
+          'ECRAN_AUT_RD', 
+          NOM_PAGE, 
+          '', 
+          ID_REGLEGESTION_AUT_RD 
+        from 
+          META_ECRAN 
+        where 
+          ID_REGLEGESTION_AUT_RD IS NOT NULL 
+          and COMPANY_ID='*'
+        union
+        select 
+          'ECRAN_AUT_CLI', 
+          NOM_PAGE, 
+          '', 
+          ID_REGLEGESTION_AUT_CLI 
+        from 
+          META_ECRAN 
+        where 
+          ID_REGLEGESTION_AUT_CLI IS NOT NULL 
+          and COMPANY_ID='*'
+        union
+        select 
+          'ECRAN_CTL_RD', 
+          NOM_PAGE, 
+          '', 
+          ID_REGLEGESTION_CTL_RD 
+        from 
+          META_ECRAN 
+        where 
+          ID_REGLEGESTION_CTL_RD IS NOT NULL 
+          and COMPANY_ID='*'
+        union
+        select 
+          'ECRAN_CTL_CLI', 
+          NOM_PAGE, 
+          '', 
+          ID_REGLEGESTION_CTL_CLI 
+        from 
+          META_ECRAN 
+        where 
+          ID_REGLEGESTION_CTL_CLI IS NOT NULL 
+          and COMPANY_ID='*'
+        union
+        select 
+          'ECRAN_AFF_RD', 
+          ID_GROUPE, 
+          '',
+          ID_REGLEGESTION_AFF_RD 
+        from 
+          meta_groupe_donnees_info 
+        where 
+          ID_REGLEGESTION_AFF_RD IS NOT NULL 
+          and COMPANY_ID='*'
+        union
+        select 
+          'GROUPE_AFF_CLI', 
+          ID_GROUPE, 
+          '', 
+          id_reglegestion_aff_cli 
+        from 
+          meta_groupe_donnees_info 
+        where 
+          id_reglegestion_aff_cli IS NOT NULL 
+          and COMPANY_ID='*'
+        union
+        select 
+          'SOUS_REGLE', 
+          ID_REGLEGESTION, 
+          '', 
+          REGEXP_SUBSTR(META_REGLEGESTION.OPERANDE2, 'IDREGLE£([^£]*)', 1,1, NULL, 1)  
+        from 
+          META_REGLEGESTION 
+        where 
+          OPERANDE2 like 'IDREGLE£%' 
+          and COMPANY_ID='*'
+        union
+        select 
+          'ECRAN_WKF_REG_AFF', 
+          'OP_NUM=' || OP_NUM, 
+          '', 
+          ECRAN_ID_REGLEGESTION_COND 
+        from 
+          META_WKF_OPERATION_ECRANS 
+        where 
+          ECRAN_ID_REGLEGESTION_COND IS NOT NULL 
+          and COMPANY_ID='*'
+        union
+        select 
+          'TAB_HOMONYMIE_CTL', 
+          'OP_NUM=' || OP_NUM, 
+          '', 
+          RECHERCHE_ID_REGLEGESTION_CTL 
+        from 
+          META_WKF_OPERATION_ECRANS 
+        where 
+          RECHERCHE_ID_REGLEGESTION_CTL IS NOT NULL 
+          and COMPANY_ID='*'
+      )
+    )
+    , donneeMisAJourParAppelTable (
+      nom_donnee, 
+      nom_page, 
+      appeltable_nompage, 
+      appeltable_idrequete, 
+      list_nom_donnee_maj, 
+      nom_donnee_maj
+    ) as (
+      select 
+        nom_donnee, 
+        nom_page, 
+        appeltable_nompage, 
+        appeltable_idrequete, 
+        replace(appeltable_listechamps, ' ', ''), 
+        '' nom_donnee_maj
+      from 
+        meta_donnee_ecran
+      where 
+        appeltable_nompage is not null
+      union all
+      select 
+        nom_donnee, 
+        nom_page, 
+        appeltable_nompage, 
+        appeltable_idrequete, 
+        case when list_nom_donnee_maj like '%,%' then substr(list_nom_donnee_maj, instr(list_nom_donnee_maj, ',')+1) else '' end list_nom_donnee_maj,
+        case when list_nom_donnee_maj like '%,%' then substr(list_nom_donnee_maj, 0, instr(list_nom_donnee_maj, ',')-1) else list_nom_donnee_maj end nom_donnee_maj
+      from 
+        donneeMisAJourParAppelTable
+      where 
+        list_nom_donnee_maj is not null
+    )
+    -- Recherche dans la colonne résultat des règles de gestion
+    select
+      META_DONNEE_GENERALE.NOM_DONNEE NOM_DONNEE,
+      META_DONNEE_ECRAN.LIBELLE_DONNEE,
+      'Valoriser depuis règle' || CASE WHEN META_REGLEGESTION.operande1='@vide££' and META_REGLEGESTION.operateur='VAL' THEN ' (mise à blanc)' ELSE '' END TYPE,
+      META_REGLEGESTION.ID_REGLEGESTION,
+      '' appeltable_nompage, 
+      '' appeltable_idrequete,
+      META_AT_IMPACT_REGLEGESTION.ID_OBJET origine,
+      META_AT_IMPACT_REGLEGESTION.PORTEE portee,
+      META_REGLEGESTION.operande1 || ' ' || META_REGLEGESTION.operateur || META_REGLEGESTION.operande2 apercu
+    from 
+      META_REGLEGESTION, META_DONNEE_GENERALE, META_DONNEE_ECRAN, META_AT_IMPACT_REGLEGESTION
+    where
+      META_REGLEGESTION.ID_REGLEGESTION=META_AT_IMPACT_REGLEGESTION.ID_REGLEGESTION
+      and META_REGLEGESTION.company_id='*'
+      and META_DONNEE_GENERALE.company_id=META_REGLEGESTION.company_id
+      and META_DONNEE_ECRAN.company_id=META_REGLEGESTION.company_id
+      and META_DONNEE_ECRAN.NOM_DONNEE=META_DONNEE_GENERALE.NOM_DONNEE
+      and META_DONNEE_ECRAN.NOM_PAGE='*'
+      and (
+        META_REGLEGESTION.RESULTAT='DONNEE£' || META_DONNEE_GENERALE.NOM_DONNEE
+        or
+        (
+          META_REGLEGESTION.RESULTAT='@donneecourante£' 
+          and 
+          META_DONNEE_GENERALE.NOM_DONNEE=META_AT_IMPACT_REGLEGESTION.ID_OBJET
+        )
+      )
+    union all
+    -- Recherche sur les fonctions RAZ
+    select
+      META_DONNEE_GENERALE.NOM_DONNEE,
+      META_DONNEE_GENERALE.LIBELLE_DONNEE,
+      'Valoriser depuis règle (mise à blanc)',
+      META_REGLEGESTION.ID_REGLEGESTION,
+      '', 
+      '',
+      META_AT_IMPACT_REGLEGESTION.ID_OBJET origine,
+      META_AT_IMPACT_REGLEGESTION.PORTEE portee,
+      'Raz ...'
+    from 
+      META_REGLEGESTION, 
+      META_DONNEE_GENERALE, 
+      META_DONNEE_ECRAN,  
+      META_AT_IMPACT_REGLEGESTION
+    where
+      OPERATEUR='FCT'
+      and META_DONNEE_ECRAN.company_id='*'
+      and META_DONNEE_ECRAN.NOM_DONNEE=META_DONNEE_GENERALE.NOM_DONNEE
+      and META_DONNEE_ECRAN.NOM_PAGE='*'
+      and META_REGLEGESTION.company_id='*'
+      and META_DONNEE_GENERALE.company_id='*'
+      and OPERANDE2 like '%FONCTION£RAZ%'
+      and (
+        OPERANDE2 like '%=DONNEE^'  || META_DONNEE_GENERALE.NOM_DONNEE || '§%'
+        OR 
+        OPERANDE2 like '%=DONNEE^'  || META_DONNEE_GENERALE.NOM_DONNEE
+      )
+      and META_REGLEGESTION.ID_REGLEGESTION=META_AT_IMPACT_REGLEGESTION.ID_REGLEGESTION
+    union all
+    -- Recherche sur les fonctions de calcul de durée
+    select
+      META_DONNEE_GENERALE.NOM_DONNEE,
+      META_DONNEE_GENERALE.LIBELLE_DONNEE,
+      'Valoriser depuis règle', META_REGLEGESTION.ID_REGLEGESTION,
+      '', 
+      '',
+      META_AT_IMPACT_REGLEGESTION.ID_OBJET origine,
+      META_AT_IMPACT_REGLEGESTION.PORTEE portee,
+      'Calcul durée ....'
+    from 
+      META_REGLEGESTION, 
+      META_DONNEE_GENERALE, 
+      META_DONNEE_ECRAN, 
+      META_AT_IMPACT_REGLEGESTION
+    where
+      OPERATEUR='FCT'
+      and META_DONNEE_ECRAN.company_id='*'
+      and META_DONNEE_ECRAN.NOM_DONNEE=META_DONNEE_GENERALE.NOM_DONNEE
+      and META_DONNEE_ECRAN.NOM_PAGE='*'
+      and META_REGLEGESTION.company_id='*'
+      and META_DONNEE_GENERALE.company_id='*'
+      and OPERANDE2  like 'FONCTION£CALCUL_DUREE_JOUR_MOIS_ANNEE%'
+      and (
+        OPERANDE2 like '%§RES_NB_JOURS=DONNEE^' || META_DONNEE_GENERALE.NOM_DONNEE || '§%'
+        OR
+        OPERANDE2 like '%§RES_NB_MOIS=DONNEE^' || META_DONNEE_GENERALE.NOM_DONNEE || '§%'
+        OR
+        OPERANDE2 like '%§RES_NB_ANNEES=DONNEE^' || META_DONNEE_GENERALE.NOM_DONNEE
+      )
+      and META_REGLEGESTION.ID_REGLEGESTION=META_AT_IMPACT_REGLEGESTION.ID_REGLEGESTION
+    union all
+    -- recherche au niveau de appels tables
+    select 
+      dMaj.nom_donnee_maj, d2.libelle_donnee, 
+      case when dMaj.nom_donnee=dMaj.nom_donnee_maj then 'Valoriser par appel table' ELSE 'Valoriser depuis appel table' END type,
+      '' id_reglegestion,
+      dMaj.appeltable_nompage, dMaj.appeltable_idrequete || '', dMaj.nom_donnee,
+      LISTAGG(dMaj.nom_page, ', ') WITHIN GROUP (ORDER BY dMaj.nom_page) ,
+      '' apercu
+    from 
+      donneeMisAJourParAppelTable dMaj
+      inner join meta_donnee_generale d1 on d1.nom_donnee=dMaj.nom_donnee_maj and d1.company_id='*'
+      inner join meta_donnee_ecran d2 on d2.nom_donnee=dMaj.nom_donnee_maj and d2.nom_page='*'
+    where 
+      dMaj.nom_donnee_maj is not null 
+      and dMaj.nom_donnee_maj not like '#%'
+    group by 
+      dMaj.nom_donnee, 
+      d2.libelle_donnee, 
+      dMaj.appeltable_nompage, 
+      dMaj.appeltable_idrequete, 
+      dMaj.nom_donnee_maj
+  )

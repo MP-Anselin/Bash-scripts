@@ -1,0 +1,31 @@
+##
+TAG_CHARSET=@€éèç
+##
+sys_requetes_jsp
+==
+DELETE FROM sys_requetes_jsp WHERE nompage='TAB_RD_MAX_DATE_EFF_HISTO' and idrequete=2
+'TAB_RD_MAX_DATE_EFF_HISTO','2','Administrateur','DIC_ADM_CONTRAT_HISTO','TO_CHAR (Max(DATE_EFF)^''dd.mm.yyyy'')','TO_CHAR (Max(DATE_EFF)^''dd.mm.yyyy'')','MATRIC=''%1''','0',NULL,NULL,'date effet de la dernicre occurence','date effet de la dernicre occurence','DATE_EFF'
+##
+meta_reglegestion_desc
+==
+DELETE FROM meta_reglegestion_desc WHERE id_reglegestion='REG_RD_CTRL_MUT_ERR'
+'*','REG_RD_CTRL_MUT_ERR','CTL','Contrôle date de mutation et derniere date d''effet','1393','0',NULL,'[{"TYPE":"OPERATION","OPERANDE_1":"££","OPERATEUR":"TAB","OPERANDE_2":"RETOURTABLE££NOM_PAGE=VALEUR^TAB_RD_MAX_DATE_EFF_HISTO§ID_REQUETE=VALEUR^2§ID_COL=VALEUR^0§PARAM_1=DONNEE^GEN_MATRIC","RESULTAT":"@TMPT£","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SI","OPERANDE_1":"DONNEE£DSMUTA_TRAV","OPERATEUR":"LE","OPERANDE_2":"@TMPT£","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"OPERATION","OPERANDE_1":"££","OPERATEUR":"ERR","OPERANDE_2":"CODEERREUR£GENMUT10£NOM_DONNEE_FOCUS=","RESULTAT":"£","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0}]','Contrôle date de mutation et dernicre date d''effet','N',NULL,'/* * REG_RD_CTRL_MUT_ERR :z * Contrôle date de mutation et dernicre date d''effetz */ TMPT = TAB("TAB_RD_MAX_DATE_EFF_HISTO",2,0,DONNEE.GEN_MATRIC); if (DIC_DONNEES_VIRTUELLES.DSMUTA_TRAV <= TMPT) {   ERR("GENMUT10");   }','Contrôle date de mutation et dernicre date d''effet'
+##
+REF_reglegestion_desc
+==
+DELETE FROM ref_reglegestion_desc WHERE id_reglegestion='REG_RD_CTRL_MUT_ERR'
+'*','REG_RD_CTRL_MUT_ERR','CTL','Contrôle date de mutation et derniere date d''effet','1393','0',NULL,'[{"TYPE":"OPERATION","OPERANDE_1":"££","OPERATEUR":"TAB","OPERANDE_2":"RETOURTABLE££NOM_PAGE=VALEUR^TAB_RD_MAX_DATE_EFF_HISTO§ID_REQUETE=VALEUR^2§ID_COL=VALEUR^0§PARAM_1=DONNEE^GEN_MATRIC","RESULTAT":"@TMPT£","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SI","OPERANDE_1":"DONNEE£DSMUTA_TRAV","OPERATEUR":"LE","OPERANDE_2":"@TMPT£","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"OPERATION","OPERANDE_1":"££","OPERATEUR":"ERR","OPERANDE_2":"CODEERREUR£GENMUT10£NOM_DONNEE_FOCUS=","RESULTAT":"£","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0}]','Contrôle date de mutation et dernicre date d''effet','N',NULL,'/* * REG_RD_CTRL_MUT_ERR :z * Contrôle date de mutation et dernicre date d''effetz */ TMPT = TAB("TAB_RD_MAX_DATE_EFF_HISTO",2,0,DONNEE.GEN_MATRIC); if (DIC_DONNEES_VIRTUELLES.DSMUTA_TRAV <= TMPT) {   ERR("GENMUT10");   }','Contrôle date de mutation et dernicre date d''effet'
+##
+meta_reglegestion
+==
+DELETE FROM meta_reglegestion WHERE id_reglegestion='REG_RD_CTRL_MUT_ERR'
+'*','REG_RD_CTRL_MUT_ERR','1','££','TAB','RETOURTABLE££NOM_PAGE=VALEUR^TAB_RD_MAX_DATE_EFF_HISTO§ID_REQUETE=VALEUR^2§ID_COL=VALEUR^0§PARAM_1=DONNEE^GEN_MATRIC','@TMPT£',NULL,NULL
+'*','REG_RD_CTRL_MUT_ERR','2',NULL,'DONNEE£DSMUTA_TRAVµ@TMPT£µLE',NULL,NULL,'3','FIN'
+'*','REG_RD_CTRL_MUT_ERR','3','££','ERR','CODEERREUR£GENMUT10£NOM_DONNEE_FOCUS=','£','FIN','FIN'
+##
+ref_reglegestion
+==
+DELETE FROM ref_reglegestion WHERE id_reglegestion='REG_RD_CTRL_MUT_ERR'
+'*','REG_RD_CTRL_MUT_ERR','1','££','TAB','RETOURTABLE££NOM_PAGE=VALEUR^TAB_RD_MAX_DATE_EFF_HISTO§ID_REQUETE=VALEUR^2§ID_COL=VALEUR^0§PARAM_1=DONNEE^GEN_MATRIC','@TMPT£',NULL,NULL
+'*','REG_RD_CTRL_MUT_ERR','2',NULL,'DONNEE£DSMUTA_TRAVµ@TMPT£µLE',NULL,NULL,'3','FIN'
+'*','REG_RD_CTRL_MUT_ERR','3','££','ERR','CODEERREUR£GENMUT10£NOM_DONNEE_FOCUS=','£','FIN','FIN'

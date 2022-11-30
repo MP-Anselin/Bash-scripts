@@ -1,0 +1,4 @@
+##
+ORG_RESPONSABLE_ETAT_CIV
+==
+CREATE OR REPLACE FORCE VIEW "ORG_RESPONSABLE_ETAT_CIV" ("MATRICFILS", "MATRICPERE", "CODORG", "NOM_PERE", "PRENOM_PERE") AS   (select org_subalterne.matricfils, org_subalterne.matricpere ,org_subalterne.codorg ,(select nom from secumatric where secumatric.matric=org_subalterne.matricpere ) as NOM_PERE,(select prenom from secumatric where secumatric.matric=org_subalterne.matricpere ) as PRENOM_PERE from org_subalterne where codorg='GENERAL' or codorg is null)  

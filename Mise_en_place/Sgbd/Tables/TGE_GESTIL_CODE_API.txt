@@ -1,0 +1,27 @@
+##
+TAG_CHARSET=@€éèç
+##
+TGE_GESTIL_CODE_API
+=SQL IFNOTEXIST=TGE_GESTIL_CODE_API=
+CREATE TABLE TGE_GESTIL_CODE_API ( CODE_API VARCHAR2(4), LIBELLE_API VARCHAR2(100) )
+##
+TGE_GESTIL_CODE_API
+==
+DELETE FROM TGE_GESTIL_CODE_API
+'MJD','Mise à jour de dossier'
+'EMB','Embauche'
+'MSO','Mise à jour de la date de sortie'
+'OOG','Départ de Gestil'
+'INI','Initialisation'
+'BIG','Retour dans Gestil'
+'ADE','Annulation de départ'
+'MEN','Mise à jour de la date d''entrée'
+'RMB','Réembauche'
+'SPD','Suppression de dossier'
+'PAI','Demande d''extraction des données de paie'
+'PAI2','Demande d''extraction des données de paie collective'
+'PAI3','Demande d''extraction des données de paie individuelle'
+'ARE','Annulation de réembauche'
+'DEP','Départ'
+'MJP','Mise à jour de période'
+'MCT','Mise à jour de compteur'

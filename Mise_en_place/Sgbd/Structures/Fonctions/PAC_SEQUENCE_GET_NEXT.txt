@@ -1,0 +1,17 @@
+##
+PAC_SEQUENCE_GET_NEXT
+=SQL=
+create or replace FUNCTION PAC_SEQUENCE_GET_NEXT(p_numpac VARCHAR2)
+RETURN VARCHAR2
+IS
+ v_pacmat   NUMBER;
+ v_retour   VARCHAR2(8);
+ BEGIN
+  v_retour := LPAD('0',8,'0');
+  IF PAC_SEQUENCE_CHECK_EXISTS(p_numpac)=1 THEN
+     EXECUTE IMMEDIATE 'SELECT LPAD('||PAC_SEQUENCE_GET_NAME(p_numpac)||'.NEXTVAL,'||8||',''0'') FROM DUAL' INTO v_retour;
+   ELSE
+     RAISE_APPLICATION_ERROR(-20000,'La séquence permettant de déterminer le PACMAT pour le PAC '''||p_numpac||''' n''existe pas');
+   END IF;
+ RETURN v_retour;
+END PAC_SEQUENCE_GET_NEXT;

@@ -1,0 +1,18 @@
+##
+GET_NB_LIGNES
+=SQL=
+create or replace FUNCTION GET_NB_LIGNES( nomTable IN VARCHAR2, clauseWhere IN VARCHAR2 ) RETURN INTEGER IS 
+PRAGMA AUTONOMOUS_TRANSACTION; 
+retour INTEGER; 
+req varchar(4000);
+BEGIN
+  IF nomTable IS NULL THEN RETURN 0; END IF;
+  req := 'SELECT COUNT(*) FROM '||nomTable;
+  IF clauseWhere IS NOT NULL THEN
+    req := req||' WHERE '||clauseWhere;
+  END IF;
+  EXECUTE IMMEDIATE req INTO retour;
+  RETURN retour;
+EXCEPTION
+  WHEN OTHERS THEN RETURN 0;
+END GET_NB_LIGNES;

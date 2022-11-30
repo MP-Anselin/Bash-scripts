@@ -1,0 +1,30 @@
+##
+SYS_MIGR_SECU_STRUCT_HRO
+=SQL=
+CREATE OR REPLACE
+PROCEDURE SYS_MIGR_SECU_STRUCT_HRO
+AS
+TYPE tcur
+IS
+  REF
+  CURSOR;
+    requete CLOB;
+    c_secu_pop_hro tcur;
+    secu_pop_login sys_usr_config.login%type;
+    secu_pop_nomrequete requetesimple.nomrequete%type;
+  BEGIN
+    OPEN c_secu_pop_hro FOR SELECT suc.login, rs.nomrequete FROM sys_usr_config suc, requetesimple rs WHERE suc.req_liste_mat=rs.nomrequete AND upper(rs.requete) LIKE '%HRORG_SECU%' AND NOT EXISTS
+    (SELECT * FROM sys_sec_usr_struct ssus WHERE ssus.login=suc.login
+    ) order by suc.login;
+  LOOP
+    FETCH c_secu_pop_hro INTO secu_pop_login, secu_pop_nomrequete;
+    EXIT
+  WHEN c_secu_pop_hro%NOTFOUND;
+    requete:='INSERT INTO REQUETESIMPLE SELECT '''||secu_pop_nomrequete||''', UTILISATEUR, ''SEC_LOC_STR'', REQUETE, REQUETEECR_GSI, REQUETESQL_GSI, TYPE_REQUETE, EST_VISIBLE FROM REQUETESIMPLE WHERE NOMREQUETE='''||secu_pop_nomrequete||''' AND UTILISATEUR=''DBA'' AND APPLICATION=''SEC_LOC'' AND NOT EXISTS (SELECT * FROM REQUETESIMPLE WHERE NOMREQUETE='''||secu_pop_nomrequete||''' AND UTILISATEUR=''DBA'' AND APPLICATION=''SEC_LOC_STR'')';
+    EXECUTE_IMMEDIATE_STRING( requete,0);
+    requete:='INSERT INTO SYS_SEC_USR_STRUCT VALUES ('''||secu_pop_login||''', '''||secu_pop_nomrequete||''')';
+    EXECUTE_IMMEDIATE_STRING(requete,0);
+  END LOOP;
+  CLOSE c_secu_pop_hro;
+  COMMIT;
+END SYS_MIGR_SECU_STRUCT_HRO; 

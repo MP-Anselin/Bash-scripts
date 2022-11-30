@@ -1,0 +1,115 @@
+##
+META_UTILISATION
+=SQL=
+CREATE OR REPLACE VIEW META_UTILISATION as
+SELECT
+  G.NOM_DONNEE,
+  G.LIBELLE_DONNEE,
+  G.NOM_DICTIONNAIRE,
+  G.TYPE_DONNEE,
+  G.LONGUEUR_MASQUE_NB_ENTIERS,
+  G.NB_DECIMAUX,
+  G.UTILISATION,
+  G.ACTIF,
+  G.ID_PROJET,
+  NVL(U.TYPE_OBJET,'aucun') AS TYPE_OBJET,
+  NVL(U.CODE_OBJET,'aucun') AS CODE_OBJET
+FROM
+  meta_donnee_generale G
+LEFT JOIN
+  (
+    SELECT DISTINCT
+      'GROUPE' AS TYPE_OBJET,
+      dg.nom_donnee,
+      gd.id_groupe AS CODE_OBJET
+    FROM
+      meta_donnee_generale dg,
+      meta_groupe_donnees gd
+    WHERE
+      dg.company_id   ='*'
+    AND gd.company_id =dg.company_id
+    AND dg.nom_donnee =gd.nom_donnee
+    UNION ALL
+    SELECT DISTINCT
+      'REGLE' AS TYPE_OBJET,
+      dg.nom_donnee,
+      rg.id_reglegestion AS CODE_OBJET
+    FROM
+      meta_donnee_generale dg,
+      meta_reglegestion rg
+    WHERE
+      dg.company_id   ='*'
+    AND rg.company_id =dg.company_id
+    AND
+      (
+        upper(operande1) = 'DONNEE£'
+        ||upper(nom_donnee)
+        ||'£'
+      OR upper(operande2) = 'DONNEE£'
+        ||upper(nom_donnee)
+        ||'£'
+      OR upper(operateur) LIKE '%DONNEE£'
+        ||upper(nom_donnee)
+        ||'µ%'
+      OR upper(operande2) LIKE '%=DONNEE^'
+        ||upper(nom_donnee)
+      OR upper(operande2) LIKE '%=DONNEE^'
+        ||upper(nom_donnee)
+        ||'§%'
+      OR upper(resultat) = 'DONNEE£'
+        ||upper(nom_donnee)
+      OR upper(operateur) LIKE '%DONNEE£'
+        ||upper(nom_donnee)
+        ||'£%'
+      OR upper(operateur) LIKE '%µDONNEE£'
+        ||upper(nom_donnee)
+        ||'£%'
+      OR upper(operateur) LIKE '%=DONNEE^'
+        ||upper(nom_donnee)
+        ||'µ%'
+      OR upper(operateur) LIKE '%=DONNEE^'
+        ||upper(nom_donnee)
+        ||'§%'
+      )
+    UNION ALL
+    SELECT DISTINCT
+      'APPELTABLE_PARAM' AS TYPE_OBJET,
+      dg.nom_donnee,
+      appeltable_parametres AS CODE_OBJET
+    FROM
+      meta_donnee_generale dg,
+      meta_donnee_ecran de
+    WHERE
+      dg.company_id            ='*'
+    AND de.company_id          =dg.company_id
+    AND NOT dg.nom_donnee      =de.nom_donnee
+    AND appeltable_parametres IS NOT NULL
+    AND ','
+      ||upper(REPLACE(appeltable_parametres,' ',''))
+      ||',' LIKE '%,'
+      ||upper(dg.nom_donnee)
+      ||',%'
+    UNION ALL
+    SELECT DISTINCT
+      'APPELTABLE_CHAMP' AS TYPE_OBJET,
+      dg.nom_donnee,
+      appeltable_listechamps AS CODE_OBJET
+    FROM
+      meta_donnee_generale dg,
+      meta_donnee_ecran de
+    WHERE
+      dg.company_id             ='*'
+    AND de.company_id           =dg.company_id
+    AND NOT dg.nom_donnee       =de.nom_donnee
+    AND appeltable_listechamps IS NOT NULL
+    AND ','
+      ||upper(REPLACE(appeltable_listechamps,' ',''))
+      ||',' LIKE '%,'
+      ||upper(dg.nom_donnee)
+      ||',%'
+  )
+  U
+ON
+  G.nom_donnee = U.NOM_DONNEE
+WHERE
+  company_id='*'

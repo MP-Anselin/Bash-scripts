@@ -1,0 +1,17 @@
+##
+SEC_PRIO_SITU_FROM_WITH_FUTUR
+=SQL=
+CREATE OR REPLACE FUNCTION SEC_PRIO_SITU_FROM_WITH_FUTUR(p_matric VARCHAR2, p_prio_situ_with_futur NUMBER) RETURN NUMBER IS
+  max_prio_situ NUMBER;
+BEGIN
+  IF p_prio_situ_with_futur=0 THEN
+    RETURN 0;
+  END IF;
+  SELECT MAX(PRIORITE_SITUATION) INTO max_prio_situ FROM SECUPACMAT WHERE MATRIC=p_matric;
+  IF max_prio_situ>0 THEN
+    IF (p_prio_situ_with_futur * -1) <= max_prio_situ THEN
+      RETURN p_prio_situ_with_futur * -1;
+    END IF;
+  END IF;
+  RETURN p_prio_situ_with_futur + max_prio_situ;
+END SEC_PRIO_SITU_FROM_WITH_FUTUR;

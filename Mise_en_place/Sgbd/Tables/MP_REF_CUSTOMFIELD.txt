@@ -1,0 +1,37 @@
+##
+TAG_CHARSET=@€ιθη
+##
+MP_REF_CUSTOMFIELD
+=SQL IFNOTEXIST=MP_REF_CUSTOMFIELD=
+CREATE TABLE MP_REF_CUSTOMFIELD (CUSTOMFIELD_PREFIX_MP VARCHAR2(50), LABEL VARCHAR2(250), SUFFIX_JSON_PATH VARCHAR2(250), CONSTRAINT MP_REF_CUSTOMFIELD_PK PRIMARY KEY (CUSTOMFIELD_PREFIX_MP))
+##
+MP_REF_CUSTOMFIELD
+==
+DELETE FROM MP_REF_CUSTOMFIELD
+'workerCustomDateTime','Custom Date Time Worker','/customFieldGroup/dateTimeFields[itemID=''@DATANAME@'']/dateTimeValue'
+'workerCustomDate','Custom Date Worker','/customFieldGroup/dateFields[itemID=''@DATANAME@'']/dateValue'
+'workerCustomString','Custom String Worker','/customFieldGroup/stringFields[itemID=''@DATANAME@'']/stringValue'
+'workerCustomIndicator','Custom Indicator Worker','/customFieldGroup/indicatorFields[itemID=''@DATANAME@'']/indicatorValue'
+'workerCustomNumber','Custom Number Worker','/customFieldGroup/numberFields[itemID=''@DATANAME@'']/numberValue'
+'personCustomDateTime','Custom Date Time Person','/person/customFieldGroup/dateTimeFields[itemID=''@DATANAME@'']/dateTimeValue'
+'personCustomDate','Custom Date Person','/person/customFieldGroup/dateFields[itemID=''@DATANAME@'']/dateValue'
+'personCustomString','Custom String Person','/person/customFieldGroup/stringFields[itemID=''@DATANAME@'']/stringValue'
+'personCustomIndicator','Custom Indicator Person','/person/customFieldGroup/indicatorFields[itemID=''@DATANAME@'']/indicatorValue'
+'personCustomNumber','Custom Number Person','/person/customFieldGroup/numberFields[itemID=''@DATANAME@'']/numberValue'
+'workAssCustomDateTime','Custom Date Time Work Assignment','/workAssignments[0]/customFieldGroup/dateTimeFields[itemID=''@DATANAME@'']/dateTimeValue'
+'workAssCustomDate','Custom Date Work Assignment','/workAssignments[0]/customFieldGroup/dateFields[itemID=''@DATANAME@'']/dateValue'
+'workAssCustomString','Custom String Work Assignment','/workAssignments[0]/customFieldGroup/stringFields[itemID=''@DATANAME@'']/stringValue'
+'workAssCustomIndicator','Custom Indicator Work Assignment','/workAssignments[0]/customFieldGroup/indicatorFields[itemID=''@DATANAME@'']/indicatorValue'
+'workAssCustomNumber','Custom Number Work Assignment','/workAssignments[0]/customFieldGroup/numberFields[itemID=''@DATANAME@'']/numberValue'
+##
+MP_REF_CUSTOMFIELD
+==
+DELETE FROM MP_REF_CUSTOMFIELD WHERE CUSTOMFIELD_PREFIX_MP = 'PayrollOutputCustom'
+'PayrollOutputCustom','Custom Payroll Output','/payrollSummary/earningsSummary/earningsSummarySections/earningsSummaryItems/earningID/PayrollOutputCustom@DATANAME@'
+##
+MP_REF_CUSTOMFIELD
+==
+DELETE FROM MP_REF_CUSTOMFIELD WHERE CUSTOMFIELD_PREFIX_MP IN ('workerCustomCode','personCustomCode','workAssCustomCode')
+'workerCustomCode','Custom Code Worker','/customFieldGroup/codeFields[itemID=''@DATANAME@'']/codeValue'
+'personCustomCode','Custom Code Person','/person/customFieldGroup/codeFields[itemID=''@DATANAME@'']/codeValue'
+'workAssCustomCode','Custom Code Work Assignment','/workAssignments[0]/customFieldGroup/codeFields[itemID=''@DATANAME@'']/codeValue'

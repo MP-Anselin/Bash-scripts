@@ -1,0 +1,21 @@
+<interface idInterface="GES">
+        <nomInterface>Dmande des elements GTA pour la paie</nomInterface>
+        <descriptionInterface>Interface GTA GESTIL PAIE</descriptionInterface>
+        <alerteSiFichierNonDisponible>OUI</alerteSiFichierNonDisponible>
+        <traitements>
+                <traitement>
+                        <descriptionTraitement>Alimentation GESTIL</descriptionTraitement>
+                        <typeTraitement>TraitementClient</typeTraitement>
+                        <classTraitement>fr.adp.com.cougar.batch.gestil.GTA_InterfaceGestil_Event</classTraitement>
+                        <modeDebug>true</modeDebug>
+                        <nomFichier></nomFichier>
+                        <MaxAttenteInMinutes>35</MaxAttenteInMinutes>
+                        <levelLog_generationFichierFSED>INFO</levelLog_generationFichierFSED>
+                        <log_generationFichierFSED>/ehc/fs1/adp/zadigtge/ZTGEclient/GxpFiles/batch/logs/lanceIntGestil.cmd.log</log_generationFichierFSED>
+                        <cheminBatch></cheminBatch>
+                        <pilote></pilote>
+                        <fichierOut>/ehc/fs1/adp/zadigtge/ZTGEBUL22/GxpFiles/batch/out/</fichierOut>
+                        <urlFileGW>aaa</urlFileGW>
+                </traitement>
+        </traitements>
+</interface>

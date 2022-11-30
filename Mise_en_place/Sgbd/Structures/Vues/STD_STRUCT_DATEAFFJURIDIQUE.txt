@@ -1,0 +1,26 @@
+##
+STD_STRUCT_DATEAFFJURIDIQUE
+=SQL=
+CREATE OR REPLACE VIEW STD_STRUCT_DATEAFFJURIDIQUE
+AS
+  (SELECT matric,
+    MIN(aff.date_eff) AS DTDEBSOCIETE,
+    MAX(AFF.date_fin) AS DTFINSOCIETE,
+    niv1
+  FROM std_struc_affectation AFF,
+    --  TODO VRI : ZEU FE, il faudra gérer le CID lors du traitement de cette partie STD_STRUC_AFFECTATION
+    std_struc_index IDX
+  WHERE last_entite = code_entite
+  AND IDX.codts     = AFF.codts
+  AND IDX.codts    IN
+    (SELECT valvar
+    FROM SYS_VARSYS
+    WHERE module = 'GPC'
+    AND codvar   = 'STRUCTURE_JUR'
+    )
+  AND AFF.date_eff BETWEEN idx.DATE_EFF AND IDX.DATE_FIN
+  AND to_char(sysdate,'YYYYMMDD') between AFF.date_eff and AFF.date_fin
+  GROUP BY matric,
+    niv1
+  )
+  

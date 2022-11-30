@@ -1,0 +1,223 @@
+##
+TAG_CHARSET=@€éèç
+##
+ORG_M_ADRESSE_TO_ADR
+=SQL=
+create or replace
+TRIGGER "ORG_M_ADRESSE_TO_ADR" AFTER UPDATE
+ON STD_ADRESSE FOR EACH ROW
+declare 
+-- trigger qui modifie dans la table adresse les infos si besoin
+  existeValeur  NUMBER :=0;
+    codniv1 VARCHAR2(10) := '';
+  codniv2 VARCHAR2(10) := '';
+  codniv3 VARCHAR2(10) := '';
+  codniv4 VARCHAR2(10) := '';
+ codniv5 VARCHAR2(10) := '';
+
+ TYPE LIG_ADRESSE IS RECORD
+ ( derNiv NUMBER ,
+      codts NUMBER ,
+      entite  VARCHAR2(25) ,
+      siren VARCHAR2(14) ,
+      nic  VARCHAR2(5)
+     );
+    rec_adr LIG_ADRESSE ;
+   Cursor C_Adr is select SN.NIVEAU ,SN.CODTS,SE.CODE_ENTITE,SE.SIREN,SE.NIC  from  std_struc_entite se, std_struc_niv sn ,STD_STRUC_ARBRE SA
+    where sn.codts=SA.CODTS and se.type_entite=sn.type_entite and se.code_entite=SA.CODE_ENTITE
+     and to_char(SYSDATE,'yyyymmdd') between se.date_eff and se.date_fin 
+    and to_char(SYSDATE,'yyyymmdd') between sn.date_eff and sn.date_fin 
+    and to_char(SYSDATE,'yyyymmdd') between SA.date_eff and SA.date_fin 
+    and se.ID_ADRESSE=:new.ID_ADRESSE;
+ Begin
+  --dbms_output.put_line('début curseur ');
+  --FIXME utiliser la procédure trace_dbms_output() 
+    Open C_Adr ;
+    Loop
+   Fetch C_Adr into rec_adr ;
+     Exit when C_Adr%NOTFOUND ;
+        --dbms_output.put_line('enregistrement ');
+        --FIXME utiliser la procédure trace_dbms_output() 
+              begin 
+               --dbms_output.put_line('Avant mise à jour adresse : '||:new.ID_ADRESSE);
+               --FIXME utiliser la procédure trace_dbms_output()
+           if rec_adr.derNiv=1 then 
+               --update ou insertion de l'adresse pour niveau 1
+                begin
+                    select CODTS into existeValeur from std_adrstr where CODTS=codts and CODNIV1=rec_adr.entite and (codniv2 ='' or codniv2 is null) ;
+                exception
+                   when no_data_found then
+                     --dbms_output.put_line('Insere adresse ');
+                     --FIXME utiliser la procédure trace_dbms_output()
+                     insert into STD_ADRSTR (CODTS,CODNIV1,CODNIV2,CODNIV3,CODNIV4,CODNIV5,CODNIV6,SIGLE,CPLADR,NUMV,BTQ,TYPV,NOMV,INSEE,COM,CP,DISTRI,TEL,SIREN,NIC,FAX,EMAIL,CODP,TYPSTR) values (rec_adr.codts,rec_adr.entite,'','','','','',:new.SIGLE,:new.COMADR,:new.NUMVOI,:new.BISTER,:new.TYPVOI,:new.NOMVOI,:new.CINSEE,:new.BOURG,:new.COPOST,:new.BUDIST,:new.NOTELE,rec_adr.siren,rec_adr.nic,:new.NOFAX,:new.EMAIL,:new.COPAYS,'');            
+                end;
+                --dbms_output.put_line('Code type structure existe dans adresse : '||existeValeur);
+                --FIXME utiliser la procédure trace_dbms_output()
+                 if ( existeValeur is not null and existeValeur>0) then
+                     --dbms_output.put_line('Update adresse ');
+                     --FIXME utiliser la procédure trace_dbms_output()
+                    update STD_ADRSTR set SIGLE=:new.SIGLE,CPLADR=:new.COMADR,NUMV=:new.NUMVOI,BTQ=:new.BISTER,TYPV=:new.TYPVOI,NOMV=:new.NOMVOI,INSEE=:new.CINSEE,COM=:new.BOURG,CP=:new.COPOST,DISTRI=:new.BUDIST,TEL=:new.NOTELE,SIREN=rec_adr.siren,NIC=rec_adr.nic,FAX=:new.NOFAX,EMAIL=:new.EMAIL,CODP=:new.COPAYS,TYPSTR=''  where CODTS=rec_adr.codts and CODNIV1=rec_adr.entite and (codniv2 ='' or codniv2 is null) ;            
+                  end if;
+          end if;
+          if rec_adr.derNiv=2 then 
+               --update ou insertion de l'adresse pour niveau 2
+                begin
+                    select CODTS into existeValeur from std_adrstr where CODTS=codts and CODNIV2=rec_adr.entite and (codniv3 ='' or codniv3 is null) ;
+                exception
+                   when no_data_found then
+                     --dbms_output.put_line('Insere adresse ');
+                     --FIXME utiliser la procédure trace_dbms_output()
+                     NULL;
+                      BEGIN 
+                         select CODE_ENT_MERE into codniv1 from STD_STRUC_ARBRE where CODTS=rec_adr.codts and CODE_ENTITE= rec_adr.entite AND  to_char(SYSDATE,'yyyymmdd') between DATE_EFF and DATE_FIN ;
+                      EXCEPTION
+                      WHEN OTHERS THEN 
+                          --DBMS_OUTPUT.PUT_LINE('Fausse alerte');
+                          --FIXME utiliser la procédure trace_dbms_output()
+                          NULL;    
+                  END ;
+                  insert into STD_ADRSTR (CODTS,CODNIV1,CODNIV2,CODNIV3,CODNIV4,CODNIV5,CODNIV6,SIGLE,CPLADR,NUMV,BTQ,TYPV,NOMV,INSEE,COM,CP,DISTRI,TEL,SIREN,NIC,FAX,EMAIL,CODP,TYPSTR) values (rec_adr.codts,codniv1,rec_adr.entite,'','','','',:new.SIGLE,:new.COMADR,:new.NUMVOI,:new.BISTER,:new.TYPVOI,:new.NOMVOI,:new.CINSEE,:new.BOURG,:new.COPOST,:new.BUDIST,:new.NOTELE,rec_adr.siren,rec_adr.nic,:new.NOFAX,:new.EMAIL,:new.COPAYS,'');            
+                end;
+                --dbms_output.put_line('Code type structure existe dans adresse : '||existeValeur);
+                --FIXME utiliser la procédure trace_dbms_output()
+                 if ( existeValeur is not null and existeValeur>0) then
+                     --dbms_output.put_line('Update adresse ');
+                     --FIXME utiliser la procédure trace_dbms_output()
+                    update STD_ADRSTR set SIGLE=:new.SIGLE,CPLADR=:new.COMADR,NUMV=:new.NUMVOI,BTQ=:new.BISTER,TYPV=:new.TYPVOI,NOMV=:new.NOMVOI,INSEE=:new.CINSEE,COM=:new.BOURG,CP=:new.COPOST,DISTRI=:new.BUDIST,TEL=:new.NOTELE,SIREN=rec_adr.siren,NIC=rec_adr.nic,FAX=:new.NOFAX,EMAIL=:new.EMAIL,CODP=:new.COPAYS,TYPSTR=''  where CODTS=rec_adr.codts and CODNIV2=rec_adr.entite and (codniv3 ='' or codniv3 is null) ;            
+                  end if;
+          end if;
+          if rec_adr.derNiv=3 then 
+               --update ou insertion de l'adresse pour niveau 2
+                begin
+                    select CODTS into existeValeur from std_adrstr where CODTS=codts and CODNIV3=rec_adr.entite and (codniv4 ='' or codniv4 is null) ;
+                exception
+                   when no_data_found then
+                     --dbms_output.put_line('Insere adresse ');
+                     --FIXME utiliser la procédure trace_dbms_output()
+                     NULL;
+                      BEGIN 
+                         select CODE_ENT_MERE into codniv2 from STD_STRUC_ARBRE where CODTS=rec_adr.codts and CODE_ENTITE= codniv3 AND  to_char(SYSDATE,'yyyymmdd') between DATE_EFF and DATE_FIN ;
+                         select CODE_ENT_MERE into codniv1 from STD_STRUC_ARBRE where CODTS=rec_adr.codts and CODE_ENTITE= codniv2 AND  to_char(SYSDATE,'yyyymmdd') between DATE_EFF and DATE_FIN ;
+                     EXCEPTION
+                      WHEN OTHERS THEN 
+                          --DBMS_OUTPUT.PUT_LINE('Fausse alerte');
+                          --FIXME utiliser la procédure trace_dbms_output()
+                          NULL;    
+                  END ;
+                  insert into STD_ADRSTR (CODTS,CODNIV1,CODNIV2,CODNIV3,CODNIV4,CODNIV5,CODNIV6,SIGLE,CPLADR,NUMV,BTQ,TYPV,NOMV,INSEE,COM,CP,DISTRI,TEL,SIREN,NIC,FAX,EMAIL,CODP,TYPSTR) values (rec_adr.codts,codniv1,codniv2,rec_adr.entite,'','','',:new.SIGLE,:new.COMADR,:new.NUMVOI,:new.BISTER,:new.TYPVOI,:new.NOMVOI,:new.CINSEE,:new.BOURG,:new.COPOST,:new.BUDIST,:new.NOTELE,rec_adr.siren,rec_adr.nic,:new.NOFAX,:new.EMAIL,:new.COPAYS,'');            
+                end;
+                --dbms_output.put_line('Code type structure existe dans adresse : '||existeValeur);
+                --FIXME utiliser la procédure trace_dbms_output()
+                 if ( existeValeur is not null and existeValeur>0) then
+                     --dbms_output.put_line('Update adresse ');
+                     --FIXME utiliser la procédure trace_dbms_output()
+                    update STD_ADRSTR set SIGLE=:new.SIGLE,CPLADR=:new.COMADR,NUMV=:new.NUMVOI,BTQ=:new.BISTER,TYPV=:new.TYPVOI,NOMV=:new.NOMVOI,INSEE=:new.CINSEE,COM=:new.BOURG,CP=:new.COPOST,DISTRI=:new.BUDIST,TEL=:new.NOTELE,SIREN=rec_adr.siren,NIC=rec_adr.nic,FAX=:new.NOFAX,EMAIL=:new.EMAIL,CODP=:new.COPAYS,TYPSTR=''  where CODTS=rec_adr.codts and CODNIV3=rec_adr.entite and (codniv4 ='' or codniv4 is null) ;            
+                  end if;
+          end if;
+          if rec_adr.derNiv=4 then 
+               --update ou insertion de l'adresse pour niveau 2
+                begin
+                    select CODTS into existeValeur from std_adrstr where CODTS=codts and CODNIV4=rec_adr.entite and (codniv5 ='' or codniv5 is null) ;
+                exception
+                   when no_data_found then
+                     --dbms_output.put_line('Insere adresse ');
+                     --FIXME utiliser la procédure trace_dbms_output()
+                     NULL;
+                      BEGIN 
+                         select CODE_ENT_MERE into codniv3 from STD_STRUC_ARBRE where CODTS=rec_adr.codts and CODE_ENTITE= rec_adr.entite AND  to_char(SYSDATE,'yyyymmdd') between DATE_EFF and DATE_FIN ;
+                         select CODE_ENT_MERE into codniv2 from STD_STRUC_ARBRE where CODTS=rec_adr.codts and CODE_ENTITE= codniv3 AND  to_char(SYSDATE,'yyyymmdd') between DATE_EFF and DATE_FIN ;
+                         select CODE_ENT_MERE into codniv1 from STD_STRUC_ARBRE where CODTS=rec_adr.codts and CODE_ENTITE= codniv2 AND  to_char(SYSDATE,'yyyymmdd') between DATE_EFF and DATE_FIN ;
+                     EXCEPTION
+                      WHEN OTHERS THEN 
+                          --DBMS_OUTPUT.PUT_LINE('Fausse alerte');
+                          --FIXME utiliser la procédure trace_dbms_output()
+                          NULL;
+                  END ;
+                  insert into STD_ADRSTR (CODTS,CODNIV1,CODNIV2,CODNIV3,CODNIV4,CODNIV5,CODNIV6,SIGLE,CPLADR,NUMV,BTQ,TYPV,NOMV,INSEE,COM,CP,DISTRI,TEL,SIREN,NIC,FAX,EMAIL,CODP,TYPSTR) values (rec_adr.codts,codniv1,codniv2,codniv3,rec_adr.entite,'','',:new.SIGLE,:new.COMADR,:new.NUMVOI,:new.BISTER,:new.TYPVOI,:new.NOMVOI,:new.CINSEE,:new.BOURG,:new.COPOST,:new.BUDIST,:new.NOTELE,rec_adr.siren,rec_adr.nic,:new.NOFAX,:new.EMAIL,:new.COPAYS,'');            
+                end;
+                --dbms_output.put_line('Code type structure existe dans adresse : '||existeValeur);
+                --FIXME utiliser la procédure trace_dbms_output()
+                 if ( existeValeur is not null and existeValeur>0) then
+                     --dbms_output.put_line('Update adresse ');
+                     --FIXME utiliser la procédure trace_dbms_output()
+                    update STD_ADRSTR set SIGLE=:new.SIGLE,CPLADR=:new.COMADR,NUMV=:new.NUMVOI,BTQ=:new.BISTER,TYPV=:new.TYPVOI,NOMV=:new.NOMVOI,INSEE=:new.CINSEE,COM=:new.BOURG,CP=:new.COPOST,DISTRI=:new.BUDIST,TEL=:new.NOTELE,SIREN=rec_adr.siren,NIC=rec_adr.nic,FAX=:new.NOFAX,EMAIL=:new.EMAIL,CODP=:new.COPAYS,TYPSTR=''  where CODTS=rec_adr.codts and CODNIV4=rec_adr.entite and (codniv5 ='' or codniv5 is null) ;            
+                  end if;
+          end if;
+         if rec_adr.derNiv=5 then 
+               --update ou insertion de l'adresse pour niveau 2
+                begin
+                    select CODTS into existeValeur from std_adrstr where CODTS=codts and CODNIV5=rec_adr.entite and (codniv6 ='' or codniv6 is null) ;
+                exception
+                   when no_data_found then
+                     --dbms_output.put_line('Insere adresse ');
+                     --FIXME utiliser la procédure trace_dbms_output()
+                     NULL;
+                      BEGIN 
+                         select CODE_ENT_MERE into codniv4 from STD_STRUC_ARBRE where CODTS=rec_adr.codts and CODE_ENTITE= rec_adr.entite AND  to_char(SYSDATE,'yyyymmdd') between DATE_EFF and DATE_FIN ;
+                         select CODE_ENT_MERE into codniv3 from STD_STRUC_ARBRE where CODTS=rec_adr.codts and CODE_ENTITE= codniv4 AND  to_char(SYSDATE,'yyyymmdd') between DATE_EFF and DATE_FIN ;
+                         select CODE_ENT_MERE into codniv2 from STD_STRUC_ARBRE where CODTS=rec_adr.codts and CODE_ENTITE= codniv3 AND  to_char(SYSDATE,'yyyymmdd') between DATE_EFF and DATE_FIN ;
+                         select CODE_ENT_MERE into codniv1 from STD_STRUC_ARBRE where CODTS=rec_adr.codts and CODE_ENTITE= codniv2 AND  to_char(SYSDATE,'yyyymmdd') between DATE_EFF and DATE_FIN ;
+                     EXCEPTION
+                      WHEN OTHERS THEN 
+                          --DBMS_OUTPUT.PUT_LINE('Fausse alerte');
+                          --FIXME utiliser la procédure trace_dbms_output()
+                          NULL;    
+                  END ;
+                  insert into STD_ADRSTR (CODTS,CODNIV1,CODNIV2,CODNIV3,CODNIV4,CODNIV5,CODNIV6,SIGLE,CPLADR,NUMV,BTQ,TYPV,NOMV,INSEE,COM,CP,DISTRI,TEL,SIREN,NIC,FAX,EMAIL,CODP,TYPSTR) values (rec_adr.codts,codniv1,codniv2,codniv3,codniv4,rec_adr.entite,'',:new.SIGLE,:new.COMADR,:new.NUMVOI,:new.BISTER,:new.TYPVOI,:new.NOMVOI,:new.CINSEE,:new.BOURG,:new.COPOST,:new.BUDIST,:new.NOTELE,rec_adr.siren,rec_adr.nic,:new.NOFAX,:new.EMAIL,:new.COPAYS,'');            
+                end;
+                --dbms_output.put_line('Code type structure existe dans adresse : '||existeValeur);
+                --FIXME utiliser la procédure trace_dbms_output()
+                 if ( existeValeur is not null and existeValeur>0) then
+                     --dbms_output.put_line('Update adresse ');
+                     --FIXME utiliser la procédure trace_dbms_output()
+                    update STD_ADRSTR set SIGLE=:new.SIGLE,CPLADR=:new.COMADR,NUMV=:new.NUMVOI,BTQ=:new.BISTER,TYPV=:new.TYPVOI,NOMV=:new.NOMVOI,INSEE=:new.CINSEE,COM=:new.BOURG,CP=:new.COPOST,DISTRI=:new.BUDIST,TEL=:new.NOTELE,SIREN=rec_adr.siren,NIC=rec_adr.nic,FAX=:new.NOFAX,EMAIL=:new.EMAIL,CODP=:new.COPAYS,TYPSTR=''  where CODTS=rec_adr.codts and CODNIV5=rec_adr.entite and (codniv6 ='' or codniv6 is null) ;            
+                  end if;
+          end if;
+         if rec_adr.derNiv=6 then 
+               --update ou insertion de l'adresse pour niveau 2
+                begin
+                    select CODTS into existeValeur from std_adrstr where CODTS=codts and CODNIV6=rec_adr.entite  ;
+                exception
+                   when no_data_found then
+                     --dbms_output.put_line('Insere adresse ');
+                     --FIXME utiliser la procédure trace_dbms_output()
+                     NULL;
+                      BEGIN 
+                         select CODE_ENT_MERE into codniv5 from STD_STRUC_ARBRE where CODTS=rec_adr.codts and CODE_ENTITE= rec_adr.entite AND  to_char(SYSDATE,'yyyymmdd') between DATE_EFF and DATE_FIN ;
+                         select CODE_ENT_MERE into codniv4 from STD_STRUC_ARBRE where CODTS=rec_adr.codts and CODE_ENTITE= codniv5 AND  to_char(SYSDATE,'yyyymmdd') between DATE_EFF and DATE_FIN ;
+                         select CODE_ENT_MERE into codniv3 from STD_STRUC_ARBRE where CODTS=rec_adr.codts and CODE_ENTITE= codniv4 AND  to_char(SYSDATE,'yyyymmdd') between DATE_EFF and DATE_FIN ;
+                         select CODE_ENT_MERE into codniv2 from STD_STRUC_ARBRE where CODTS=rec_adr.codts and CODE_ENTITE= codniv3 AND  to_char(SYSDATE,'yyyymmdd') between DATE_EFF and DATE_FIN ;
+                         select CODE_ENT_MERE into codniv1 from STD_STRUC_ARBRE where CODTS=rec_adr.codts and CODE_ENTITE= codniv2 AND  to_char(SYSDATE,'yyyymmdd') between DATE_EFF and DATE_FIN ;
+                     EXCEPTION
+                      WHEN OTHERS THEN 
+                          --DBMS_OUTPUT.PUT_LINE('Fausse alerte');
+                          --FIXME utiliser la procédure trace_dbms_output()
+                          NULL;    
+                  END ;
+                  insert into STD_ADRSTR (CODTS,CODNIV1,CODNIV2,CODNIV3,CODNIV4,CODNIV5,CODNIV6,SIGLE,CPLADR,NUMV,BTQ,TYPV,NOMV,INSEE,COM,CP,DISTRI,TEL,SIREN,NIC,FAX,EMAIL,CODP,TYPSTR) values (rec_adr.codts,codniv1,codniv2,codniv3,codniv4,codniv5,rec_adr.entite,:new.SIGLE,:new.COMADR,:new.NUMVOI,:new.BISTER,:new.TYPVOI,:new.NOMVOI,:new.CINSEE,:new.BOURG,:new.COPOST,:new.BUDIST,:new.NOTELE,rec_adr.siren,rec_adr.nic,:new.NOFAX,:new.EMAIL,:new.COPAYS,'');            
+                end;
+                --dbms_output.put_line('Code type structure existe dans adresse : '||existeValeur);
+                --FIXME utiliser la procédure trace_dbms_output()
+                 if ( existeValeur is not null and existeValeur>0) then
+                    --dbms_output.put_line('Update adresse ');
+                    --FIXME utiliser la procédure trace_dbms_output()
+                    update STD_ADRSTR set SIGLE=:new.SIGLE,CPLADR=:new.COMADR,NUMV=:new.NUMVOI,BTQ=:new.BISTER,TYPV=:new.TYPVOI,NOMV=:new.NOMVOI,INSEE=:new.CINSEE,COM=:new.BOURG,CP=:new.COPOST,DISTRI=:new.BUDIST,TEL=:new.NOTELE,SIREN=rec_adr.siren,NIC=rec_adr.nic,FAX=:new.NOFAX,EMAIL=:new.EMAIL,CODP=:new.COPAYS,TYPSTR=''  where CODTS=rec_adr.codts and CODNIV6=rec_adr.entite  ;            
+                  end if;
+          end if;
+          exception
+  When OTHERS then
+    --dbms_output.put_line('Code type structure existe dans adresse : '||existeValeur);
+    --dbms_output.put_line( 'Code    erreur : ' || to_char( SQLCODE )) ;
+    --dbms_output.put_line( 'libellé erreur : ' || to_char( SQLERRM )) ; 
+    --dbms_output.put_line('problème de mise à jour de l''adresse');
+    --FIXME utiliser la procédure trace_dbms_output()
+    NULL;
+            end;
+       End loop ;
+         --dbms_output.put_line('fin curseur ');
+         --FIXME utiliser la procédure trace_dbms_output() 
+  End ;
+##
+ORG_M_ADRESSE_TO_ADR
+=SQL=
+DROP TRIGGER ORG_M_ADRESSE_TO_ADR

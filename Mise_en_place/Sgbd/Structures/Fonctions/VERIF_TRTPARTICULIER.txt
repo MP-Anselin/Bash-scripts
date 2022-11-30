@@ -1,0 +1,40 @@
+##
+VERIF_TRTPARTICULIER
+=SQL=
+CREATE OR REPLACE FUNCTION VERIF_TRTPARTICULIER RETURN T_TABLE AS 
+  p_traitement VARCHAR2(1000);
+  p_retour T_TABLE := T_TABLE();
+  n INTEGER := 0;
+  w_date tab_varchar;
+BEGIN
+  FOR un_traitement IN (SELECT distinct TRTPARTICULIER, DONNEEGXP, TABLEGXP, TGE_REF_MAPDO.NUMPAC, TGE_REF_MAPDO.ELEMENT ,
+                        case when masque >0 and masque <8 and TYPE='N' THEN 'D' else   'NOTDATE' end as type_donnee,
+                        LONGUEUR 
+                        FROM TGE_REF_MAPDO ,TGE_REF_DICOZ 
+                        WHERE TGE_REF_DICOZ.element =TGE_REF_MAPDO.element AND TRTPARTICULIER  IS NOT NULL
+                        ORDER BY TRTPARTICULIER)
+  LOOP
+    BEGIN
+      p_traitement := un_traitement.TRTPARTICULIER;
+      p_traitement := REPLACE(p_traitement,''''||'$DONNEEGXP'||'''',''''||un_traitement.DONNEEGXP||'''');
+      p_traitement := REPLACE(p_traitement,'$DONNEEGXP',un_traitement.DONNEEGXP);
+      p_traitement := REPLACE(p_traitement,'$TABLE',un_traitement.TABLEGXP);
+      p_traitement := REPLACE(p_traitement,'$NUMPAC',un_traitement.NUMPAC);
+      IF p_traitement IS NOT NULL THEN
+        IF un_traitement.type_donnee ='D' AND un_traitement.LONGUEUR >=8 THEN
+          p_traitement := 'SELECT to_char(' || p_traitement || ',''yyyymmddHH24MISS'') FROM ' || un_traitement.TABLEGXP ||' where rownum<1000';
+          EXECUTE IMMEDIATE p_traitement bulk collect INTO w_date;
+        ELSE
+          p_traitement := 'SELECT ' || p_traitement || ' FROM ' || un_traitement.TABLEGXP ||' where rownum<1000 ';
+          EXECUTE_IMMEDIATE_STRING (p_traitement,0) ;
+        END IF;
+      END IF;
+    EXCEPTION
+    WHEN OTHERS THEN
+      p_retour.extend;
+      n                        := n + 1;
+      p_retour(p_retour.count) := T_COL(un_traitement.NUMPAC, un_traitement.ELEMENT, un_traitement.TRTPARTICULIER);
+    END;
+  END LOOP;
+  RETURN p_retour;
+END VERIF_TRTPARTICULIER;

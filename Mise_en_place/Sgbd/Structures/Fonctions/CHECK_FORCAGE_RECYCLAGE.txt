@@ -1,0 +1,30 @@
+##
+CHECK_FORCAGE_RECYCLAGE
+=SQL=
+create or replace FUNCTION CHECK_FORCAGE_RECYCLAGE( 
+    p_numpac IN DIC_ADM_CONTRAT.NUMPAC%TYPE, 
+    p_pacmat IN DIC_ADM_CONTRAT.PACMAT%TYPE, 
+    p_numcnt IN DIC_ADM_CONTRAT.NUMCNT%TYPE, 
+    p_drpai2 IN DIC_ADM_CONTRAT_HISTO.DRPAI2%TYPE, 
+    p_periodeencours IN TGE_REF_PAC.PERIODEENCOURS%TYPE ) 
+RETURN INTEGER IS
+  v_dsdcn DIC_ADM_CONTRAT.DSDCN%TYPE; 
+  v_natcol DIC_ADM_CONTRAT.NATCOL%TYPE; 
+  v_periodeencours TGE_REF_PAC.PERIODEENCOURS%TYPE; 
+BEGIN
+    SELECT DSDCN, NATCOL INTO v_dsdcn, v_natcol FROM DIC_ADM_CONTRAT WHERE NUMPAC=p_numpac AND PACMAT=p_pacmat AND NUMCNT=p_numcnt;
+    IF v_natcol IN ('SAL','STA') THEN
+      IF p_periodeencours IS NOT NULL THEN
+        v_periodeencours := p_periodeencours;
+      ELSE
+        SELECT PERIODEENCOURS INTO v_periodeencours FROM TGE_REF_PAC WHERE NUMPAC=p_numpac;
+      END IF;
+      IF TO_CHAR(v_dsdcn,'YYYYMM') <= v_periodeencours THEN
+        UPDATE SECUPACMAT SET PERIODE_RECYCLAGE='1' WHERE NUMPAC=p_numpac AND PACMAT=p_pacmat;
+        RETURN 1;
+      END IF;
+    END IF; 
+  RETURN 0;
+EXCEPTION
+  WHEN OTHERS THEN RETURN 0;
+END CHECK_FORCAGE_RECYCLAGE;

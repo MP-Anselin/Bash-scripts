@@ -1,0 +1,4 @@
+##
+DATE_A275
+=SQL IF_TYPE_NOTEXIST=DATE_A275=
+CREATE OR REPLACE TYPE DATE_A275 FORCE AS   object     (numpac      varchar2(6),      IDPACMAT    varchar2(14),     donnee_A275 DATE  );

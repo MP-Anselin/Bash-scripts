@@ -1,0 +1,41 @@
+##
+GET_TGE_MAP_ARG_ELT_BY_NUMPAC
+=SQL=
+create or replace FUNCTION GET_TGE_MAP_ARG_ELT_BY_NUMPAC ( NUMPAC                  IN VARCHAR2
+ )
+ RETURN TGE_MAP_ARG_ELT_ENTRY_TABLE
+ IS
+  resultat TGE_MAP_ARG_ELT_ENTRY_TABLE;
+  CURSOR tge_map_arg (p_numpac TGE_REF_PAC.NUMPAC%TYPE)
+ IS
+ WITH tge_map_arg_elt_with_PAC (nom_elt,nom_arg) AS
+ (SELECT nom_elt,
+ nom_arg
+ FROM tge_map_arg_elt
+ WHERE nom_arg IN ('A01','A02','A03')
+ AND code_table = 'LTP'
+ AND NUMPAC     = p_numpac
+ )
+ select TGE_MAP_ARG_ELT_ENTRY(nom_arg,nom_elt)
+ from (
+ SELECT nom_elt,nom_arg FROM tge_map_arg_elt_with_PAC 
+ UNION ALL
+ SELECT el2.nom_elt,el2.nom_arg
+ FROM tge_map_arg_elt el2
+ WHERE el2.nom_arg   IN ('A01','A02','A03')
+ AND el2.code_table   = 'LTP'
+ AND el2.NUMPAC       = '*'
+ AND el2.nom_arg NOT IN
+ ( SELECT nom_arg FROM tge_map_arg_elt_with_PAC)
+)P ;
+ BEGIN
+OPEN tge_map_arg(NUMPAC) ;
+ LOOP
+ FETCH tge_map_arg BULK COLLECT INTO resultat ;
+ EXIT
+ WHEN tge_map_arg%NOTFOUND;
+ END LOOP;
+ CLOSE tge_map_arg;
+ RETURN resultat;
+ END GET_TGE_MAP_ARG_ELT_BY_NUMPAC;
+ 

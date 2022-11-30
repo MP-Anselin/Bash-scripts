@@ -1,0 +1,617 @@
+##
+TAG_CHARSET=@€éèç
+##
+TOOLS_V5
+=SQL=
+CREATE OR REPLACE PACKAGE TOOLS_V5 AS
+ FUNCTION GET_OBJETS_USED_BY_OP(
+   p_op_num VARCHAR2,
+   is_ux NUMBER DEFAULT 0) 
+   RETURN TAB_REF_OBJ_USED_BY_OBJECT;
+   
+ FUNCTION GET_OBJETS_USED_BY_ECR(
+   p_nom_page VARCHAR2,
+   is_ux NUMBER DEFAULT 0)
+   RETURN TAB_REF_OBJ_USED_BY_OBJECT;
+   
+ FUNCTION GET_OBJETS_USED_BY_GRP(
+   p_id_groupe VARCHAR2,
+   is_ux NUMBER DEFAULT 0)
+   RETURN TAB_REF_OBJ_USED_BY_OBJECT;
+   
+ FUNCTION GET_OBJETS_USED_BY_DON(
+   p_nom_donnee VARCHAR2,
+   is_ux NUMBER DEFAULT 0)
+   RETURN TAB_REF_OBJ_USED_BY_OBJECT;
+   
+ FUNCTION GET_OBJETS_USED_BY_REG(
+   p_id_reglegestion VARCHAR2,
+   is_ux NUMBER DEFAULT 0) 
+   RETURN TAB_REF_OBJ_USED_BY_OBJECT;
+   
+END TOOLS_V5;
+##
+TOOLS_V5
+=SQL=
+CREATE OR REPLACE PACKAGE BODY TOOLS_V5 AS
+  PROCEDURE ALIM_OBJETS_USED_BY_OBJET(p_code_objet_init VARCHAR2, p_nom_table VARCHAR2, p_code_objet VARCHAR2, p_nom_ecran_reference VARCHAR2 DEFAULT NULL, p_nom_table_parent VARCHAR2 DEFAULT NULL, p_code_objet_parent_1 VARCHAR2 DEFAULT NULL, p_code_objet_parent_2 VARCHAR2 DEFAULT NULL) 
+  IS
+    v_count NUMBER;
+    v_cle_table VARCHAR2(4000);
+    v_nom_table_parent VARCHAR2(1000);
+    v_code_objet_parent_1 VARCHAR2(1000);
+    v_code_objet_parent_2 VARCHAR2(1000);
+    v_code_objet_tmp_1 VARCHAR2(4000);
+    v_code_objet_tmp_2 VARCHAR2(4000);
+    v_code_objet_tmp_3 VARCHAR2(4000);
+  BEGIN
+    IF p_code_objet IS NULL THEN
+      RETURN;
+    END IF;
+    v_nom_table_parent := NVL(p_nom_table_parent,'__NULL__');
+    v_code_objet_parent_1 := NVL(p_code_objet_parent_1,'__NULL__');
+    v_code_objet_parent_2 := NVL(p_code_objet_parent_2,'__NULL__');
+    SELECT COUNT(*) INTO v_count FROM REF_OBJ_USED_BY_OBJECT WHERE CODE_OBJET_INIT=p_code_objet_init AND NOM_TABLE=p_nom_table AND CODE_OBJET=p_code_objet AND NVL(NOM_TABLE_PARENT,'__NULL__')=v_nom_table_parent AND NVL(CODE_OBJET_PARENT_1,'__NULL__')=v_code_objet_parent_1 AND NVL(CODE_OBJET_PARENT_2,'__NULL__')=v_code_objet_parent_2;
+    IF v_count>0 THEN
+      -- Objet déjà traité : on ne le retraite pas
+      RETURN;
+    END IF;
+    v_cle_table := NULL;
+    IF p_nom_table='REF_WKF_OPERATION_ECRANS_INFO' THEN
+      v_cle_table := 'OP_NUM';
+    ELSIF p_nom_table='REF_ECRAN' THEN
+      v_cle_table := 'NOM_PAGE';
+    ELSIF p_nom_table='REF_DESTINATION_ECRAN' THEN
+      v_cle_table := 'CODE_DESTINATION';
+    ELSIF p_nom_table='REF_GROUPE_DONNEES_INFO' THEN
+      v_cle_table := 'ID_GROUPE';
+    ELSIF p_nom_table='REF_DONNEE_GENERALE' THEN
+      v_cle_table := 'NOM_DONNEE';
+    ELSIF p_nom_table='REF_DICTIONNAIRE' THEN
+      v_cle_table := 'NOM_DICTIONNAIRE';
+    ELSIF p_nom_table='REF_REGLEGESTION_DESC' THEN
+      v_cle_table := 'ID_REGLEGESTION';
+    ELSIF p_nom_table='SYS_REQUETES_JSP' THEN
+      v_cle_table := 'NOMPAGE||'' / ''||IDREQUETE';
+    ELSIF p_nom_table='SYS_DEF_ERREURS' THEN
+      v_cle_table := 'CODERR';
+    ELSIF p_nom_table='SYS_VARSYS' THEN
+      v_cle_table := 'MODULE||'' / ''||CODVAR';
+    END IF;
+    INSERT INTO REF_OBJ_USED_BY_OBJECT VALUES (p_code_objet_init, p_nom_table, v_cle_table, p_code_objet, v_nom_table_parent, v_code_objet_parent_1, v_code_objet_parent_2);
+    IF p_nom_table='REF_DICTIONNAIRE' THEN
+      MERGE INTO REF_OBJ_USED_BY_OBJECT R USING (SELECT p_code_objet_init AS CODE_OBJET_INIT, 'TGE_REF_MAPTA' AS NOM_TABLE, 'ROWNUMBER' AS CLE_TABLE, ROWNUMBER AS CODE_OBJET, p_nom_table AS NOM_TABLE_PARENT, p_code_objet AS CODE_OBJET_PARENT_1, '__NULL__' AS CODE_OBJET_PARENT_2 FROM TGE_REF_MAPTA@RDMOD WHERE NUMPAC='*' AND TABLEPHY=p_code_objet) T
+      ON (R.CODE_OBJET_INIT=T.CODE_OBJET_INIT AND R.NOM_TABLE=T.NOM_TABLE AND R.CODE_OBJET=T.CODE_OBJET AND R.NOM_TABLE_PARENT=T.NOM_TABLE_PARENT AND R.CODE_OBJET_PARENT_1=T.CODE_OBJET_PARENT_1 AND R.CODE_OBJET_PARENT_2=T.CODE_OBJET_PARENT_2)
+      WHEN NOT MATCHED THEN INSERT VALUES (T.CODE_OBJET_INIT, T.NOM_TABLE, T.CLE_TABLE, T.CODE_OBJET, T.NOM_TABLE_PARENT, T.CODE_OBJET_PARENT_1, T.CODE_OBJET_PARENT_2);
+    ELSIF p_nom_table='REF_DONNEE_GENERALE' THEN
+      MERGE INTO REF_OBJ_USED_BY_OBJECT R USING (SELECT p_code_objet_init AS CODE_OBJET_INIT, 'TGE_REF_MAPDO' AS NOM_TABLE, 'ELEMENT||'' / ''||OCCURENCE' AS CLE_TABLE, ELEMENT||' / '||OCCURENCE AS CODE_OBJET, p_nom_table AS NOM_TABLE_PARENT, p_code_objet AS CODE_OBJET_PARENT_1, '__NULL__' AS CODE_OBJET_PARENT_2 FROM TGE_REF_MAPDO@RDMOD WHERE NUMPAC='*' AND DONNEEGXP=p_code_objet) T
+      ON (R.CODE_OBJET_INIT=T.CODE_OBJET_INIT AND R.NOM_TABLE=T.NOM_TABLE AND R.CODE_OBJET=T.CODE_OBJET AND R.NOM_TABLE_PARENT=T.NOM_TABLE_PARENT AND R.CODE_OBJET_PARENT_1=T.CODE_OBJET_PARENT_1 AND R.CODE_OBJET_PARENT_2=T.CODE_OBJET_PARENT_2)
+      WHEN NOT MATCHED THEN INSERT VALUES (T.CODE_OBJET_INIT, T.NOM_TABLE, T.CLE_TABLE, T.CODE_OBJET, T.NOM_TABLE_PARENT, T.CODE_OBJET_PARENT_1, T.CODE_OBJET_PARENT_2);
+    ELSIF p_nom_table='SYS_REQUETES_JSP' THEN
+      MERGE INTO REF_OBJ_USED_BY_OBJECT R USING (SELECT p_code_objet_init AS CODE_OBJET_INIT, 'TGE_REF_MAPVR' AS NOM_TABLE, 'TABLEZADIG||'' / ''||CHAMPZADIG' AS CLE_TABLE, TABLEZADIG||' / '||CHAMPZADIG AS CODE_OBJET, p_nom_table AS NOM_TABLE_PARENT, p_code_objet AS CODE_OBJET_PARENT_1, '__NULL__' AS CODE_OBJET_PARENT_2 FROM TGE_REF_MAPVR@RDMOD WHERE NUMPAC='*' AND TABLEGXP=(SELECT NOMTABLE FROM SYS_REQUETES_JSP@RDMOD WHERE NOMPAGE||' / '||IDREQUETE=p_code_objet)) T
+      ON (R.CODE_OBJET_INIT=T.CODE_OBJET_INIT AND R.NOM_TABLE=T.NOM_TABLE AND R.CODE_OBJET=T.CODE_OBJET AND R.NOM_TABLE_PARENT=T.NOM_TABLE_PARENT AND R.CODE_OBJET_PARENT_1=T.CODE_OBJET_PARENT_1 AND R.CODE_OBJET_PARENT_2=T.CODE_OBJET_PARENT_2)
+      WHEN NOT MATCHED THEN INSERT VALUES (T.CODE_OBJET_INIT, T.NOM_TABLE, T.CLE_TABLE, T.CODE_OBJET, T.NOM_TABLE_PARENT, T.CODE_OBJET_PARENT_1, T.CODE_OBJET_PARENT_2);
+    END IF;
+    IF p_nom_table='REF_WKF_OPERATION_ECRANS_INFO' THEN
+      -- Une opération référence :
+      --     Des groupes de données :
+      FOR OBJET IN (
+      --         REF_WKF_OPERATION_ECRANS_INFO.ID_GROUPE_ECRITURE
+        SELECT ID_GROUPE_ECRITURE AS CODE_OBJET FROM REF_WKF_OPERATION_ECRANS_INFO@RDMOD WHERE OP_NUM=p_code_objet AND ID_GROUPE_ECRITURE IS NOT NULL
+        UNION
+      --         REF_WKF_OPERATION_ECRANS.RECHERCHE_ID_GROUPE_LECTURE
+        SELECT RECHERCHE_ID_GROUPE_LECTURE AS CODE_OBJET FROM REF_WKF_OPERATION_ECRANS@RDMOD WHERE OP_NUM=p_code_objet and RECHERCHE_ID_GROUPE_LECTURE IS NOT NULL
+        UNION
+      --         REF_WKF_OPERATION_ECRANS.RECAP_ID_GROUPE_1
+        SELECT RECAP_ID_GROUPE_1 AS CODE_OBJET FROM REF_WKF_OPERATION_ECRANS@RDMOD WHERE OP_NUM=p_code_objet and RECAP_ID_GROUPE_1 IS NOT NULL
+        UNION
+      --         REF_WKF_OPERATION_ECRANS.RECAP_ID_GROUPE_2
+        SELECT RECAP_ID_GROUPE_2 AS CODE_OBJET FROM REF_WKF_OPERATION_ECRANS@RDMOD WHERE OP_NUM=p_code_objet and RECAP_ID_GROUPE_2 IS NOT NULL
+      )
+      LOOP
+        ALIM_OBJETS_USED_BY_OBJET(p_code_objet_init, 'REF_GROUPE_DONNEES_INFO',OBJET.CODE_OBJET,p_nom_ecran_reference,p_nom_table,p_code_objet);
+      END LOOP;
+      --     Des données :
+      FOR OBJET IN (
+      --         REF_WKF_OPERATION_ECRANS_INFO.BTN_SUPPRIMER_DONNEE_COMM
+        SELECT BTN_SUPPRIMER_DONNEE_COMM AS CODE_OBJET FROM REF_WKF_OPERATION_ECRANS_INFO@RDMOD WHERE OP_NUM=p_code_objet AND BTN_SUPPRIMER_DONNEE_COMM IS NOT NULL
+        UNION
+      --         REF_WKF_OPERATION_ECRANS_INFO.BTN_RENVOIDOSSIER_DONNEE_COMM
+        SELECT BTN_RENVOIDOSSIER_DONNEE_COMM AS CODE_OBJET FROM REF_WKF_OPERATION_ECRANS_INFO@RDMOD WHERE OP_NUM=p_code_objet and BTN_RENVOIDOSSIER_DONNEE_COMM IS NOT NULL
+      )
+      LOOP
+        ALIM_OBJETS_USED_BY_OBJET(p_code_objet_init, 'REF_DONNEE_GENERALE',OBJET.CODE_OBJET,p_nom_ecran_reference,p_nom_table,p_code_objet);
+      END LOOP;
+      --     Des erreurs :
+      FOR OBJET IN (
+      --         REF_WKF_OPERATION_ECRANS_INFO.BTN_SUPPRIMER_ERR_COMM_VID
+        SELECT BTN_SUPPRIMER_ERR_COMM_VID AS CODE_OBJET FROM REF_WKF_OPERATION_ECRANS_INFO@RDMOD WHERE OP_NUM=p_code_objet AND BTN_SUPPRIMER_ERR_COMM_VID IS NOT NULL
+        UNION
+      --         REF_WKF_OPERATION_ECRANS_INFO.BTN_RENVOIDOSSIER_ERR_COMM_VID
+        SELECT BTN_RENVOIDOSSIER_ERR_COMM_VID AS CODE_OBJET FROM REF_WKF_OPERATION_ECRANS_INFO@RDMOD WHERE OP_NUM=p_code_objet and BTN_RENVOIDOSSIER_ERR_COMM_VID IS NOT NULL
+      )
+      LOOP
+        ALIM_OBJETS_USED_BY_OBJET(p_code_objet_init, 'SYS_DEF_ERREURS',OBJET.CODE_OBJET,p_nom_ecran_reference,p_nom_table,p_code_objet);
+      END LOOP;
+      --     Des écrans :
+      FOR OBJET IN (
+      --         REF_WKF_OPERATION_ECRANS.ECRAN_NOM_PAGE
+        SELECT ECRAN_NOM_PAGE AS CODE_OBJET FROM REF_WKF_OPERATION_ECRANS@RDMOD WHERE OP_NUM=p_code_objet AND ECRAN_NOM_PAGE IS NOT NULL
+        UNION
+      --         REF_WKF_OPERATION_ECRANS.ECRAN_NOM_PAGE_ALTERNATIF
+        SELECT ECRAN_NOM_PAGE_ALTERNATIF AS CODE_OBJET FROM REF_WKF_OPERATION_ECRANS@RDMOD WHERE OP_NUM=p_code_objet and ECRAN_NOM_PAGE_ALTERNATIF IS NOT NULL
+      )
+      LOOP
+        ALIM_OBJETS_USED_BY_OBJET(p_code_objet_init, 'REF_ECRAN',OBJET.CODE_OBJET,p_nom_ecran_reference,p_nom_table,p_code_objet);
+      END LOOP;
+      --     Des règles de gestion :
+      FOR OBJET IN (
+      --         REF_WKF_OPERATION_ECRANS.ECRAN_ID_REGLEGESTION_COND
+        SELECT ECRAN_ID_REGLEGESTION_COND AS CODE_OBJET FROM REF_WKF_OPERATION_ECRANS@RDMOD WHERE OP_NUM=p_code_objet AND ECRAN_ID_REGLEGESTION_COND IS NOT NULL
+        UNION
+      --         REF_WKF_OPERATION_ECRANS.RECHERCHE_ID_REGLEGESTION_CTL
+        SELECT RECHERCHE_ID_REGLEGESTION_CTL AS CODE_OBJET FROM REF_WKF_OPERATION_ECRANS@RDMOD WHERE OP_NUM=p_code_objet and RECHERCHE_ID_REGLEGESTION_CTL IS NOT NULL
+      )
+      LOOP
+        ALIM_OBJETS_USED_BY_OBJET(p_code_objet_init, 'REF_REGLEGESTION_DESC',OBJET.CODE_OBJET,p_nom_ecran_reference,p_nom_table,p_code_objet);
+      END LOOP;
+      --     un appel table :
+      FOR OBJET IN (
+      --         REF_WKF_OPERATION_ECRANS.RECHERCHE_REQUETE_NOMPAGE / REF_WKF_OPERATION_ECRANS.RECHERCHE_REQUETE_IDREQUETE
+        SELECT DISTINCT RECHERCHE_REQUETE_NOMPAGE||' / '||RECHERCHE_REQUETE_IDREQUETE AS CODE_OBJET FROM REF_WKF_OPERATION_ECRANS@RDMOD WHERE OP_NUM=p_code_objet AND RECHERCHE_REQUETE_NOMPAGE IS NOT NULL AND RECHERCHE_REQUETE_IDREQUETE IS NOT NULL
+      )
+      LOOP
+        ALIM_OBJETS_USED_BY_OBJET(p_code_objet_init, 'SYS_REQUETES_JSP',OBJET.CODE_OBJET,p_nom_ecran_reference,p_nom_table,p_code_objet);
+      END LOOP;
+    ELSIF p_nom_table='REF_ECRAN' THEN
+      -- Un écran référence :
+      --     Une destination :
+      FOR OBJET IN (
+      --         REF_ECRAN.CODE_DESTINATION
+        SELECT DISTINCT CODE_DESTINATION AS CODE_OBJET FROM REF_ECRAN@RDMOD WHERE NOM_PAGE=p_code_objet AND CODE_DESTINATION IS NOT NULL
+      )
+      LOOP
+        ALIM_OBJETS_USED_BY_OBJET(p_code_objet_init, 'REF_DESTINATION_ECRAN',OBJET.CODE_OBJET,p_code_objet,p_nom_table,p_code_objet);
+      END LOOP;
+      --     Un dictionnaire :
+      FOR OBJET IN (
+      --         REF_ECRAN.NOM_DICTIONNAIRE
+        SELECT DISTINCT NOM_DICTIONNAIRE AS CODE_OBJET FROM REF_ECRAN@RDMOD WHERE NOM_PAGE=p_code_objet AND NOM_DICTIONNAIRE IS NOT NULL
+      )
+      LOOP
+        ALIM_OBJETS_USED_BY_OBJET(p_code_objet_init, 'REF_DICTIONNAIRE',OBJET.CODE_OBJET,p_code_objet,p_nom_table,p_code_objet);
+      END LOOP;
+      --     Un groupe de données :
+      FOR OBJET IN (
+      --         REF_ECRAN.ID_GROUPE_DONNEES
+        SELECT DISTINCT ID_GROUPE_DONNEES AS CODE_OBJET FROM REF_ECRAN@RDMOD WHERE NOM_PAGE=p_code_objet AND ID_GROUPE_DONNEES IS NOT NULL
+      )
+      LOOP
+        ALIM_OBJETS_USED_BY_OBJET(p_code_objet_init, 'REF_GROUPE_DONNEES_INFO',OBJET.CODE_OBJET,p_code_objet,p_nom_table,p_code_objet);
+      END LOOP;
+      --     Des règles de gestion :
+      FOR OBJET IN (
+      --         REF_ECRAN.ID_REGLEGESTION_AUT_RD
+        SELECT ID_REGLEGESTION_AUT_RD AS CODE_OBJET FROM REF_ECRAN@RDMOD WHERE NOM_PAGE=p_code_objet AND ID_REGLEGESTION_AUT_RD IS NOT NULL
+        UNION
+      --         REF_ECRAN.ID_REGLEGESTION_AUT_CLI
+        SELECT ID_REGLEGESTION_AUT_CLI AS CODE_OBJET FROM REF_ECRAN@RDMOD WHERE NOM_PAGE=p_code_objet AND ID_REGLEGESTION_AUT_CLI IS NOT NULL
+        UNION
+      --         REF_ECRAN.ID_REGLEGESTION_CTL_RD
+        SELECT ID_REGLEGESTION_CTL_RD AS CODE_OBJET FROM REF_ECRAN@RDMOD WHERE NOM_PAGE=p_code_objet AND ID_REGLEGESTION_CTL_RD IS NOT NULL
+        UNION
+      --         REF_ECRAN.ID_REGLEGESTION_CTL_CLI
+        SELECT ID_REGLEGESTION_CTL_CLI AS CODE_OBJET FROM REF_ECRAN@RDMOD WHERE NOM_PAGE=p_code_objet AND ID_REGLEGESTION_CTL_CLI IS NOT NULL
+      )
+      LOOP
+        ALIM_OBJETS_USED_BY_OBJET(p_code_objet_init, 'REF_REGLEGESTION_DESC',OBJET.CODE_OBJET,p_code_objet,p_nom_table,p_code_objet);
+      END LOOP;
+    ELSIF p_nom_table='REF_DESTINATION_ECRAN' THEN
+      -- Une destination d'écran ne référence rien
+      NULL;
+    ELSIF p_nom_table='REF_GROUPE_DONNEES_INFO' THEN
+      -- Un groupe de données référence :
+      --     Des règles de gestion :
+      FOR OBJET IN (
+      --         REF_GROUPE_DONNEES_INFO.ID_REGLEGESTION_AFF_RD
+        SELECT ID_REGLEGESTION_AFF_RD AS CODE_OBJET FROM REF_GROUPE_DONNEES_INFO@RDMOD WHERE ID_GROUPE=p_code_objet AND ID_REGLEGESTION_AFF_RD IS NOT NULL
+        UNION
+      --         REF_GROUPE_DONNEES_INFO.ID_REGLEGESTION_AFF_CLI
+        SELECT ID_REGLEGESTION_AFF_CLI AS CODE_OBJET FROM REF_GROUPE_DONNEES_INFO@RDMOD WHERE ID_GROUPE=p_code_objet and ID_REGLEGESTION_AFF_CLI IS NOT NULL
+        UNION
+      --         REF_GROUPE_DONNEES.ID_REGLEGESTION_CTL_RD_SUPP
+        SELECT ID_REGLEGESTION_CTL_RD_SUPP AS CODE_OBJET FROM REF_GROUPE_DONNEES@RDMOD WHERE ID_GROUPE=p_code_objet and ID_REGLEGESTION_CTL_RD_SUPP IS NOT NULL
+        UNION
+      --         REF_GROUPE_DONNEES.ID_REGLEGESTION_CTL_CLI_SUPP
+        SELECT ID_REGLEGESTION_CTL_CLI_SUPP AS CODE_OBJET FROM REF_GROUPE_DONNEES@RDMOD WHERE ID_GROUPE=p_code_objet and ID_REGLEGESTION_CTL_CLI_SUPP IS NOT NULL
+      )
+      LOOP
+        ALIM_OBJETS_USED_BY_OBJET(p_code_objet_init, 'REF_REGLEGESTION_DESC',OBJET.CODE_OBJET,p_nom_ecran_reference,p_nom_table,p_code_objet);
+      END LOOP;
+      --     Une donnée :
+      FOR OBJET IN (
+      --         REF_GROUPE_DONNEES.NOM_DONNEE
+        SELECT DISTINCT NOM_DONNEE AS CODE_OBJET FROM REF_GROUPE_DONNEES@RDMOD WHERE ID_GROUPE=p_code_objet and NOM_DONNEE IS NOT NULL AND NOM_DONNEE NOT LIKE '#%'
+      )
+      LOOP
+        ALIM_OBJETS_USED_BY_OBJET(p_code_objet_init, 'REF_DONNEE_GENERALE',OBJET.CODE_OBJET,p_nom_ecran_reference,p_nom_table,p_code_objet);
+      END LOOP;
+      --     Un groupe de données :
+      FOR OBJET IN (
+      --         REF_GROUPE_DONNEES.SUFFIXE_OU_LIBELLE
+        SELECT DISTINCT SUFFIXE_OU_LIBELLE AS CODE_OBJET FROM REF_GROUPE_DONNEES@RDMOD WHERE ID_GROUPE=p_code_objet and SUFFIXE_OU_LIBELLE IS NOT NULL AND (NOM_DONNEE LIKE '#GROUPE%' OR NOM_DONNEE LIKE '#RECONDUCTION_DONNEES%')
+      )
+      LOOP
+        ALIM_OBJETS_USED_BY_OBJET(p_code_objet_init, 'REF_GROUPE_DONNEES_INFO',OBJET.CODE_OBJET,p_nom_ecran_reference,p_nom_table,p_code_objet);
+      END LOOP;
+      --     Un appel table :
+      FOR OBJET IN (
+      --         REF_GROUPE_DONNEES.TABLEAU_REQUETE_NOMPAGE / REF_GROUPE_DONNEES.TABLEAU_REQUETE_IDREQUETE
+        SELECT DISTINCT TABLEAU_REQUETE_NOMPAGE||' / '||TABLEAU_REQUETE_IDREQUETE AS CODE_OBJET FROM REF_GROUPE_DONNEES@RDMOD WHERE ID_GROUPE=p_code_objet AND TABLEAU_REQUETE_NOMPAGE IS NOT NULL AND TABLEAU_REQUETE_IDREQUETE IS NOT NULL AND NOM_DONNEE LIKE '#TABLEAU%'
+      )
+      LOOP
+        ALIM_OBJETS_USED_BY_OBJET(p_code_objet_init, 'SYS_REQUETES_JSP',OBJET.CODE_OBJET,p_nom_ecran_reference,p_nom_table,p_code_objet);
+      END LOOP;
+      --     Des écrans :
+      FOR OBJET IN (
+      --         REF_GROUPE_DONNEES.NOM_PAGE_AJOUT
+        SELECT DISTINCT NOM_PAGE_AJOUT AS CODE_OBJET FROM REF_GROUPE_DONNEES@RDMOD WHERE ID_GROUPE=p_code_objet and NOM_PAGE_AJOUT IS NOT NULL AND NOM_DONNEE LIKE '#TABLEAU%'
+        UNION
+      --         REF_GROUPE_DONNEES.NOM_PAGE_MODIF
+        SELECT DISTINCT NOM_PAGE_MODIF AS CODE_OBJET FROM REF_GROUPE_DONNEES@RDMOD WHERE ID_GROUPE=p_code_objet and NOM_PAGE_MODIF IS NOT NULL AND NOM_DONNEE LIKE '#TABLEAU%'
+      )
+      LOOP
+        ALIM_OBJETS_USED_BY_OBJET(p_code_objet_init, 'REF_ECRAN',OBJET.CODE_OBJET,p_nom_ecran_reference,p_nom_table,p_code_objet);
+      END LOOP;
+    ELSIF p_nom_table='REF_DONNEE_GENERALE' THEN
+      -- Une donnée référence :
+      --     Un dictionnaire :
+      FOR OBJET IN (
+      --         REF_DONNEE_GENERALE.NOM_DICTIONNAIRE
+        SELECT DISTINCT NOM_DICTIONNAIRE AS CODE_OBJET FROM REF_DONNEE_GENERALE@RDMOD WHERE NOM_DONNEE=p_code_objet AND NOM_DICTIONNAIRE IS NOT NULL
+      )
+      LOOP
+        ALIM_OBJETS_USED_BY_OBJET(p_code_objet_init, 'REF_DICTIONNAIRE',OBJET.CODE_OBJET,p_nom_ecran_reference,p_nom_table,p_code_objet);
+      END LOOP;
+      --     Des données :
+      FOR OBJET IN (
+      --         REF_DONNEE_GENERALE.NOM_DONNEE_CLE_DIC_REFERENCE
+        SELECT NOM_DONNEE_CLE_DIC_REFERENCE AS CODE_OBJET FROM REF_DONNEE_GENERALE@RDMOD WHERE NOM_DONNEE=p_code_objet AND NOM_DONNEE_CLE_DIC_REFERENCE IS NOT NULL
+      )
+      LOOP
+        v_code_objet_tmp_1 := OBJET.CODE_OBJET||',';
+        LOOP
+          EXIT WHEN v_code_objet_tmp_1 IS NULL OR INSTR(v_code_objet_tmp_1,',')<=0;
+          v_code_objet_tmp_2 := TRIM(SUBSTR(v_code_objet_tmp_1,1,INSTR(v_code_objet_tmp_1,',')-1));
+          IF v_code_objet_tmp_2 IS NOT NULL AND v_code_objet_tmp_2 NOT LIKE '#%' AND v_code_objet_tmp_2 NOT LIKE '''%' AND NOT v_code_objet_tmp_2=p_code_objet THEN
+            ALIM_OBJETS_USED_BY_OBJET(p_code_objet_init, 'REF_DONNEE_GENERALE',v_code_objet_tmp_2,p_nom_ecran_reference,p_nom_table,p_code_objet);
+          END IF;
+          v_code_objet_tmp_1 := SUBSTR(v_code_objet_tmp_1,INSTR(v_code_objet_tmp_1,',')+1);
+        END LOOP;
+      END LOOP;
+      FOR OBJET IN (
+      --         REF_DONNEE_ECRAN.APPELTABLE_LISTECHAMPS
+        SELECT APPELTABLE_LISTECHAMPS AS CODE_OBJET, NOM_PAGE AS CODE_OBJET_PARENT_2 FROM REF_DONNEE_ECRAN@RDMOD WHERE NOM_DONNEE=p_code_objet AND APPELTABLE_LISTECHAMPS IS NOT NULL AND (p_nom_ecran_reference IS NULL OR NOM_PAGE=p_nom_ecran_reference OR (NOM_PAGE='*' AND NOT EXISTS (SELECT 1 FROM REF_DONNEE_ECRAN@RDMOD WHERE NOM_DONNEE=p_code_objet AND NOM_PAGE=p_nom_ecran_reference)))
+        UNION
+      --         REF_DONNEE_ECRAN.APPELTABLE_PARAMETRES
+        SELECT APPELTABLE_PARAMETRES AS CODE_OBJET, NOM_PAGE AS CODE_OBJET_PARENT_2 FROM REF_DONNEE_ECRAN@RDMOD WHERE NOM_DONNEE=p_code_objet AND APPELTABLE_PARAMETRES IS NOT NULL AND (p_nom_ecran_reference IS NULL OR NOM_PAGE=p_nom_ecran_reference OR (NOM_PAGE='*' AND NOT EXISTS (SELECT 1 FROM REF_DONNEE_ECRAN@RDMOD WHERE NOM_DONNEE=p_code_objet AND NOM_PAGE=p_nom_ecran_reference)))
+      )
+      LOOP
+        v_code_objet_tmp_1 := OBJET.CODE_OBJET||',';
+        LOOP
+          EXIT WHEN v_code_objet_tmp_1 IS NULL OR INSTR(v_code_objet_tmp_1,',')<=0;
+          v_code_objet_tmp_2 := TRIM(SUBSTR(v_code_objet_tmp_1,1,INSTR(v_code_objet_tmp_1,',')-1));
+          IF v_code_objet_tmp_2 IS NOT NULL AND v_code_objet_tmp_2 NOT LIKE '#%' AND v_code_objet_tmp_2 NOT LIKE '''%' AND NOT v_code_objet_tmp_2=p_code_objet THEN
+            SELECT COUNT(*) INTO v_count FROM REF_DONNEE_GENERALE@RDMOD WHERE NOM_DONNEE=TRIM(v_code_objet_tmp_2);
+            IF v_count>0 THEN
+              ALIM_OBJETS_USED_BY_OBJET(p_code_objet_init, 'REF_DONNEE_GENERALE',v_code_objet_tmp_2,p_nom_ecran_reference,p_nom_table,p_code_objet,OBJET.CODE_OBJET_PARENT_2);
+            END IF;
+          END IF;
+          v_code_objet_tmp_1 := SUBSTR(v_code_objet_tmp_1,INSTR(v_code_objet_tmp_1,',')+1);
+        END LOOP;
+      END LOOP;
+      --     Un appel table :
+      FOR OBJET IN (
+      --         REF_DONNEE_ECRAN.APPELTABLE_NOMPAGE / REF_DONNEE_ECRAN.APPELTABLE_IDREQUETE
+        SELECT DISTINCT APPELTABLE_NOMPAGE||' / '||APPELTABLE_IDREQUETE AS CODE_OBJET, NOM_PAGE AS CODE_OBJET_PARENT_2 FROM REF_DONNEE_ECRAN@RDMOD WHERE NOM_DONNEE=p_code_objet AND APPELTABLE_NOMPAGE IS NOT NULL AND APPELTABLE_IDREQUETE IS NOT NULL AND (p_nom_ecran_reference IS NULL OR NOM_PAGE=p_nom_ecran_reference OR (NOM_PAGE='*' AND NOT EXISTS (SELECT 1 FROM REF_DONNEE_ECRAN@RDMOD WHERE NOM_DONNEE=p_code_objet AND NOM_PAGE=p_nom_ecran_reference)))
+      )
+      LOOP
+        ALIM_OBJETS_USED_BY_OBJET(p_code_objet_init, 'SYS_REQUETES_JSP',OBJET.CODE_OBJET,p_nom_ecran_reference,p_nom_table,p_code_objet,OBJET.CODE_OBJET_PARENT_2);
+      END LOOP;
+      --     Une règle de gestion :
+      FOR OBJET IN (
+      --         REF_DONNEE_ECRAN.EST_OBLIGATOIRE (R_...)
+        SELECT SUBSTR(EST_OBLIGATOIRE,3) AS CODE_OBJET, NOM_PAGE AS CODE_OBJET_PARENT_2 FROM REF_DONNEE_ECRAN@RDMOD WHERE NOM_DONNEE=p_code_objet AND REGEXP_LIKE(EST_OBLIGATOIRE,'^R_.*$') AND (p_nom_ecran_reference IS NULL OR NOM_PAGE=p_nom_ecran_reference OR (NOM_PAGE='*' AND NOT EXISTS (SELECT 1 FROM REF_DONNEE_ECRAN@RDMOD WHERE NOM_DONNEE=p_code_objet AND NOM_PAGE=p_nom_ecran_reference)))
+        UNION
+      --         REF_DONNEE_ECRAN.VALEUR_DEFAUT (ID_REGLE=...)
+        SELECT SUBSTR(VALEUR_DEFAUT,10) AS CODE_OBJET, NOM_PAGE AS CODE_OBJET_PARENT_2 FROM REF_DONNEE_ECRAN@RDMOD WHERE NOM_DONNEE=p_code_objet AND REGEXP_LIKE(VALEUR_DEFAUT,'^ID_REGLE=.*$') AND (p_nom_ecran_reference IS NULL OR NOM_PAGE=p_nom_ecran_reference OR (NOM_PAGE='*' AND NOT EXISTS (SELECT 1 FROM REF_DONNEE_ECRAN@RDMOD WHERE NOM_DONNEE=p_code_objet AND NOM_PAGE=p_nom_ecran_reference)))
+        UNION
+      --         REF_DONNEE_ECRAN.ID_REGLEGESTION_AUT_RD
+        SELECT ID_REGLEGESTION_AUT_RD AS CODE_OBJET, NOM_PAGE AS CODE_OBJET_PARENT_2 FROM REF_DONNEE_ECRAN@RDMOD WHERE NOM_DONNEE=p_code_objet AND ID_REGLEGESTION_AUT_RD IS NOT NULL AND (p_nom_ecran_reference IS NULL OR NOM_PAGE=p_nom_ecran_reference OR (NOM_PAGE='*' AND NOT EXISTS (SELECT 1 FROM REF_DONNEE_ECRAN@RDMOD WHERE NOM_DONNEE=p_code_objet AND NOM_PAGE=p_nom_ecran_reference)))
+        UNION
+      --         REF_DONNEE_ECRAN.ID_REGLEGESTION_AUT_CLI
+        SELECT ID_REGLEGESTION_AUT_CLI AS CODE_OBJET, NOM_PAGE AS CODE_OBJET_PARENT_2 FROM REF_DONNEE_ECRAN@RDMOD WHERE NOM_DONNEE=p_code_objet AND ID_REGLEGESTION_AUT_CLI IS NOT NULL AND (p_nom_ecran_reference IS NULL OR NOM_PAGE=p_nom_ecran_reference OR (NOM_PAGE='*' AND NOT EXISTS (SELECT 1 FROM REF_DONNEE_ECRAN@RDMOD WHERE NOM_DONNEE=p_code_objet AND NOM_PAGE=p_nom_ecran_reference)))
+        UNION
+      --         REF_DONNEE_ECRAN.ID_REGLEGESTION_AFF_RD
+        SELECT ID_REGLEGESTION_AFF_RD AS CODE_OBJET, NOM_PAGE AS CODE_OBJET_PARENT_2 FROM REF_DONNEE_ECRAN@RDMOD WHERE NOM_DONNEE=p_code_objet AND ID_REGLEGESTION_AFF_RD IS NOT NULL AND (p_nom_ecran_reference IS NULL OR NOM_PAGE=p_nom_ecran_reference OR (NOM_PAGE='*' AND NOT EXISTS (SELECT 1 FROM REF_DONNEE_ECRAN@RDMOD WHERE NOM_DONNEE=p_code_objet AND NOM_PAGE=p_nom_ecran_reference)))
+        UNION
+      --         REF_DONNEE_ECRAN.ID_REGLEGESTION_AFF_CLI
+        SELECT ID_REGLEGESTION_AFF_CLI AS CODE_OBJET, NOM_PAGE AS CODE_OBJET_PARENT_2 FROM REF_DONNEE_ECRAN@RDMOD WHERE NOM_DONNEE=p_code_objet AND ID_REGLEGESTION_AFF_CLI IS NOT NULL AND (p_nom_ecran_reference IS NULL OR NOM_PAGE=p_nom_ecran_reference OR (NOM_PAGE='*' AND NOT EXISTS (SELECT 1 FROM REF_DONNEE_ECRAN@RDMOD WHERE NOM_DONNEE=p_code_objet AND NOM_PAGE=p_nom_ecran_reference)))
+        UNION
+      --         REF_DONNEE_ECRAN.ID_REGLEGESTION_CTL_RD
+        SELECT ID_REGLEGESTION_CTL_RD AS CODE_OBJET, NOM_PAGE AS CODE_OBJET_PARENT_2 FROM REF_DONNEE_ECRAN@RDMOD WHERE NOM_DONNEE=p_code_objet AND ID_REGLEGESTION_CTL_RD IS NOT NULL AND (p_nom_ecran_reference IS NULL OR NOM_PAGE=p_nom_ecran_reference OR (NOM_PAGE='*' AND NOT EXISTS (SELECT 1 FROM REF_DONNEE_ECRAN@RDMOD WHERE NOM_DONNEE=p_code_objet AND NOM_PAGE=p_nom_ecran_reference)))
+        UNION
+      --         REF_DONNEE_ECRAN.ID_REGLEGESTION_CTL_CLI
+        SELECT ID_REGLEGESTION_CTL_CLI AS CODE_OBJET, NOM_PAGE AS CODE_OBJET_PARENT_2 FROM REF_DONNEE_ECRAN@RDMOD WHERE NOM_DONNEE=p_code_objet AND ID_REGLEGESTION_CTL_CLI IS NOT NULL AND (p_nom_ecran_reference IS NULL OR NOM_PAGE=p_nom_ecran_reference OR (NOM_PAGE='*' AND NOT EXISTS (SELECT 1 FROM REF_DONNEE_ECRAN@RDMOD WHERE NOM_DONNEE=p_code_objet AND NOM_PAGE=p_nom_ecran_reference)))
+      )
+      LOOP
+        ALIM_OBJETS_USED_BY_OBJET(p_code_objet_init, 'REF_REGLEGESTION_DESC',OBJET.CODE_OBJET,p_nom_ecran_reference,p_nom_table,p_code_objet,OBJET.CODE_OBJET_PARENT_2);
+      END LOOP;
+    ELSIF p_nom_table='REF_DICTIONNAIRE' THEN
+      -- Un dictionnaire référence :
+      --     Des données :
+      FOR OBJET IN (
+      --         REF_DICTIONNAIRE.CHAMPS_CLE
+        SELECT DISTINCT CHAMPS_CLE AS CODE_OBJET FROM REF_DICTIONNAIRE@RDMOD WHERE NOM_DICTIONNAIRE=p_code_objet AND CHAMPS_CLE IS NOT NULL
+      )
+      LOOP
+        v_code_objet_tmp_1 := OBJET.CODE_OBJET||',';
+        LOOP
+          EXIT WHEN v_code_objet_tmp_1 IS NULL OR INSTR(v_code_objet_tmp_1,',')<=0;
+          v_code_objet_tmp_2 := TRIM(SUBSTR(v_code_objet_tmp_1,1,INSTR(v_code_objet_tmp_1,',')-1));
+          IF v_code_objet_tmp_2 IS NOT NULL AND v_code_objet_tmp_2 NOT LIKE '#%' AND v_code_objet_tmp_2 NOT LIKE '''%' THEN
+            ALIM_OBJETS_USED_BY_OBJET(p_code_objet_init, 'REF_DONNEE_GENERALE',v_code_objet_tmp_2,p_nom_ecran_reference,p_nom_table,p_code_objet);
+          END IF;
+          v_code_objet_tmp_1 := SUBSTR(v_code_objet_tmp_1,INSTR(v_code_objet_tmp_1,',')+1);
+        END LOOP;
+      END LOOP;
+    ELSIF p_nom_table='REF_REGLEGESTION_DESC' THEN
+      -- Une règle de gestion référence :
+      --     Des données :
+      FOR OBJET IN (
+      --         REF_REGLEGESTION.OPERANDE1 / REF_REGLEGESTION.OPERATEUR / REF_REGLEGESTION.OPERANDE2 / REF_REGLEGESTION.RESULTAT
+        SELECT DISTINCT '£'||REPLACE(REPLACE(REPLACE(OPERANDE1,'µ','£'),'§','£'),'^','£')||'£'||REPLACE(REPLACE(REPLACE(OPERATEUR,'µ','£'),'§','£'),'^','£')||'£'||REPLACE(REPLACE(REPLACE(OPERANDE2,'µ','£'),'§','£'),'^','£')||'£'||REPLACE(REPLACE(REPLACE(RESULTAT,'µ','£'),'§','£'),'^','£') AS CODE_OBJET FROM REF_REGLEGESTION@RDMOD WHERE ID_REGLEGESTION=p_code_objet
+      )
+      LOOP
+        v_code_objet_tmp_1 := OBJET.CODE_OBJET||'£';
+        LOOP
+          EXIT WHEN v_code_objet_tmp_1 IS NULL OR INSTR(v_code_objet_tmp_1,'£')<=0;
+          v_code_objet_tmp_2 := TRIM(SUBSTR(v_code_objet_tmp_1,1,INSTR(v_code_objet_tmp_1,'£')-1));
+          v_code_objet_tmp_3 := NULL;
+          IF v_code_objet_tmp_2='DONNEE' THEN
+            v_code_objet_tmp_3 := 'REF_DONNEE_GENERALE';
+          ELSIF v_code_objet_tmp_2='IDREGLE' THEN
+            v_code_objet_tmp_3 := 'REF_REGLEGESTION_DESC';
+          ELSIF v_code_objet_tmp_2='NOM_PAGE=VALEUR' THEN
+            v_code_objet_tmp_3 := 'SYS_REQUETES_JSP';
+          ELSIF v_code_objet_tmp_2='CODEERREUR' THEN
+            v_code_objet_tmp_3 := 'SYS_DEF_ERREURS';
+          ELSIF v_code_objet_tmp_2='VARSYS' THEN
+            v_code_objet_tmp_3 := 'SYS_VARSYS';
+          END IF;
+          IF v_code_objet_tmp_3 IS NOT NULL THEN
+            v_code_objet_tmp_1 := SUBSTR(v_code_objet_tmp_1,INSTR(v_code_objet_tmp_1,'£')+1);
+            v_code_objet_tmp_2 := TRIM(SUBSTR(v_code_objet_tmp_1,1,INSTR(v_code_objet_tmp_1,'£')-1));
+            IF v_code_objet_tmp_3 = 'SYS_REQUETES_JSP' THEN
+              v_code_objet_tmp_1 := SUBSTR(v_code_objet_tmp_1,INSTR(v_code_objet_tmp_1,'£')+1);
+              v_code_objet_tmp_3 := SUBSTR(v_code_objet_tmp_1,1,INSTR(v_code_objet_tmp_1,'£')-1);
+              IF v_code_objet_tmp_3='ID_REQUETE=VALEUR' THEN
+                v_code_objet_tmp_1 := SUBSTR(v_code_objet_tmp_1,INSTR(v_code_objet_tmp_1,'£')+1);
+                v_code_objet_tmp_3 := SUBSTR(v_code_objet_tmp_1,1,INSTR(v_code_objet_tmp_1,'£')-1);
+                IF v_code_objet_tmp_3 IS NOT NULL THEN
+                  v_code_objet_tmp_2 := v_code_objet_tmp_2||' / '||v_code_objet_tmp_3;
+                ELSE
+                  v_code_objet_tmp_2 := NULL;
+                END IF;
+              ELSE
+                v_code_objet_tmp_2 := NULL;
+              END IF;
+              v_code_objet_tmp_3 := 'SYS_REQUETES_JSP';
+            END IF;
+            IF v_code_objet_tmp_2 IS NOT NULL THEN
+              ALIM_OBJETS_USED_BY_OBJET(p_code_objet_init, v_code_objet_tmp_3,v_code_objet_tmp_2,p_nom_ecran_reference,p_nom_table,p_code_objet);
+            END IF;
+          END IF;
+          v_code_objet_tmp_1 := SUBSTR(v_code_objet_tmp_1,INSTR(v_code_objet_tmp_1,'£')+1);
+        END LOOP;
+      END LOOP;
+    ELSIF p_nom_table='SYS_REQUETES_JSP' THEN
+      -- Un appel table référence :
+      --     Des données :
+      FOR OBJET IN (
+      --         SYS_REQUETES_JSP.NOMTABLE / SYS_REQUETES_JSP.LISTCOLAFF / SYS_REQUETES_JSP.LISTCOLSET / SYS_REQUETES_JSP.CLAUSEWHERE
+        SELECT DISTINCT NOMTABLE||' '||LISTCOLAFF||' '||LISTCOLSET||' '||CLAUSEWHERE AS CODE_OBJET FROM SYS_REQUETES_JSP@RDMOD WHERE (NOMPAGE||' / '||IDREQUETE)=p_code_objet AND NOMTABLE||LISTCOLAFF||LISTCOLSET||CLAUSEWHERE LIKE '%@%'
+      )
+      LOOP
+        v_code_objet_tmp_1 := OBJET.CODE_OBJET||'@';
+        LOOP
+          EXIT WHEN v_code_objet_tmp_1 IS NULL OR INSTR(v_code_objet_tmp_1,'@')<=0;
+          v_code_objet_tmp_2 := TRIM(SUBSTR(v_code_objet_tmp_1,INSTR(v_code_objet_tmp_1,'@')+1));
+          EXIT WHEN v_code_objet_tmp_2 IS NULL OR INSTR(v_code_objet_tmp_2,'@')<=0;
+          v_code_objet_tmp_2 := TRIM(SUBSTR(v_code_objet_tmp_2,1,INSTR(v_code_objet_tmp_2,'@')-1));
+          IF v_code_objet_tmp_2 IS NOT NULL THEN
+            ALIM_OBJETS_USED_BY_OBJET(p_code_objet_init, 'REF_DONNEE_GENERALE',v_code_objet_tmp_2,p_nom_ecran_reference,p_nom_table,p_code_objet);
+          END IF;
+          v_code_objet_tmp_1 := SUBSTR(v_code_objet_tmp_1,INSTR(v_code_objet_tmp_1,'@')+1);
+          v_code_objet_tmp_1 := SUBSTR(v_code_objet_tmp_1,INSTR(v_code_objet_tmp_1,'@')+1);
+        END LOOP;
+      END LOOP;
+    ELSIF p_nom_table='SYS_DEF_ERREURS' THEN
+      -- Une erreur ne référence rien
+      NULL;
+    ELSIF p_nom_table='SYS_VARSYS' THEN
+      -- Une varsys ne référence rien
+      NULL;
+    END IF;
+  END ALIM_OBJETS_USED_BY_OBJET;
+  
+  FUNCTION GET_OBJETS_USED_BY_OP(p_op_num VARCHAR2, is_ux NUMBER DEFAULT 0) 
+  RETURN TAB_REF_OBJ_USED_BY_OBJECT 
+  IS 
+    PRAGMA AUTONOMOUS_TRANSACTION;
+    all_op_num VARCHAR2(4000);
+    tmp_op_num VARCHAR2(4000);
+    retour TAB_REF_OBJ_USED_BY_OBJECT := TAB_REF_OBJ_USED_BY_OBJECT();
+  BEGIN
+    all_op_num := p_op_num||',';
+    LOOP
+      EXIT WHEN all_op_num IS NULL OR INSTR(all_op_num,',')<=0;
+      tmp_op_num := SUBSTR(all_op_num,1,INSTR(all_op_num,',')-1);
+      IF tmp_op_num IS NOT NULL THEN
+        ALIM_OBJETS_USED_BY_OBJET(tmp_op_num, 'REF_WKF_OPERATION_ECRANS_INFO',tmp_op_num);
+      END IF;
+      all_op_num := SUBSTR(all_op_num,INSTR(all_op_num,',')+1);
+    END LOOP;
+    IF is_ux = 1 THEN
+      FOR r IN (SELECT DISTINCT NOM_DONNEE FROM REF_DONNEE_MAPPING_UX@RDMOD)
+      LOOP
+        ALIM_OBJETS_USED_BY_OBJET(r.NOM_DONNEE, 'REF_DONNEE_GENERALE',r.NOM_DONNEE);
+      END LOOP;
+    END IF;
+    FOR r IN (SELECT * FROM REF_OBJ_USED_BY_OBJECT)
+    LOOP
+      retour.EXTEND();
+      retour(retour.COUNT) := LIG_REF_OBJ_USED_BY_OBJECT(r.CODE_OBJET_INIT, r.NOM_TABLE, r.CLE_TABLE, r.CODE_OBJET, r.NOM_TABLE_PARENT, r.CODE_OBJET_PARENT_1, r.CODE_OBJET_PARENT_2);
+    END LOOP;
+    ROLLBACK;
+   RETURN retour;
+   EXCEPTION
+   WHEN OTHERS THEN ROLLBACK; RETURN NULL;
+  END GET_OBJETS_USED_BY_OP;
+  
+  FUNCTION GET_OBJETS_USED_BY_ECR(p_nom_page VARCHAR2, is_ux NUMBER DEFAULT 0) 
+  RETURN TAB_REF_OBJ_USED_BY_OBJECT 
+  IS 
+    PRAGMA AUTONOMOUS_TRANSACTION;
+    all_nom_page VARCHAR2(4000);
+    tmp_nom_page VARCHAR2(4000);
+    retour TAB_REF_OBJ_USED_BY_OBJECT := TAB_REF_OBJ_USED_BY_OBJECT();
+  BEGIN
+    all_nom_page := p_nom_page||',';
+    LOOP
+      EXIT WHEN all_nom_page IS NULL OR INSTR(all_nom_page,',')<=0;
+      tmp_nom_page := SUBSTR(all_nom_page,1,INSTR(all_nom_page,',')-1);
+      IF tmp_nom_page IS NOT NULL THEN
+        ALIM_OBJETS_USED_BY_OBJET(tmp_nom_page, 'REF_ECRAN',tmp_nom_page,tmp_nom_page);
+      END IF;
+      all_nom_page := SUBSTR(all_nom_page,INSTR(all_nom_page,',')+1);
+    END LOOP;
+    IF is_ux = 1 THEN
+      FOR r IN (SELECT DISTINCT NOM_DONNEE FROM REF_DONNEE_MAPPING_UX@RDMOD)
+      LOOP
+        ALIM_OBJETS_USED_BY_OBJET(r.NOM_DONNEE, 'REF_DONNEE_GENERALE',r.NOM_DONNEE,tmp_nom_page);
+      END LOOP;
+    END IF;
+    FOR r IN (SELECT * FROM REF_OBJ_USED_BY_OBJECT)
+    LOOP
+      retour.EXTEND();
+      retour(retour.COUNT) := LIG_REF_OBJ_USED_BY_OBJECT(r.CODE_OBJET_INIT, r.NOM_TABLE, r.CLE_TABLE, r.CODE_OBJET, r.NOM_TABLE_PARENT, r.CODE_OBJET_PARENT_1, r.CODE_OBJET_PARENT_2);
+    END LOOP;
+    ROLLBACK;
+   RETURN retour;
+   EXCEPTION
+   WHEN OTHERS THEN ROLLBACK; RETURN NULL;
+  END GET_OBJETS_USED_BY_ECR;
+  
+  FUNCTION GET_OBJETS_USED_BY_GRP(p_id_groupe VARCHAR2, is_ux NUMBER DEFAULT 0) 
+  RETURN TAB_REF_OBJ_USED_BY_OBJECT 
+  IS 
+    PRAGMA AUTONOMOUS_TRANSACTION;
+    all_id_groupe VARCHAR2(4000);
+    tmp_id_groupe VARCHAR2(4000);
+    retour TAB_REF_OBJ_USED_BY_OBJECT := TAB_REF_OBJ_USED_BY_OBJECT();
+  BEGIN
+    all_id_groupe := p_id_groupe||',';
+    LOOP
+      EXIT WHEN all_id_groupe IS NULL OR INSTR(all_id_groupe,',')<=0;
+      tmp_id_groupe := SUBSTR(all_id_groupe,1,INSTR(all_id_groupe,',')-1);
+      IF tmp_id_groupe IS NOT NULL THEN
+        ALIM_OBJETS_USED_BY_OBJET(tmp_id_groupe, 'REF_GROUPE_DONNEES_INFO',tmp_id_groupe);
+      END IF;
+      all_id_groupe := SUBSTR(all_id_groupe,INSTR(all_id_groupe,',')+1);
+    END LOOP;
+    IF is_ux = 1 THEN
+      FOR r IN (SELECT DISTINCT NOM_DONNEE FROM REF_DONNEE_MAPPING_UX@RDMOD)
+      LOOP
+        ALIM_OBJETS_USED_BY_OBJET(r.NOM_DONNEE, 'REF_DONNEE_GENERALE',r.NOM_DONNEE);
+      END LOOP;
+    END IF;
+    FOR r IN (SELECT * FROM REF_OBJ_USED_BY_OBJECT)
+    LOOP
+      retour.EXTEND();
+      retour(retour.COUNT) := LIG_REF_OBJ_USED_BY_OBJECT(r.CODE_OBJET_INIT, r.NOM_TABLE, r.CLE_TABLE, r.CODE_OBJET, r.NOM_TABLE_PARENT, r.CODE_OBJET_PARENT_1, r.CODE_OBJET_PARENT_2);
+    END LOOP;
+    ROLLBACK;
+   RETURN retour;
+   EXCEPTION
+   WHEN OTHERS THEN ROLLBACK; RETURN NULL;
+  END GET_OBJETS_USED_BY_GRP;
+  
+  FUNCTION GET_OBJETS_USED_BY_DON(p_nom_donnee VARCHAR2, is_ux NUMBER DEFAULT 0) 
+  RETURN TAB_REF_OBJ_USED_BY_OBJECT 
+  IS 
+    PRAGMA AUTONOMOUS_TRANSACTION;
+    all_nom_donnee VARCHAR2(4000);
+    tmp_nom_donnee VARCHAR2(4000);
+    retour TAB_REF_OBJ_USED_BY_OBJECT := TAB_REF_OBJ_USED_BY_OBJECT();
+  BEGIN
+    all_nom_donnee := p_nom_donnee||',';
+    LOOP
+      EXIT WHEN all_nom_donnee IS NULL OR INSTR(all_nom_donnee,',')<=0;
+      tmp_nom_donnee := SUBSTR(all_nom_donnee,1,INSTR(all_nom_donnee,',')-1);
+      IF tmp_nom_donnee IS NOT NULL THEN
+        ALIM_OBJETS_USED_BY_OBJET(tmp_nom_donnee, 'REF_DONNEE_GENERALE',tmp_nom_donnee);
+      END IF;
+      all_nom_donnee := SUBSTR(all_nom_donnee,INSTR(all_nom_donnee,',')+1);
+    END LOOP;
+    IF is_ux = 1 THEN
+      FOR r IN (SELECT DISTINCT NOM_DONNEE FROM REF_DONNEE_MAPPING_UX@RDMOD)
+      LOOP
+        ALIM_OBJETS_USED_BY_OBJET(r.NOM_DONNEE, 'REF_DONNEE_GENERALE',r.NOM_DONNEE);
+      END LOOP;
+    END IF;
+    FOR r IN (SELECT * FROM REF_OBJ_USED_BY_OBJECT)
+    LOOP
+      retour.EXTEND();
+      retour(retour.COUNT) := LIG_REF_OBJ_USED_BY_OBJECT(r.CODE_OBJET_INIT, r.NOM_TABLE, r.CLE_TABLE, r.CODE_OBJET, r.NOM_TABLE_PARENT, r.CODE_OBJET_PARENT_1, r.CODE_OBJET_PARENT_2);
+    END LOOP;
+    ROLLBACK;
+   RETURN retour;
+   EXCEPTION
+   WHEN OTHERS THEN ROLLBACK; RETURN NULL;
+  END GET_OBJETS_USED_BY_DON;
+  
+  FUNCTION GET_OBJETS_USED_BY_REG(p_id_reglegestion VARCHAR2, is_ux NUMBER DEFAULT 0) 
+  RETURN TAB_REF_OBJ_USED_BY_OBJECT 
+  IS 
+    PRAGMA AUTONOMOUS_TRANSACTION;
+    all_id_reglegestion VARCHAR2(4000);
+    tmp_id_reglegestion VARCHAR2(4000);
+    retour TAB_REF_OBJ_USED_BY_OBJECT := TAB_REF_OBJ_USED_BY_OBJECT();
+  BEGIN
+    all_id_reglegestion := p_id_reglegestion||',';
+    LOOP
+      EXIT WHEN all_id_reglegestion IS NULL OR INSTR(all_id_reglegestion,',')<=0;
+      tmp_id_reglegestion := SUBSTR(all_id_reglegestion,1,INSTR(all_id_reglegestion,',')-1);
+      IF tmp_id_reglegestion IS NOT NULL THEN
+        ALIM_OBJETS_USED_BY_OBJET(tmp_id_reglegestion, 'REF_REGLEGESTION_DESC',tmp_id_reglegestion);
+      END IF;
+      all_id_reglegestion := SUBSTR(all_id_reglegestion,INSTR(all_id_reglegestion,',')+1);
+    END LOOP;
+    IF is_ux = 1 THEN
+      FOR r IN (SELECT DISTINCT NOM_DONNEE FROM REF_DONNEE_MAPPING_UX@RDMOD)
+      LOOP
+        ALIM_OBJETS_USED_BY_OBJET(r.NOM_DONNEE, 'REF_DONNEE_GENERALE',r.NOM_DONNEE);
+      END LOOP;
+    END IF;
+    FOR r IN (SELECT * FROM REF_OBJ_USED_BY_OBJECT)
+    LOOP
+      retour.EXTEND();
+      retour(retour.COUNT) := LIG_REF_OBJ_USED_BY_OBJECT(r.CODE_OBJET_INIT, r.NOM_TABLE, r.CLE_TABLE, r.CODE_OBJET, r.NOM_TABLE_PARENT, r.CODE_OBJET_PARENT_1, r.CODE_OBJET_PARENT_2);
+    END LOOP;
+    ROLLBACK;
+   RETURN retour;
+   EXCEPTION
+   WHEN OTHERS THEN ROLLBACK; RETURN NULL;
+  END GET_OBJETS_USED_BY_REG;
+END TOOLS_V5;

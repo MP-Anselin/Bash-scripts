@@ -1,0 +1,21 @@
+##
+CONVERSIONSECONDESHHMM
+=SQL=
+CREATE OR REPLACE
+  FUNCTION CONVERSIONSECONDESHHMM(
+      p_seconde IN NUMBER)
+    RETURN VARCHAR2
+  IS
+    v_h NUMBER;
+    v_m NUMBER;
+  BEGIN
+    v_h    := TRUNC(p_seconde          /3600);
+    v_m    := TRUNC(mod(p_seconde,3600)/60);
+    IF v_h IS NULL THEN
+      v_h  :='0';
+    END IF;
+    IF v_m IS NULL THEN
+      v_m  :='00';
+    END IF;
+    RETURN (TO_CHAR(v_h) ||'h'||TO_CHAR (v_m, '00'));
+  END; 

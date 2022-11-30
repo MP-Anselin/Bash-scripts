@@ -1,0 +1,40 @@
+<interface idInterface="REFER">
+	<nomInterface>Chargement des tables de reference de GA</nomInterface>
+	<descriptionInterface></descriptionInterface>
+	<alerteSiFichierNonDisponible>OUI</alerteSiFichierNonDisponible>
+	<listeDependancesFichiers>
+		<nomFichierDep>REFER.TXT</nomFichierDep>
+	</listeDependancesFichiers>
+	<traitements>
+		<traitement>
+			<descriptionTraitement>Script SQL specifique avant chargement du fichier REFER</descriptionTraitement>
+			<typeTraitement>SCRIPT</typeTraitement>
+			<nomFichier>sql_CLI_avant_REFER.sql</nomFichier>
+			<typeFichier>SQL</typeFichier>
+			<continueSiErreur>OUI</continueSiErreur>
+		</traitement>
+		<traitement>
+			<descriptionTraitement>Chargement des donnees</descriptionTraitement>
+			<typeTraitement>CHARGEMENT</typeTraitement>
+			<nbcommit>1000</nbcommit>
+			<nomFichier>REFER.TXT</nomFichier>
+			<typeFichier>MAJBASE</typeFichier>
+			<modeChargement>AER</modeChargement>
+			<continueSiErreur>OUI</continueSiErreur>
+		</traitement>
+		<traitement>
+			<descriptionTraitement>Script SQL standard apres chargement du fichier REFER</descriptionTraitement>
+			<typeTraitement>SCRIPT</typeTraitement>
+			<nomFichier>sql_RD_apres_REFER.sql</nomFichier>
+			<typeFichier>SQL</typeFichier>
+			<continueSiErreur>OUI</continueSiErreur>
+		</traitement>
+		<traitement>
+			<descriptionTraitement>Script SQL specifique apres chargement du fichier REFER</descriptionTraitement>
+			<typeTraitement>SCRIPT</typeTraitement>
+			<nomFichier>sql_CLI_apres_REFER.sql</nomFichier>
+			<typeFichier>SQL</typeFichier>
+			<continueSiErreur>OUI</continueSiErreur>
+		</traitement>
+	</traitements>
+</interface>

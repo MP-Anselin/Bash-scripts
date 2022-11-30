@@ -1,0 +1,884 @@
+##
+TAG_CHARSET=@€éèç
+TAG_IMPORT=5.05.004.R013
+##
+TAG_CHARSET=@€éèç
+##
+TGE_CONTROLE_40_CHEVAUCHEMENT
+=SQL=
+create or replace PROCEDURE TGE_CONTROLE_40_CHEVAUCHEMENT (P_LOGIN IN VARCHAR2, P_DATE_IMPORT IN VARCHAR2, P_NUMLIGNE IN VARCHAR2, P_CODLANG IN VARCHAR2) AS 
+ /********************************************************************************
+ Version     : V5.05.003
+ *********************************************************************************/
+ 
+ dateDebutSQL  VARCHAR2(20);                      --date fin import_absence
+ dateFinSQL    VARCHAR2(20);                      --date fin import_absence
+ cod_erreur    VARCHAR2(10);                      --code anomalie
+ msg           VARCHAR(1000);                     --Message d'ano namlie
+ typ_msg       VARCHAR2(10);                      --type de message ERROR ou WARNING
+ varsys        VARCHAR2(100);                     --boolean varsys CTRL_ABS_CHEVAUCH
+ ctrlWhere     VARCHAR2(2000) ;                   --requet SELECT pour controler le chevauchement
+ updatesql     VARCHAR2(2000);                    --requete d'insertion de ERROR/WARNING
+ C_FORMAT_DATE CONSTANT VARCHAR(10) :='YYYYMMDD'; --format date
+ iterChev      NUMBER               :=0;          --compteur iteration absence chevauchante
+ haveJ         NUMBER               :=0;          --boolean verifier si une absence type J a été traité
+ firstMsg      NUMBER               :=0;
+ haveMsg2demiJr NUMBER              :=0;
+ accepte_2_demi_journee boolean:=false;
+ type_demi_journee_meme_motif boolean:=false;
+ 
+ ------- variable temporaire info abs. chevauché -------
+ v_DATE_DEBUT TGE_ABSENCES.DATE_DEBUT%TYPE ;
+ v_DATE_FIN TGE_ABSENCES.DATE_FIN%TYPE;
+ v_FIN_MA TGE_ABSENCES.FIN_MA%TYPE;
+ v_DEBUT_MA TGE_ABSENCES.DEBUT_MA%TYPE;
+ v_MOTIF TGE_ABSENCES.MOTIF%TYPE;
+ v_DEMI_JOURNEE TGE_REF_PRE.DEMI_JOURNEE%TYPE;
+ v_duree VARCHAR2(100);
+ --------------------------------------
+ TYPE TGE_CTRL40_type_map_msg_error
+ IS
+ TABLE OF VARCHAR2(200) INDEX BY VARCHAR2(10);-- typer table temporère pour optimiser la recupération des erreurs */
+ abs_chevauch SYS_REFCURSOR;                  -- cursor + variable absence chevauché
+ prop_abs_encour TGE_CTRL40_prop_absence;     -- contient statut absence
+ map_msg TGE_CTRL40_type_map_msg_error;       -- for optimization error
+ inf_abs TGE_CTRL40_info_absence;             -- Objet de sauvegarde des propriété absence calculable
+ tmp_record_cursor TGE_CTRL40_abs_row_cursor  :=TGE_CTRL40_abs_row_cursor(NULL,NULL,NULL,NULL,NULL,NULL);
+ C_SQL_NON_DEMI_JOURNEE CONSTANT VARCHAR(200) :='and not exists (select 1 from tge_ref_pre pre  where absence.numpac=pre.numpac and absence.motif=pre.code_incident and pre.demi_journee =1 )';
+ /************ CURSORS ************/
+ -- Curseur des absence à contrôler
+ CURSOR ABS_IMPORT
+ IS
+ SELECT absence.LOGIN,
+ absence.DATE_IMPORT,
+ absence.NUMLIGNE,
+ absence.MATRICULE,
+ absence.NUMPAC,
+ absence.PACMAT,
+ absence.PAIEZAD,
+ absence.PERIODE,
+ absence.TYPE_TRAITEMENT,
+ absence.DATE_DEBUT,
+ absence.DATE_FIN,
+ absence.HEURES_TRAV,
+ absence.TYPE_HEURE,
+ absence.HEURES_IP,
+ absence.CODE_IP,
+ absence.CODE_IMPUTATION,
+ absence.DOMAINE_IMP,
+ absence.ORIGINE,
+ absence.ERREURS,
+ absence.STATUT,
+ absence.WARNINGS,
+ absence.DATE_EFFET,
+ absence.FSED_PAIEZAD,
+ MOT.DEMI_JOURNEE,
+ mot.RUB_ECHANGE,
+ mot.UNITE
+ FROM TGE_IMPORT_INCIDENTS absence LEFT JOIN TGE_REF_PRE mot
+ ON absence.CODE_IP=mot.CODE_INCIDENT AND mot.NUMPAC    =absence.NUMPAC WHERE LOGIN =P_LOGIN  AND DATE_IMPORT   =P_DATE_IMPORT;
+ 
+ --Curseur des messages d'erreurs
+ CURSOR error_msg_cursor
+ IS SELECT coderr, liberr FROM sys_def_erreurs WHERE codlang=P_CODLANG AND CODMOD   ='TGE'
+ AND coderr  IN ('TGE00172','TGE00184','TGE00187','TGE00188','TGE00198','TGE00185','TGE00186','TGE00197','TGE00295','TGE00296','TGE00297','TGE00298','TGE00344','TGE00345');
+ 
+ BEGIN
+ /**********DEBUT TRAITEMENT ***********/
+ TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'CTRL_CHEVAUCHEMENT_40 DEBUT '||TO_CHAR(SYSTIMESTAMP, 'DD.MM.YYYY HH24:MI:SSxFF'));
+ 
+ /** Alimentation des erreur en memoir **/
+ FOR row_err IN error_msg_cursor LOOP
+ map_msg(row_err.coderr):=row_err.liberr;
+ END LOOP;
+ 
+ --get varsys CTRL_ABS_CHEVAUCH
+ --IF true inserer dans Erreur ELSE inserer dans Warning
+ SELECT valvar INTO varsys FROM sys_varsys WHERE module ='TGE' AND CODVAR      ='CTRL_ABS_CHEVAUCH';
+ IF upper(varsys)='TRUE' THEN  typ_msg :='erreurs'; ELSE typ_msg:='warnings'; END IF;
+ 
+ /**************************************/
+ /****  LOOP sur TGE_IMPORT_ABSENCES****/
+ /**************************************/
+ FOR absence IN ABS_IMPORT
+ LOOP
+ 
+ dateDebutSQL                  :='';
+ dateFinSQL                    :='';
+ iterChev                      :=0;
+ tmp_record_cursor.DATE_DEBUT  :=absence.DATE_DEBUT;
+ tmp_record_cursor.DATE_FIN    :=absence.DATE_FIN;
+ tmp_record_cursor.UNITE       :=absence.UNITE;
+ tmp_record_cursor.HEURES_IP   :=absence.HEURES_IP;
+ tmp_record_cursor.DEMI_JOURNEE:=absence.DEMI_JOURNEE;
+ tmp_record_cursor.RUB_ECHANGE :=absence.RUB_ECHANGE;
+ 
+ -- get info absence
+ inf_abs  := TGE_CTRL40_GET_INFO_ABSENCE(tmp_record_cursor,dateDebutSQL , dateFinSQL);
+ 
+ -- calculer les états de l'absence
+ prop_abs_encour :=TGE_CTRL40_GET_ETATS_ABSENCE(absence.HEURES_IP, absence.DEMI_JOURNEE, inf_abs, dateDebutSQL, dateFinSQL);
+ 
+ /* verification date absence */
+ IF dateDebutSQL IS NULL THEN dateDebutSQL := '19000102'; END IF;
+ IF dateFinSQL   IS NULL THEN dateFinSQL   := '20990101'; END IF;
+ 
+ /********************************************************/
+ /* Construction de la requete controle chevauchement !! */
+ /********************************************************/
+ ctrlWhere :='SELECT DATE_DEBUT, DATE_FIN, FIN_MA, DEBUT_MA,MOTIF , TO_CHAR(NVL(DUREE,0)) as DUREE, DEMI_JOURNEE FROM TGE_ABSENCES absence LEFT JOIN TGE_REF_PRE mot ON absence.MOTIF=mot.CODE_INCIDENT AND mot.NUMPAC=absence.NUMPAC  WHERE MATRIC='''||absence.MATRICULE||''' AND STATUT IN (select CODE from TGE_GTA_ABS_STATUTS  where EST_ABS_ACTIVE = 1) ' ;
+ ctrlWhere := ctrlWhere|| 'AND ( ( TO_DATE( ' || dateDebutSQL ||','''|| C_FORMAT_DATE ||''') between DATE_DEBUT AND DATE_FIN OR TO_DATE('||dateFinSQL||','''|| C_FORMAT_DATE ||''') between DATE_DEBUT AND DATE_FIN OR DATE_DEBUT between TO_DATE('||dateDebutSql||','''|| C_FORMAT_DATE ||''') AND TO_DATE('||dateFinSql||','''|| C_FORMAT_DATE ||''') OR  DATE_FIN  between TO_DATE('||dateDebutSql ||','''|| C_FORMAT_DATE ||''') AND TO_DATE('||dateDebutSql||','''|| C_FORMAT_DATE ||''') ) AND ';
+ IF prop_abs_encour.isJourneeCompleteSurUnSeulJour   =1 OR prop_abs_encour.isEnDureeSurUnSeulJour=1 OR prop_abs_encour.isJourneCompletSurPlusieurJour=1 OR prop_abs_encour.isEnDureeSurPlusieursJour=1 THEN
+ ctrlWhere :=ctrlWhere||' 1=1 ';
+ ELSIF prop_abs_encour.isDemiJourneeSurUnSeulJour=1  OR prop_abs_encour.estDemiJournee=1 THEN
+ ctrlWhere :=ctrlWhere||' ((DEBUT_MA=''J'' AND ( ('''|| NVL(absence.heures_ip,'0') ||'''=''0.50'' AND TO_CHAR(NVL(DUREE,0))=''14400'') OR  ''0'' = NVL(DUREE,''0'')) ) OR (DEBUT_MA in (''M'',''D'',''A'')) OR (FIN_MA in (''M'',''D'',''A'')) OR DEMI_JOURNEE = ''1'')';
+ ELSIF prop_abs_encour.isMatinSurUnSeulJour =1 OR prop_abs_encour.isMatinSurPlusieursJour=1 THEN --
+ ctrlWhere :=ctrlWhere||' ( (DEBUT_MA IN (''D'',''J'',''M'') AND DEBUT_MA =FIN_MA '||C_SQL_NON_DEMI_JOURNEE||' ) OR (DEBUT_MA=''A'' AND FIN_MA in (''M'',''J'') AND TO_DATE('||dateFinSql||','''|| C_FORMAT_DATE ||''') <> DATE_DEBUT ) OR (DEBUT_MA=''J'' AND FIN_MA=''M'') )';
+ ELSIF prop_abs_encour.isApresMidiSurUnSeulJour      =1 OR prop_abs_encour.isApresMidiSurPlusieursJour=1 THEN--
+ ctrlWhere :=ctrlWhere||' (  (DEBUT_MA in (''D'',''J'',''A'') AND DEBUT_MA= FIN_MA '||C_SQL_NON_DEMI_JOURNEE||' ) OR (DEBUT_MA=''A'' AND FIN_MA=''J'') OR ( DEBUT_MA IN (''A'',''J'') and FIN_MA=''M'' and TO_DATE('||dateDebutSql||','''|| C_FORMAT_DATE ||''') <> DATE_FIN ) ) ';
+ ELSIF prop_abs_encour.isStatApremdAndFinitToutJourne=1 THEN
+ ctrlWhere :=ctrlWhere||' ( (DEBUT_MA in(''J'',''D'',''A'') AND DEBUT_MA= FIN_MA '||C_SQL_NON_DEMI_JOURNEE||' ) OR (DEBUT_MA=''A'' and FIN_MA=''J'') OR ( DEBUT_MA in (''A'',''J'') AND FIN_MA=''M'' AND TO_DATE('||dateDebutSql ||','''|| C_FORMAT_DATE ||''') <> DATE_FIN ) OR ( DEBUT_MA=''M'' and FIN_MA=''M'' AND DATE_FIN >  TO_DATE( '|| dateDebutSQL||' ,'''|| C_FORMAT_DATE ||''') ) )';
+ ELSIF prop_abs_encour.isStartApremidiAndFinitMatin  =1 THEN
+ ctrlWhere :=ctrlWhere||' ( (DEBUT_MA IN (''J'',''D'') AND DEBUT_MA=FIN_MA '||C_SQL_NON_DEMI_JOURNEE||' ) OR ( DEBUT_MA=''M'' AND FIN_MA=''M'' AND DATE_FIN> TO_DATE('||dateDebutSql ||','''|| C_FORMAT_DATE ||''') ) OR ( DEBUT_MA=''A'' AND FIN_MA=''A'' AND DATE_DEBUT > TO_DATE( '||dateFinSql||','''|| C_FORMAT_DATE ||''') ) OR ( DEBUT_MA=''A'' AND FIN_MA=''M'' AND DATE_DEBUT <> TO_DATE('||dateFinSql||','''|| C_FORMAT_DATE ||''') and DATE_FIN <> TO_DATE('||dateDebutSql ||','''|| C_FORMAT_DATE ||''') ) OR ( DEBUT_MA=''J'' AND FIN_MA=''M'' AND DATE_FIN <> TO_DATE('||dateDebutSql||','''|| C_FORMAT_DATE ||''') ) )';
+ ELSIF prop_abs_encour.isStartToutJourneAndFinitMatin=1 THEN
+ ctrlWhere :=ctrlWhere||' ( ( DEBUT_MA IN (''J'',''D'',''M'') AND DEBUT_MA=FIN_MA '||C_SQL_NON_DEMI_JOURNEE||' ) OR ( DEBUT_MA =''A'' AND FIN_MA =''A''  AND DATE_DEBUT < TO_DATE('||dateFinSql||','''|| C_FORMAT_DATE ||''') ) OR ( DEBUT_MA =''A'' AND FIN_MA IN (''J'',''M'') AND DATE_DEBUT <> TO_DATE('||dateFinSQL||','''|| C_FORMAT_DATE ||''') ) OR ( DEBUT_MA=''J'' AND FIN_MA=''M'' ) )';
+ END IF;
+ ctrlWhere :=ctrlWhere||')  ORDER BY DEBUT_MA desc';
+ 
+ 
+ IF NOT prop_abs_encour.erreur=1 THEN
+ --parcourir les absences en cheuvauchement pour inserer les erreurs/warnings
+ OPEN abs_chevauch FOR ctrlWhere;
+ LOOP
+ FETCH abs_chevauch INTO v_DATE_DEBUT, v_DATE_FIN, v_FIN_MA, v_DEBUT_MA, v_MOTIF, v_duree, v_DEMI_JOURNEE;
+ EXIT WHEN abs_chevauch%NOTFOUND;
+ 
+
+ 
+ IF v_DEBUT_MA='J' OR v_FIN_MA='J' THEN haveJ:=1; END IF;
+ 
+ iterChev :=iterChev+1;
+ 
+ -- condition qui accepte 2 demi journée
+ accepte_2_demi_journee:= iterchev<2 AND (prop_abs_encour.isDemiJourneeSurUnSeulJour=1 OR prop_abs_encour.estDemiJournee=1) AND ( ((v_duree ='14400') AND v_DEBUT_MA = 'J' AND v_DEMI_JOURNEE <> 1) OR  v_DEBUT_MA IN ('M','A') OR v_FIN_MA IN ('M','A') OR (v_DEMI_JOURNEE=1 AND v_MOTIF != absence.CODE_IP));
+ -- condition qui bloque la 2éme absence typé demi_journée si même motif d'absence
+ type_demi_journee_meme_motif:=prop_abs_encour.estDemiJournee=1 AND v_DEMI_JOURNEE=1 AND v_MOTIF=absence.CODE_IP;
+ 
+ -- contrôle pour ne pas dépasser 2 demi journée dans la même journée (sauf pour la durée) et qui bloque l'import d'une 2eme absnece typée demi-journée avec le même motif.
+ IF firstMsg = 0 AND (not(accepte_2_demi_journee) OR type_demi_journee_meme_motif ) THEN
+ msg:=map_msg('TGE00172');
+ updatesql:=' update TGE_IMPORT_INCIDENTS set '|| ( CASE WHEN v_DEBUT_MA='D' AND haveJ=0 THEN 'warnings' ELSE typ_msg END) ||' = '|| ( CASE WHEN v_DEBUT_MA='D' AND haveJ=0 THEN 'warnings' ELSE typ_msg END) ||' || '''||REPLACE(msg,'''','''''')||'''  WHERE login='''||absence.login||''' and date_import='''||absence.date_import||''' and numligne='|| absence.numligne||'';
+ EXECUTE_IMMEDIATE_STRING(updatesql,0);
+ firstMsg:=1;
+ END IF;
+ IF accepte_2_demi_journee THEN
+ CONTINUE;
+ ELSIF haveMsg2demiJr=0 AND prop_abs_encour.isDemiJourneeSurUnSeulJour=1 AND (v_DEBUT_MA  <> 'D' OR haveJ = 1)  AND iterchev>=2 THEN
+ msg:=map_msg('TGE00344');
+ msg:=regexp_replace(msg,'#',v_DATE_DEBUT,1,1);
+ haveMsg2demiJr:=1;
+ GOTO MAJ_TBL_IMPORT;
+ ELSIF haveMsg2demiJr=1 AND prop_abs_encour.isDemiJourneeSurUnSeulJour=1 AND iterchev>=2 THEN
+ CONTINUE;
+ END IF;
+ IF type_demi_journee_meme_motif THEN
+ msg:=map_msg('TGE00345');
+ msg:=regexp_replace(msg,'#',v_MOTIF,1,1);
+ msg:=regexp_replace(msg,'#',v_DATE_DEBUT,1,1);
+ GOTO MAJ_TBL_IMPORT;
+ END IF;
+ 
+ --get code erreur adéquat
+ IF v_DATE_DEBUT   =v_DATE_FIN THEN
+ IF    v_DEBUT_MA='D' THEN cod_erreur   :='TGE00184';
+ ELSIF v_DEBUT_MA='M' THEN cod_erreur   :='TGE00187';
+ ELSIF v_DEBUT_MA='A' THEN cod_erreur   :='TGE00188';
+ ELSIF v_DEBUT_MA='J' THEN cod_erreur   :='TGE00198';
+ END IF;
+ ELSE
+ IF v_DEBUT_MA   ='M' THEN
+ cod_erreur   :='TGE00185';
+ ELSIF v_DEBUT_MA='A' AND v_FIN_MA!='M' AND v_FIN_MA!='J' THEN cod_erreur   :='TGE00186';
+ ELSIF v_DEBUT_MA='J' AND v_FIN_MA!='M' THEN cod_erreur   :='TGE00197';
+ ELSIF v_DEBUT_MA='A' AND v_FIN_MA='J' THEN cod_erreur   :='TGE00295';
+ ELSIF v_DEBUT_MA='A' AND v_FIN_MA='M' THEN cod_erreur   :='TGE00296';
+ ELSIF v_DEBUT_MA='J' AND v_FIN_MA='M' THEN cod_erreur   :='TGE00297';
+ ELSIF v_DEBUT_MA='D' THEN cod_erreur   :='TGE00298';
+ END IF;
+ END IF;
+ 
+ --récupèrer message d'erreur et remplacer les paramétres
+ msg:=map_msg(cod_erreur);
+ msg:=regexp_replace(msg,'#',v_MOTIF,1,1);
+ msg:=regexp_replace(msg,'#',v_DATE_DEBUT,1,1);
+ msg:=regexp_replace(msg,'#',v_DATE_FIN,1,1);
+ 
+ <<MAJ_TBL_IMPORT>>
+ --MAJ de l'anomalie import_absence / WARNINGS si MA=Durée
+ updatesql:=' UPDATE TGE_IMPORT_INCIDENTS SET '|| ( CASE WHEN v_DEBUT_MA='D' AND haveJ=0 THEN 'warnings' ELSE typ_msg END) ||' = '|| ( CASE WHEN v_DEBUT_MA='D' AND haveJ=0 THEN 'warnings' ELSE typ_msg END) ||' || '''||REPLACE(msg,'''','''''')||'''  WHERE login='''||absence.login||''' AND date_import='''||absence.date_import||''' AND numligne='|| absence.numligne||'';
+ EXECUTE_IMMEDIATE_STRING(updatesql,0);
+ 
+ END LOOP; --FIN LOOP absence chevauché
+ iterChev:=0; firstMsg:=0;haveJ:=0;haveMsg2demiJr:=0;
+ CLOSE abs_chevauch;
+ 
+ ELSE
+ msg :='Problem de controle de chevauchement. ';
+ updatesql:=' UPDATE TGE_IMPORT_ABSENCES SET '||( CASE WHEN v_DEBUT_MA='D' AND haveJ=0 THEN 'warnings' ELSE typ_msg END) ||' = '|| ( CASE WHEN v_DEBUT_MA='D' AND haveJ=0 THEN 'warnings' ELSE typ_msg END) ||' || '''||REPLACE(msg,'''','''''')||'''  WHERE login='''||absence.login||''' AND date_import='''||absence.date_import||''' AND numligne='|| absence.numligne||'';
+ EXECUTE_IMMEDIATE_STRING(updatesql,0);
+ END IF;
+ END LOOP;--FIN LOOP import_absence
+ 
+ TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'CTRL_CHEVAUCHEMENT_40 FIN '||TO_CHAR(SYSTIMESTAMP, 'DD.MM.YYYY HH24:MI:SSxFF'));
+ 
+ EXCEPTION
+ WHEN OTHERS THEN
+ IF (P_LOGIN != 'BATCH') THEN
+ -- On remonte l'erreur à l'application
+ raise;
+ END IF;
+ END TGE_CONTROLE_40_CHEVAUCHEMENT;
+##
+TAG_CHARSET=@€éèç
+##
+TRG_TGE_INCIDENTS_PAIE
+=SQL=
+create or replace trigger trg_tge_incidents_paie FOR
+  insert or
+  update or
+  delete on tge_incidents_paie COMPOUND TRIGGER
+
+  v_recycl           varchar2(1);
+  v_retro            varchar2(1);
+  v_periode_recycl   varchar2(1);
+  v_numpac           varchar2(6);
+  v_pacmat           varchar2(8);
+  v_type_writer      varchar2(1);
+  v_paiezad          varchar2(8);
+  v_date_effet       DATE; 
+  v_periode_retro    VARCHAR2(6);
+  V_PERIODE          varchar2(6);
+  V_DEB_RETRO        varchar2(6);
+  V_DEB_HISTO_RETRO  varchar2(6);
+  V_PERIODEENCOURS   varchar2(6);
+  V_CODE_CHRONO      varchar2(6);
+  v_bypass_trigger   number;
+  V_NB_MOIS_RETRO    number;
+  TYPE T_PERIODE_BY_NUMPAC IS TABLE OF TGE_REF_PAC.PERIODEENCOURS%TYPE INDEX BY TGE_REF_PAC.NUMPAC%TYPE;
+  tabPeriodeByNumpac T_PERIODE_BY_NUMPAC;
+  date_test_recycl   DATE;
+  date_effet_recycl   DATE;
+BEFORE EACH ROW
+IS
+begin
+  -- action de 'bypass' le trigger 
+  select count(*) into v_bypass_trigger from bypass_trg_recycl_on_session;
+  if (v_bypass_trigger = 0) then
+    -- s'il y a une ligne dans la table temporaire, alors il n'y a pas de recyclage ni de rétroactivité
+
+  if deleting then
+    v_type_writer := nvl(:old.type_writer, 'O');
+  else
+    v_type_writer := nvl(:new.type_writer, 'O');
+    -- On remet TYPE_WRITER à NULL pour qu'il ne soit pas considéré comme 'N' lors des futurs update n'incluant pas cette colonne
+    :new.type_writer := null;
+    BEGIN
+        v_numpac        := NVL(:new.numpac, :old.numpac);
+        v_paiezad       := NVL(:new.paiezad, :old.paiezad);
+        v_date_effet    := NVL(:new.date_effet, :old.date_effet);
+        SELECT MIN(MOIS_PAIE) 
+        INTO v_periode_retro
+        FROM TGE_PERIODE_RECUEIL_PAIEZAD
+        WHERE numpac = v_numpac
+        AND paiezad  = v_paiezad
+        AND v_date_effet BETWEEN DEBUT_PERIODE_RECUEIL AND FIN_PERIODE_RECUEIL;
+        IF v_periode_retro IS NOT NULL THEN
+          :new.periode     := TO_DATE(v_periode_retro || 01, 'yyyyMMdd');
+        END IF;
+    EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        -- Période de recueil non trouvé
+        null;
+    END;
+  end if;
+
+  if (v_type_writer <> 'N') then
+    v_numpac      := nvl(:new.numpac, :old.numpac);
+    v_paiezad     := nvl(:new.paiezad, :old.paiezad);
+    BEGIN
+        SELECT t.pacmat,nvl(t.periode_recyclage,'1'),CODE_CHRONO
+        INTO v_pacmat,v_periode_recycl,V_CODE_CHRONO
+        from dic_adm_contrat_SITU d, secupacmat t
+        where d.numpac = v_numpac
+        and d.paiezad  = v_paiezad
+        and d.numpac   = t.numpac
+        and d.pacmat   = t.pacmat
+        and nvl(:new.DATE_EFFET,:old.DATE_EFFET) BETWEEN d.DSDSC AND NVL(d.DSFSC,to_date('31122099','DDMMYYYY'));
+    EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        null;
+    END;
+    if v_periode_recycl = '3' then
+      raise_application_error(-20000, 'CODERR=GENREC02');
+    elsif v_periode_recycl = '2' then
+      raise_application_error(-20000, 'CODERR=GENREC01');
+    elsif v_periode_recycl = '1' then
+      v_recycl            := 'N';
+      IF NOT tabPeriodeByNumpac.exists(v_numpac) THEN
+        select periodeencours into tabPeriodeByNumpac(v_numpac) from tge_ref_pac where numpac = v_numpac;
+      END IF;
+      IF DELETING THEN
+        date_test_recycl := :old.periode;
+		date_effet_recycl :=:old.date_effet;
+      ELSE
+        date_test_recycl := :new.periode;
+		 IF updating THEN
+		 	date_effet_recycl :=LEAST(:new.date_effet,:old.date_effet);
+		 ELSE
+		 	date_effet_recycl :=:new.date_effet;
+		 END IF;
+	  END IF;
+      IF  (NVL(TO_CHAR(date_effet_recycl,'yyyymm'),'000000') > tabPeriodeByNumpac(v_numpac) ) THEN
+		 date_test_recycl := TO_DATE('20991231','yyyymmdd');
+      END IF;
+      if (NVL(TO_CHAR(date_test_recycl,'yyyymm'),'000000') <= tabPeriodeByNumpac(v_numpac)) then
+        if inserting or deleting then
+          v_recycl := 'O';
+        elsif updating then
+          if :new.code_imputation    <> :old.code_imputation or (:new.code_imputation is not null and :old.code_imputation is null) or (:new.code_imputation is null and :old.code_imputation is not null) then
+            v_recycl                 := 'O';
+          elsif :new.code_ip         <> :old.code_ip or (:new.code_ip is not null and :old.code_ip is null) or (:new.code_ip is null and :old.code_ip is not null) then
+            v_recycl                 := 'O';
+          elsif :new.date_effet      <> :old.date_effet or (:new.date_effet is not null and :old.date_effet is null) or (:new.date_effet is null and :old.date_effet is not null) then
+            v_recycl                 := 'O';
+          elsif :new.heures          <> :old.heures or (:new.heures is not null and :old.heures is null) or (:new.heures is null and :old.heures is not null) then
+            v_recycl                 := 'O';
+          elsif :new.origine         <> :old.origine or (:new.origine is not null and :old.origine is null) or (:new.origine is null and :old.origine is not null) then
+            v_recycl                 := 'O';
+          elsif :new.type_ip         <> :old.type_ip or (:new.type_ip is not null and :old.type_ip is null) or (:new.type_ip is null and :old.type_ip is not null) then
+            v_recycl                 := 'O';
+          elsif :new.type_traitement <> :old.type_traitement or (:new.type_traitement is not null and :old.type_traitement is null) or (:new.type_traitement is null and :old.type_traitement is not null) then
+            v_recycl                 := 'O';
+          elsif :new.periode         <> :old.periode or (:new.periode is not null and :old.periode is null) or (:new.periode is null and :old.periode is not null) then
+            v_recycl                 := 'O';
+          elsif :new.action_retro    <> :old.action_retro or (:new.action_retro is not null and :old.action_retro is null) or (:new.action_retro is null and :old.action_retro is not null) then
+            v_recycl                 := 'O';
+          end if;
+        end if;
+        if v_recycl = 'O' then
+          begin
+            merge into gap_recycl_matric a using (select v_numpac as numpac, v_pacmat as pacmat from dual) b on (a.pacmat = b.pacmat and a.numpac = b.numpac)
+          when not matched then
+            insert (a.numpac, a.pacmat) values (b.numpac, b.pacmat);
+          exception
+          when others then
+            --dbms_output.put_line('Collaborateur déjà en recyclage ' || v_numpac || '/' || v_pacmat);
+            --FIXME utiliser la procédure trace_dbms_output()
+            NULL;
+          end;
+        end if;
+      end if;
+    end if;
+    /** Test de mise en rétro **/
+    v_retro            := 'N';
+    if inserting or deleting then
+      v_retro := 'O';
+    elsif updating then
+      -- Les valeurs des colonnes clés ne peuvent pas être nulls 
+      if :new.code_imputation    <> :old.code_imputation or (:new.code_imputation is not null and :old.code_imputation is null) or (:new.code_imputation is null and :old.code_imputation is not null) then
+        v_retro                 := 'O';
+      elsif :new.code_ip         <> :old.code_ip or (:new.code_ip is not null and :old.code_ip is null) or (:new.code_ip is null and :old.code_ip is not null) then
+        v_retro                 := 'O';
+      elsif :new.date_effet      <> :old.date_effet or (:new.date_effet is not null and :old.date_effet is null) or (:new.date_effet is null and :old.date_effet is not null) then
+        v_retro                 := 'O';
+      elsif :new.heures          <> :old.heures or (:new.heures is not null and :old.heures is null) or (:new.heures is null and :old.heures is not null) then
+        v_retro                 := 'O';
+      elsif :new.origine         <> :old.origine or (:new.origine is not null and :old.origine is null) or (:new.origine is null and :old.origine is not null) then
+        v_retro                 := 'O';
+      elsif :new.type_ip         <> :old.type_ip or (:new.type_ip is not null and :old.type_ip is null) or (:new.type_ip is null and :old.type_ip is not null) then
+        v_retro                 := 'O';
+      elsif :new.type_traitement <> :old.type_traitement or (:new.type_traitement is not null and :old.type_traitement is null) or (:new.type_traitement is null and :old.type_traitement is not null) then
+        v_retro                 := 'O';
+      elsif :new.periode         <> :old.periode or (:new.periode is not null and :old.periode is null) or (:new.periode is null and :old.periode is not null) then
+        v_retro                 := 'O';
+      elsif :new.action_retro    <> :old.action_retro or (:new.action_retro is not null and :old.action_retro is null) or (:new.action_retro is null and :old.action_retro is not null) then
+        v_retro                 := 'O';
+      end if;
+    end if;
+    if v_retro = 'O' then
+      V_PERIODE := TO_CHAR(NVL(:NEW.PERIODE,:OLD.PERIODE),'YYYYMM');
+      TGE_RETRO_INSCRIPT_WITH_CHECK(V_NUMPAC, V_PACMAT, V_PERIODE, V_CODE_CHRONO, V_PAIEZAD, 'TGE_INCIDENTS_PAIE');
+    END IF;
+  /** Fin test de mise en rétro **/
+  end if;
+  end if;
+END BEFORE EACH ROW;
+end trg_tge_incidents_paie;
+##
+TAG_CHARSET=@€éèç
+##
+BATCH_DESCRIPTION
+==
+delete from BATCH_DESCRIPTION where FAMILLE = 'BATCH_STC' and CLASSE_NAME in ('fr.adp.com.gxp.std.modules.lib.objects.zpaie.mgr.Traitement_annulerDepartStc.java','fr.adp.com.gxp.std.modules.lib.objects.zpaie.mgr.Traitement_annulerDepartStc','fr.adp.com.gxp.std.modules.lib.objects.zpaie.mgr.Traitement_departOuMutationStc.java','fr.adp.com.gxp.std.modules.lib.objects.zpaie.mgr.Traitement_departOuMutationStc')
+'BATCH_STC','fr.adp.com.gxp.std.modules.lib.objects.zpaie.mgr.Traitement_annulerDepartStc','Annulation d''un départ (avec STC non calculé en paie)',NULL,NULL
+'BATCH_STC','fr.adp.com.gxp.std.modules.lib.objects.zpaie.mgr.Traitement_departOuMutationStc','Départ solde tout compte (STC)',NULL,NULL
+##
+DEL_FONCTIONMETIER_LIB
+==
+DELETE FROM DEL_FONCTIONMETIER_LIB  WHERE CODE_FCTMETIER =-1
+-1,'Gestion des dossiers',0,'UX - Gestion des dossiers'
+##
+DEL_FONCTIONMETIER_LIB
+==
+DELETE FROM DEL_FONCTIONMETIER_LIB  WHERE CODE_FCTMETIER =-2
+-2,'Gestion des temps',0,'UX - Gestion des temps'
+##
+SYS_DEF_ERREURS
+==
+DELETE FROM SYS_DEF_ERREURS WHERE CODERR IN ( 'IMPEX083') AND CODLANG = 'fr_fr' AND CODMOD ='TGE'
+'IMPEX083','TGE','fr_fr','0','Vous pouvez rafraîchir l''écran Import données Zadig pour suivre l''état d''avancement du traitement en cliquant sur le bouton "Afficher".','1'
+##
+SYS_DEF_ERREURS
+==
+delete from SYS_DEF_ERREURS where CODERR in ('BDG00090') and CODLANG = 'fr_fr' and CODMOD ='GTA'
+'BDG00090','GTA','fr_fr','0','Vous ne pouvez pas sélectionner plus de 1000 collaborateurs.','1'
+##
+SYS_REQUETES_JSP
+==
+DELETE FROM SYS_REQUETES_JSP WHERE NOMPAGE='TAB_RD_MOTMED' and idrequete='1'
+'TAB_RD_MOTMED','1','Utilisateur','GA_MOTVISIT','CODE_MOTIF, LIBELLE_MOTIF','CODE_MOTIF, LIBELLE_MOTIF','(FILLER_1 = ''2'' or FILLER_1 = ''%1'')','0',NULL,'CODE_MOTIF',NULL,'Motifs de visite médicale',NULL
+##
+SYS_REQUETES_JSP
+==
+DELETE FROM SYS_REQUETES_JSP WHERE nompage = 'TAB_RD_MOTVIS'
+'TAB_RD_MOTVIS','1','Utilisateur','GA_MOTVISIT','CODE_MOTIF, LIBELLE_MOTIF','CODE_MOTIF, LIBELLE_MOTIF','FILLER_1 = ''2'' or FILLER_1 = ''%1''','0','false','CODE_MOTIF',NULL,'Motifs de visite médicale',NULL
+##
+TAG_CHARSET=@€éèç
+##
+SYS_TRC_MODIF
+=SQL IFNOTEXIST=SYS_TRC_MODIF=NUMPAC=
+alter table SYS_TRC_MODIF add NUMPAC varchar2(32)
+##
+SYS_TRC_MODIF
+=SQL IFNOTEXIST=SYS_TRC_MODIF=PACMAT=
+alter table SYS_TRC_MODIF add PACMAT varchar2(32)
+##
+SYS_TRC_MODIF
+=SQL IFNOTEXIST=SYS_TRC_MODIF=PAIEZAD=
+alter table SYS_TRC_MODIF add PAIEZAD varchar2(32)
+##
+SYS_TRC_MODIF
+=SQL IFNOTEXIST=SYS_TRC_MODIF=MATRIC=
+alter table SYS_TRC_MODIF add MATRIC varchar2(32)
+##
+SYS_TRC_MODIF
+=SQL IFNOTEXIST=SYS_TRC_MODIF=DATE_EFFET=
+alter table SYS_TRC_MODIF add DATE_EFFET DATE
+##
+SYS_REQUETES_JSP
+==
+DELETE FROM SYS_REQUETES_JSP WHERE NOMPAGE = 'ATTESTATIONLISTE'
+'ATTESTATIONLISTE','1','Utilisateur','GA_ATTESTATION_TYPES','ATTEST_ID,ATTEST_LIBELLE,CODEDI,FAMEDI,DESCRIPTION','ATTEST_ID,ATTEST_LIBELLE,CODEDI,FAMEDI,DESCRIPTION',NULL,'0',NULL,'ORDRE, ATTEST_LIBELLE',NULL,'Liste des attestations proposé sur l''écran Edition des attestations','ATTEST_ID,ATTEST_LIBELLE'
+##
+TGE_REF_CARTE_FSED
+==
+DELETE from TGE_REF_CARTE_FSED where CODE_CARTE in ('29_30_DIF_FSED_RETRO','29_30_DIF_FSED','W566','ANNULATION','ANNULATION_RETRO','W566_RETRO','29_30_TGE_ELEMENT_PAIE','29_30_TGE_ELEMENT_PAIE_RETRO','40','40_RETRO','60','60_RETRO','70','70_RETRO') and ORIGINE_CARTE = 'RD'
+##
+TGE_REF_CARTE_FSED
+'29_30_DIF_FSED','RD','SELECT','001',NULL,'DIF_FSED','NUMPAC','6','0','FALSE',NULL,NULL
+'29_30_DIF_FSED_RETRO','RD','SELECT','001',NULL,'DIF_FSED_PARTIERETRO','NUMPAC','6','0','FALSE',NULL,NULL
+'29_30_DIF_FSED','RD','SELECT','002','30',NULL,NULL,'2','0','FALSE',NULL,NULL
+'29_30_DIF_FSED','RD','SELECT','003',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,NULL
+'29_30_DIF_FSED','RD','SELECT','004',NULL,'DIF_FSED','PAIEZAD','8','0','TRUE',NULL,NULL
+'29_30_DIF_FSED_RETRO','RD','SELECT','004',NULL,'DIF_FSED_PARTIERETRO','PAIEZAD','8','0','TRUE',NULL,NULL
+'29_30_DIF_FSED','RD','SELECT','005',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,NULL
+'29_30_DIF_FSED','RD','SELECT','006',NULL,NULL,NULL,'2',NULL,'FALSE',NULL,NULL
+'29_30_DIF_FSED','RD','SELECT','007',NULL,'DIF_FSED','ELEM','4',NULL,'FALSE',NULL,NULL
+'29_30_DIF_FSED_RETRO','RD','SELECT','007',NULL,'DIF_FSED_PARTIERETRO','ELEM','4',NULL,'FALSE',NULL,NULL
+'29_30_DIF_FSED','RD','SELECT','008',NULL,NULL,NULL,'2',NULL,'FALSE',NULL,NULL
+'29_30_DIF_FSED','RD','SELECT','009',NULL,'DIF_FSED','OCC','16',NULL,'FALSE',NULL,NULL
+'29_30_DIF_FSED_RETRO','RD','SELECT','009',NULL,'DIF_FSED_PARTIERETRO','OCC','16',NULL,'FALSE',NULL,NULL
+'29_30_DIF_FSED','RD','SELECT','010',NULL,NULL,NULL,'2',NULL,'FALSE',NULL,NULL
+'29_30_DIF_FSED','RD','SELECT','011',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,NULL
+'29_30_DIF_FSED','RD','SELECT','012',NULL,'DIF_FSED','VALEUR','40',NULL,'FALSE',NULL,'FORMATAGE_TYPE_DONNEE_VALEUR'
+'29_30_DIF_FSED_RETRO','RD','SELECT','012',NULL,'DIF_FSED_PARTIERETRO','VALEUR','40',NULL,'FALSE',NULL,'FORMATAGE_TYPE_DONNEE_VALEUR'
+'29_30_DIF_FSED','RD','SELECT','013',NULL,'DIF_FSED','TYPE_DONNEE','1',NULL,'FALSE',NULL,NULL
+'29_30_DIF_FSED_RETRO','RD','SELECT','013',NULL,'DIF_FSED_PARTIERETRO','TYPE_DONNEE','1',NULL,'FALSE',NULL,NULL
+'29_30_DIF_FSED','RD','SELECT','014',NULL,NULL,NULL,'4',NULL,'FALSE',NULL,'FORMATAGE_COMPLEMENT_DESCRIPTIF_FROM_TYPE_DONNEE'
+'29_30_DIF_FSED','RD','SELECT','015',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,NULL
+'29_30_DIF_FSED','RD','SELECT','016',NULL,NULL,NULL,'75',NULL,'FALSE',NULL,NULL
+'29_30_DIF_FSED','RD','SELECT','017',NULL,'DAC','PACMAT','8',NULL,'FALSE',NULL,'FORMATAGE_PACMAT'
+'29_30_DIF_FSED','RD','SELECT','018',NULL,'DAC','CODE_CHRONO','6',NULL,'FALSE',NULL,'FORMATAGE_CODE_CHRONO'
+'29_30_DIF_FSED','RD','SELECT','019',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,'PARAM_ORIGINE(code_origine)'
+'29_30_DIF_FSED','RD','SELECT','020',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,NULL
+'29_30_DIF_FSED','RD','SELECT','021','DIF_FSED',NULL,NULL,'8',NULL,'FALSE',NULL,NULL
+'29_30_DIF_FSED_RETRO','RD','SELECT','021','DIF_FSED_PARTIERETRO',NULL,NULL,'8',NULL,'FALSE',NULL,NULL
+'29_30_DIF_FSED','RD','SELECT','022',NULL,NULL,NULL,'8',NULL,'FALSE',NULL,'FORMATAGE_DATE(AAAAMMJJ)'
+'29_30_DIF_FSED','RD','SELECT','023',NULL,NULL,NULL,'6',NULL,'FALSE',NULL,'FORMATAGE_DATE(HHMNSS)'
+'29_30_DIF_FSED','RD','SELECT','024',NULL,'DIF_FSED','DTEFFET','8',NULL,'FALSE','TO_CHAR(@COLONNE_CIBLE@,''YYYYMMDD'')','FORMATAGE_DATE_EFFET'
+'29_30_DIF_FSED_RETRO','RD','SELECT','024',NULL,'DIF_FSED_PARTIERETRO','DTEFFET','8',NULL,'FALSE','TO_CHAR(@COLONNE_CIBLE@,''YYYYMMDD'')','FORMATAGE_DATE_EFFET'
+'29_30_DIF_FSED','RD','SELECT','025',NULL,NULL,NULL,'6',NULL,'FALSE',NULL,'PARAM_ORIGINE(periode_paie)'
+'29_30_DIF_FSED_RETRO','RD','SELECT','025',NULL,'DIF_FSED_PARTIERETRO','PERIODE','6',0,'FALSE',NULL,NULL
+'29_30_DIF_FSED','RD','SELECT','026',NULL,NULL,NULL,'8',NULL,'FALSE',NULL,NULL
+'29_30_DIF_FSED','RD','SELECT','027','TT',NULL,NULL,'2',NULL,'FALSE',NULL,NULL
+'29_30_DIF_FSED','RD','SELECT','028',NULL,NULL,NULL,'3',NULL,'FALSE',NULL,NULL
+'29_30_DIF_FSED','RD','SELECT','029',NULL,NULL,NULL,'3',NULL,'FALSE',NULL,NULL
+'29_30_DIF_FSED','RD','SELECT','030',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,'PARAM_ORIGINE(TYPE_PAIE)'
+'29_30_DIF_FSED','RD','SELECT','031',NULL,NULL,NULL,'1','E','FALSE',NULL,NULL
+'29_30_DIF_FSED','RD','SELECT','032',NULL,NULL,NULL,'4',NULL,'FALSE',NULL,NULL
+'29_30_DIF_FSED','RD','SELECT_EN_PLUS','001',NULL,NULL,NULL,'4',NULL,'FALSE','/*+ FULL(DIF_FSED)*/ TGE_REF_DICOZ.MASQUE',NULL
+'29_30_DIF_FSED_RETRO','RD','SELECT_EN_PLUS','001',NULL,NULL,NULL,'4',NULL,'FALSE','/*+ FULL(DIF_FSED_PARTIERETRO)*/ TGE_REF_DICOZ.MASQUE',NULL
+'29_30_DIF_FSED','RD','SELECT_EN_PLUS','002',NULL,NULL,NULL,'4',NULL,'FALSE','DIF_FSED.CODEOP',NULL
+'29_30_DIF_FSED_RETRO','RD','SELECT_EN_PLUS','002',NULL,NULL,NULL,'4',NULL,'FALSE','DIF_FSED_PARTIERETRO.CODEOP',NULL
+'29_30_DIF_FSED','RD','SELECT_EN_PLUS','003',NULL,NULL,NULL,'4',NULL,'FALSE','TO_CHAR(DAC.DSDCN,''YYYYMMDD'') as DSDCN',NULL
+'29_30_DIF_FSED','RD','SELECT_EN_PLUS','004',NULL,NULL,NULL,'4',NULL,'FALSE','DIF_FSED.CLE',NULL
+'29_30_DIF_FSED_RETRO','RD','SELECT_EN_PLUS','004',NULL,NULL,NULL,'4',NULL,'FALSE','DIF_FSED_PARTIERETRO.CLE',NULL
+'29_30_DIF_FSED','RD','FROM','003',NULL,NULL,NULL,NULL,NULL,NULL,'TGE_REF_DICOZ',NULL
+'29_30_DIF_FSED','RD','FROM','002',NULL,NULL,NULL,NULL,NULL,NULL,'DIF_FSED',NULL
+'29_30_DIF_FSED_RETRO','RD','FROM','002',NULL,NULL,NULL,NULL,NULL,NULL,'DIF_FSED_PARTIERETRO',NULL
+'29_30_DIF_FSED','RD','FROM_WITH','001',NULL,DAC,NULL,NULL,NULL,NULL,'WITH DAC AS (select /*+ MATERIALIZE */ C.MATRIC,C.PACMAT,max(DACS.CODE_CHRONO) CODE_CHRONO,DACH.PAIEZAD,min(C.DSDCN) DSDCN,max(DACH.DATE_SORTIE_SIT_BO) DATE_SORTIE_SIT_BO from DIC_ADM_CONTRAT C, DIC_ADM_CONTRAT_SITU DACS, DIC_ADM_CONTRAT_HISTO DACH, GAP_TRT_LISTE_MAT L where C.NUMPAC=@@@NUMPAC@@@ and DACH.NUMPAC=@@@NUMPAC@@@ and C.NUMPAC=DACH.NUMPAC and C.PACMAT=DACH.PACMAT and C.NUMCNT=DACH.NUMCNT and C.NUMPAC=DACS.NUMPAC and C.PACMAT=DACS.PACMAT and C.NUMCNT=DACS.NUMCNT and DACH.date_eff = (select MAX(dach2.DATE_EFF) from DIC_ADM_CONTRAT_HISTO dach2 where dach2.numpac =@@@NUMPAC@@@ and c.numpac = dach2.numpac and c.pacmat = dach2.pacmat and c.numcnt = dach2.numcnt and dach2.DATE_EFF <=last_day(to_date(@@@PERIODE_PAIE@@@,''yyyymm''))) and C.DSDCN <=last_day(to_date(@@@PERIODE_PAIE@@@,''yyyymm'')) and DACH.DATE_SORTIE_SIT_BO >= add_months((to_date(@@@PERIODE_PAIE@@@,''yyyymm'')),-@@@NB_MOIS_PAIE_INIT@@@) and L.ID_TRT=@@@ID_TRT@@@ and L.NUMPAC=@@@NUMPAC@@@ and C.PACMAT=L.PACMAT and NVL(DACH.DRPAI2, ''B'') <> ''B'' and C.NATCOL IN (''SAL'',''STA'') group by C.MATRIC,C.PACMAT,DACH.PAIEZAD)',NULL
+'29_30_DIF_FSED','RD','WHERE','001',NULL,NULL,NULL,NULL,NULL,NULL,'DIF_FSED.NUMPAC = @@@NUMPAC@@@',NULL
+'29_30_DIF_FSED_RETRO','RD','WHERE','001',NULL,NULL,NULL,NULL,NULL,NULL,'DIF_FSED_PARTIERETRO.NUMPAC = @@@NUMPAC@@@',NULL
+'29_30_DIF_FSED','RD','WHERE','002',NULL,NULL,NULL,NULL,NULL,NULL,'and TGE_REF_DICOZ.NUMPAC = @@@NUMPAC@@@',NULL
+'29_30_DIF_FSED','RD','WHERE','003',NULL,NULL,NULL,NULL,NULL,NULL,'and DIF_FSED.NUMPAC = @@@NUMPAC@@@',NULL
+'29_30_DIF_FSED_RETRO','RD','WHERE','003',NULL,NULL,NULL,NULL,NULL,NULL,'and DIF_FSED_PARTIERETRO.NUMPAC = @@@NUMPAC@@@',NULL
+'29_30_DIF_FSED','RD','WHERE','004',NULL,NULL,NULL,NULL,NULL,NULL,'and DIF_FSED.ID_TRT = @@@ID_TRT@@@',NULL
+'29_30_DIF_FSED_RETRO','RD','WHERE','004',NULL,NULL,NULL,NULL,NULL,NULL,'and DIF_FSED_PARTIERETRO.ID_TRT = @@@ID_TRT@@@',NULL
+'29_30_DIF_FSED','RD','WHERE','005',NULL,NULL,NULL,NULL,NULL,NULL,'and DIF_FSED.PAIEZAD = DAC.PAIEZAD',NULL
+'29_30_DIF_FSED_RETRO','RD','WHERE','005',NULL,NULL,NULL,NULL,NULL,NULL,'and DIF_FSED_PARTIERETRO.PAIEZAD = DAC.PAIEZAD',NULL
+'29_30_DIF_FSED','RD','WHERE','006',NULL,NULL,NULL,NULL,NULL,NULL,'and DIF_FSED.ELEM = TGE_REF_DICOZ.ELEMENT',NULL
+'29_30_DIF_FSED_RETRO','RD','WHERE','006',NULL,NULL,NULL,NULL,NULL,NULL,'and DIF_FSED_PARTIERETRO.ELEM = TGE_REF_DICOZ.ELEMENT',NULL
+'29_30_DIF_FSED','RD','WHERE','007',NULL,NULL,NULL,NULL,NULL,NULL,'and DIF_FSED.PAIEZAD not in (select PAIEZAD from DELETED_PAIEZAD where NUMPAC = @@@NUMPAC@@@)',NULL
+'29_30_DIF_FSED_RETRO','RD','WHERE','007',NULL,NULL,NULL,NULL,NULL,NULL,'and DIF_FSED_PARTIERETRO.PAIEZAD not in (select PAIEZAD from DELETED_PAIEZAD where NUMPAC = @@@NUMPAC@@@)',NULL
+'29_30_DIF_FSED','RD','ORDER_BY','001',NULL,NULL,NULL,NULL,NULL,NULL,'PAIEZAD,ELEM,CLE,CODEOP,OCC',NULL
+'29_30_TGE_ELEMENT_PAIE','RD','SELECT','001',NULL,'TGE_ELEMENTS_PAIE','NUMPAC','6','0','FALSE',NULL,NULL
+'29_30_TGE_ELEMENT_PAIE','RD','SELECT','002','30',NULL,NULL,'2','0','FALSE',NULL,NULL
+'29_30_TGE_ELEMENT_PAIE','RD','SELECT','003',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,NULL
+'29_30_TGE_ELEMENT_PAIE','RD','SELECT','004',NULL,'TGE_ELEMENTS_PAIE','PAIEZAD','8','0','TRUE',NULL,NULL
+'29_30_TGE_ELEMENT_PAIE','RD','SELECT','005',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,NULL
+'29_30_TGE_ELEMENT_PAIE','RD','SELECT','006',NULL,NULL,NULL,'2',NULL,'FALSE',NULL,NULL
+'29_30_TGE_ELEMENT_PAIE','RD','SELECT','007',NULL,'TGE_ELEMENTS_PAIE','CODE_ELEMENT','4',NULL,'FALSE',NULL,NULL
+'29_30_TGE_ELEMENT_PAIE','RD','SELECT','008',NULL,NULL,NULL,'2',NULL,'FALSE',NULL,NULL
+'29_30_TGE_ELEMENT_PAIE','RD','SELECT','009',NULL,'TGE_ELEMENTS_PAIE','INDICATIF','16',NULL,'FALSE',NULL,'FORMATAGE_INDICATIF'
+'29_30_TGE_ELEMENT_PAIE','RD','SELECT','010',NULL,NULL,NULL,'2',NULL,'FALSE',NULL,NULL
+'29_30_TGE_ELEMENT_PAIE','RD','SELECT','011',NULL,'TGE_ELEMENTS_PAIE','SENS','1',NULL,'FALSE',NULL,NULL
+'29_30_TGE_ELEMENT_PAIE','RD','SELECT','012',NULL,'TGE_ELEMENTS_PAIE','VALEUR','40',NULL,'FALSE',NULL,'FORMATAGE_TYPE_VALEUR'
+'29_30_TGE_ELEMENT_PAIE','RD','SELECT','013',NULL,'TGE_REF_DICOZ','TYPE','1',NULL,'FALSE',NULL,'FORMATAGE_TYPE'
+'29_30_TGE_ELEMENT_PAIE','RD','SELECT','014',NULL,NULL,NULL,'4',NULL,'FALSE',NULL,'FORMATAGE_COMPLEMENT_DESCRIPTIF_FROM_TYPE'
+'29_30_TGE_ELEMENT_PAIE','RD','SELECT','015',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,NULL
+'29_30_TGE_ELEMENT_PAIE','RD','SELECT','016',NULL,NULL,NULL,'75',NULL,'FALSE',NULL,NULL
+'29_30_TGE_ELEMENT_PAIE','RD','SELECT','017',NULL,'DAC','PACMAT','8',NULL,'FALSE',NULL,'FORMATAGE_PACMAT'
+'29_30_TGE_ELEMENT_PAIE','RD','SELECT','018',NULL,'DAC','CODE_CHRONO','6',NULL,'FALSE',NULL,'FORMATAGE_CODE_CHRONO'
+'29_30_TGE_ELEMENT_PAIE','RD','SELECT','019',NULL,'TGE_ELEMENTS_PAIE','ORIGINE','1',NULL,'FALSE',NULL,'PARAM_ORIGINE(code_origine)'
+'29_30_TGE_ELEMENT_PAIE','RD','SELECT','020',NULL,'TGE_ELEMENTS_PAIE','CODE_REMPLACEMENT','1',NULL,'FALSE',NULL,NULL
+'29_30_TGE_ELEMENT_PAIE','RD','SELECT','021',NULL,'TGE_ELEMENTS_PAIE','LOGIN_MAJ','8',NULL,'FALSE',NULL,NULL
+'29_30_TGE_ELEMENT_PAIE','RD','SELECT','022',NULL,'TGE_ELEMENTS_PAIE','DATE_MAJ','8',NULL,'FALSE',NULL,'FORMATAGE_DATE(AAAAMMJJ)'
+'29_30_TGE_ELEMENT_PAIE','RD','SELECT','023',NULL,'TGE_ELEMENTS_PAIE','DATE_MAJ','6',NULL,'FALSE',NULL,'FORMATAGE_DATE(HHMNSS)'
+'29_30_TGE_ELEMENT_PAIE','RD','SELECT','024',NULL,'TGE_ELEMENTS_PAIE','DATE_EFFET','8',NULL,'FALSE',NULL,'FORMATAGE_DATE(AAAAMMJJ)'
+'29_30_TGE_ELEMENT_PAIE','RD','SELECT','025',NULL,NULL,NULL,'6',NULL,'FALSE',NULL,'PARAM_ORIGINE(periode_paie)'
+'29_30_TGE_ELEMENT_PAIE_RETRO','RD','SELECT','025',NULL,'TGE_ELEMENTS_PAIE','PERIODE','6',NULL,'FALSE',NULL,NULL
+'29_30_TGE_ELEMENT_PAIE','RD','SELECT','026',NULL,NULL,NULL,'8',NULL,'FALSE',NULL,NULL
+'29_30_TGE_ELEMENT_PAIE','RD','SELECT','027','TT',NULL,NULL,'2',NULL,'FALSE',NULL,NULL
+'29_30_TGE_ELEMENT_PAIE','RD','SELECT','028',NULL,NULL,NULL,'3',NULL,'FALSE',NULL,NULL
+'29_30_TGE_ELEMENT_PAIE','RD','SELECT','029',NULL,NULL,NULL,'3',NULL,'FALSE',NULL,NULL
+'29_30_TGE_ELEMENT_PAIE','RD','SELECT','030',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,'PARAM_ORIGINE(TYPE_PAIE)'
+'29_30_TGE_ELEMENT_PAIE','RD','SELECT','031',NULL,NULL,NULL,'1','E','FALSE',NULL,NULL
+'29_30_TGE_ELEMENT_PAIE','RD','SELECT','032',NULL,NULL,NULL,'4',NULL,'FALSE',NULL,NULL
+'29_30_TGE_ELEMENT_PAIE','RD','SELECT_EN_PLUS','001',NULL,NULL,NULL,'4',NULL,'FALSE','TGE_REF_DICOZ.MASQUE',NULL
+'29_30_TGE_ELEMENT_PAIE','RD','SELECT_EN_PLUS','002',NULL,NULL,NULL,'4',NULL,'FALSE','TGE_ELEMENTS_PAIE.DERNIER_CODE_OPE',NULL
+'29_30_TGE_ELEMENT_PAIE','RD','SELECT_EN_PLUS','003',NULL,NULL,NULL,'4',NULL,'FALSE','TO_CHAR(DAC.DSDCN,''YYYYMMDD'') as DSDCN',NULL
+'29_30_TGE_ELEMENT_PAIE','RD','SELECT_EN_PLUS','004',NULL,NULL,NULL,'4',NULL,'FALSE','DAC.CODE_CHRONO',NULL
+'29_30_TGE_ELEMENT_PAIE','RD','FROM','001',NULL,NULL,NULL,NULL,NULL,NULL,'(select C.MATRIC,C.PACMAT,max(DACS.CODE_CHRONO) CODE_CHRONO,DACH.PAIEZAD,min(C.DSDCN) DSDCN,max(DACH.DATE_SORTIE_SIT_BO) DATE_SORTIE_SIT_BO from DIC_ADM_CONTRAT C, DIC_ADM_CONTRAT_SITU DACS, DIC_ADM_CONTRAT_HISTO DACH, GAP_TRT_LISTE_MAT L where C.NUMPAC=@@@NUMPAC@@@ and DACH.NUMPAC=@@@NUMPAC@@@ and C.NUMPAC=DACH.NUMPAC and C.PACMAT=DACH.PACMAT and C.NUMCNT=DACH.NUMCNT and C.NUMPAC=DACS.NUMPAC and C.PACMAT=DACS.PACMAT and C.NUMCNT=DACS.NUMCNT and DACH.date_eff = (select MAX(dach2.DATE_EFF) from DIC_ADM_CONTRAT_HISTO dach2 where dach2.numpac =@@@NUMPAC@@@ and c.numpac = dach2.numpac and c.pacmat = dach2.pacmat and c.numcnt = dach2.numcnt and dach2.DATE_EFF <=last_day(to_date(@@@PERIODE_PAIE@@@,''yyyymm''))) and C.DSDCN <=last_day(to_date(@@@PERIODE_PAIE@@@,''yyyymm'')) and DACH.DATE_SORTIE_SIT_BO >= add_months((to_date(@@@PERIODE_PAIE@@@,''yyyymm'')),-@@@NB_MOIS_PAIE_INIT@@@) and L.ID_TRT=@@@ID_TRT@@@ and L.NUMPAC=@@@NUMPAC@@@ and C.PACMAT=L.PACMAT group by C.MATRIC,C.PACMAT,DACH.PAIEZAD) DAC',NULL
+'29_30_TGE_ELEMENT_PAIE','RD','FROM','002',NULL,NULL,NULL,NULL,NULL,NULL,'TGE_ELEMENTS_PAIE',NULL
+'29_30_TGE_ELEMENT_PAIE','RD','FROM','003',NULL,NULL,NULL,NULL,NULL,NULL,'TGE_REF_DICOZ',NULL
+'29_30_TGE_ELEMENT_PAIE','RD','WHERE','001',NULL,NULL,NULL,NULL,NULL,NULL,'TGE_ELEMENTS_PAIE.NUMPAC = @@@NUMPAC@@@',NULL
+'29_30_TGE_ELEMENT_PAIE','RD','WHERE','002',NULL,NULL,NULL,NULL,NULL,NULL,'and TGE_REF_DICOZ.NUMPAC = @@@NUMPAC@@@',NULL
+'29_30_TGE_ELEMENT_PAIE','RD','WHERE','003',NULL,NULL,NULL,NULL,NULL,NULL,'and TGE_ELEMENTS_PAIE.PAIEZAD = DAC.PAIEZAD ',NULL
+'29_30_TGE_ELEMENT_PAIE','RD','WHERE','004',NULL,NULL,NULL,NULL,NULL,NULL,'and TGE_ELEMENTS_PAIE.CODE_ELEMENT = TGE_REF_DICOZ.ELEMENT ',NULL
+'29_30_TGE_ELEMENT_PAIE','RD','WHERE','005',NULL,NULL,NULL,NULL,NULL,NULL,'and TGE_ELEMENTS_PAIE.DERNIER_CODE_OPE <> ''S''',NULL
+'29_30_TGE_ELEMENT_PAIE','RD','WHERE','006',NULL,NULL,NULL,NULL,NULL,NULL,'and ((TGE_ELEMENTS_PAIE.ORIGINE is null or TGE_ELEMENTS_PAIE.ORIGINE = ''T'' or TGE_ELEMENTS_PAIE.ORIGINE in ( select CODE_ORIGINE from TGE_REF_ORIGINE_GTA where NUMPAC = @@@NUMPAC@@@ and (MODE_3060 = ''W'' or ( MODE_3060 = ''R'' and ENVOI_MODE_R = ''O'' )))) or TGE_ELEMENTS_PAIE.CODE_REMPLACEMENT is not null) ',NULL
+'29_30_TGE_ELEMENT_PAIE','RD','WHERE','007',NULL,NULL,NULL,NULL,NULL,NULL,' and TGE_ELEMENTS_PAIE.PERIODE @@@OPERATEUR_RETRO@@@ @@@PERIODE_PAIE@@@',NULL
+'29_30_TGE_ELEMENT_PAIE_RETRO','RD','WHERE','007',NULL,NULL,NULL,NULL,NULL,NULL,' AND TGE_ELEMENTS_PAIE.PERIODE in (SELECT PERIODE_RETRO FROM GAP_RETRO_MATRIC G WHERE G.NUMPAC=TGE_ELEMENTS_PAIE.NUMPAC AND G.numpac||G.pacmat=TGE_ELEMENTS_PAIE.idpacmat union all select periode_retro from gap_selection_retro S where S.NUMPAC=TGE_ELEMENTS_PAIE.NUMPAC AND  S.numpac||S.pacmat=TGE_ELEMENTS_PAIE.idpacmat) AND TGE_ELEMENTS_PAIE.ACTION_RETRO is not null ',NULL
+'29_30_TGE_ELEMENT_PAIE','RD','ORDER_BY','001',NULL,NULL,NULL,NULL,NULL,NULL,'DAC.PAIEZAD, TGE_ELEMENTS_PAIE.CODE_ELEMENT',NULL
+'40','RD','SELECT','001',NULL,'TGE_INCIDENTS_PAIE','NUMPAC','6','0','FALSE',NULL,NULL
+'40','RD','SELECT','002','40',NULL,NULL,'2','0','FALSE',NULL,NULL
+'40','RD','SELECT','003',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,NULL
+'40','RD','SELECT','004',NULL,'TGE_INCIDENTS_PAIE','PAIEZAD','8','0','TRUE',NULL,NULL
+'40','RD','SELECT','005',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,NULL
+'40','RD','SELECT','006',NULL,NULL,NULL,'2',NULL,'FALSE',NULL,NULL
+'40','RD','SELECT','007',NULL,'TGE_INCIDENTS_PAIE','DATE_EFFET','8',NULL,'FALSE','TO_CHAR(@COLONNE_CIBLE@,''YYYYMMDD'')',NULL
+'40','RD','SELECT','008',NULL,NULL,NULL,'8',NULL,'FALSE',NULL,NULL
+'40','RD','SELECT','009',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,NULL
+'40','RD','SELECT','010',NULL,NULL,NULL,'4',NULL,'FALSE',NULL,NULL
+'40','RD','SELECT','011',NULL,NULL,NULL,'4',NULL,'FALSE',NULL,NULL
+'40','RD','SELECT','012',NULL,'TGE_INCIDENTS_PAIE','TYPE_IP','1',NULL,'FALSE','CASE WHEN @COLONNE_CIBLE@ = ''R'' THEN ''R'' WHEN @COLONNE_CIBLE@ = ''T'' THEN ''T'' ELSE '' '' END',NULL
+'40','RD','SELECT','013',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,NULL
+'40','RD','SELECT','014','F',NULL,NULL,'1',NULL,'FALSE',NULL,NULL
+'40','RD','SELECT','015',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,NULL
+'40','RD','SELECT','016',NULL,'TGE_INCIDENTS_PAIE','HEURES_T','5','0','TRUE','CASE WHEN (TGE_INCIDENTS_PAIE.TYPE_IP = ''A'' or TGE_INCIDENTS_PAIE.TYPE_IP = ''P'' or TGE_INCIDENTS_PAIE.TYPE_IP = ''T'') THEN '' '' ELSE nvl(TO_CHAR(TGE_INCIDENTS_PAIE.HEURES),'' '') END','FORMATAGE_40_HEURES_TRAVAILLEES'
+'40','RD','SELECT','017',NULL,'TGE_INCIDENTS_PAIE','TEMOIN_HT','1','0','FALSE','CASE WHEN (TGE_INCIDENTS_PAIE.TYPE_IP = ''R'') and TGE_INCIDENTS_PAIE.HEURES is not null  THEN ''1'' ELSE ''0'' END',NULL
+'40','RD','SELECT','018',NULL,'TGE_INCIDENTS_PAIE','HEURES_I','5','0','TRUE','CASE WHEN (TGE_INCIDENTS_PAIE.TYPE_IP = ''R'') THEN '' '' ELSE nvl(TO_CHAR(TGE_INCIDENTS_PAIE.HEURES),'' '') END','FORMATAGE_40_HEURES_INCIDENT'
+'40','RD','SELECT','019',NULL,'TGE_INCIDENTS_PAIE','TEMOIN_HI','1','0','FALSE','CASE WHEN (TGE_INCIDENTS_PAIE.TYPE_IP = ''A'' or TGE_INCIDENTS_PAIE.TYPE_IP = ''P'' or TGE_INCIDENTS_PAIE.TYPE_IP = ''T'') and TGE_INCIDENTS_PAIE.HEURES is not null  THEN ''1'' WHEN (TGE_INCIDENTS_PAIE.TYPE_IP = ''A'' or TGE_INCIDENTS_PAIE.TYPE_IP = ''P'') and CODE_IP is not null THEN ''1'' ELSE ''0'' END',NULL
+'40','RD','SELECT','020',NULL,'TGE_INCIDENTS_PAIE','CODE_IP','5',NULL,'FALSE','CASE WHEN (TGE_INCIDENTS_PAIE.TYPE_IP = ''A'' or TGE_INCIDENTS_PAIE.TYPE_IP = ''P'' or TGE_INCIDENTS_PAIE.TYPE_IP = ''T'') THEN to_char(TGE_INCIDENTS_PAIE.CODE_IP) ELSE '' '' END',NULL
+'40','RD','SELECT','021',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,NULL
+'40','RD','SELECT','022',NULL,'TGE_INCIDENTS_PAIE','CODE_IMPUTATION','18',NULL,'FALSE',NULL,'FORMATAGE_40_IMPUTATION'
+'40','RD','SELECT','023',NULL,'TGE_INCIDENTS_PAIE','DOM_IMPUTATION','1',NULL,'FALSE','CASE WHEN TGE_INCIDENTS_PAIE.CODE_IMPUTATION is null THEN '''' ELSE CASE WHEN (TGE_INCIDENTS_PAIE.TYPE_IP = ''A'' or TGE_INCIDENTS_PAIE.TYPE_IP = ''P'') THEN ''1'' WHEN TGE_INCIDENTS_PAIE.TYPE_IP = ''R'' THEN ''H'' ELSE '' '' END END',NULL
+'40','RD','SELECT','024',NULL,NULL,NULL,'6',NULL,'FALSE',NULL,NULL
+'40','RD','SELECT','025',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,NULL
+'40','RD','SELECT','026',NULL,NULL,NULL,'73',NULL,'FALSE',NULL,NULL
+'40','RD','SELECT','027',NULL,'DAC','PACMAT','8',NULL,'FALSE',NULL,'FORMATAGE_PACMAT'
+'40','RD','SELECT','028',NULL,'DAC','CODE_CHRONO','6',NULL,'FALSE',NULL,'FORMATAGE_CODE_CHRONO'
+'40','RD','SELECT','029',NULL,'TGE_INCIDENTS_PAIE','ORIGINE','1',NULL,'FALSE',NULL,'PARAM_ORIGINE(code_origine)'
+'40','RD','SELECT','030',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,NULL
+'40','RD','SELECT','031',NULL,'TGE_INCIDENTS_PAIE','LOGIN_MAJ','8',NULL,'FALSE',NULL,NULL
+'40','RD','SELECT','032',NULL,'TGE_INCIDENTS_PAIE','DATE_MAJ','8',NULL,'FALSE',NULL,'FORMATAGE_DATE(AAAAMMJJ)'
+'40','RD','SELECT','033',NULL,'TGE_INCIDENTS_PAIE','DATE_MAJ','6',NULL,'FALSE',NULL,'FORMATAGE_DATE(HHMNSS)'
+'40','RD','SELECT','034',NULL,'TGE_INCIDENTS_PAIE','DATE_EFFET','8',NULL,'FALSE','TO_CHAR(@COLONNE_CIBLE@,''YYYYMMDD'')',NULL
+'40','RD','SELECT','035',NULL,NULL,NULL,'6',NULL,'FALSE',NULL,'PARAM_ORIGINE(periode_paie)'
+'40_RETRO','RD','SELECT','035',NULL,'TGE_INCIDENTS_PAIE','PERIODE','6',NULL,'FALSE','TO_CHAR(@COLONNE_CIBLE@,''YYYYMM'')',NULL
+'40','RD','SELECT','036',NULL,NULL,NULL,'8',NULL,'FALSE',NULL,NULL
+'40','RD','SELECT','037',NULL,'TGE_INCIDENTS_PAIE','TYPE_TRAITEMENT','2',NULL,'FALSE',NULL,NULL
+'40','RD','SELECT','038',NULL,NULL,NULL,'3',NULL,'FALSE',NULL,NULL
+'40','RD','SELECT','039',NULL,NULL,NULL,'3',NULL,'FALSE',NULL,NULL
+'40','RD','SELECT','040',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,'PARAM_ORIGINE(TYPE_PAIE)'
+'40','RD','SELECT','041',NULL,NULL,NULL,'1','E','FALSE',NULL,NULL
+'40','RD','SELECT','042',NULL,NULL,NULL,'4',NULL,'FALSE',NULL,NULL
+'40','RD','SELECT_EN_PLUS','001',NULL,NULL,NULL,NULL,NULL,NULL,'TGE_INCIDENTS_PAIE.TYPE_IP as TYPE_IP_FROM_TABLE',NULL
+'40','RD','SELECT_EN_PLUS','002',NULL,NULL,NULL,NULL,NULL,NULL,'TGE_INCIDENTS_PAIE.CODE_IP as CODE_IP_FROM_TABLE',NULL
+'40','RD','SELECT_EN_PLUS','003',NULL,NULL,NULL,'4',NULL,'FALSE','DAC.CODE_CHRONO',NULL
+'40','RD','FROM','001',NULL,NULL,NULL,NULL,NULL,NULL,'(WITH TABLE_DATES_EFF (PACMAT, NUMCNT, DATE_EFF) AS ( SELECT DISTINCT DACH2.PACMAT, DACH2.NUMCNT , MAX(DATE_EFF) OVER (PARTITION BY L.NUMPAC, L.PACMAT, DACH2.NUMCNT) FROM GAP_TRT_LISTE_MAT L, DIC_ADM_CONTRAT_HISTO DACH2 WHERE L.ID_TRT = @@@ID_TRT@@@ and L.NUMPAC = @@@NUMPAC@@@ and DACH2.NUMPAC = @@@NUMPAC@@@ and DACH2.PACMAT = L.PACMAT and DACH2.DATE_EFF <= LAST_DAY(TO_DATE(@@@PERIODE_PAIE@@@,''yyyymm'')) and DACH2.DATE_SORTIE_SIT_BO >= ADD_MONTHS((TO_DATE(@@@PERIODE_PAIE@@@,''yyyymm'')),-@@@NB_MOIS_PAIE_INIT@@@) ) SELECT C.PACMAT, DACH.PAIEZAD, C.MATRIC, MIN(C.DSDCN) DSDCN, MAX(DACS.CODE_CHRONO) CODE_CHRONO, max(DACH.DATE_SORTIE_SIT_BO) DATE_SORTIE_SIT_BO FROM TABLE_DATES_EFF T, DIC_ADM_CONTRAT C, DIC_ADM_CONTRAT_SITU DACS, DIC_ADM_CONTRAT_HISTO DACH WHERE C.NUMPAC = @@@NUMPAC@@@ and DACS.NUMPAC = @@@NUMPAC@@@ and DACH.NUMPAC = @@@NUMPAC@@@ and C.PACMAT = T.PACMAT and C.NUMCNT = T.NUMCNT and DACH.PACMAT = T.PACMAT and DACH.NUMCNT = T.NUMCNT and DACH.DATE_EFF = T.DATE_EFF and DACS.PACMAT = T.PACMAT and DACS.NUMCNT = T.NUMCNT and DACS.PAIEZAD = DACH.PAIEZAD and C.DSDCN <= LAST_DAY(TO_DATE(@@@PERIODE_PAIE@@@,''yyyymm'')) and NVL(DACH.DRPAI2, ''B'') <> ''B'' and C.NATCOL IN (''SAL'',''STA'') GROUP BY C.PACMAT, DACH.PAIEZAD, C.MATRIC ) DAC',NULL
+'40','RD','FROM','002',NULL,NULL,NULL,NULL,NULL,NULL,'TGE_INCIDENTS_PAIE',NULL
+'40','RD','FROM','003',NULL,NULL,NULL,NULL,NULL,NULL,'TGE_REF_PAC',NULL
+'40','RD','FROM','004',NULL,NULL,NULL,NULL,NULL,NULL,'TGE_PERIODE_RECUEIL_PAIEZAD',NULL
+'40','RD','WHERE','001',NULL,NULL,NULL,NULL,NULL,NULL,'TGE_INCIDENTS_PAIE.NUMPAC = @@@NUMPAC@@@',NULL
+'40','RD','WHERE','002',NULL,NULL,NULL,NULL,NULL,NULL,'and TGE_REF_PAC.NUMPAC = @@@NUMPAC@@@',NULL
+'40','RD','WHERE','003',NULL,NULL,NULL,NULL,NULL,NULL,'and TGE_INCIDENTS_PAIE.PAIEZAD = DAC.PAIEZAD  ',NULL
+'40','RD','WHERE','004',NULL,NULL,NULL,NULL,NULL,NULL,'and TGE_INCIDENTS_PAIE.NUMPAC = TGE_PERIODE_RECUEIL_PAIEZAD.NUMPAC',NULL
+'40','RD','WHERE','005',NULL,NULL,NULL,NULL,NULL,NULL,'and TGE_INCIDENTS_PAIE.PAIEZAD = TGE_PERIODE_RECUEIL_PAIEZAD.PAIEZAD',NULL
+'40','RD','WHERE','006',NULL,NULL,NULL,NULL,NULL,NULL,'and (TGE_INCIDENTS_PAIE.ORIGINE is null or TGE_INCIDENTS_PAIE.ORIGINE = ''T'' or TGE_INCIDENTS_PAIE.ORIGINE in ( select CODE_ORIGINE from TGE_REF_ORIGINE_GTA where NUMPAC = @@@NUMPAC@@@ and (MODE_T2 = ''W'' or ( MODE_T2 = ''R'' and ENVOI_MODE_R = ''O'' )))) ',NULL
+'40','RD','WHERE','007',NULL,NULL,NULL,NULL,NULL,NULL,'and (TGE_INCIDENTS_PAIE.TYPE_IP <> ''T'' or (TGE_INCIDENTS_PAIE.TYPE_IP=''T'' and TGE_REF_PAC.ENVOI_HP = ''O''))',NULL
+'40','RD','WHERE','008',NULL,NULL,NULL,NULL,NULL,NULL,'and TO_CHAR(TGE_INCIDENTS_PAIE.PERIODE,''YYYYMM'') @@@OPERATEUR_RETRO@@@ TGE_REF_PAC.PERIODEENCOURS',NULL
+'40_RETRO','RD','WHERE','008',NULL,NULL,NULL,NULL,NULL,NULL,' and TO_CHAR(TGE_INCIDENTS_PAIE.PERIODE,''YYYYMM'') in (SELECT PERIODE_RETRO FROM GAP_RETRO_MATRIC G WHERE G.NUMPAC=TGE_INCIDENTS_PAIE.NUMPAC AND G.numpac||G.pacmat=TGE_INCIDENTS_PAIE.idpacmat union all select periode_retro from gap_selection_retro S where S.NUMPAC=TGE_INCIDENTS_PAIE.NUMPAC AND  S.numpac||S.pacmat=TGE_INCIDENTS_PAIE.idpacmat)',NULL
+'40','RD','WHERE','009',NULL,NULL,NULL,NULL,NULL,NULL,'and tge_periode_recueil_paiezad.mois_paie = tge_ref_pac.periodeencours',NULL
+'40_RETRO','RD','WHERE','009',NULL,NULL,NULL,NULL,NULL,NULL,'and TO_CHAR(TGE_INCIDENTS_PAIE.PERIODE,''YYYYMM'') = TGE_PERIODE_RECUEIL_PAIEZAD.MOIS_PAIE',NULL
+'40','RD','WHERE','010',NULL,NULL,NULL,NULL,NULL,NULL,'and ((TGE_INCIDENTS_PAIE.TYPE_IP = ''T'' and TGE_INCIDENTS_PAIE.DATE_EFFET between TGE_PERIODE_RECUEIL_PAIEZAD.DEBUT_PER_GENERATION_HP and TGE_PERIODE_RECUEIL_PAIEZAD.FIN_PER_GENERATION_HP and tge_ref_pac.envoi_hp =''O'')',NULL
+'40','RD','WHERE','011',NULL,NULL,NULL,NULL,NULL,NULL,'or (TGE_INCIDENTS_PAIE.TYPE_IP <> ''T'' and TGE_INCIDENTS_PAIE.DATE_EFFET <= TGE_PERIODE_RECUEIL_PAIEZAD.FIN_PERIODE_RECUEIL)',NULL
+'40_RETRO','RD','WHERE','011',NULL,NULL,NULL,NULL,NULL,NULL,'or (TGE_INCIDENTS_PAIE.TYPE_IP <> ''T'' and TGE_INCIDENTS_PAIE.DATE_EFFET between TGE_PERIODE_RECUEIL_PAIEZAD.DEBUT_PERIODE_RECUEIL and TGE_PERIODE_RECUEIL_PAIEZAD.FIN_PERIODE_RECUEIL)',NULL
+'40','RD','WHERE','012',NULL,NULL,NULL,NULL,NULL,NULL,'or (TGE_INCIDENTS_PAIE.TYPE_IP <> ''T'' and TGE_INCIDENTS_PAIE.DATE_EFFET between TGE_PERIODE_RECUEIL_PAIEZAD.DEBUT_PER_RECUEIL_RETRO and TGE_PERIODE_RECUEIL_PAIEZAD.FIN_PER_RECUEIL_RETRO and tge_ref_pac.gc_retro =''O'' AND RETRO_GC is not null))',NULL
+'40','RD','ORDER_BY','001',NULL,NULL,NULL,NULL,NULL,NULL,'DAC.PAIEZAD,TGE_INCIDENTS_PAIE.DATE_EFFET',NULL
+'60','RD','SELECT','001',NULL,'TGE_DONNEES_PAIE','NUMPAC','6','0','FALSE',NULL,NULL
+'60','RD','SELECT','002','60',NULL,NULL,'2','0','FALSE',NULL,NULL
+'60','RD','SELECT','003',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,NULL
+'60','RD','SELECT','004',NULL,'DAC','PAIEZAD','8','0','TRUE',NULL,NULL
+'60','RD','SELECT','005',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,NULL
+'60','RD','SELECT','006',NULL,NULL,NULL,'2',NULL,'FALSE',NULL,NULL
+'60','RD','SELECT','007',NULL,'TGE_DONNEES_PAIE','CODE_RUBRIQUE','4',NULL,'FALSE',NULL,NULL
+'60','RD','SELECT','008',NULL,NULL,NULL,'2',NULL,'FALSE',NULL,NULL
+'60','RD','SELECT','009',NULL,'TGE_DONNEES_PAIE','MONTANT','13','0','TRUE',NULL,'FORMATAGE_MULTIPLI_VALEUR(100)'
+'60','RD','SELECT','010',NULL,'TGE_DONNEES_PAIE','MONTANT','1',NULL,'FALSE',NULL,'VALEUR_CONDITIONEE(NULL;0;1) '
+'60','RD','SELECT','011',NULL,'TGE_DONNEES_PAIE','NOMBRE','15','0','TRUE',NULL,'FORMATAGE_MULTIPLI_VALEUR(10000)'
+'60','RD','SELECT','012',NULL,'TGE_DONNEES_PAIE','NOMBRE','1',NULL,'FALSE',NULL,'VALEUR_CONDITIONEE(NULL;0;1) '
+'60','RD','SELECT','013',NULL,'TGE_DONNEES_PAIE','TAUX','15','0','TRUE',NULL,'FORMATAGE_MULTIPLI_VALEUR(10000)'
+'60','RD','SELECT','014',NULL,'TGE_DONNEES_PAIE','TAUX','1',NULL,'FALSE',NULL,'VALEUR_CONDITIONEE(NULL;0;1) '
+'60','RD','SELECT','015',NULL,'TGE_DONNEES_PAIE','POURCENTAGE','6',NULL,'FALSE',NULL,'FORMATAGE_MULTIPLI_VALEUR(1000)'
+'60','RD','SELECT','016',NULL,'TGE_DONNEES_PAIE','DOMAINE_PRCTE','1',NULL,'FALSE',NULL,NULL
+'60','RD','SELECT','017',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,NULL
+'60','RD','SELECT','018',NULL,'TGE_DONNEES_PAIE','SENS','1',NULL,'FALSE',NULL,NULL
+'60','RD','SELECT','019',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,NULL
+'60','RD','SELECT','020',NULL,'TGE_DONNEES_PAIE','CODE_IMPUTATION','18',NULL,'FALSE',NULL,NULL
+'60','RD','SELECT','021',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,NULL
+'60','RD','SELECT','022',NULL,'TGE_DONNEES_PAIE','CODE_CAISSE','10',NULL,'FALSE',NULL,'VALEUR_CONDITIONNEE_AVEC_AUTRE_COLONNE(TYPE_DONNEE;3;CODE_CAISSE;)'
+'60','RD','SELECT','023',NULL,NULL,NULL,'22',NULL,'FALSE',NULL,NULL
+'60','RD','SELECT','024',NULL,'TGE_DONNEES_PAIE','DATE_DEB_ARRET','8',NULL,'FALSE','TO_CHAR(@COLONNE_CIBLE@,''YYYYMMDD'')',NULL
+'60','RD','SELECT','025',NULL,'TGE_DONNEES_PAIE','PERIODE_RATTACH_DEB','8',NULL,'FALSE','TO_CHAR(@COLONNE_CIBLE@,''YYYYMMDD'')',NULL
+'60','RD','SELECT','026',NULL,'TGE_DONNEES_PAIE','PERIODE_RATTACH_FIN','8',NULL,'FALSE','TO_CHAR(@COLONNE_CIBLE@,''YYYYMMDD'')',NULL
+'60','RD','SELECT','027',NULL,NULL,NULL,'9',NULL,'FALSE',NULL,NULL
+'60','RD','SELECT','028',NULL,'DAC','PACMAT','8',NULL,'FALSE',NULL,'FORMATAGE_PACMAT'
+'60','RD','SELECT','029',NULL,'DAC','CODE_CHRONO','6',NULL,'FALSE',NULL,'FORMATAGE_CODE_CHRONO'
+'60','RD','SELECT','030',NULL,'TGE_DONNEES_PAIE','ORIGINE','1',NULL,'FALSE',NULL,'PARAM_ORIGINE(code_origine)'
+'60','RD','SELECT','031',NULL,'TGE_DONNEES_PAIE','CODE_REMPLACEMENT','1',NULL,'FALSE',NULL,NULL
+'60','RD','SELECT','032',NULL,'TGE_DONNEES_PAIE','LOGIN_MAJ','8',NULL,'FALSE',NULL,NULL
+'60','RD','SELECT','033',NULL,'TGE_DONNEES_PAIE','DATE_MAJ','8',NULL,'FALSE',NULL,'FORMATAGE_DATE(AAAAMMJJ)'
+'60','RD','SELECT','034',NULL,'TGE_DONNEES_PAIE','DATE_MAJ','6',NULL,'FALSE',NULL,'FORMATAGE_DATE(HHMNSS)'
+'60','RD','SELECT','035',NULL,'TGE_DONNEES_PAIE','DATE_EFFET','8',NULL,'FALSE',NULL,'FORMATAGE_DATE(AAAAMMJJ)'
+'60','RD','SELECT','036',NULL,NULL,NULL,'6',NULL,'FALSE',NULL,'PARAM_ORIGINE(periode_paie)'
+'60_RETRO','RD','SELECT','036',NULL,'TGE_DONNEES_PAIE','PERIODE','6',NULL,'FALSE',NULL,NULL
+'60','RD','SELECT','037',NULL,NULL,NULL,'8',NULL,'FALSE',NULL,NULL
+'60','RD','SELECT','038',NULL,'TGE_DONNEES_PAIE','TYPE_TRAITEMENT','2',NULL,'FALSE',NULL,NULL
+'60','RD','SELECT','039',NULL,NULL,NULL,'3',NULL,'FALSE',NULL,NULL
+'60','RD','SELECT','040',NULL,NULL,NULL,'3',NULL,'FALSE',NULL,NULL
+'60','RD','SELECT','041',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,'PARAM_ORIGINE(TYPE_PAIE)'
+'60','RD','SELECT','042',NULL,NULL,NULL,'1','E','FALSE',NULL,NULL
+'60','RD','SELECT','043',NULL,NULL,NULL,'4',NULL,'FALSE',NULL,NULL
+'60','RD','SELECT_EN_PLUS','001',NULL,NULL,NULL,NULL,NULL,NULL,'TGE_DONNEES_PAIE.TYPE_DONNEE',NULL
+'60','RD','SELECT_EN_PLUS','002',NULL,NULL,NULL,'4',NULL,'FALSE','DAC.CODE_CHRONO',NULL
+'60','RD','FROM','001',NULL,NULL,NULL,NULL,NULL,NULL,'(select C.MATRIC,C.PACMAT,max(DACS.CODE_CHRONO) CODE_CHRONO,DACH.PAIEZAD,min(C.DSDCN) DSDCN,max(DACH.DATE_SORTIE_SIT_BO) DATE_SORTIE_SIT_BO from DIC_ADM_CONTRAT C, DIC_ADM_CONTRAT_SITU DACS, DIC_ADM_CONTRAT_HISTO DACH, GAP_TRT_LISTE_MAT L where C.NUMPAC=@@@NUMPAC@@@ and DACH.NUMPAC=@@@NUMPAC@@@ and C.NUMPAC=DACH.NUMPAC and C.PACMAT=DACH.PACMAT and C.NUMCNT=DACH.NUMCNT and C.NUMPAC=DACS.NUMPAC and C.PACMAT=DACS.PACMAT and C.NUMCNT=DACS.NUMCNT and DACH.date_eff = (select MAX(dach2.DATE_EFF) from DIC_ADM_CONTRAT_HISTO dach2 where dach2.numpac =@@@NUMPAC@@@ and c.numpac = dach2.numpac and c.pacmat = dach2.pacmat and c.numcnt = dach2.numcnt and dach2.DATE_EFF <=last_day(to_date(@@@PERIODE_PAIE@@@,''yyyymm''))) and C.DSDCN <=last_day(to_date(@@@PERIODE_PAIE@@@,''yyyymm'')) and DACH.DATE_SORTIE_SIT_BO >= add_months((to_date(@@@PERIODE_PAIE@@@,''yyyymm'')),-@@@NB_MOIS_PAIE_INIT@@@) and L.ID_TRT=@@@ID_TRT@@@ and L.NUMPAC=@@@NUMPAC@@@ and C.PACMAT=L.PACMAT group by C.MATRIC,C.PACMAT,DACH.PAIEZAD) DAC',NULL
+'60','RD','FROM','002',NULL,NULL,NULL,NULL,NULL,NULL,'TGE_DONNEES_PAIE',NULL
+'60','RD','WHERE','001',NULL,NULL,NULL,NULL,NULL,NULL,'TGE_DONNEES_PAIE.NUMPAC = @@@NUMPAC@@@',NULL
+'60','RD','WHERE','002',NULL,NULL,NULL,NULL,NULL,NULL,'and TGE_DONNEES_PAIE.TYPE_DONNEE = ''1''',NULL
+'60','RD','WHERE','003',NULL,NULL,NULL,NULL,NULL,NULL,'and TGE_DONNEES_PAIE.DERNIER_CODE_OPE <> ''S''',NULL
+'60','RD','WHERE','004',NULL,NULL,NULL,NULL,NULL,NULL,'and TGE_DONNEES_PAIE.PAIEZAD = DAC.PAIEZAD',NULL
+'60','RD','WHERE','005',NULL,NULL,NULL,NULL,NULL,NULL,'and ((TGE_DONNEES_PAIE.ORIGINE is null or TGE_DONNEES_PAIE.ORIGINE = ''T'' or TGE_DONNEES_PAIE.ORIGINE in ( select CODE_ORIGINE from TGE_REF_ORIGINE_GTA where NUMPAC = @@@NUMPAC@@@ and (MODE_3060 = ''W'' or ( MODE_3060 = ''R'' and ENVOI_MODE_R = ''O'' )))) or TGE_DONNEES_PAIE.CODE_REMPLACEMENT is not null)',NULL
+'60','RD','WHERE','006',NULL,NULL,NULL,NULL,NULL,NULL,'and TGE_DONNEES_PAIE.PERIODE @@@OPERATEUR_RETRO@@@ (SELECT PERIODEENCOURS FROM TGE_REF_PAC WHERE NUMPAC = @@@NUMPAC@@@)',NULL
+'60_RETRO','RD','WHERE','006',NULL,NULL,NULL,NULL,NULL,NULL,' and TGE_DONNEES_PAIE.PERIODE in (SELECT PERIODE_RETRO FROM GAP_RETRO_MATRIC G WHERE G.NUMPAC=TGE_DONNEES_PAIE.NUMPAC AND G.numpac||G.pacmat=TGE_DONNEES_PAIE.idpacmat union all select periode_retro from gap_selection_retro S where S.NUMPAC=TGE_DONNEES_PAIE.NUMPAC AND  S.numpac||S.pacmat=TGE_DONNEES_PAIE.idpacmat) AND TGE_DONNEES_PAIE.ACTION_RETRO is not null ',NULL
+'60','RD','ORDER_BY','001',NULL,NULL,NULL,NULL,NULL,NULL,'DAC.PAIEZAD,TGE_DONNEES_PAIE.CODE_RUBRIQUE',NULL
+'70','RD','SELECT','001',NULL,'TGE_DONNEES_PAIE','NUMPAC','6','0','FALSE',NULL,NULL
+'70','RD','SELECT','002','70',NULL,NULL,'2','0','FALSE',NULL,NULL
+'70','RD','SELECT','003',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,NULL
+'70','RD','SELECT','004',NULL,'TGE_DONNEES_PAIE','PAIEZAD','8','0','TRUE',NULL,NULL
+'70','RD','SELECT','005',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,NULL
+'70','RD','SELECT','006',NULL,NULL,NULL,'2',NULL,'FALSE',NULL,NULL
+'70','RD','SELECT','007',NULL,'TGE_DONNEES_PAIE','CODE_RUBRIQUE','4',NULL,'FALSE',NULL,NULL
+'70','RD','SELECT','008',NULL,NULL,NULL,'2',NULL,'FALSE',NULL,NULL
+'70','RD','SELECT','009',NULL,'TGE_DONNEES_PAIE','MONTANT','13','0','TRUE',NULL,'FORMATAGE_MULTIPLI_VALEUR(100)'
+'70','RD','SELECT','010',NULL,'TGE_DONNEES_PAIE','MONTANT','1',NULL,'FALSE',NULL,'VALEUR_CONDITIONEE(NULL;0;1) '
+'70','RD','SELECT','011',NULL,'TGE_DONNEES_PAIE','NOMBRE','15','0','TRUE',NULL,'FORMATAGE_MULTIPLI_VALEUR(10000)'
+'70','RD','SELECT','012',NULL,'TGE_DONNEES_PAIE','NOMBRE','1',NULL,'FALSE',NULL,'VALEUR_CONDITIONEE(NULL;0;1) '
+'70','RD','SELECT','013',NULL,'TGE_DONNEES_PAIE','TAUX','15','0','TRUE',NULL,'FORMATAGE_MULTIPLI_VALEUR(10000)'
+'70','RD','SELECT','014',NULL,'TGE_DONNEES_PAIE','TAUX','1',NULL,'FALSE',NULL,'VALEUR_CONDITIONEE(NULL;0;1) '
+'70','RD','SELECT','015',NULL,'TGE_DONNEES_PAIE','POURCENTAGE','6',NULL,'FALSE',NULL,'FORMATAGE_MULTIPLI_VALEUR(1000)'
+'70','RD','SELECT','016',NULL,'TGE_DONNEES_PAIE','DOMAINE_PRCTE','1',NULL,'FALSE',NULL,NULL
+'70','RD','SELECT','017',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,NULL
+'70','RD','SELECT','018',NULL,'TGE_DONNEES_PAIE','SENS','1',NULL,'FALSE',NULL,NULL
+'70','RD','SELECT','019',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,NULL
+'70','RD','SELECT','020',NULL,'TGE_DONNEES_PAIE','CODE_IMPUTATION','18',NULL,'FALSE',NULL,NULL
+'70','RD','SELECT','021',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,NULL
+'70','RD','SELECT','022',NULL,'TGE_DONNEES_PAIE','CODE_CAISSE','10',NULL,'FALSE',NULL,'VALEUR_CONDITIONNEE_AVEC_AUTRE_COLONNE(TYPE_DONNEE;3;CODE_CAISSE;)'
+'70','RD','SELECT','023',NULL,NULL,NULL,'22',NULL,'FALSE',NULL,NULL
+'70','RD','SELECT','024',NULL,'TGE_DONNEES_PAIE','DATE_DEB_ARRET','8',NULL,'FALSE','TO_CHAR(@COLONNE_CIBLE@,''YYYYMMDD'')',NULL
+'70','RD','SELECT','025',NULL,'TGE_DONNEES_PAIE','PERIODE_RATTACH_DEB','8',NULL,'FALSE','TO_CHAR(@COLONNE_CIBLE@,''YYYYMMDD'')',NULL
+'70','RD','SELECT','026',NULL,'TGE_DONNEES_PAIE','PERIODE_RATTACH_FIN','8',NULL,'FALSE','TO_CHAR(@COLONNE_CIBLE@,''YYYYMMDD'')',NULL
+'70','RD','SELECT','027',NULL,'TGE_DONNEES_PAIE','PERIODE_AFFECTATION','9',NULL,'FALSE','CASE WHEN ( nvl(TO_CHAR(@COLONNE_CIBLE@,''YYYYMM''),'''') is null) THEN '''' ELSE CASE WHEN (TGE_REF_PAC.MPE=''S'') THEN TO_CHAR(@COLONNE_CIBLE@,''YYYYMMDD'')||'' '' ELSE TO_CHAR(@COLONNE_CIBLE@,''YYYYMM'')||''001'' END END',NULL
+'70','RD','SELECT','028',NULL,'DAC','PACMAT','8',NULL,'FALSE',NULL,'FORMATAGE_PACMAT'
+'70','RD','SELECT','029',NULL,'DAC','CODE_CHRONO','6',NULL,'FALSE',NULL,'FORMATAGE_CODE_CHRONO'
+'70','RD','SELECT','030',NULL,'TGE_DONNEES_PAIE','ORIGINE','1',NULL,'FALSE',NULL,'PARAM_ORIGINE(code_origine)'
+'70','RD','SELECT','031',NULL,'TGE_DONNEES_PAIE','CODE_REMPLACEMENT','1',NULL,'FALSE',NULL,NULL
+'70','RD','SELECT','032',NULL,'TGE_DONNEES_PAIE','LOGIN_MAJ','8',NULL,'FALSE',NULL,NULL
+'70','RD','SELECT','033',NULL,'TGE_DONNEES_PAIE','DATE_MAJ','8',NULL,'FALSE',NULL,'FORMATAGE_DATE(AAAAMMJJ)'
+'70','RD','SELECT','034',NULL,'TGE_DONNEES_PAIE','DATE_MAJ','6',NULL,'FALSE',NULL,'FORMATAGE_DATE(HHMNSS)'
+'70','RD','SELECT','035',NULL,'TGE_DONNEES_PAIE','DATE_EFFET','8',NULL,'FALSE',NULL,'FORMATAGE_DATE(AAAAMMJJ)'
+'70','RD','SELECT','036',NULL,NULL,NULL,'6',NULL,'FALSE',NULL,'PARAM_ORIGINE(periode_paie)'
+'70_RETRO','RD','SELECT','036',NULL,'TGE_DONNEES_PAIE','PERIODE','6',NULL,'FALSE',NULL,NULL
+'70','RD','SELECT','037',NULL,NULL,NULL,'8',NULL,'FALSE',NULL,NULL
+'70','RD','SELECT','038',NULL,'TGE_DONNEES_PAIE','TYPE_TRAITEMENT','2',NULL,'FALSE',NULL,NULL
+'70','RD','SELECT','039',NULL,NULL,NULL,'3',NULL,'FALSE',NULL,NULL
+'70','RD','SELECT','040',NULL,NULL,NULL,'3',NULL,'FALSE',NULL,NULL
+'70','RD','SELECT','041',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,'PARAM_ORIGINE(TYPE_PAIE)'
+'70','RD','SELECT','042',NULL,NULL,NULL,'1','E','FALSE',NULL,NULL
+'70','RD','SELECT','043',NULL,NULL,NULL,'4',NULL,'FALSE',NULL,NULL
+'70','RD','SELECT_EN_PLUS','001',NULL,NULL,NULL,NULL,NULL,NULL,'TGE_DONNEES_PAIE.TYPE_DONNEE',NULL
+'70','RD','SELECT_EN_PLUS','002',NULL,NULL,NULL,'4',NULL,'FALSE','DAC.CODE_CHRONO',NULL
+'70','RD','FROM','001',NULL,NULL,NULL,NULL,NULL,NULL,'(select C.MATRIC,C.PACMAT,max(DACS.CODE_CHRONO) CODE_CHRONO,DACH.PAIEZAD,min(C.DSDCN) DSDCN,max(DACH.DATE_SORTIE_SIT_BO) DATE_SORTIE_SIT_BO from DIC_ADM_CONTRAT C, DIC_ADM_CONTRAT_SITU DACS, DIC_ADM_CONTRAT_HISTO DACH, GAP_TRT_LISTE_MAT L where C.NUMPAC=@@@NUMPAC@@@ and DACH.NUMPAC=@@@NUMPAC@@@ and C.NUMPAC=DACH.NUMPAC and C.PACMAT=DACH.PACMAT and C.NUMCNT=DACH.NUMCNT and C.NUMPAC=DACS.NUMPAC and C.PACMAT=DACS.PACMAT and C.NUMCNT=DACS.NUMCNT and DACH.date_eff = (select MAX(dach2.DATE_EFF) from DIC_ADM_CONTRAT_HISTO dach2 where dach2.numpac =@@@NUMPAC@@@ and c.numpac = dach2.numpac and c.pacmat = dach2.pacmat and c.numcnt = dach2.numcnt and dach2.DATE_EFF <=last_day(to_date(@@@PERIODE_PAIE@@@,''yyyymm''))) and C.DSDCN <=last_day(to_date(@@@PERIODE_PAIE@@@,''yyyymm'')) and DACH.DATE_SORTIE_SIT_BO >= add_months((to_date(@@@PERIODE_PAIE@@@,''yyyymm'')),-@@@NB_MOIS_PAIE_INIT@@@) and L.ID_TRT=@@@ID_TRT@@@ and L.NUMPAC=@@@NUMPAC@@@ and C.PACMAT=L.PACMAT group by C.MATRIC,C.PACMAT,DACH.PAIEZAD) DAC',NULL
+'70','RD','FROM','002',NULL,NULL,NULL,NULL,NULL,NULL,'TGE_DONNEES_PAIE',NULL
+'70','RD','FROM','003',NULL,NULL,NULL,NULL,NULL,NULL,'TGE_REF_PAC',NULL
+'70','RD','WHERE','001',NULL,NULL,NULL,NULL,NULL,NULL,'TGE_DONNEES_PAIE.NUMPAC = @@@NUMPAC@@@',NULL
+'70','RD','WHERE','002',NULL,NULL,NULL,NULL,NULL,NULL,'and TGE_REF_PAC.NUMPAC = @@@NUMPAC@@@',NULL
+'70','RD','WHERE','003',NULL,NULL,NULL,NULL,NULL,NULL,'and TGE_DONNEES_PAIE.TYPE_DONNEE in (''2'',''3'')',NULL
+'70','RD','WHERE','004',NULL,NULL,NULL,NULL,NULL,NULL,'and TGE_DONNEES_PAIE.DERNIER_CODE_OPE <> ''S''',NULL
+'70','RD','WHERE','005',NULL,NULL,NULL,NULL,NULL,NULL,'and TGE_DONNEES_PAIE.PAIEZAD = DAC.PAIEZAD',NULL
+'70','RD','WHERE','006',NULL,NULL,NULL,NULL,NULL,NULL,'and ((TGE_DONNEES_PAIE.ORIGINE is null or TGE_DONNEES_PAIE.ORIGINE = ''T'' or TGE_DONNEES_PAIE.ORIGINE in ( select CODE_ORIGINE from TGE_REF_ORIGINE_GTA where NUMPAC = @@@NUMPAC@@@ and (MODE_3060 = ''W'' or ( MODE_3060 = ''R'' and ENVOI_MODE_R = ''O'' )))) or TGE_DONNEES_PAIE.CODE_REMPLACEMENT is not null)',NULL
+'70','RD','WHERE','007',NULL,NULL,NULL,NULL,NULL,NULL,'and TGE_DONNEES_PAIE.PERIODE @@@OPERATEUR_RETRO@@@ (SELECT PERIODEENCOURS FROM TGE_REF_PAC WHERE NUMPAC = @@@NUMPAC@@@)',NULL
+'70_RETRO','RD','WHERE','007',NULL,NULL,NULL,NULL,NULL,NULL,' and TGE_DONNEES_PAIE.PERIODE in (SELECT PERIODE_RETRO FROM GAP_RETRO_MATRIC G WHERE G.NUMPAC=TGE_DONNEES_PAIE.NUMPAC AND G.numpac||G.pacmat=TGE_DONNEES_PAIE.idpacmat union all select periode_retro from gap_selection_retro S where S.NUMPAC=TGE_DONNEES_PAIE.NUMPAC AND  S.numpac||S.pacmat=TGE_DONNEES_PAIE.idpacmat) AND TGE_DONNEES_PAIE.ACTION_RETRO is not null ',NULL
+'70','RD','ORDER_BY','001',NULL,NULL,NULL,NULL,NULL,NULL,'DAC.PAIEZAD,TGE_DONNEES_PAIE.CODE_RUBRIQUE',NULL
+'ANNULATION','RD','SELECT','001',NULL,'TGE_REF_PAC','NUMPAC','6','0','FALSE',NULL,NULL
+'ANNULATION','RD','SELECT','002','30',NULL,NULL,'2','0','FALSE',NULL,NULL
+'ANNULATION','RD','SELECT','003',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,NULL
+'ANNULATION','RD','SELECT','004',NULL,'DAC','PAIEZAD','8','0','TRUE',NULL,NULL
+'ANNULATION','RD','SELECT','005',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,NULL
+'ANNULATION','RD','SELECT','006',NULL,NULL,NULL,'2',NULL,'FALSE',NULL,NULL
+'ANNULATION','RD','SELECT','007','££££',NULL,NULL,'4','0','FALSE',NULL,NULL
+'ANNULATION','RD','SELECT','008',NULL,NULL,NULL,'2',NULL,'FALSE',NULL,NULL
+'ANNULATION','RD','SELECT','009',NULL,NULL,NULL,'16',NULL,'FALSE',NULL,NULL
+'ANNULATION','RD','SELECT','010',NULL,NULL,NULL,'2',NULL,'FALSE',NULL,NULL
+'ANNULATION','RD','SELECT','011',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,NULL
+'ANNULATION','RD','SELECT','012',NULL,NULL,NULL,'40',NULL,'FALSE',NULL,NULL
+'ANNULATION','RD','SELECT','013',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,NULL
+'ANNULATION','RD','SELECT','014',NULL,NULL,NULL,'4',NULL,'FALSE',NULL,NULL
+'ANNULATION','RD','SELECT','015',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,NULL
+'ANNULATION','RD','SELECT','016',NULL,NULL,NULL,'75',NULL,'FALSE',NULL,NULL
+'ANNULATION','RD','SELECT','017',NULL,'DAC','PACMAT','8',NULL,'FALSE',NULL,'FORMATAGE_PACMAT'
+'ANNULATION','RD','SELECT','018',NULL,'DAC','CODE_CHRONO','6',NULL,'FALSE',NULL,'FORMATAGE_CODE_CHRONO'
+'ANNULATION','RD','SELECT','019',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,'PARAM_ORIGINE(code_origine)'
+'ANNULATION','RD','SELECT','020',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,NULL
+'ANNULATION','RD','SELECT','021','DIF_FSED',NULL,NULL,'8',NULL,'FALSE',NULL,NULL
+'ANNULATION','RD','SELECT','022',NULL,NULL,NULL,'8',NULL,'FALSE',NULL,'FORMATAGE_DATE(AAAAMMJJ)'
+'ANNULATION','RD','SELECT','023',NULL,NULL,NULL,'6',NULL,'FALSE',NULL,'FORMATAGE_DATE(HHMNSS)'
+'ANNULATION','RD','SELECT','024',NULL,NULL,NULL,'8',NULL,'FALSE',NULL,'PARAM_ORIGINE(periode_paie;01)'
+'ANNULATION_RETRO','RD','SELECT','024',NULL,'DAC','PERIODE','8',NULL,'FALSE',NULL,'FORMATAGE_DATE(AAAAMMJJ)'
+'ANNULATION','RD','SELECT','025',NULL,NULL,NULL,'6',NULL,'FALSE',NULL,'PARAM_ORIGINE(periode_paie)'
+'ANNULATION_RETRO','RD','SELECT','025',NULL,'DAC','PERIODE','6',NULL,'FALSE',NULL,NULL
+'ANNULATION','RD','SELECT','026',NULL,NULL,NULL,'8',NULL,'FALSE',NULL,NULL
+'ANNULATION','RD','SELECT','027','TT',NULL,NULL,'2',NULL,'FALSE',NULL,NULL
+'ANNULATION','RD','SELECT','028',NULL,NULL,NULL,'3',NULL,'FALSE',NULL,NULL
+'ANNULATION','RD','SELECT','029',NULL,NULL,NULL,'3',NULL,'FALSE',NULL,NULL
+'ANNULATION','RD','SELECT','030',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,'PARAM_ORIGINE(TYPE_PAIE)'
+'ANNULATION','RD','SELECT','031',NULL,NULL,NULL,'1','E','FALSE',NULL,NULL
+'ANNULATION','RD','SELECT','032',NULL,NULL,NULL,'4',NULL,'FALSE',NULL,NULL
+'ANNULATION','RD','SELECT_EN_PLUS','001',NULL,NULL,NULL,'4',NULL,'FALSE','DAC.CODE_CHRONO',NULL
+'ANNULATION','RD','FROM','001',NULL,NULL,NULL,NULL,NULL,NULL,'(WITH TABLE_DATES_EFF (PACMAT, NUMCNT, DATE_EFF) AS ( SELECT DISTINCT DACH2.PACMAT, DACH2.NUMCNT , MAX(DATE_EFF) OVER (PARTITION BY L.NUMPAC, L.PACMAT, DACH2.NUMCNT) FROM GAP_TRT_LISTE_MAT L, DIC_ADM_CONTRAT_HISTO DACH2 WHERE L.ID_TRT = @@@ID_TRT@@@ and L.NUMPAC = @@@NUMPAC@@@ and DACH2.NUMPAC = @@@NUMPAC@@@ and DACH2.PACMAT = L.PACMAT and DACH2.DATE_EFF <= LAST_DAY(TO_DATE(@@@PERIODE_PAIE@@@,''yyyymm'')) and DACH2.DATE_SORTIE_SIT_BO >= ADD_MONTHS((TO_DATE(@@@PERIODE_PAIE@@@,''yyyymm'')),-@@@NB_MOIS_PAIE_INIT@@@) ) SELECT C.PACMAT, DACH.PAIEZAD, C.MATRIC, MIN(C.DSDCN) DSDCN, MAX(DACS.CODE_CHRONO) CODE_CHRONO, max(DACH.DATE_SORTIE_SIT_BO) DATE_SORTIE_SIT_BO FROM TABLE_DATES_EFF T, DIC_ADM_CONTRAT C, DIC_ADM_CONTRAT_SITU DACS, DIC_ADM_CONTRAT_HISTO DACH WHERE C.NUMPAC = @@@NUMPAC@@@ and DACS.NUMPAC = @@@NUMPAC@@@ and DACH.NUMPAC = @@@NUMPAC@@@ and C.PACMAT = T.PACMAT and C.NUMCNT = T.NUMCNT and DACH.PACMAT = T.PACMAT and DACH.NUMCNT = T.NUMCNT and DACH.DATE_EFF = T.DATE_EFF and DACS.PACMAT = T.PACMAT and DACS.NUMCNT = T.NUMCNT and DACS.PAIEZAD = DACH.PAIEZAD and C.DSDCN <= LAST_DAY(TO_DATE(@@@PERIODE_PAIE@@@,''yyyymm'')) and NVL(DACH.DRPAI2, ''B'') <> ''B'' and C.NATCOL IN (''SAL'',''STA'') GROUP BY C.PACMAT, DACH.PAIEZAD, C.MATRIC ) DAC',NULL
+'ANNULATION_RETRO','RD','FROM','001',NULL,NULL,NULL,NULL,NULL,NULL,'(WITH TABLE_DATES_EFF (PACMAT, NUMCNT, DATE_EFF) AS ( SELECT DISTINCT DACH2.PACMAT, DACH2.NUMCNT , MAX(DATE_EFF) OVER (PARTITION BY L.NUMPAC, L.PACMAT, DACH2.NUMCNT) FROM GAP_TRT_LISTE_MAT L, DIC_ADM_CONTRAT_HISTO DACH2 WHERE L.ID_TRT = @@@ID_TRT@@@ and L.NUMPAC = @@@NUMPAC@@@ and DACH2.NUMPAC = @@@NUMPAC@@@ and DACH2.PACMAT = L.PACMAT and DACH2.DATE_EFF <= LAST_DAY(TO_DATE(@@@PERIODE_PAIE@@@,''yyyymm'')) and DACH2.DATE_SORTIE_SIT_BO >= ADD_MONTHS((TO_DATE(@@@PERIODE_PAIE@@@,''yyyymm'')),-@@@NB_MOIS_PAIE_INIT@@@) ),TABLE_RETRO (PACMAT,NUMPAC,PERIODE_RETRO)AS((select PACMAT,NUMPAC,PERIODE_RETRO from GAP_RETRO_MATRIC mat where mat.NUMPAC = @@@NUMPAC@@@)union all(select distinct PACMAT,NUMPAC ,PERIODE_RETRO from GAP_SELECTION_RETRO sel where sel.NUMPAC = @@@NUMPAC@@@ and not exists (select 1  from GAP_RETRO_MATRIC gap where gap.NUMPAC =sel.numpac and gap.pacmat=sel.pacmat and gap.periode_retro=sel.periode_retro ))) SELECT C.PACMAT, DACH.PAIEZAD, C.MATRIC,RETRO.PERIODE_RETRO AS PERIODE, MIN(C.DSDCN) DSDCN, MAX(DACS.CODE_CHRONO) CODE_CHRONO, max(DACH.DATE_SORTIE_SIT_BO) DATE_SORTIE_SIT_BO FROM TABLE_DATES_EFF T, DIC_ADM_CONTRAT C, DIC_ADM_CONTRAT_SITU DACS, DIC_ADM_CONTRAT_HISTO DACH,TABLE_RETRO RETRO WHERE C.NUMPAC = @@@NUMPAC@@@ and DACS.NUMPAC = @@@NUMPAC@@@ and DACH.NUMPAC = @@@NUMPAC@@@ and C.PACMAT = T.PACMAT and C.NUMCNT = T.NUMCNT and DACH.PACMAT = T.PACMAT and DACH.NUMCNT = T.NUMCNT and DACH.DATE_EFF = T.DATE_EFF and DACS.PACMAT = T.PACMAT and DACS.NUMCNT = T.NUMCNT and DACS.PAIEZAD = DACH.PAIEZAD and C.DSDCN <= LAST_DAY(TO_DATE(@@@PERIODE_PAIE@@@,''yyyymm'')) and NVL(DACH.DRPAI2, ''B'') <> ''B'' and C.NATCOL IN (''SAL'',''STA'') AND RETRO.NUMPAC =C.NUMPAC  AND RETRO.PACMAT =C.PACMAT  GROUP BY C.PACMAT, DACH.PAIEZAD, C.MATRIC ,RETRO.PERIODE_RETRO) DAC',NULL
+'ANNULATION','RD','FROM','002',NULL,NULL,NULL,NULL,NULL,NULL,'TGE_REF_PAC',NULL
+'ANNULATION','RD','WHERE','001',NULL,NULL,NULL,NULL,NULL,NULL,'TGE_REF_PAC.NUMPAC = @@@NUMPAC@@@',NULL
+'ANNULATION','RD','WHERE','002',NULL,NULL,NULL,NULL,NULL,NULL,'and DAC.PAIEZAD not in (select PAIEZAD from DELETED_PAIEZAD where NUMPAC=@@@NUMPAC@@@)',NULL
+'ANNULATION','RD','ORDER_BY','001',NULL,NULL,NULL,NULL,NULL,NULL,'DAC.PAIEZAD',NULL
+'W566','RD','SELECT','001',NULL,'TGE_REF_PAC','NUMPAC','6','0','FALSE',NULL,NULL
+'W566','RD','SELECT','002','30',NULL,NULL,'2','0','FALSE',NULL,NULL
+'W566','RD','SELECT','003',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,NULL
+'W566','RD','SELECT','004',NULL,'DAC','PAIEZAD','8','0','TRUE',NULL,NULL
+'W566','RD','SELECT','005',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,NULL
+'W566','RD','SELECT','006',NULL,NULL,NULL,'2',NULL,'FALSE',NULL,NULL
+'W566','RD','SELECT','007','W566',NULL,NULL,'4','0','FALSE',NULL,NULL
+'W566','RD','SELECT','008',NULL,NULL,NULL,'2',NULL,'FALSE',NULL,NULL
+'W566','RD','SELECT','009',NULL,NULL,NULL,'16',NULL,'FALSE',NULL,NULL
+'W566','RD','SELECT','010',NULL,NULL,NULL,'2',NULL,'FALSE',NULL,NULL
+'W566','RD','SELECT','011',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,NULL
+'W566','RD','SELECT','012','200',NULL,NULL,'40',NULL,'FALSE',NULL,NULL
+'W566','RD','SELECT','013','N',NULL,NULL,'1',NULL,'FALSE',NULL,NULL
+'W566','RD','SELECT','014',NULL,NULL,NULL,'4',NULL,'FALSE',NULL,NULL
+'W566','RD','SELECT','015',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,NULL
+'W566','RD','SELECT','016',NULL,NULL,NULL,'75',NULL,'FALSE',NULL,NULL
+'W566','RD','SELECT','017',NULL,'DAC','PACMAT','8',NULL,'FALSE',NULL,'FORMATAGE_PACMAT'
+'W566','RD','SELECT','018',NULL,'DAC','CODE_CHRONO','6',NULL,'FALSE',NULL,'FORMATAGE_CODE_CHRONO'
+'W566','RD','SELECT','019',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,'PARAM_ORIGINE(code_origine)'
+'W566','RD','SELECT','020',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,NULL
+'W566','RD','SELECT','021','DIF_FSED',NULL,NULL,'8',NULL,'FALSE',NULL,NULL
+'W566','RD','SELECT','022',NULL,NULL,NULL,'8',NULL,'FALSE',NULL,'FORMATAGE_DATE(AAAAMMJJ)'
+'W566','RD','SELECT','023',NULL,NULL,NULL,'6',NULL,'FALSE',NULL,'FORMATAGE_DATE(HHMNSS)'
+'W566','RD','SELECT','024',NULL,NULL,NULL,'8',NULL,'FALSE',NULL,'PARAM_ORIGINE(periode_paie;01)'
+'W566_RETRO','RD','SELECT','024',NULL,'DAC','PERIODE','8',NULL,'FALSE',NULL,'FORMATAGE_DATE(AAAAMMJJ)'
+'W566','RD','SELECT','025',NULL,NULL,NULL,'6',NULL,'FALSE',NULL,'PARAM_ORIGINE(periode_paie)'
+'W566_RETRO','RD','SELECT','025',NULL,'DAC','PERIODE','6',NULL,'FALSE',NULL,NULL
+'W566','RD','SELECT','026',NULL,NULL,NULL,'8',NULL,'FALSE',NULL,NULL
+'W566','RD','SELECT','027','TT',NULL,NULL,'2',NULL,'FALSE',NULL,NULL
+'W566','RD','SELECT','028',NULL,NULL,NULL,'3',NULL,'FALSE',NULL,NULL
+'W566','RD','SELECT','029',NULL,NULL,NULL,'3',NULL,'FALSE',NULL,NULL
+'W566','RD','SELECT','030',NULL,NULL,NULL,'1',NULL,'FALSE',NULL,'PARAM_ORIGINE(TYPE_PAIE)'
+'W566','RD','SELECT','031',NULL,NULL,NULL,'1','E','FALSE',NULL,NULL
+'W566','RD','SELECT','032',NULL,NULL,NULL,'4',NULL,'FALSE',NULL,NULL
+'W566','RD','SELECT_EN_PLUS','001',NULL,NULL,NULL,'4',NULL,'FALSE','DAC.CODE_CHRONO',NULL
+'W566','RD','FROM','001',NULL,NULL,NULL,NULL,NULL,NULL,'(WITH TABLE_DATES_EFF (PACMAT, NUMCNT, DATE_EFF) AS ( SELECT DISTINCT DACH2.PACMAT, DACH2.NUMCNT , MAX(DATE_EFF) OVER (PARTITION BY L.NUMPAC, L.PACMAT, DACH2.NUMCNT) FROM GAP_TRT_LISTE_MAT L, DIC_ADM_CONTRAT_HISTO DACH2 WHERE L.ID_TRT = @@@ID_TRT@@@ and L.NUMPAC = @@@NUMPAC@@@ and DACH2.NUMPAC = @@@NUMPAC@@@ and DACH2.PACMAT = L.PACMAT and DACH2.DATE_EFF <= LAST_DAY(TO_DATE(@@@PERIODE_PAIE@@@,''yyyymm'')) and DACH2.DATE_SORTIE_SIT_BO >= ADD_MONTHS((TO_DATE(@@@PERIODE_PAIE@@@,''yyyymm'')),-@@@NB_MOIS_PAIE_INIT@@@) ) SELECT C.PACMAT, DACH.PAIEZAD, C.MATRIC, MIN(C.DSDCN) DSDCN, MAX(DACS.CODE_CHRONO) CODE_CHRONO, max(DACH.DATE_SORTIE_SIT_BO) DATE_SORTIE_SIT_BO FROM TABLE_DATES_EFF T, DIC_ADM_CONTRAT C, DIC_ADM_CONTRAT_SITU DACS, DIC_ADM_CONTRAT_HISTO DACH WHERE C.NUMPAC = @@@NUMPAC@@@ and DACS.NUMPAC = @@@NUMPAC@@@ and DACH.NUMPAC = @@@NUMPAC@@@ and C.PACMAT = T.PACMAT and C.NUMCNT = T.NUMCNT and DACH.PACMAT = T.PACMAT and DACH.NUMCNT = T.NUMCNT and DACH.DATE_EFF = T.DATE_EFF and DACS.PACMAT = T.PACMAT and DACS.NUMCNT = T.NUMCNT and DACS.PAIEZAD = DACH.PAIEZAD and C.DSDCN <= LAST_DAY(TO_DATE(@@@PERIODE_PAIE@@@,''yyyymm'')) and NVL(DACH.DRPAI2, ''B'') <> ''B'' and C.NATCOL IN (''SAL'',''STA'') GROUP BY C.PACMAT, DACH.PAIEZAD, C.MATRIC ) DAC',NULL
+'W566_RETRO','RD','FROM','001',NULL,NULL,NULL,NULL,NULL,NULL,'(WITH TABLE_DATES_EFF (PACMAT, NUMCNT, DATE_EFF) AS ( SELECT DISTINCT DACH2.PACMAT, DACH2.NUMCNT , MAX(DATE_EFF) OVER (PARTITION BY L.NUMPAC, L.PACMAT, DACH2.NUMCNT) FROM GAP_TRT_LISTE_MAT L, DIC_ADM_CONTRAT_HISTO DACH2 WHERE L.ID_TRT = @@@ID_TRT@@@ and L.NUMPAC = @@@NUMPAC@@@ and DACH2.NUMPAC = @@@NUMPAC@@@ and DACH2.PACMAT = L.PACMAT and DACH2.DATE_EFF <= LAST_DAY(TO_DATE(@@@PERIODE_PAIE@@@,''yyyymm'')) and DACH2.DATE_SORTIE_SIT_BO >= ADD_MONTHS((TO_DATE(@@@PERIODE_PAIE@@@,''yyyymm'')),-@@@NB_MOIS_PAIE_INIT@@@) ),date_R (mois) AS ( select trunc(ADD_MONTHS(TO_DATE(@@@PERIODE_PAIE@@@,''YYYYMM''),level-1-24),''month'') mois from dual connect by trunc(ADD_MONTHS(TO_DATE(@@@PERIODE_PAIE@@@,''YYYYMM''),level-1-24),''month'' )< TO_DATE(@@@PERIODE_PAIE@@@,''YYYYMM'')),TABLE_RETRO (PACMAT,NUMPAC,PERIODE_RETRO)AS ((SELECT PACMAT,NUMPAC,PERIODE_RETRO FROM GAP_RETRO_MATRIC mat WHERE mat.NUMPAC = @@@NUMPAC@@@)UNION ALL(SELECT PACMAT,NUMPAC,PERIODE_RETRO FROM GAP_SELECTION_RETRO sel WHERE sel.NUMPAC = @@@NUMPAC@@@)) SELECT C.PACMAT, DACH.PAIEZAD, C.MATRIC,to_char(D.mois,''yyyymm'') as periode, MIN(C.DSDCN) DSDCN, MAX(DACS.CODE_CHRONO) CODE_CHRONO, max(DACH.DATE_SORTIE_SIT_BO) DATE_SORTIE_SIT_BO FROM TABLE_DATES_EFF T, DIC_ADM_CONTRAT C, DIC_ADM_CONTRAT_SITU DACS, DIC_ADM_CONTRAT_HISTO DACH,date_R D WHERE C.NUMPAC = @@@NUMPAC@@@ and DACS.NUMPAC = @@@NUMPAC@@@ and DACH.NUMPAC = @@@NUMPAC@@@ and C.PACMAT = T.PACMAT and C.NUMCNT = T.NUMCNT and DACH.PACMAT = T.PACMAT and DACH.NUMCNT = T.NUMCNT and DACH.DATE_EFF = T.DATE_EFF and DACS.PACMAT = T.PACMAT and DACS.NUMCNT = T.NUMCNT and DACS.PAIEZAD = DACH.PAIEZAD and C.DSDCN <= LAST_DAY(TO_DATE(@@@PERIODE_PAIE@@@,''yyyymm'')) and NVL(DACH.DRPAI2, ''B'') <> ''B'' and C.NATCOL IN (''SAL'',''STA'')  AND D.mois >=trunc(to_date((select min(RETRO.PERIODE_RETRO) from  table_retro RETRO where RETRO.NUMPAC=C.NUMPAC AND RETRO.PACMAT =C.PACMAT ),''YYYYMM''),''month'') AND D.mois >=trunc(DACS.dsdsc,''month'') GROUP BY C.PACMAT, DACH.PAIEZAD, C.MATRIC,to_char(D.mois,''yyyymm'') ) DAC',NULL
+'W566','RD','FROM','002',NULL,NULL,NULL,NULL,NULL,NULL,'TGE_REF_PAC',NULL,NULL
+'W566','RD','WHERE','001',NULL,NULL,NULL,NULL,NULL,NULL,'TGE_REF_PAC.NUMPAC = @@@NUMPAC@@@',NULL
+'W566','RD','ORDER_BY','001',NULL,NULL,NULL,NULL,NULL,NULL,'DAC.PAIEZAD',NULL
+'W566_RETRO','RD','ORDER_BY','001',NULL,NULL,NULL,NULL,NULL,NULL,'DAC.PAIEZAD,DAC.PERIODE',NULL
+##
+TGE_REF_CARTE_FSED
+=SQL=
+update tge_ref_carte_fsed set FORMATAGE_EN_SORTIE = 'FORMATAGE_PACMAT', COMPLESSION = '' where code_carte in ('609','409','509','309') and colonne_origine like 'MATRIC%'
+##
+TGE_REF_MAPDO
+==
+UPDATE TGE_REF_MAPDO SET DONNEEGXP = 'FRONTA', TABLEGXP = 'DIC_ADRESSE' WHERE NUMPAC = '*' AND ELEMENT = 'A994' AND OCCURENCE = '**'
+##
+TAG_CHARSET=@€éèç
+##
+IDX_KEYS_SYS_TRC_MODIF
+=SQL IF_INDEX_NOTEXIST=IDX_KEYS_SYS_TRC_MODIF=
+CREATE INDEX IDX_KEYS_SYS_TRC_MODIF ON SYS_TRC_MODIF (NUMPAC, PACMAT, PAIEZAD, MATRIC)
+##
+TAG_CHARSET=@€éèç
+##
+IDX_KEYS_SYS_TRC_MODIF_2
+=SQL IF_INDEX_NOTEXIST=IDX_KEYS_SYS_TRC_MODIF_2=
+CREATE INDEX IDX_KEYS_SYS_TRC_MODIF_2 ON SYS_TRC_MODIF (KEYS_VALUES)

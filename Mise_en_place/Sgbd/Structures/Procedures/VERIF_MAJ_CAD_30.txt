@@ -1,0 +1,61 @@
+##
+VERIF_MAJ_CAD_30
+=SQL=
+CREATE OR REPLACE PROCEDURE VERIF_MAJ_CAD_30 
+(
+  P_ID IN NUMBER 
+, P_NUMPAC IN VARCHAR2 
+) AS 
+BEGIN
+
+INSERT INTO TGE_MAJ_30_MATRIC_TEMPORARY
+SELECT  matric
+FROM DIC_ADM_CONTRAT_SITU
+WHERE numpac =P_NUMPAC
+AND paiezad IN
+  (SELECT DISTINCT 
+      imp.paiezad
+    FROM
+      (SELECT *
+      FROM TGE_REF_MAPDO
+      WHERE numpac= p_numpac
+      AND TRTPARTICULIER LIKE 'CAD=%'
+    UNION ALL
+    SELECT *
+    FROM TGE_REF_MAPDO
+    WHERE numpac     ='*'
+    AND ELEMENT NOT IN
+      (SELECT ELEMENT FROM TGE_REF_MAPDO WHERE numpac=p_numpac
+      )
+    AND TRTPARTICULIER LIKE 'CAD=%'
+      ) DO ,
+      tge_import_fsed_30 imp
+    WHERE id_trt        = p_id
+    AND imp.code_element= do.element);
+COMMIT;
+ 
+ 
+INSERT INTO TGE_MAJ_30_CPT_TEMPORARY
+SELECT SUBSTR(SUBSTR(DO.TRTPARTICULIER,1,instr(DO.TRTPARTICULIER,',')-1), 
+       instr(SUBSTR(DO.TRTPARTICULIER,1,instr(DO.TRTPARTICULIER,',')-1),'=')+1,
+       LENGTH(SUBSTR(DO.TRTPARTICULIER,1,instr(DO.TRTPARTICULIER,',')-1)))
+FROM
+  (SELECT *
+  FROM TGE_REF_MAPDO
+  WHERE numpac= P_NUMPAC
+  AND TRTPARTICULIER LIKE 'CAD=%'
+  UNION ALL
+  SELECT *
+  FROM TGE_REF_MAPDO
+  WHERE numpac     ='*'
+  AND ELEMENT NOT IN
+    (SELECT ELEMENT FROM TGE_REF_MAPDO WHERE numpac=P_NUMPAC
+    )
+  AND TRTPARTICULIER LIKE 'CAD=%'
+  ) DO ,
+  tge_import_fsed_30 imp
+WHERE id_trt        = P_ID
+AND imp.code_element= do.element ;
+COMMIT;
+
+END VERIF_MAJ_CAD_30;

@@ -1,0 +1,40 @@
+##
+TGE_RETRO_INSCRIPTION_RELIQ
+=SQL=
+CREATE OR REPLACE PROCEDURE TGE_RETRO_INSCRIPTION_RELIQ (P_ID IN NUMBER,P_NUMPAC IN VARCHAR2 , P_PERIODE IN VARCHAR2 ) AS 
+/********************************************************************************
+Version     : V5.05.04
+*********************************************************************************/
+BEGIN
+
+
+  FSED.FSED_AVANCEMENT_PLSQL(p_id,'tge_retro_inscription_reliq (Begin)','Début inscription retro des reliq pour le numpac: '||P_NUMPAC);
+  
+  FOR C IN
+ (select numpac,pacmat,periode,min(code_chrono)as CODE_CHRONO ,paiezad,table_maj from 
+(
+with table_chrono (numpac,pacmat,paiezad, code_chrono,DSDSC,DSFSC) as 
+(select numpac,pacmat,paiezad, code_chrono,DSDSC,DSFSC from DIC_ADM_CONTRAT_SITU dacs where numpac=P_NUMPAC)
+
+select tge.numpac,substr(tge.idpacmat,7,length(tge.idpacmat)) as pacmat,tge.periode as periode ,dacs.code_chrono, tge.paiezad ,'TGE_DONNEES_PAIE' as table_maj from TGE_RELIQ_DONNEES_PAIE tge ,table_chrono dacs 
+where tge.numpac=P_NUMPAC and tge.numpac=dacs.numpac and  tge.paiezad=dacs.paiezad and substr(tge.idpacmat,7,length(tge.idpacmat))= dacs.pacmat 
+and TO_DATE(tge.periode,'YYYYMM') BETWEEN  TRUNC(dacs.DSDSC,'MONTH') AND dacs.DSFSC
+union all 
+select tge.numpac,substr(tge.idpacmat,7,length(tge.idpacmat))as pacmat,tge.periode as periode,dacs.code_chrono, tge.paiezad ,'TGE_ELEMENTS_PAIE' as table_maj from TGE_RELIQ_ELEMENTS_PAIE  tge ,table_chrono dacs 
+where tge.numpac=P_NUMPAC and tge.numpac=dacs.numpac and  tge.paiezad=dacs.paiezad and substr(tge.idpacmat,7,length(tge.idpacmat))= dacs.pacmat 
+and TO_DATE(tge.periode,'YYYYMM') BETWEEN  TRUNC(dacs.DSDSC,'MONTH') AND dacs.DSFSC
+union all 
+select tge.numpac,substr(tge.idpacmat,7,length(tge.idpacmat))as pacmat,to_char(tge.periode,'YYYYMM')as periode,dacs.code_chrono, tge.paiezad ,'TGE_INCIDENTS_PAIE' as table_maj from TGE_RELIQ_INCIDENTS_PAIE  tge ,table_chrono dacs 
+where tge.numpac=P_NUMPAC and tge.numpac=dacs.numpac and  tge.paiezad=dacs.paiezad and substr(tge.idpacmat,7,length(tge.idpacmat))= dacs.pacmat 
+and to_date(tge.periode) BETWEEN  TRUNC(dacs.DSDSC,'MONTH') AND dacs.DSFSC
+union all
+select tge.numpac,tge.pacmat as pacmat ,P_PERIODE as periode,dacs.code_chrono, dacs.paiezad,tge.table_to_send  as table_maj from TGE_RELIQ_PACMAT_TORESEND_RETRO tge,table_chrono dacs 
+where tge.numpac=P_NUMPAC and tge.numpac=dacs.numpac  and tge.pacmat= dacs.pacmat 
+and to_date(P_PERIODE,'YYYYMM') BETWEEN  TRUNC(dacs.DSDSC,'MONTH') AND dacs.DSFSC)
+group by numpac,pacmat,periode,paiezad,table_maj
+ )
+ LOOP
+   TGE_RETRO_INSCRIPTION(C.NUMPAC, C.PACMAT,C.periode, C.CODE_CHRONO, C.PAIEZAD, C.table_maj); 
+ END LOOP;
+  FSED.FSED_AVANCEMENT_PLSQL(p_id,'tge_retro_inscription_reliq (End)','Fin inscription retro des reliq pour le numpac : '||P_NUMPAC);
+END TGE_RETRO_INSCRIPTION_RELIQ;

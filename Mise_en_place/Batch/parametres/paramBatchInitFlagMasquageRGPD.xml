@@ -1,0 +1,17 @@
+<interface idInterface="InitFlagMasquage">
+	<nomInterface>InitFlagMasquageRGPD</nomInterface>
+	<descriptionInterface>
+		InitFlagMasquageRGPD
+	</descriptionInterface>
+	<traitements>	
+		<traitement>
+			<descriptionTraitement>calcul masquage RGPD dans secupacmat</descriptionTraitement>
+			<typeTraitement>InterfaceInitFlagMasquageRGPD</typeTraitement>
+			<modeDebug>false</modeDebug>
+			<versionTraitement>V1</versionTraitement>
+			<activerMail>OUI</activerMail>
+			<pac>XXXXXXX</pac>
+			<continueSiErreur>OUI</continueSiErreur>
+		</traitement>
+	</traitements>
+</interface>

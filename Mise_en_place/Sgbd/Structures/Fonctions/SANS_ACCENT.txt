@@ -1,0 +1,12 @@
+##
+SANS_ACCENT
+=SQL=
+CREATE OR REPLACE
+  FUNCTION SANS_ACCENT(
+      p_chaine VARCHAR2 )
+    RETURN VARCHAR2
+  AS
+  BEGIN
+    RETURN TRANSLATE(p_chaine,'ְֱֲֳִֵאבגדהוׂ׃װױײ״עףפץצרָֹÊֻטיךכַחּֽ־ֿלםמןÙÚÛÜשתûüÝx‎ÿׁס','AAAAAAaaaaaaOOOOOOooooooEEEEeeeeCcIIIIiiiiUUUUuuuuYYyyNn');
+  END SANS_ACCENT; 
+  

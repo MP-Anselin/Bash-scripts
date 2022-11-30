@@ -1,0 +1,128 @@
+##
+TAG_CHARSET=@€ιθη
+##
+META_AT_IMPACT_MODELE_DONNEES
+=SQL=
+BEGIN
+  EXECUTE_IMMEDIATE_STRING('DROP MATERIALIZED VIEW "META_AT_IMPACT_MODELE_DONNEES"',0);
+EXCEPTION WHEN OTHERS THEN NULL;
+END;
+##
+META_AT_IMPACT_MODELE_DONNEES
+=SQL=
+CREATE MATERIALIZED VIEW "META_AT_IMPACT_MODELE_DONNEES" ("DATE_MAJ", "ALP_ESPACE", "ALP_REGROUPEMENT", "ALP_THEME", "ALP_LIBELLE_PAGE", "ALP_NOM_PAGE", "ALP_ONGLET", "ALP_ORDRE", "ALP_DONNEE", "ALP_DONNEE_LIBELLE", "ALP_DICTIONNAIRE", "TYPE_DONNEE", "ALP_DONNEE_ELT", "MODE_SAISIE", "REFERENTIEL", "PROFILS_HABILITES")
+BUILD IMMEDIATE
+USING INDEX 
+REFRESH FORCE ON DEMAND START WITH sysdate+5/1400 NEXT SYSDATE + 1
+AS 
+  WITH liensdonneesgroupes (
+    company_id,
+    id_groupe,
+    nom_donnee,
+    id_groupe_donnees,
+    suffixe_ou_libelle,
+    onglet,
+    ordre
+  ) AS (
+    SELECT
+      gd.company_id,
+      gd.id_groupe,
+      CASE
+        WHEN substr(gd.nom_donnee, 1, 1) = '#' THEN gd.nom_donnee || '£' || gd.id_groupe
+        ELSE gd.nom_donnee
+      END AS nom_donnee,
+      gd.id_groupe,
+      gd.suffixe_ou_libelle,
+      '',
+      LPAD(gd.ordre, 4, '0')
+    FROM
+      ref_groupe_donnees gd
+    UNION ALL
+    SELECT
+      l.company_id,
+      l.id_groupe,
+      CASE
+        WHEN substr(gd.nom_donnee, 1, 1) = '#' THEN gd.nom_donnee || '£' || gd.id_groupe
+        ELSE gd.nom_donnee
+      END AS nom_donnee,
+      gd.id_groupe,
+      gd.suffixe_ou_libelle,
+      decode(gd_info.est_onglet, 'O', gd_info.libelle_groupe, l.onglet),
+      l.ordre||LPAD(gd.ordre, 4, '0')
+    FROM
+      ref_groupe_donnees        gd,
+      liensdonneesgroupes        l,
+      ref_groupe_donnees_info   gd_info
+    WHERE
+      gd.company_id = l.company_id
+      AND gd.id_groupe = gd_info.id_groupe
+      AND gd.id_groupe = l.suffixe_ou_libelle
+      AND l.nom_donnee LIKE '#GROUPE%'
+  )
+  select 
+    SYSDATE DATE_MAJ,
+    espace_elt.libelle alp_espace,
+    regroupement_elt.libelle alp_regroupement,
+    theme_elt.libelle alp_theme,
+    page_elt.libelle
+    || (
+      CASE
+        WHEN sys_pages_modal_restriction.nom_page_modale IS NOT NULL THEN ' (popup)'
+        ELSE ''
+      END
+    ) alp_libelle_page,
+    e.nom_page alp_nom_page, 
+    liensdonneesgroupes.onglet alp_onglet,
+    row_number () over (partition by e.nom_page order by liensdonneesgroupes.ordre asc) alp_ordre,
+    liensdonneesgroupes.nom_donnee alp_donnee,
+    nvl(ref_donnee_ecran.libelle_donnee, ref_donnee_ecran_defaut.libelle_donnee)alp_donnee_libelle,
+    ref_donnee_generale.nom_dictionnaire alp_dictionnaire,
+    case 
+      when ref_donnee_generale.type_donnee='9' then 'N' || ref_donnee_generale.longueur_masque_nb_entiers  || CASE WHEN NVL(ref_donnee_generale.nb_decimaux, 0)>0 THEN  '.' || ref_donnee_generale.nb_decimaux  ElSE '' END
+      when ref_donnee_generale.type_donnee='N' then 'N' || ref_donnee_generale.longueur_masque_nb_entiers 
+      when ref_donnee_generale.type_donnee='D' then ref_donnee_generale.longueur_masque_nb_entiers
+      when ref_donnee_generale.type_donnee='X' then 'X'||ref_donnee_generale.longueur_masque_nb_entiers
+      else ref_donnee_generale.type_donnee 
+    end as type_donnee,
+    RTRIM((select linearisereq('select distinct tge_ref_mapdo.numpac ||'':'' || element from tge_ref_mapdo where tge_ref_mapdo.donneegxp=''' || ref_donnee_generale.nom_donnee ||''' and nvl(occurence, ''*'')!=''!!''' , ',') from dual), ',')
+    alp_donnee_elt,
+    case 
+      when ref_donnee_ecran_defaut.nom_donnee='LINAIS' then 'text' 
+      when nvl(ref_donnee_ecran.mode_saisie, ref_donnee_ecran_defaut.mode_saisie)='searchStruct' 
+      then 'hro - '||nvl(substr(ref_donnee_ecran.search_structure_param, instr(ref_donnee_ecran.search_structure_param, 'CODTS='),  7), substr(ref_donnee_ecran_defaut.search_structure_param, instr(ref_donnee_ecran_defaut.search_structure_param, 'CODTS='),  7) )
+      else nvl(ref_donnee_ecran.mode_saisie, ref_donnee_ecran_defaut.mode_saisie) 
+    end as MODE_SAISIE,
+    case 
+      when nvl(ref_donnee_ecran.mode_saisie, ref_donnee_ecran_defaut.mode_saisie)='checkbox' then ref_donnee_generale.checkbox_valeur_on || '/' || ref_donnee_generale.checkbox_valeur_off  
+      when sys_requetes_jsp.nomtable = q'[ (select 'O' as code,'Oui' as libelle  from dual union select 'N' as Code,'Non' as Libelle from dual)]' then 'O/N-slh'
+      else sys_requetes_jsp.nomtable 
+    end referentiel,
+    RTRIM((
+      select linearisereq(
+        'select sys_sch_profil.code_profil from sys_sch_profil inner join sys_sch_profil_p on sys_sch_profil_p.code_profil=sys_sch_profil.code_profil and sys_sch_profil_p.nom_page=''' || page_elt.nom_page || ''''
+        , ', '
+      ) 
+      from dual
+    ), ', ') as profils_habilites
+  from 
+    ref_ecran e
+    left outer join sys_pages_modal_restriction ON nom_page_modale = 'Ext.adp.Modules.' || e.code_destination || '.'  || e.module_ecran || '.'  || e.role_ecran || '.'  || e.nom_page || '.'  || e.nom_page    
+    inner join sys_sch_element page_elt ON page_elt.nom_page = 'Ext.adp.Modules.' || e.code_destination || '.'  || e.module_ecran || '.'  || e.role_ecran || '.'  || e.nom_page || '.'  || e.nom_page or page_elt.nom_page = sys_pages_modal_restriction.nom_page_bur_liee    
+    inner join sys_schemas page_lien ON page_elt.code_element = page_lien.code_elt AND page_elt.niveau = page_lien.niveau
+    inner join sys_schemas theme_lien ON page_lien.code_asso_pere = theme_lien.code_asso
+    inner join sys_sch_element theme_elt ON theme_lien.code_elt = theme_elt.code_element AND theme_lien.niveau = theme_elt.niveau
+    inner join sys_schemas regroupement_lien ON theme_lien.code_asso_pere = regroupement_lien.code_asso
+    inner join sys_sch_element regroupement_elt ON regroupement_lien.code_elt = regroupement_elt.code_element AND regroupement_lien.niveau = regroupement_elt.niveau
+    inner join sys_schemas espace_lien ON regroupement_lien.code_asso_pere = espace_lien.code_asso
+    inner join sys_sch_element espace_elt ON espace_lien.code_elt = espace_elt.code_element AND espace_lien.niveau = espace_elt.niveau
+    inner join liensdonneesgroupes ON e.id_groupe_donnees = liensdonneesgroupes.id_groupe AND liensdonneesgroupes.company_id = '*'
+    inner join ref_donnee_generale ON liensdonneesgroupes.nom_donnee = ref_donnee_generale.nom_donnee AND ref_donnee_generale.company_id = '*' and nvl(actif, 'O')='O'
+    inner join ref_donnee_ecran ref_donnee_ecran_defaut ON ref_donnee_generale.nom_donnee = ref_donnee_ecran_defaut.nom_donnee AND ref_donnee_ecran_defaut.company_id = '*' AND ref_donnee_ecran_defaut.nom_page = '*'
+    left outer join ref_donnee_ecran ON ref_donnee_generale.nom_donnee = ref_donnee_ecran.nom_donnee AND ref_donnee_ecran.company_id = '*' AND ref_donnee_ecran.nom_page = e.nom_page
+    left outer join sys_requetes_jsp on sys_requetes_jsp.nompage=nvl(ref_donnee_ecran.appeltable_nompage, ref_donnee_ecran_defaut.appeltable_nompage) and sys_requetes_jsp.idrequete=nvl(ref_donnee_ecran.appeltable_idrequete, ref_donnee_ecran_defaut.appeltable_idrequete)
+  where
+    1=1
+    and ref_donnee_ecran_defaut.nom_donnee not in ('TRAV_LINAIS_ET', 'TRAV_LINAIS_FR')
+    and (nvl(ref_donnee_ecran.mode_saisie, ref_donnee_ecran_defaut.mode_saisie) not in ('hidden') or ref_donnee_ecran_defaut.nom_donnee='LINAIS')
+    and (ref_donnee_generale.nom_dictionnaire like e.nom_dictionnaire||'%' or ref_donnee_generale.nom_dictionnaire='DIC_DONNEES_VIRTUELLES')
+    and page_elt.nom_page in (select nom_page from sys_sch_profil_p)

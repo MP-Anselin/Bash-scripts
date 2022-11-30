@@ -1,0 +1,20 @@
+<interfaces>
+	<interface idInterface="GTAEXT">
+		<nomInterface>Import des fichiers en provenance d'une GTA externe</nomInterface>
+		<descriptionInterface>Cette interface permet d'importer des donnees envoyees par une GTA autre que la GTA-D</descriptionInterface>
+		<SupprimerFichier>non</SupprimerFichier>
+		<traitements>
+			<traitement>
+				<RepertoireFichierCommande>/ehc/fs1/adp/gxplink/common/batch/bin409</RepertoireFichierCommande>
+				<descriptionTraitement>Un import</descriptionTraitement>
+				<typeTraitement>GTA_EXTERNE</typeTraitement>
+				<modeDebug>true</modeDebug>
+				<delimiter>;</delimiter>
+				<paquetSize>10000</paquetSize>
+				<hostPilotName>RDST</hostPilotName>
+				<gatewayDirectory>GTW</gatewayDirectory>
+				<prefixZip>VOJSGTES</prefixZip>
+			</traitement>
+		</traitements>
+	</interface>
+</interfaces>

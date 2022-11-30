@@ -1,0 +1,97 @@
+##
+TAG_CHARSET=@€éèç
+##
+HRORG_CONSOLIDE_AFFECTATION
+=SQL=
+create or replace PROCEDURE HRORG_CONSOLIDE_AFFECTATION AS
+ TYPE tcur
+ IS
+ REF
+ CURSOR;
+ c_struc_affec tcur;
+ aff_codts               NUMBER;
+ aff_matric              VARCHAR2 (32);
+ aff_code_entite         VARCHAR2 (25);
+ aff_date_eff            VARCHAR2 (8);
+ aff_date_fin            VARCHAR2 (8);
+ aff_est_affec_principal VARCHAR2 (1);
+ pre_codts               NUMBER;
+ pre_matric              VARCHAR2 (32);
+ pre_code_entite         VARCHAR2 (25);
+ pre_date_eff            VARCHAR2 (8);
+ pre_date_fin            VARCHAR2 (8);
+ pre_est_affec_principal  VARCHAR2 (1);
+ pre_tmp_date_fin        DATE ;
+ aff_tmp_date_eff        DATE ;
+ exit_function           EXCEPTION;
+ BEGIN
+ /** 
+  * Le rôle de cette procédure est de réduire le nombre de lignes dans la table STD_STRUC_AFFECTATION :
+  * quand 2 lignes se suivent pour un collaborateur/codts et que ces 2 lignes correspondant au même code_entite afin de regrouper les dates d'effet
+  */ 
+ EXECUTE_IMMEDIATE_STRING('TRUNCATE TABLE std_struc_affectation_consolid',0);
+ 
+ OPEN c_struc_affec FOR SELECT codts, matric,date_eff,date_fin,code_entite,est_affec_principal FROM std_struc_affectation ORDER BY codts,matric,date_eff;
+ LOOP
+ FETCH c_struc_affec
+ INTO aff_codts,
+ aff_matric,
+ aff_date_eff,
+ aff_date_fin,
+ aff_code_entite,
+ aff_est_affec_principal;
+ EXIT WHEN c_struc_affec % NOTFOUND;
+ 
+ IF (pre_code_entite IS NULL AND pre_date_eff IS NULL AND pre_date_fin IS NULL) THEN
+ -- Première affectation
+ pre_codts         := aff_codts;
+ pre_matric        := aff_matric;
+ pre_date_eff      := aff_date_eff;
+ pre_date_fin      := aff_date_fin;
+ pre_code_entite   := aff_code_entite;
+ pre_est_affec_principal := aff_est_affec_principal;
+ 
+ ELSIF (pre_codts <> aff_codts or pre_matric <> aff_matric or pre_code_entite <> aff_code_entite) THEN
+ -- Rupture : sur le codTs ou le matricule ou le code_entite
+ -- On enregistre la ligne
+ INSERT INTO STD_STRUC_AFFECTATION_CONSOLID (CODTS, MATRIC, DATE_EFF, DATE_FIN, CODE_ENTITE, EST_AFFEC_PRINCIPAL)
+ VALUES (pre_codts, pre_matric, pre_date_eff, pre_date_fin, pre_code_entite, pre_est_affec_principal);
+ -- On conserve les informations
+ pre_codts        := aff_codts;
+ pre_matric       := aff_matric;
+ pre_date_eff     := aff_date_eff;
+ pre_date_fin     := aff_date_fin;
+ pre_code_entite  := aff_code_entite;
+ pre_est_affec_principal := aff_est_affec_principal;
+ ELSE
+ -- Pas de rupture, on contrôle les dates
+ pre_tmp_date_fin     := to_date(pre_date_fin,'YYYYMMDD') ;
+ aff_tmp_date_eff     := to_date(aff_date_eff,'YYYYMMDD') ;
+ 
+ IF(pre_tmp_date_fin+1 = aff_tmp_date_eff) THEN
+ -- On consolide
+ pre_date_fin       := aff_date_fin;
+ ELSE
+ -- On enregistre la ligne
+ INSERT INTO STD_STRUC_AFFECTATION_CONSOLID(CODTS, MATRIC, DATE_EFF, DATE_FIN, CODE_ENTITE, EST_AFFEC_PRINCIPAL)
+ VALUES(pre_codts, pre_matric, pre_date_eff, pre_date_fin, pre_code_entite, pre_est_affec_principal);
+ -- On conserve les informations
+ pre_codts       := aff_codts;
+ pre_matric      := aff_matric;
+ pre_date_eff    := aff_date_eff;
+ pre_date_fin    := aff_date_fin;
+ pre_code_entite := aff_code_entite;
+ pre_est_affec_principal := aff_est_affec_principal;
+ END IF ;
+ END IF ;
+ END LOOP;
+ CLOSE c_struc_affec;
+ -- On enregistre la dernière ligne
+ INSERT INTO std_struc_affectation_consolid(CODTS, MATRIC, DATE_EFF, DATE_FIN, CODE_ENTITE, EST_AFFEC_PRINCIPAL)
+ VALUES(pre_codts, pre_matric, pre_date_eff, pre_date_fin, pre_code_entite, pre_est_affec_principal);
+ 
+ -- On remplace les données de  STD_STRUC_AFFECTATION par les données que l'on vient de consolider
+ EXECUTE_IMMEDIATE_STRING('TRUNCATE TABLE std_struc_affectation',0);
+ INSERT INTO std_struc_affectation (select * from STD_STRUC_AFFECTATION_CONSOLID);
+ 
+ END HRORG_CONSOLIDE_AFFECTATION;

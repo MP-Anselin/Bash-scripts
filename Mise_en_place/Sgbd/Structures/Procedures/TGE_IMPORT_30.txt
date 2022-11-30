@@ -1,0 +1,352 @@
+##
+TAG_CHARSET=@€éèç
+##
+TGE_IMPORT_30
+=SQL=
+create or replace PROCEDURE TGE_IMPORT_30
+(
+    P_LOGIN       IN VARCHAR2 ,
+    P_DATE_IMPORT IN VARCHAR2 ,
+    P_ROLE        IN VARCHAR2 ,
+    -- Origine écran
+    P_ORIGINE     IN VARCHAR2 ,
+    P_VALIDATION  IN VARCHAR2 ,
+    P_WITH30      IN VARCHAR2 ,
+    P_CODLANG     IN VARCHAR2,
+    -- Valeurs attendues : EC -> écran création, EM -> écran modification, GAP -> création en sous-marin, I --> pour le préchargement des imports Web, VI -> pour la validation des imports Web ou Batch
+    P_TYPE_ACTION IN VARCHAR2 ,
+    P_DATE_MAJ    IN SYS_TRC_MODIF.DATEMAJ%type)
+AS
+  isClientZEUFE NUMBER;
+  reqDel CLOB;
+  w_err   VARCHAR2(2000);
+  v_start NUMBER;
+  v_stop  NUMBER;
+  req CLOB;
+  reqvalues CLOB;
+  reqInsert CLOB;
+  dateMaj SYS_TRC_MODIF.datemaj%type;
+  functionnalityTrace VARCHAR2(250);
+BEGIN
+  v_start       := DBMS_UTILITY.GET_TIME;
+  SELECT COUNT(*) INTO isClientZEUFE FROM USER_TABLES WHERE TABLE_NAME ='MULTICLIENT_REF_PAC' ;
+  IF P_DATE_MAJ IS NULL THEN
+    SELECT CURRENT_TIMESTAMP INTO dateMaj FROM dual;
+  ELSE
+    dateMaj:= P_DATE_MAJ;
+  END IF;
+  IF ( P_WITH30 =1) THEN
+    BEGIN
+      TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'début controle carte 30');
+      TGE_CONTROLE_30 (p_login, p_date_import, NULL, p_codlang, P_TYPE_ACTION);
+    EXCEPTION
+    WHEN OTHERS THEN
+      w_err := SQLCODE;
+      w_err := w_err||'  '||sqlerrm;
+      TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'imp:TGE_CONTROLE_30 - Erreur : ' || w_err);
+      IF (P_LOGIN != 'BATCH') THEN
+      	-- On remonte l'erreur à l'application
+      	raise;
+      END IF;
+    END ;
+  END IF;
+  IF p_validation = 1 THEN
+    BEGIN
+      TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'début validation : insertion TGE_ELEMENTS_PAIE');
+      INSERT
+      INTO TGE_ELEMENTS_PAIE
+        (
+          NUMPAC ,
+          PAIEZAD ,
+          PERIODE ,
+          TYPE_TRAITEMENT ,
+          CODE_ELEMENT ,
+          INDICATIF ,
+          ORIGINE ,
+          SENS ,
+          VALEUR ,
+          DERNIER_CODE_OPE ,
+          LOGIN_MAJ ,
+          DATE_MAJ ,
+          CLE_IMPORT ,
+          IDPACMAT,
+          type_writer,
+          CODE_REMPLACEMENT,
+          DATE_EFFET,
+         ACTION_RETRO,
+         ACTION_RETRO_DATE
+        )
+      SELECT E.NUMPAC ,
+        PAIEZAD ,
+        PERIODE ,
+        TYPE_TRAITEMENT ,
+        CODE_ELEMENT ,
+        UPPER (NVL(INDICATIF,'*')) AS INDICATIF,
+        ORIGINE ,
+        SENS ,
+        VALEUR ,
+        'C' ,
+        p_login ,
+        TO_CHAR (sysdate, 'YYYYMMDDHH24MI') ,
+        CASE
+          WHEN 'VI' = P_TYPE_ACTION or 'MP' = P_TYPE_ACTION
+          -- Pour les EZ, on va stocker une clé d'import en import et en MP
+		  -- afin de pouvoir retrouver la ligne créée pour les traces
+          THEN P_LOGIN
+            ||'#'
+            ||P_DATE_IMPORT
+            ||'#'
+            ||NUMLIGNE
+          ELSE NULL
+        END AS CLE_IMPORT,
+        CASE
+          WHEN E.NUMPAC IS NOT NULL
+          AND PACMAT    IS NOT NULL
+          THEN RPAD(E.NUMPAC,6)
+            || PACMAT
+          ELSE ' '
+        END AS IDPACMAT,
+        CASE
+          WHEN (SELECT O.MODE_T2
+              ||'#'
+              ||O.ENVOI_MODE_R
+            FROM TGE_REF_ORIGINE_GTA O
+            WHERE O.NUMPAC     = E.NUMPAC
+            AND O.CODE_ORIGINE = E.ORIGINE) = 'R#N'
+          THEN 'N'
+          ELSE NULL
+        END AS TYPE_WRITER,
+        NVL(E.CODE_REMPLACEMENT,'*') AS CODE_REMPLACEMENT,
+        TO_DATE(E.DATE_EFFET,'YYYYMMDD') AS DATE_EFFET,
+        -- Gestion Action Retro : pour ne pas bousiller les perfs, on va positionner une valeur '*' dans actionRetro et null dans actionRetroDate
+        -- et ensuite avec une requête d'update mettre à jour la valeur de actionRetro et actionRetroDate.
+        -- On évite ainsi de faire 2 sous-select sur TGE_REF_PAC ou une jointure globale pour récupérer TGE_REF_PAC.PERIODEENCOURS
+        case
+        	when  E.PERIODE < (select PAC.PERIODEENCOURS from TGE_REF_PAC PAC where PAC.NUMPAC = E.NUMPAC)
+         	then '*'
+         	else NULL
+        end as ACTION_RETRO,
+        NULL as ACTION_RETRO_DATE
+                             
+      FROM TGE_IMPORT_ELEMENTS E
+      WHERE LOGIN           =P_LOGIN
+      AND CODE_ELEMENT NOT IN ('B690','B691')
+      AND DATE_IMPORT       = p_date_import
+      AND ((ERREURS        IS NULL
+      AND STATUT            = 'TRAIT')
+      OR (ERREURS          IS NOT NULL
+      AND STATUT            = 'TRANS'));
+      
+      -- Gestion Action Retro : si création d'une ligne rétro, on sauvegarde qu'il s'agit d'une création comme première action et la date à laquelle elle a eu lieu
+      update TGE_ELEMENTS_PAIE set 
+      	ACTION_RETRO = 'C',
+      	ACTION_RETRO_DATE = DATE_MAJ
+      where ACTION_RETRO = '*';
+      
+    EXCEPTION
+    WHEN OTHERS THEN
+      w_err := SQLCODE;
+      w_err := w_err||'  ' ||sqlerrm;
+      TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'ValidElement - Erreur : ' || w_err);
+      IF (P_LOGIN != 'BATCH' or SQLCODE=-20001) THEN
+      	-- On remonte l'erreur à l'application
+      	raise;
+      END IF;
+    END ;
+        
+    --- Gestion de la trace pour les imports ou la MarketPlace : on enregistre une trace pour chaque ligne de l'import qui n'est pas en erreur
+    IF P_TYPE_ACTION = 'VI' or P_TYPE_ACTION = 'MP' THEN
+    	functionnalityTrace := 'IMPORT_ELEMENT_PAIE';
+    	IF P_TYPE_ACTION = 'MP' THEN
+    		functionnalityTrace := 'IMPORT_ELEMENT_PAIE_MP';
+    	END IF;
+    	
+      	TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'Début SYS_TRC_MODIF pour insertion EZ');
+      	
+		insert into SYS_TRC_MODIF (LOGIN, DATEMAJ, ROLE, FUNCTIONNALITY, KEYS_VALUES, SHORT_NAME, ACTION, 
+	  		NAMES_VALUES_HAVE_CHANGED, AFTER_CHANGE, NUMPAC, PACMAT, PAIEZAD, MATRIC, DATE_EFFET)
+			select EI.LOGIN, SYSDATE, '3', functionnalityTrace, 
+			-- KEY_VALUES
+			'numPac='||E.NUMPAC||'&paieZad='||E.PAIEZAD||'&periode='||E.PERIODE||'&type_traitement='||E.TYPE_TRAITEMENT||'&code_element='||E.CODE_ELEMENT||'&indicatif='||E.INDICATIF||'&'||'code_remplacement='||E.CODE_REMPLACEMENT,
+			-- SHORT_NAME : on gère si c'est un élément de remplacement ou non
+			'Ajout d''un EZ' || decode(E.CODE_REMPLACEMENT, '*', '', ' rempl.'), 
+			-- ACTION
+			'C',
+			-- NAMES_VALUES_HAVE_CHANGED 
+			'numPac^paieZad^periode^type_traitement^code_element^indicatif^valeur^origine^dernier_code_ope^login_maj^date_maj^idPacMat^code_remplacement^date_effet^cle_import',
+			-- AFTER_CHANGE
+			E.NUMPAC||'^'||E.PAIEZAD||'^'||E.PERIODE||'^'||E.TYPE_TRAITEMENT||'^'||E.CODE_ELEMENT||'^'||E.INDICATIF||'^'||E.VALEUR
+			||'^'||E.ORIGINE||'^'||E.DERNIER_CODE_OPE||'^'||E.LOGIN_MAJ||'^'||E.DATE_MAJ||'^'||E.IDPACMAT||'^'||E.CODE_REMPLACEMENT
+			||'^'||E.DATE_EFFET||'^'||E.CLE_IMPORT,
+			-- NUMPAC / PACMAT / PAIEZAD / MATRIC / DATE_EFFET
+			E.NUMPAC, EI.PACMAT, E.PAIEZAD, EI.MATRICULE, E.DATE_EFFET
+		from TGE_ELEMENTS_PAIE E inner join TGE_IMPORT_ELEMENTS EI on E.CLE_IMPORT = EI.LOGIN||'#'||EI.DATE_IMPORT||'#'||EI.NUMLIGNE
+		where EI.LOGIN = P_LOGIN and EI.DATE_IMPORT = P_DATE_IMPORT;
+    END IF;
+    
+    -- Mise à jour de la column RETRO_GC de la table TGE_PERIODE_RECUEIL_PAIEZAD
+    -- si la "full" rétroactivité n'est pas activé sur le pac
+    UPDATE TGE_PERIODE_RECUEIL_PAIEZAD R
+    SET R.RETRO_GC =
+      (SELECT E.VALEUR
+      FROM TGE_ELEMENTS_PAIE E
+      WHERE R.NUMPAC     = E.NUMPAC
+      AND R.PAIEZAD      = E.PAIEZAD
+      AND R.MOIS_PAIE    = E.PERIODE
+      AND E.CODE_ELEMENT = 'WG96'
+      )
+    WHERE (R.NUMPAC, R.PAIEZAD, R.MOIS_PAIE) IN
+      (SELECT e2.numpac,
+        e2.paiezad,
+        e2.periode
+      FROM TGE_IMPORT_ELEMENTS E2
+      WHERE e2.login     = P_LOGIN
+      AND e2.date_import = p_date_import
+      AND ((e2.ERREURS  IS NULL
+      AND e2.STATUT     IN ('TRAIT','FIN'))
+      OR (e2.ERREURS    IS NOT NULL
+      AND e2.STATUT      = 'TRANS'))
+      AND EXISTS (SELECT 'ACTIVE_RETRO_GC'
+	 	FROM TGE_REF_PAC
+	 	WHERE NUMPAC = e2.NUMPAC
+	 		AND (DEB_RETRO IS NULL OR DEB_RETRO > e2.periode)
+	 	)
+      );
+    ----------------------------------------------------------------------------
+    
+    TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'début update TGE_IMPORT_ELEMENTS');
+    -- Mise à jour des lignes d'import qui sont encore en erreur après validation, statut prend TRANS
+   	UPDATE TGE_IMPORT_ELEMENTS
+   	SET STATUT ='TRANS'
+   	WHERE LOGIN = P_LOGIN
+   	AND DATE_IMPORT = p_date_import
+   	AND (ERREURS IS NOT NULL
+   	AND STATUT = 'TRAIT')
+   	AND CODE_ELEMENT NOT IN ('B690','B691');
+	
+   	-- Mise à jour des lignes d'import qui ne sont plus en erreur après validation, statut prend FIN
+    UPDATE TGE_IMPORT_ELEMENTS
+    SET STATUT ='FIN'
+    WHERE LOGIN = P_LOGIN
+    AND DATE_IMPORT = p_date_import
+    AND ERREURS IS NULL
+    AND CODE_ELEMENT NOT IN ('B690','B691');
+    IF (isClientZEUFE = 1) THEN
+      -- Suppression des lignes dans dans DIC_IMPUTA
+      TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'début DELETE FROM DIC_IMPUTA'); 
+      reqDel := 'DELETE FROM DIC_IMPUTA A WHERE (A.NUMPAC,A.PAIEZAD) IN (SELECT B.NUMPAC, B.paiezad FROM TGE_IMPORT_ELEMENTS B WHERE B.CODE_ELEMENT >=''B690'' AND B.CODE_ELEMENT   <=''B691'' AND B.CODE_ELEMENT IS NOT NULL';
+      reqDel := reqDel || ' AND B.ERREURS IS NULL AND B.DATE_IMPORT  = ''' || p_date_import || ''' AND B.LOGIN = ''' || P_LOGIN || ''' GROUP BY LOGIN,NUMPAC,PAIEZAD,DATE_IMPORT,INDICATIF HAVING COUNT(DISTINCT B.CODE_ELEMENT) >1)';
+    ELSE   
+      -- Suppression des lignes dans DIC_TGE_IMPUTATION_PERMANENTE
+      TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'début DELETE FROM dic_tge_imputations_perm');
+      reqDel := 'DELETE FROM DIC_TGE_IMPUTATIONS_PERM A WHERE (A.NUMPAC,A.PAIEZAD) IN (SELECT B.NUMPAC, B.paiezad FROM TGE_IMPORT_ELEMENTS B WHERE B.CODE_ELEMENT >=''B690'' AND B.CODE_ELEMENT   <=''B691'' AND B.CODE_ELEMENT IS NOT NULL';
+      reqDel := reqDel || ' AND B.ERREURS IS NULL AND B.DATE_IMPORT  = ''' || p_date_import || ''' AND B.LOGIN = ''' || P_LOGIN || ''' GROUP BY LOGIN,NUMPAC,PAIEZAD,DATE_IMPORT,INDICATIF HAVING COUNT(DISTINCT B.CODE_ELEMENT ) >1)';
+    END IF;
+    EXECUTE_IMMEDIATE_STRING( reqDel,0);
+    /*DELETE
+    FROM DIC_TGE_IMPUTATIONS_PERM A
+    WHERE (A.NUMPAC,A.PAIEZAD) IN
+      (SELECT B.NUMPAC,
+        B.paiezad
+      FROM TGE_IMPORT_ELEMENTS B
+      WHERE B.CODE_ELEMENT >='B690'
+      AND B.CODE_ELEMENT   <='B691'
+      AND B.CODE_ELEMENT   IS NOT NULL
+      AND B.ERREURS        IS NULL
+      AND B.DATE_IMPORT     = p_date_import
+      AND B.LOGIN           = P_LOGIN
+      GROUP BY LOGIN,
+        NUMPAC,
+        PAIEZAD,
+        DATE_IMPORT,
+        INDICATIF
+      HAVING COUNT(DISTINCT B.CODE_ELEMENT ) >1
+      ) ;*/
+    IF (isClientZEUFE = 1) THEN
+      -- Ajout dans la table  DIC_IMPUTA
+      TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'début Ajout dans la table DIC_IMPUTA');
+    ELSE
+      -- Ajout dans la table  DIC_TGE_IMPUTATION_PERMANENTE
+      TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'début Ajout dans la table  DIC_TGE_IMPUTATION_PERMANENTE');
+    END IF;
+    FOR b_numpac IN
+    (SELECT DISTINCT numpac
+    FROM TGE_IMPORT_ELEMENTS
+    WHERE LOGIN       = P_LOGIN
+    AND DATE_IMPORT   = p_date_import
+    AND ERREURS      IS NULL
+    AND code_ELEMENT IN ('B690','B691')
+    )
+    LOOP
+    IF (isClientZEUFE = 1) THEN
+      req      :='insert into DIC_IMPUTA p(numpac,paiezad,MATRIC,pacmat';
+    ELSE 
+      req      :='insert into DIC_TGE_IMPUTATIONS_PERM p(numpac,paiezad,MATRIC,pacmat';
+    END IF;
+      reqInsert:='select numpac,paiezad,MATRICULE,pacmat,';
+      reqvalues:= ' from (select numpac,paiezad,MATRICULE,pacmat,code_element||''#''||indicatif as el, valeur';
+      reqvalues:= reqvalues|| ' from TGE_IMPORT_ELEMENTS b where login='''||p_login||''' and date_import='''||P_DATE_IMPORT||''' and code_element in (''B690'',''B691'')  )';
+
+
+      reqvalues:= reqvalues|| '  pivot (max(valeur)   for(el) in (';
+      TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'Trace SYS_TRC_MODIF : insertion DIC_TGE_IMPUTATIONS_PERM');
+      FOR cur IN
+      (SELECT ELEMENT,
+        occurence,
+        DOnneegxp,
+        tablegxp
+      FROM tge_ref_mapdo
+      WHERE element IN ('B690','B691')
+      AND numpac     =b_numpac.numpac
+      UNION
+      SELECT ELEMENT,
+        occurence,
+        DOnneegxp,
+        tablegxp
+      FROM tge_ref_mapdo
+      WHERE element IN ('B690','B691')
+      AND numpac     ='*'
+      )
+      LOOP
+        req           :=req||','||cur.DONNEEGXP;
+        reqvalues     := reqvalues||''''||cur.element||'#'||cur.occurence ||''' as '|| cur.DONNEEGXP||',';
+        IF cur.element ='B690' THEN
+          reqInsert   := reqInsert||cur.DONNEEGXP ||',';
+        ELSE
+          reqInsert:= reqInsert||' IS_NUMBER(replace('||cur.DONNEEGXP ||','','',''.'')) as '||cur.DONNEEGXP ||' ,';
+        END IF;
+        IF P_LOGIN = 'BATCH' THEN
+          SYS_TRACE_MODIF(P_LOGIN,dateMaj,'3','IMPUTATION_PAIE', 'CARTE=30&LOGIN='||P_LOGIN||'&DATE_IMPORT='||P_DATE_IMPORT||'&ROLE=3'||'&ORIGINE='||P_ORIGINE||'&ELEMENT='||cur.element||'&DONNEEGXP='||cur.DONNEEGXP, 'Import Batch 30 B690/B691','C',NULL,NULL,NULL,NULL);
+        END IF;
+      END LOOP;
+      reqvalues:= SUBSTR(reqvalues,1,LENGTH(reqvalues)-1)||'))  ';
+      reqvalues:= reqvalues|| ' b where   exists (select 1 from TGE_IMPORT_ELEMENTS c where c.login='''||p_login||'''  and c.date_import='''||P_DATE_IMPORT||'''  and b.numpac=c.numpac and b.paiezad=c.paiezad and c.code_element=''B690''   and ERREURs is  null)
+      and  exists (select 1 from TGE_IMPORT_ELEMENTS c where c.login='''||p_login||''' and c.date_import='''||P_DATE_IMPORT||''' and b.numpac=c.numpac and b.paiezad=c.paiezad and c.code_element=''B691''  and ERREURs is  null) ';
+      reqInsert:= SUBSTR(reqInsert,1,LENGTH(reqInsert)-1);
+      req      :=req||')  ';
+      req      :=req||reqInsert|| reqvalues;
+       EXECUTE_IMMEDIATE_STRING( req,0);
+    END LOOP;
+    TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'début UPDATE TGE_IMPORT_LISTE');
+    UPDATE TGE_IMPORT_LISTE
+    SET NBLIGNES_ERR =
+      (SELECT COUNT(*)
+      FROM TGE_IMPORT_ELEMENTS
+      WHERE LOGIN     = P_LOGIN
+      AND DATE_IMPORT = p_date_import
+      AND ERREURS    IS NOT NULL
+      ),
+      NBLIGNES_IMP =
+      (SELECT COUNT(*)
+      FROM TGE_IMPORT_ELEMENTS
+      WHERE LOGIN     = P_LOGIN
+      AND DATE_IMPORT = p_date_import
+      ),
+      STATUT        ='TRANS'
+    WHERE LOGIN     = P_LOGIN
+    AND DATE_IMPORT = p_date_import
+    AND TYPE        = '2';
+    -- Inscription en recyclage
+    TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'Inscription en recyclage');
+  END IF;
+END TGE_IMPORT_30;

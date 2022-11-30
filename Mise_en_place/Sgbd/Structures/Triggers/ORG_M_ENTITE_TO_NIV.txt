@@ -1,0 +1,171 @@
+##
+TAG_CHARSET=@€éèç
+##
+ORG_M_ENTITE_TO_NIV
+=SQL=
+create or replace
+TRIGGER "ORG_M_ENTITE_TO_NIV" AFTER UPDATE
+ON STD_STRUC_ENTITE FOR EACH ROW
+declare 
+-- trigger qui modifie dans la table de niveau appropriée le libellé
+derNiv NUMBER        :=0 ;
+codts  NUMBER        :=0 ;
+  sigleAdr VARCHAR2(20) := '';
+  comAdr VARCHAR2(50) := '';
+  numvoiAdr VARCHAR2(4) := '';
+  bisterAdr VARCHAR2(1) := '';
+  typvoiAdr VARCHAR2(3) := '';
+  nomvoiAdr VARCHAR2(35) := '';
+  cinseeAdr VARCHAR2(6) := '';
+  bourgAdr VARCHAR2(30) := '';
+  copostAdr VARCHAR2(5) := '';
+  budistAdr VARCHAR2(30) := '';
+  noteleAdr VARCHAR2(20) := '';
+  nofaxAdr VARCHAR2(20) := '';
+  emailAdr VARCHAR2(50) := '';
+  copaysAdr VARCHAR2(3) := '';
+  typstrAdr VARCHAR2(4) := '';
+  existeValeur  NUMBER :=0;
+LE$trop_long exception ;
+pragma exception_init( LE$trop_long, -12899 ) ;
+BEGIN
+-- si l'occurrence de STD_STRUC_ENTITE est à la date du jour on va tenter la mise à jour dans une table de niveau
+ if to_char(SYSDATE,'yyyymmdd') between :new.date_eff and :new.date_fin then
+-- recuperation du niveau
+   begin 
+    select Sn.niveau,SA.CODTS into derNiv,codts from  std_struc_niv sn ,STD_STRUC_ARBRE SA
+    where sn.codts=SA.CODTS and sn.type_entite=:new.TYPE_ENTITE and SA.CODE_ENTITE=:new.CODE_ENTITE
+    and to_char(SYSDATE,'yyyymmdd') between sn.date_eff and sn.date_fin 
+    and to_char(SYSDATE,'yyyymmdd') between SA.date_eff and SA.date_fin ;
+      --dbms_output.put_line('derNiv : '||derNiv);
+      --FIXME utiliser la procédure trace_dbms_output()
+     exception
+     when no_data_found then
+     --dbms_output.put_line('ici'||derNiv);
+     --FIXME utiliser la procédure trace_dbms_output()
+     NULL;
+     when others then
+     --dbms_output.put_line('pas de niveau');
+     --FIXME utiliser la procédure trace_dbms_output()
+     NULL;
+    end;
+  -- recuperation infos adresse
+       begin 
+       if :new.ID_ADRESSE !='' then
+        select SIGLE,COMADR,NUMVOI,BISTER,TYPVOI,NOMVOI,CINSEE,BOURG,COPOST,BUDIST,COPAYS,NOTELE,NOFAX,EMAIL into  sigleAdr,comAdr,numvoiAdr,bisterAdr,typvoiAdr,nomvoiAdr , cinseeAdr, bourgAdr,copostAdr, budistAdr,copaysAdr,  noteleAdr, nofaxAdr ,  emailAdr    from  STD_ADRESSE WHERE ID_ADRESSE=:new.ID_ADRESSE;
+      --dbms_output.put_line('identifiant adresse : '||:new.ID_ADRESSE);
+      --FIXME utiliser la procédure trace_dbms_output()
+       end if;
+    exception
+       when no_data_found then
+       --dbms_output.put_line('pas de donnée trouvée adresse'||:new.ID_ADRESSE);
+       --FIXME utiliser la procédure trace_dbms_output()
+       NULL;
+       when others then
+        --dbms_output.put_line('problème recherche adresse : '||:new.ID_ADRESSE);
+        --FIXME utiliser la procédure trace_dbms_output()
+        NULL;
+    end;
+      --dbms_output.put_line('autre begin');
+      --FIXME utiliser la procédure trace_dbms_output()
+   BEGIN
+         if derNiv =1 then 
+  --mise à jour dans NIV1
+           --dbms_output.put_line('avant update niv1 : '||:new.LIBELLE);
+           --FIXME utiliser la procédure trace_dbms_output()
+               if :new.LIBELLE is not null then
+                 update NIV1 set LIBNIV1=SUBSTR(:new.LIBELLE,0,100) where CODTS=codts and CODNIV1=:new.CODE_ENTITE ;
+                    else
+                update NIV1 set LIBNIV1='' where CODTS=codts and CODNIV1=:new.CODE_ENTITE ;
+             end if;
+               begin 
+               --dbms_output.put_line('Avant mise à jour adresse : '||:new.ID_ADRESSE);
+               --FIXME utiliser la procédure trace_dbms_output()
+               if ( :new.ID_ADRESSE is not null or :new.SIREN is not null or :new.NIC is not null)   then
+              --update ou insertion
+                begin
+                    select CODTS into existeValeur from std_adrstr where CODTS=codts and CODNIV1=:new.CODE_ENTITE and (codniv2 ='' or codniv2 is null) ;
+                                     exception
+             when no_data_found then
+                     --dbms_output.put_line('Insere adresse ');
+                     --FIXME utiliser la procédure trace_dbms_output()
+                     insert into STD_ADRSTR (CODTS,CODNIV1,CODNIV2,CODNIV3,CODNIV4,CODNIV5,CODNIV6,SIGLE,CPLADR,NUMV,BTQ,TYPV,NOMV,INSEE,COM,CP,DISTRI,TEL,SIREN,NIC,FAX,EMAIL,CODP,TYPSTR) values (codts,:new.CODE_ENTITE,'','','','','',sigleAdr,comAdr,numvoiAdr,bisterAdr,typvoiAdr,nomvoiAdr,cinseeAdr,bourgAdr,copostAdr,budistAdr,noteleAdr,:new.SIREN,:new.NIC,nofaxAdr,emailAdr,copaysAdr,typstrAdr);            
+             end;
+                --dbms_output.put_line('Code type structure existe dans adresse : '||existeValeur);
+                --FIXME utiliser la procédure trace_dbms_output()
+                 if ( existeValeur is not null and existeValeur>0) then
+                     --dbms_output.put_line('Update adresse ');
+                     --FIXME utiliser la procédure trace_dbms_output()
+                    update STD_ADRSTR set SIGLE=sigleAdr,CPLADR=comAdr,NUMV=numvoiAdr,BTQ=bisterAdr,TYPV=typvoiAdr,NOMV=nomvoiAdr,INSEE=cinseeAdr,COM=bourgAdr,CP=copostAdr,DISTRI=budistAdr,TEL=noteleAdr,SIREN=:new.SIREN,NIC=:new.NIC,FAX=nofaxAdr,EMAIL=emailAdr,CODP=copaysAdr,TYPSTR=typstrAdr  where CODTS=codts and CODNIV1=:new.CODE_ENTITE and (codniv2 ='' or codniv2 is null) ;            
+                  end if;
+             else
+               --dbms_output.put_line('Delete adresse ');
+               --FIXME utiliser la procédure trace_dbms_output()
+              delete from STD_ADRSTR where CODTS=codts and CODNIV1=:new.CODE_ENTITE and (codniv2 ='' or codniv2 is null) ;
+            end if;
+               exception
+  When OTHERS then
+    --dbms_output.put_line('Code type structure existe dans adresse : '||existeValeur);
+    --dbms_output.put_line( 'Code    erreur : ' || to_char( SQLCODE )) ;
+    --dbms_output.put_line( 'libellé erreur : ' || to_char( SQLERRM )) ; 
+    --dbms_output.put_line('problème de mise à jour de l''adresse');
+    --FIXME utiliser la procédure trace_dbms_output()
+    NULL;
+            end;
+           end if;
+           if derNiv =2 then 
+  --mise à jour dans NIV2
+               if :new.LIBELLE is not null then
+                 update NIV2 set LIBNIV2=SUBSTR(:new.LIBELLE,0,100) where CODTS=codts and CODNIV2=:new.CODE_ENTITE ;
+                    else
+                update NIV2 set LIBNIV2='' where CODTS=codts and CODNIV2=:new.CODE_ENTITE ;
+             end if;
+         end if;
+  --mise à jour dans NIV3
+         if derNiv =3 then 
+               if :new.LIBELLE is not null then
+                 update NIV3 set LIBNIV3=SUBSTR(:new.LIBELLE,0,100) where CODTS=codts and CODNIV3=:new.CODE_ENTITE ;
+                    else
+                update NIV3 set LIBNIV3='' where CODTS=codts and CODNIV3=:new.CODE_ENTITE ;
+             end if;
+      end if;
+         --insertion dans NIV4
+    if derNiv =4 then 
+               if :new.LIBELLE is not null then
+                 update NIV4 set LIBNIV4=SUBSTR(:new.LIBELLE,0,100) where CODTS=codts and CODNIV4=:new.CODE_ENTITE ;
+                    else
+                update NIV4 set LIBNIV4='' where CODTS=codts and CODNIV4=:new.CODE_ENTITE ;
+             end if;
+       end if;
+  --mise à jour dans NIV5
+    if derNiv =5 then 
+               if :new.LIBELLE is not null then
+                 update NIV5 set LIBNIV5=SUBSTR(:new.LIBELLE,0,100) where CODTS=codts and CODNIV5=:new.CODE_ENTITE ;
+                    else
+                update NIV5 set LIBNIV5='' where CODTS=codts and CODNIV5=:new.CODE_ENTITE ;
+             end if;
+     end if;
+  --mise à jour dans NIV6
+           if derNiv =6 then 
+              if :new.LIBELLE is not null then
+                 update NIV6 set LIBNIV6=SUBSTR(:new.LIBELLE,0,100) where CODTS=codts and CODNIV6=:new.CODE_ENTITE ;
+                    else
+                update NIV6 set LIBNIV6='' where CODTS=codts and CODNIV6=:new.CODE_ENTITE ;
+             end if;
+     end if;
+      exception
+when LE$trop_long then
+  --dbms_output.put_line('problème de mise à jour lié à non existance probable dans table de niveau');
+  --FIXME utiliser la procédure trace_dbms_output()
+  NULL;
+  When OTHERS then
+   --dbms_output.put_line('problème de mise à jour lié à non existance probable dans table de niveau');
+   --FIXME utiliser la procédure trace_dbms_output()
+   null;
+end ;
+end if;
+END;
+##
+ORG_M_ENTITE_TO_NIV
+=SQL=
+DROP TRIGGER ORG_M_ENTITE_TO_NIV

@@ -1,0 +1,32 @@
+##
+TAG_CHARSET=@€ιθη
+##
+SYS_JSPTAG
+=SQL IFNOTEXIST=SYS_JSPTAG=
+CREATE TABLE "SYS_JSPTAG"    (	"NOMPAGE" VARCHAR2(250 BYTE), 	"FIELDNAME" VARCHAR2(50 BYTE), 	"ACTIF" VARCHAR2(1 BYTE), 	 PRIMARY KEY ("NOMPAGE"))
+##
+SYS_JSPTAG
+==
+DELETE FROM SYS_JSPTAG
+'GestionAideEnLigneJsonServlet_saveBrouillon','texteAide','O'
+'GestionChartsJsonServlet_testRequete','requete','O'
+'GestionChartsJsonServlet_updateGraphe','requete','O'
+'Modules/ADP_ONLY/Parametrage/modal/DashboardParamCMS.jsp','DASH_REQ','O'
+'Modules/Parametrage/Edition.jsp','param','O'
+'Modules/Parametrage/TemplatesEdition.jsp','DATA_TEMPLATE','O'
+'Modules/Parametrage/TexteModele.jsp','T_MODELE','O'
+'Modules/Parametrage/TexteModelePlanning.jsp','T_MODELE','O'
+'Moteur/ADP_ONLY/Comp/WebAdmin/Publication/PublicationAlertExpertCMS.jsp','RequeteAlerte','O'
+'Moteur/Comp/AppliRequeteurVisualiser.jsp','JOINTURES','O'
+'Moteur/Comp/WebAdmin/GestionAppelsTable.jsp','clauseWhere','O'
+'Moteur/Comp/WebAdmin/MajSI/ExportElementCMS.jsp','CLAUSE_WHERE','O'
+'Moteur/Comp/WebAdmin/Purge/ParametragePurgeTablesAjoutModif.jsp','WHERE_COMPLEXE','O'
+'Moteur/Comp/WebAdmin/StdErreurCMS.jsp','LIBERR_W','O'
+'Moteur/CreateFile.jsp','param','O'
+'Moteur/DescriptionStandard.jsp','DESCRIPTION','O'
+'ReqEditionsJsonServiceLet_updateFct','param10','O'
+'ReqEditionsJsonServiceLet_validation','requete','O'
+'VarSysJsonServlet_ajouterVarSys','valeur','O'
+'VarSysJsonServlet_ajouterVarSysUser','valeur','O'
+'VarSysJsonServlet_modifierVarSys','VALVAR_W','O'
+'VarSysJsonServlet_modifierVarSysUser','VALVAR_W','O'

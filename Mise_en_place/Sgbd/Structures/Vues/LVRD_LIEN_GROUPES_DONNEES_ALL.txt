@@ -1,0 +1,53 @@
+##
+LVRD_LIEN_GROUPES_DONNEES_ALL
+=SQL=
+CREATE OR REPLACE FORCE VIEW LVRD_LIEN_GROUPES_DONNEES_ALL (NUM_LIVRABLE,COMPANY_ID, ID_GROUPE, NOM_DONNEE, SUFFIXE_OU_LIBELLE, ORDRE, ID_GROUPE_DONNEES)
+                                                                                                   AS
+WITH liensDonneesGroupes(NUM_LIVRABLE, company_id, id_groupe, nom_donnee, id_groupe_donnees, suffixe_ou_libelle) AS
+  (SELECT 
+  gd.NUM_LIVRABLE,
+  gd.company_id,
+    gd.id_groupe,
+    CASE
+      WHEN SUBSTR(gd.nom_donnee,1,1)='#'
+      THEN gd.nom_donnee
+        ||'£'
+        ||gd.id_groupe
+      ELSE gd.nom_donnee
+    END AS nom_donnee,
+    gd.id_groupe,
+    gd.suffixe_ou_libelle
+  FROM lvrd_groupe_donnees gd
+  UNION ALL
+  SELECT 
+  l.NUM_LIVRABLE,
+  l.company_id,
+    l.id_groupe,
+    CASE
+      WHEN SUBSTR(gd.nom_donnee,1,1)='#'
+      THEN gd.nom_donnee
+        ||'£'
+        ||gd.id_groupe
+      ELSE gd.nom_donnee
+    END AS nom_donnee,
+    gd.id_groupe,
+    gd.suffixe_ou_libelle
+  FROM lvrd_groupe_donnees gd,
+    liensDonneesGroupes l
+  WHERE gd.company_id=l.company_id
+  AND gd.id_groupe   =l.suffixe_ou_libelle
+  AND l.nom_donnee LIKE '#GROUPE%'
+  )
+SELECT 
+NUM_LIVRABLE,
+company_id,
+  id_groupe,
+  CASE
+    WHEN INSTR(nom_donnee,'£')=0
+    THEN nom_donnee
+    ELSE SUBSTR(nom_donnee,1,INSTR(nom_donnee,'£')-1)
+  END AS nom_donnee,
+  suffixe_ou_libelle,
+  LVRD_ORDRE_DONNEE_IN_GROUPE(NUM_LIVRABLE, company_id, id_groupe, nom_donnee) AS ordre,
+  id_groupe_donnees
+FROM liensDonneesGroupes

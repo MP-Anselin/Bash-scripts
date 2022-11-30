@@ -1,0 +1,11 @@
+<interface idInterface="ENVOI_PHOTOS_CONTAINER">
+    <nomInterface>ENVOI_PHOTOS_CONTAINER</nomInterface>
+    <descriptionInterface></descriptionInterface>
+    <SupprimerFichier>non</SupprimerFichier>
+    <traitements>
+        <traitement>
+            <descriptionTraitement>Déposer un fichier Zip sur le NAS de document Container puis envoyer un message MQ</descriptionTraitement>
+            <typeTraitement>ENVOI_PHOTOS_CONTAINER</typeTraitement>
+        </traitement>
+    </traitements>
+</interface>

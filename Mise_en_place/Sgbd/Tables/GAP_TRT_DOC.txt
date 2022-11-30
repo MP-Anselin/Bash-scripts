@@ -1,0 +1,6 @@
+##
+TAG_CHARSET=@€ιθη
+##
+GAP_TRT_DOC
+=SQL IFEXIST=GAP_TRT_DOC=DOC_NAME=
+alter table GAP_TRT_DOC modify DOC_NAME varchar2(256 BYTE)

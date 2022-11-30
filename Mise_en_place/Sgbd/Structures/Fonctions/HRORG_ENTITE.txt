@@ -1,0 +1,80 @@
+##
+TAG_CHARSET=@€éèç
+##
+HRORG_ENTITE
+=SQL=
+CREATE OR REPLACE FUNCTION "HRORG_ENTITE"(
+    p_codts  IN std_struc_arbre.codts%TYPE,
+    p_niveau IN std_struc_niv.niveau%TYPE,
+    p_entite IN std_struc_entite.code_entite%TYPE,
+    p_date   IN std_struc_entite.date_eff%TYPE,
+    p_cid    IN std_struc_entite.cid%TYPE default null)
+  RETURN std_struc_entite.code_entite%TYPE
+IS
+  v_entite_mere VARCHAR2(25);
+  v_date_fin    VARCHAR2(8);
+  v_type_entite VARCHAR2(15);
+  v_niv_tech    NUMBER;
+  v_cid std_struc_entite.cid%TYPE;
+  
+BEGIN
+  
+  v_cid := p_cid;
+  IF (v_cid IS NULL) THEN
+  	BEGIN
+  		SELECT VALVAR INTO v_cid FROM SYS_VARSYS where CODVAR = 'NS_CLIENT_ID';
+  	EXCEPTION
+  	WHEN NO_DATA_FOUND THEN
+  		v_cid := null;
+  	END;
+  END IF;
+  IF (v_cid IS NULL) THEN
+  	-- En mode multiclient, la varsys peut être null et le passage du paramètre pCid est obligatoire
+  	RETURN null;
+  END IF;
+	
+  /* lecture du niveau technique de l'entité */
+  SELECT niv_tech
+  INTO v_niv_tech
+  FROM std_struc_index
+  WHERE niv_tech >= p_niveau
+  AND cid = v_cid
+  AND codts       = p_codts
+  AND last_entite = p_entite
+  AND p_date BETWEEN date_eff AND date_fin ;
+  
+  IF v_niv_tech IS NULL THEN
+    /* échec de la lecture */
+    RETURN NULL ;
+  ELSE
+    /* on vérifie le niveau technique dans la structure */
+    IF v_niv_tech > p_niveau THEN
+      /* lecture de l'arbre pour trouver l'entite mère un cran au-dessus */
+      SELECT code_ent_mere,
+        date_fin
+      INTO v_entite_mere,
+        v_date_fin
+      FROM std_struc_arbre
+      WHERE codts     = p_codts
+      AND cid = v_cid
+      AND code_entite = p_entite
+      AND p_date BETWEEN date_eff AND date_fin ;
+      
+      IF v_entite_mere IS NULL THEN
+        /* échec de la lecture de l'entité mère */
+        RETURN NULL ;
+      ELSE
+        /* appel récursif à la fonction avec l'entité mère */
+        RETURN HRORG_ENTITE(p_codts,p_niveau,v_entite_mere,p_date, v_cid) ;
+      END IF ;
+    ELSE
+      /* c'est bon on a l'entité du bon niveau */
+      --DBMS_OUTPUT.PUT_LINE('p_entite ' || p_entite);
+      --FIXME utiliser la procédure trace_dbms_output()
+      RETURN p_entite ;
+    END IF;
+  END IF;
+EXCEPTION
+WHEN OTHERS THEN
+  RETURN NULL ;
+END HRORG_ENTITE ;

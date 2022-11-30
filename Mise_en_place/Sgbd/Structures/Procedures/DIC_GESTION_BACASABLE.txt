@@ -1,0 +1,93 @@
+##
+DIC_GESTION_BACASABLE
+=SQL=
+create or replace PROCEDURE DIC_GESTION_BACASABLE( NOM_DICTIONNAIRE          IN VARCHAR2 ,
+ NOM_DICTIONNAIRE_IDPROJET IN VARCHAR2 ,
+ LISTKEYS                  IN VARCHAR2 ) AUTHID CURRENT_USER
+ AS
+ TYPE TYP_COL_NAME
+ IS
+ TABLE OF USER_TAB_COLUMNS.COLUMN_NAME%type ;
+ Tabcol TYP_COL_NAME ;
+ req  VARCHAR2(512);
+ lkey VARCHAR2(512);
+ ListCle TYP_COL_NAME ;
+ selectCle VARCHAR2(512);
+ v_nbMatric NUMBER(10);
+ BEGIN
+ BEGIN
+ EXECUTE_IMMEDIATE_STRING('DROP TABLE '||NOM_DICTIONNAIRE_IDPROJET ,0);
+ EXCEPTION
+ WHEN OTHERS THEN
+ --dbms_output.put('table absente '||NOM_DICTIONNAIRE_IDPROJET);
+ --FIXME utiliser la procédure trace_dbms_output()
+ NULL;
+ END ;
+  SELECT cols.column_name BULK COLLECT INTO ListCle
+  FROM USER_CONSTRAINTS cons, user_cons_columns cols
+  WHERE cols.table_name = NOM_DICTIONNAIRE
+  AND cons.constraint_type = 'P'
+  AND cons.constraint_name = cols.constraint_name
+  AND cols.column_name IN ('NUMPAC','PACMAT','PAIEZAD','MATRIC')
+  AND cons.owner = cols.owner
+  ORDER BY cols.table_name, cols.position;
+  IF (ListCle.COUNT = 1 AND ListCle(1) = 'NUMPAC') OR ListCle.COUNT = 0 THEN
+    BEGIN
+   EXECUTE_IMMEDIATE_STRING( 'CREATE TABLE '||NOM_DICTIONNAIRE_IDPROJET||' as select * from '||NOM_DICTIONNAIRE,0) ;
+   EXCEPTION
+   WHEN OTHERS THEN
+   --dbms_output.put('impossible de créer la table '||NOM_DICTIONNAIRE_IDPROJET);
+   --FIXME utiliser la procédure trace_dbms_output()
+   NULL;
+    END ;
+  ELSE
+    selectCle := 'CREATE TABLE '||NOM_DICTIONNAIRE_IDPROJET||' as select DISTINCT '||NOM_DICTIONNAIRE||'.* from '||NOM_DICTIONNAIRE||',CLE_BAC_A_SABLE ';
+    IF ListCle.count>0 THEN
+       FOR i IN ListCle.first..ListCle.last
+       LOOP
+         IF i  = 1 THEN
+         selectCle:=selectCle||' WHERE '||NOM_DICTIONNAIRE||'.'||ListCle(i)||' = '||'CLE_BAC_A_SABLE'||'.'||ListCle(i);
+         ELSE 
+         selectCle:=selectCle||' AND '||NOM_DICTIONNAIRE||'.'||ListCle(i)||' = '||'CLE_BAC_A_SABLE'||'.'||ListCle(i);
+         END IF;
+       END LOOP;
+    END IF; 
+    EXECUTE_IMMEDIATE_STRING( selectCle,0) ;
+  END IF;
+
+ IF LISTKEYS IS NULL THEN
+ SELECT cols.column_name BULK COLLECT
+ INTO Tabcol
+ FROM user_constraints cons,
+ user_cons_columns cols
+ WHERE cols.table_name    = NOM_DICTIONNAIRE
+ AND cons.constraint_type = 'P'
+ AND cons.constraint_name = cols.constraint_name
+ AND cons.owner           = cols.owner
+ ORDER BY cols.table_name,
+ cols.position ;
+ IF Tabcol.count>0 THEN
+ FOR i IN Tabcol.first..Tabcol.last
+ LOOP
+ IF i   > 1 THEN
+ lkey:=lkey||',';
+ END IF;
+ lkey:=lkey||Tabcol(i);
+ END LOOP;
+ END IF;
+ IF LENGTH(lkey)>0 THEN
+ req         :='ALTER TABLE '||NOM_DICTIONNAIRE_IDPROJET||' ADD PRIMARY KEY ('||lkey||')';
+ dbms_output.put_line('lkey : '||lkey);
+ EXECUTE_IMMEDIATE_STRING (req,0);
+ END IF ;
+ ELSE
+ BEGIN
+ EXECUTE_IMMEDIATE_STRING('ALTER TABLE '||NOM_DICTIONNAIRE_IDPROJET||' ADD PRIMARY KEY ('||LISTKEYS||')',0);
+ EXCEPTION
+ WHEN OTHERS THEN
+ --dbms_output.put('impossible de positionner les clés '||NOM_DICTIONNAIRE_IDPROJET);
+ --FIXME utiliser la procédure trace_dbms_output()
+ NULL;
+ END ;
+ END IF;
+ END DIC_GESTION_BACASABLE;

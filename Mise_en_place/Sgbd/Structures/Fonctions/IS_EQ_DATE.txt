@@ -1,0 +1,14 @@
+##
+TAG_CHARSET=@€ιθη
+##
+IS_EQ_DATE
+=SQL=
+CREATE OR REPLACE FUNCTION IS_EQ_DATE(
+  pVal1 in DATE, 
+  pVal2 in DATE, 
+  pFormat VARCHAR2 DEFAULT 'yyyymmdd') 
+RETURN BOOLEAN 
+IS
+BEGIN
+  RETURN NVL(TO_CHAR(pVal1,pFormat),'__NULL__')=NVL(TO_CHAR(pVal2,pFormat),'__NULL__');
+END IS_EQ_DATE;

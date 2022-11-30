@@ -1,0 +1,6 @@
+##
+TAG_CHARSET=@€ιθη
+##
+WKF_POSS_CODEUSER
+=SQL IF_INDEX_NOTEXIST=WKF_POSS_CODEUSER=
+create index WKF_POSS_CODEUSER on wkf_possession (CODE_USER) online compute statistics

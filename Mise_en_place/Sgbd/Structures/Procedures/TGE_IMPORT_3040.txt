@@ -1,0 +1,963 @@
+##
+TAG_CHARSET=@€éèç
+##
+TGE_IMPORT_3040
+=SQL=
+create or replace PROCEDURE TGE_IMPORT_3040( P_LOGIN       IN VARCHAR2 , P_DATE_IMPORT IN VARCHAR2 , P_ROLE        IN VARCHAR2 ,
+ P_ORIGINE     IN VARCHAR2 ,
+ P_VALIDATION  IN NUMBER ,
+ P_WITH30      IN NUMBER ,
+ P_WITH40      IN NUMBER ,
+ P_WITH60      IN NUMBER ,
+ P_WITH70      IN NUMBER ,
+ P_WITH50      IN NUMBER ,
+ P_ISFSED      IN NUMBER ,
+ P_CODLANG     IN VARCHAR2,
+ -- Valeurs attendues : VI -> pour la validation des imports Web ou Batch, MP -> pour la validation depuis le Market Place
+ P_TYPE_ACTION IN VARCHAR2)
+ AS
+ /********************************************************************************
+ Version     : V5.05.004
+ *********************************************************************************/
+ w_err   VARCHAR2(2000);
+ v_start NUMBER;
+ v_stop  NUMBER;
+ id_trt number ;
+ dateMaj SYS_TRC_MODIF.datemaj%type;
+ doRollback boolean;
+ desactiveTraitements   VARCHAR2(1000);
+
+ BEGIN
+ doRollback:=false;
+ v_start := DBMS_UTILITY.GET_TIME;
+ id_trt := IMP_TRT_SEQ_ID.nextval;
+ -- FVI on peut lire le pac une seule fois
+ TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'TGE_IMPORT_3040 début ' || P_LOGIN || '-' || P_DATE_IMPORT || '-' || P_ROLE || '-' || P_ORIGINE || '-' || P_VALIDATION || '-' || P_WITH30 || '-' || P_WITH40|| '-' || P_WITH60|| '-' || P_WITH70|| '-' || P_WITH50|| '-' || P_ISFSED || '-' || P_CODLANG || '-' || P_TYPE_ACTION);
+ -- Mise à jour des donnees ID collab
+ select CURRENT_TIMESTAMP into dateMaj from dual;
+ -- Cartes d'annulation
+ TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'début delete pour gérer annulation  ');
+ 
+ -- Suppression dans TGE_ABSENCES
+ DELETE
+ FROM TGE_ABSENCES ABS
+ WHERE EXISTS
+ (SELECT 1
+ FROM TGE_INCIDENTS_PAIE  P,
+ TGE_REF_TYPES_GTA   GTA,
+ TGE_REF_ORIGINE_GTA  ori,
+ TGE_IMPORT_ANNULATION A,DIC_ADM_CONTRAT_SITU C
+ WHERE ABS.NUMPAC = A.NUMPAC
+ AND   P.NUMPAC   = C.NUMPAC
+ AND   C.NUMPAC   = A.NUMPAC
+ AND   GTA.NUMPAC = A.NUMPAC
+ AND   ori.NUMPAC = A.NUMPAC
+ AND A.LOGIN       =P_LOGIN
+ AND A.DATE_IMPORT =P_DATE_IMPORT
+ and A.ERREURS is null
+ AND NVL(GTA.MATRIC_GTA,'PAIEZAD')='PACMAT'
+ AND GTA.CODE_GTA    = ori.CODE_GTA
+ AND ori.CODE_ORIGINE =P.ORIGINE
+ AND ABS.MATRIC                  =A.MATRICULE
+ AND C.PACMAT   = A.PACMAT
+ AND C.MATRIC = A.MATRICULE
+ AND P.PAIEZAD = C.PAIEZAD
+ AND A.ORIGINE                    =P.ORIGINE
+ AND TO_DATE(A.PERIODE,'yyyymm')  =P.PERIODE
+ AND P.CLE_ABSENCE               IS NOT NULL
+ AND ABS.ID = P.CLE_ABSENCE
+ );
+ 
+ DELETE
+ FROM TGE_ABSENCES ABS
+ WHERE EXISTS
+ (SELECT 1
+ FROM TGE_INCIDENTS_PAIE p,TGE_REF_TYPES_GTA gta
+ WHERE p.numpac = abs.numpac
+ AND p.cle_absence IS NOT NULL
+ AND p.cle_absence = abs.id
+ and p.numpac = gta.numpac
+ and gta.code_gta =(select code_gta from TGE_REF_ORIGINE_GTA where numpac =p.numpac and code_origine =p.origine )
+ AND EXISTS
+ (SELECT *
+ FROM TGE_IMPORT_ANNULATION a
+ WHERE a.LOGIN                   =P_LOGIN
+ AND a.DATE_IMPORT               =P_DATE_IMPORT
+ AND a.numpac                    =p.numpac
+ AND a.matricule                 = abs.matric
+ and a.erreurs is null
+ AND ( NVL(gta.matric_gta,'PAIEZAD') ='PAIEZAD' AND a.paiezad = p.paiezad )
+ AND a.origine                   =p.origine
+ AND to_date(a.periode,'yyyymm') =p.periode
+ )
+ );
+ 
+ -- Suppression dans TGE_INCIDENTS_PAIE sur la colonne PERIODE
+ DELETE
+ FROM TGE_INCIDENTS_PAIE p
+ WHERE EXISTS
+ (SELECT 1
+ FROM TGE_IMPORT_ANNULATION a,TGE_REF_TYPES_GTA gta
+ WHERE a.LOGIN                   =P_LOGIN
+ AND a.DATE_IMPORT               =P_DATE_IMPORT
+ AND a.numpac                    =p.numpac
+ and gta.numpac   = p.numpac
+ and a.erreurs is null
+ and gta.code_gta =(select code_gta from TGE_REF_ORIGINE_GTA where numpac =a.numpac and code_origine = a.origine )
+ AND  NVL(gta.matric_gta,'PAIEZAD')='PACMAT'
+ AND( EXISTS (
+ SELECT c.paiezad
+ FROM DIC_ADM_CONTRAT_SITU C
+ WHERE C.NUMPAC  =a.NUMPAC
+ AND   C.NUMPAC    = p.numpac
+ AND   C.paiezad   = p.paiezad
+ AND   c.PACMAT    = a.PACMAT
+ ) )
+ AND a.origine                   =p.origine
+ AND to_date(a.periode,'yyyymm') =p.periode
+ );
+ 
+ DELETE
+ FROM TGE_INCIDENTS_PAIE p
+ WHERE EXISTS
+ (SELECT 1
+ FROM TGE_IMPORT_ANNULATION a,TGE_REF_TYPES_GTA gta
+ WHERE a.LOGIN                   =P_LOGIN
+ AND a.DATE_IMPORT               =P_DATE_IMPORT
+ AND a.numpac                    =p.numpac
+ and gta.numpac   = p.numpac
+ and a.erreurs is null
+ and gta.code_gta =(select code_gta from TGE_REF_ORIGINE_GTA where numpac =a.numpac and code_origine = a.origine )
+ AND   NVL(gta.matric_gta,'PAIEZAD') ='PAIEZAD'
+ AND a.paiezad = p.paiezad
+ AND a.origine                   =p.origine
+ AND to_date(a.periode,'yyyymm') =p.periode
+ );
+ 
+-- Suppression dans TGE_INCIDENTS_PAIE sur la colonne PERIODE_INIT
+DELETE
+ FROM TGE_INCIDENTS_PAIE p
+ WHERE EXISTS
+ (SELECT 1
+ FROM TGE_IMPORT_ANNULATION a,TGE_REF_TYPES_GTA gta
+ WHERE a.LOGIN                   =P_LOGIN
+ AND a.DATE_IMPORT               =P_DATE_IMPORT
+ AND a.numpac                    =p.numpac
+ and gta.numpac   = p.numpac
+ and a.erreurs is null
+ and gta.code_gta =(select code_gta from TGE_REF_ORIGINE_GTA where numpac =a.numpac and code_origine = a.origine )
+ AND  NVL(gta.matric_gta,'PAIEZAD')='PACMAT'
+ AND( EXISTS (
+ SELECT c.paiezad
+ FROM DIC_ADM_CONTRAT_SITU C
+ WHERE C.NUMPAC  =a.NUMPAC
+ AND   C.NUMPAC    = p.numpac
+ AND   C.paiezad   = p.paiezad
+ AND   c.PACMAT    = a.PACMAT
+ ) )
+ AND a.origine                   =p.origine
+ AND to_date(a.periode,'yyyymm') =p.periode_init
+ );
+
+DELETE
+ FROM TGE_INCIDENTS_PAIE p
+ WHERE EXISTS
+ (SELECT 1
+ FROM TGE_IMPORT_ANNULATION a,TGE_REF_TYPES_GTA gta
+ WHERE a.LOGIN                   =P_LOGIN
+ AND a.DATE_IMPORT               =P_DATE_IMPORT
+ AND a.numpac                    =p.numpac
+ and gta.numpac   = p.numpac
+ and a.erreurs is null
+ and gta.code_gta =(select code_gta from TGE_REF_ORIGINE_GTA where numpac =a.numpac and code_origine = a.origine )
+ AND   NVL(gta.matric_gta,'PAIEZAD') ='PAIEZAD'
+ AND a.paiezad = p.paiezad
+ AND a.origine                   =p.origine
+ AND to_date(a.periode,'yyyymm') =p.periode_init
+ );
+ 
+ -- Gestion de l'annulation pour les éléments de paie et les données variables (on pourra rajouter les autres types si on veut)
+ TGE_IMPORT_CARTE_ANNULATION(P_LOGIN, P_DATE_IMPORT);
+ 
+  -- Suppression dans TGE_IMPUTATIONS
+  
+ DELETE
+ FROM TGE_IMPUTATIONS p
+ WHERE EXISTS
+ (SELECT 1
+ FROM TGE_IMPORT_ANNULATION a,TGE_REF_TYPES_GTA gta
+ WHERE a.LOGIN    =P_LOGIN
+ AND a.DATE_IMPORT=P_DATE_IMPORT
+ AND a.numpac     =p.numpac
+ and gta.numpac   = p.numpac
+ and a.erreurs is null
+ and gta.code_gta =(select code_gta from TGE_REF_ORIGINE_GTA where numpac =a.numpac and code_origine = a.origine )
+ AND  NVL(gta.matric_gta,'PAIEZAD')='PACMAT'
+ AND( EXISTS (
+ SELECT c.paiezad
+ FROM DIC_ADM_CONTRAT_SITU C
+ WHERE C.NUMPAC  =a.NUMPAC
+ AND   C.NUMPAC    = p.numpac
+ AND   C.paiezad   = p.paiezad
+ AND   c.PACMAT    = a.PACMAT
+ ) )
+ AND a.origine    =p.origine
+ AND a.periode    =p.periode
+ )
+ AND (( p.origine in (select code_origine
+ from tge_ref_origine_gta
+ where numpac=p.numpac
+ and code_origine=p.origine
+ and  mode_3060 !='F')));
+ 
+ DELETE
+ FROM TGE_IMPUTATIONS p
+ WHERE EXISTS
+ (SELECT 1
+ FROM TGE_IMPORT_ANNULATION a,TGE_REF_TYPES_GTA gta
+ WHERE a.LOGIN    =P_LOGIN
+ AND a.DATE_IMPORT=P_DATE_IMPORT
+ AND a.numpac     =p.numpac
+ and gta.numpac   = p.numpac
+ and a.erreurs is null
+ and gta.code_gta =(select code_gta from TGE_REF_ORIGINE_GTA where numpac =a.numpac and code_origine = a.origine )
+ AND  NVL(gta.matric_gta,'PAIEZAD') ='PAIEZAD' AND a.paiezad = p.paiezad
+ AND a.origine    =p.origine
+ AND a.periode    =p.periode
+ )
+ AND (( p.origine in (select code_origine
+ from tge_ref_origine_gta
+ where numpac=p.numpac
+ and code_origine=p.origine
+ and  mode_3060 !='F')));
+ 
+ IF P_WITH30 =1 THEN
+ BEGIN
+ TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'Début carte 30');
+ TGE_IMPORT_30 (P_LOGIN , P_DATE_IMPORT , P_ROLE , P_ORIGINE , P_VALIDATION , P_WITH30 , P_CODLANG, P_TYPE_ACTION, datemaj );
+ EXCEPTION
+ WHEN OTHERS THEN
+ w_err := SQLCODE;
+ w_err := w_err||'  '||sqlerrm;
+ FSED.FSED_ERREUR( id_trt , ' imp:TGE_IMPORT_30 ' , P_LOGIN ||','|| P_DATE_IMPORT ||','|| P_ROLE ||','|| P_ORIGINE ||','|| P_VALIDATION||','|| P_WITH30, w_err );
+--UN TRAITEMENT DE PAIE EST EN COURS
+ if(SQLCODE='-20001') then 
+  doRollback:=true;
+  GOTO end_proc;
+ end if ; 
+ IF (P_LOGIN != 'BATCH') THEN
+ -- On remonte l'erreur à l'application
+ raise;
+ END IF;
+ END ;
+ END IF;
+ IF P_WITH50 =1 THEN
+ BEGIN
+ TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'Début carte 50');
+ TGE_IMPORT_50 (P_LOGIN , P_DATE_IMPORT , P_ROLE , P_ORIGINE , P_VALIDATION , P_WITH50 , P_CODLANG, P_TYPE_ACTION, datemaj );
+ EXCEPTION
+ WHEN OTHERS THEN
+ w_err := SQLCODE;
+ w_err := w_err||'  '||sqlerrm;
+ FSED.FSED_ERREUR( id_trt , ' imp:TGE_IMPORT_50 ' , P_LOGIN ||','|| P_DATE_IMPORT ||','|| P_ROLE ||','|| P_ORIGINE ||','|| P_VALIDATION||','|| P_WITH50, w_err );
+ --UN TRAITEMENT DE PAIE EST EN COURS
+ if(SQLCODE='-20001') then
+ doRollback:=true;
+ GOTO end_proc;
+ end if ;
+ IF (P_LOGIN != 'BATCH') THEN
+ -- On remonte l'erreur à l'application
+ raise;
+ END IF;
+ END ;
+ END IF;
+ IF P_WITH60 =1 OR P_WITH70 =1 THEN
+ BEGIN
+ TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'Début carte 60');
+ TGE_IMPORT_6070 (P_LOGIN , P_DATE_IMPORT , P_ROLE , P_ORIGINE , P_VALIDATION , P_WITH60 , P_WITH70 , P_CODLANG, P_TYPE_ACTION );
+ EXCEPTION
+ WHEN OTHERS THEN
+ w_err := SQLCODE;
+ w_err := w_err||'  '||sqlerrm;
+ FSED.FSED_ERREUR( id_trt , ' imp:TGE_IMPORT_6070 ' , P_LOGIN ||','|| P_DATE_IMPORT ||','|| P_ROLE ||','|| P_ORIGINE ||','|| P_VALIDATION||','|| P_WITH60 ||','|| P_WITH70 , w_err );
+ if(SQLCODE='-20001') then 
+   doRollback:=true;
+   GOTO end_proc;
+  end if ;
+ IF (P_LOGIN != 'BATCH') THEN
+ -- On remonte l'erreur à l'application
+ raise;
+ END IF;
+ END ;
+ END IF;
+ 
+ IF P_WITH40 =1 THEN
+ 
+ 
+ --Supprimer les absences sur le mois de paie M-1 si le flag Retro GC = 'O'
+ DELETE from
+ TGE_ABSENCES A
+ WHERE exists
+ (
+ SELECT ABS.ID FROM TGE_ABSENCES ABS
+ INNER JOIN TGE_IMPORT_INCIDENTS t on ( ABS.MATRIC = T.MATRICULE and T.numpac=ABS.NUMPAC)
+ INNER JOIN TGE_INCIDENTS_PAIE INC ON ABS.ID = INC.CLE_ABSENCE
+ INNER JOIN TGE_REF_PAC PAC ON INC.NUMPAC = PAC.NUMPAC
+ INNER JOIN TGE_REF_PER PER ON PER.NUMPAC = INC.NUMPAC AND PER.PERIODEENCOURS = TO_CHAR(ADD_MONTHS(TO_DATE(PAC.PERIODEENCOURS,'yyyymm'),-1),'YYYYMM')
+ INNER JOIN TGE_PERIODE_RECUEIL_PAIEZAD REC ON INC.NUMPAC = REC.NUMPAC AND INC.PAIEZAD = REC.PAIEZAD AND REC.MOIS_PAIE = PAC.PERIODEENCOURS
+ WHERE INC.DATE_EFFET BETWEEN DEBUT_PER_RECUEIL_RETRO AND FIN_PER_RECUEIL_RETRO
+ AND REC.RETRO_GC = '1'
+ AND A.ID=ABS.ID
+ AND T.LOGIN=P_LOGIN
+ AND T.DATE_IMPORT=P_DATE_IMPORT
+ );
+ 
+ BEGIN
+ TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'Début controle carte 40');
+ TGE_CONTROLE_40 (p_login,p_date_import,NULL,p_codlang , P_ISFSED);
+ 
+ -- activer ou non les nouveaux traitements de l'import 3040
+ select NVL(upper(VALVAR), ' ') into desactiveTraitements from sys_varsys where module='STD' and codvar='DESACTIVE_TRAITEMENTS_IMPORT_3040';
+ IF INSTR(desactiveTraitements, 'TGE_CONTROLE_40_CHEVAUCHEMENT') < 1 THEN
+	 --controle chevauchement
+	 TGE_CONTROLE_40_CHEVAUCHEMENT(P_LOGIN, P_DATE_IMPORT ,null , P_CODLANG );
+ END IF;
+ 
+ EXCEPTION
+ WHEN OTHERS THEN
+ w_err := SQLCODE;
+ w_err := w_err||'  ' ||sqlerrm;
+ FSED.FSED_ERREUR( id_trt , 'imp:TGE_CONTROLE_40' , P_LOGIN ||','|| P_DATE_IMPORT ||','|| P_ROLE ||','|| P_ORIGINE ||','|| P_VALIDATION||','|| P_WITH30 ||','|| P_WITH40 , w_err );
+ IF (P_LOGIN != 'BATCH') THEN
+ -- On remonte l'erreur à l'application
+ raise;
+ END IF;
+ END ;
+ BEGIN
+ --Controle Abscence
+ TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'début Controle Abscence');
+ 
+ TGE_CONTROLE_ABSENCES (p_login,p_date_import,NULL,p_codlang);
+ EXCEPTION
+ WHEN OTHERS THEN
+ w_err := w_err||'  ' ||sqlerrm;
+ FSED.FSED_ERREUR( id_trt , 'imp:TGE_CONTROLE_ABSENCES' , P_LOGIN ||','|| P_DATE_IMPORT ||','|| P_ROLE ||','|| P_ORIGINE ||','|| P_VALIDATION||','|| P_WITH30 ||','|| P_WITH40 , w_err );
+ IF (P_LOGIN != 'BATCH') THEN
+ -- On remonte l'erreur à l'application
+ raise;
+ END IF;
+ END ;
+ IF P_VALIDATION = 1 THEN
+ --Creation Abscence
+ BEGIN
+ TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'début validation : Creation Abscence');
+ 
+ INSERT
+ INTO TGE_ABSENCES
+ (
+ ID,
+ MATRIC ,
+ MOTIF ,
+ NUMPAC ,
+ DATE_DEBUT ,
+ DEBUT_MA ,
+ DATE_FIN ,
+ FIN_MA ,
+ DUREE ,
+ DATE_IJEDI ,
+ LOGIN_CREATE ,
+ DATE_CREATE ,
+ ROLE_CREATE ,
+ ORIGINE_CREATE ,
+ LOGIN_MAJ ,
+ DATE_MAJ ,
+ ROLE_MAJ ,
+ ORIGINE_MAJ ,
+ CLE_IMPORT,
+ STATUT,
+ ORIGINE,
+ CODE_IMPUTATION
+ )
+ SELECT SEQ_TGE_ABSENCES.NEXTVAL ,
+ ABSENCES.MATRIC ,
+ ABSENCES.MOTIF ,
+ ABSENCES.NUMPAC ,
+ ABSENCES.DATE_DEBUT ,
+ ABSENCES.DEBUT_MA ,
+ ABSENCES.DATE_FIN ,
+ ABSENCES.FIN_MA ,
+ ABSENCES.DUREE ,
+ ABSENCES.DATE_IJEDI ,
+ ABSENCES.LOGIN_CREATE ,
+ ABSENCES.DATE_CREATE ,
+ ABSENCES.ROLE_CREATE ,
+ ABSENCES.ORIGINE_CREATE ,
+ ABSENCES.LOGIN_MAJ ,
+ ABSENCES.DATE_MAJ ,
+ ABSENCES.ROLE_MAJ ,
+ ABSENCES.ORIGINE_MAJ ,
+ ABSENCES.CLE_IMPORT,
+ ABSENCES.STATUT,
+ ABSENCES.ORIGINE,
+ ABSENCES.CODE_IMPUTATION
+ FROM
+ (SELECT
+ (SELECT C.MATRIC
+ FROM DIC_ADM_CONTRAT_SITU C
+ WHERE C.NUMPAC = INCI.NUMPAC
+ AND C.PAIEZAD  =INCI.PAIEZAD
+ AND rownum     = 1
+ )                                   AS MATRIC,--matricule
+ INCI.CODE_IP                        AS MOTIF, --motif
+ INCI.NUMPAC                         AS NUMPAC,
+ to_date(INCI.DATE_DEBUT,'yyyyMMdd') AS DATE_DEBUT, --date debut
+ CASE
+ WHEN UPPER(
+ (SELECT pre.unite
+ FROM tge_ref_pre pre
+ WHERE pre.CODE_INCIDENT = INCI.CODE_IP
+ AND pre.numpac          = inci.NUMPAC
+ ))                      = 'J'
+ THEN DECODE (INCI.HEURES_IP,'1.00','J',DECODE(IS_NUMBER(INCI.HEURES_IP),0.5,'M','J'))
+ WHEN UPPER(
+ (SELECT pre.unite
+ FROM tge_ref_pre pre
+ WHERE pre.CODE_INCIDENT = INCI.CODE_IP
+ AND pre.numpac          = inci.NUMPAC
+ ))                      = 'H'
+ THEN DECODE (INCI.HEURES_IP ,NULL,'J','D')
+ END                               AS DEBUT_MA , --debutma
+ to_date(INCI.DATE_FIN,'yyyyMMdd') AS DATE_FIN,  --date fin
+ CASE
+ WHEN UPPER(
+ (SELECT pre.unite
+ FROM tge_ref_pre pre
+ WHERE pre.CODE_INCIDENT = INCI.CODE_IP
+ AND pre.numpac          = inci.NUMPAC
+ ))                      = 'J'
+ THEN DECODE (INCI.HEURES_IP,'1.00','J',DECODE(IS_NUMBER(INCI.HEURES_IP),0.5,'M','J'))
+ WHEN UPPER(
+ (SELECT pre.unite
+ FROM tge_ref_pre pre
+ WHERE pre.CODE_INCIDENT = INCI.CODE_IP
+ AND pre.numpac          = inci.NUMPAC
+ ))                      = 'H'
+ THEN DECODE (INCI.HEURES_IP ,NULL,'J','D')
+ END AS FIN_MA, --Fin ma
+ CASE
+ WHEN UPPER(
+ (SELECT pre.unite
+ FROM tge_ref_pre pre
+ WHERE pre.CODE_INCIDENT = INCI.CODE_IP
+ AND pre.numpac          = inci.NUMPAC
+ ))                      = 'J'
+ AND ((SELECT pre.demi_journee
+ FROM tge_ref_pre pre
+ WHERE pre.CODE_INCIDENT = INCI.CODE_IP
+ AND pre.numpac          = inci.NUMPAC
+ )                       = 1 
+ OR IS_NUMBER(INCI.HEURES_IP) = 0.5
+)
+ THEN NVL(is_number(REPLACE(INCI.HEURES_IP,'.',',')) *8*3600,NULL) 
+ WHEN UPPER(
+ (SELECT pre.unite
+ FROM tge_ref_pre pre
+ WHERE pre.CODE_INCIDENT = INCI.CODE_IP
+ AND pre.numpac          = inci.NUMPAC
+ ))                      = 'H'
+THEN NVL(is_number(REPLACE(INCI.HEURES_IP,'.',',')) *3600,NULL) 
+ELSE NULL
+ END        AS DUREE,        --duree
+ NULL       AS DATE_IJEDI,   --date_ijedi
+ INCI.LOGIN AS LOGIN_CREATE, --login create
+ sysdate    AS DATE_CREATE,  --date_create
+ P_ROLE     AS ROLE_CREATE,
+ P_ORIGINE  AS ORIGINE_CREATE, --'IMPORT_INCIDENT',--origine_create :ToolsTge.ORI_ECRAN_IMPORT_INCIDENT
+ INCI.LOGIN AS LOGIN_MAJ,      --login maj
+ sysdate    AS DATE_MAJ,       -- date_maj
+ P_ROLE     AS ROLE_MAJ,
+ P_ORIGINE  AS ORIGINE_MAJ,--'IMPORT_INCIDENT',--origine_maj   :ToolsTge.ORI_ECRAN_IMPORT_INCIDENT
+ P_LOGIN
+ || '#'
+ ||INCI.DATE_IMPORT
+ || '#'
+ ||INCI.NUMLIGNE AS CLE_IMPORT,--cle_import
+ 'Q' AS STATUT,
+  INCI.origine AS ORIGINE,     --origine 
+  CASE
+ WHEN INCI.heures_ip IS NOT NULL
+ OR INCI.code_ip     IS NOT NULL
+ AND INCI.domaine_imp ='1'
+ THEN INCI.code_imputation
+ WHEN INCI.type_heure IN ('T','R')
+ AND INCI.domaine_imp  ='H'
+ THEN INCI.code_imputation
+ END AS code_imputation-- code_imputation
+ FROM TGE_IMPORT_INCIDENTS INCI
+ WHERE EXISTS (
+ (SELECT ri.CODE_INCIDENT
+ FROM TGE_REF_PRE ri
+ WHERE ri.numpac             = INCI.numpac
+ AND ri.code_incident        =inci.code_ip
+ AND ri.OPTION_CONSERV_HISTO = 'A'
+ )
+ UNION
+ (SELECT ri.CODE_INCIDENT
+ FROM TGE_REF_PRE ri
+ WHERE ri.numpac             ='*'
+ AND ri.code_incident        =inci.code_ip
+ AND ri.OPTION_CONSERV_HISTO = 'A'
+ AND NOT EXISTS
+ (SELECT *
+ FROM TGE_REF_PRE rt2
+ WHERE rt2.numpac      =iNCI.numpac
+ AND rt2.code_incident =ri.code_incident
+ )
+ ))
+ AND INCI.LOGIN       = P_LOGIN
+ AND INCI.DATE_IMPORT = P_DATE_IMPORT
+ AND ((INCI.ERREURS  IS NULL
+ AND INCI.STATUT      = 'TRAIT')
+ OR (INCI.ERREURS    IS NOT NULL
+ AND INCI.STATUT      = 'TRANS'))
+ ) ABSENCES ,
+ TGE_REF_ORIGINE_GTA
+ WHERE ABSENCES.numpac=TGE_REF_ORIGINE_GTA.numpac
+ AND ABSENCES.ORIGINE =TGE_REF_ORIGINE_GTA.CODE_ORIGINE;
+ EXCEPTION
+ WHEN OTHERS THEN
+ w_err := SQLCODE;
+ w_err := w_err||'  ' ||sqlerrm;
+ FSED.FSED_ERREUR( id_trt , 'ValidAbsences' , P_LOGIN ||','|| P_DATE_IMPORT ||','|| P_ROLE ||','|| P_ORIGINE ||','|| P_VALIDATION||','|| P_WITH30 ||','|| P_WITH40 , w_err );
+ IF (P_LOGIN != 'BATCH') THEN
+ -- On remonte l'erreur à l'application
+ raise;
+ END IF;
+ END ;
+ --insertion des incidents
+ BEGIN
+ TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'début validation : insertion des incidents');
+ 
+ INSERT
+ INTO TGE_INCIDENTS_PAIE
+ (
+ ID ,
+ NUMPAC,
+ PAIEZAD,
+ PERIODE,
+ TYPE_TRAITEMENT,
+ TYPE_IP,
+ CODE_IP,
+ DATE_EFFET,
+ CODE_IMPUTATION,
+ HEURES,
+ ORIGINE,
+ LOGIN_CREATE,
+ DATE_CREATE,
+ ROLE_CREATE,
+ ORIGINE_CREATE,
+ LOGIN_MAJ,
+ DATE_MAJ,
+ ROLE_MAJ,
+ ORIGINE_MAJ,
+ CLE_IMPORT,
+ CLE_ABSENCE,
+ IDPACMAT,
+ ENVOYE,
+ type_writer,
+ ACTION_RETRO,
+ ACTION_RETRO_DATE,
+ DERNIER_CODE_OPE 
+ )
+ SELECT SEQ_TGE_INCIDENTS_PAIE.NEXTVAL ,
+ INCIDENTS.NUMPAC,
+ INCIDENTS.PAIEZAD,
+ INCIDENTS.PERIODE,
+ INCIDENTS.TYPE_TRAITEMENT,
+ INCIDENTS.TYPE_IP,
+ INCIDENTS.CODE_IP,
+ INCIDENTS.DATE_EFFET,
+ INCIDENTS.CODE_IMPUTATION,
+ INCIDENTS.HEURES,
+ INCIDENTS.ORIGINE,
+ INCIDENTS.LOGIN_CREATE,
+ INCIDENTS.DATE_CREATE,
+ INCIDENTS.ROLE_CREATE,
+ INCIDENTS.ORIGINE_CREATE,
+ INCIDENTS.LOGIN_MAJ,
+ INCIDENTS.DATE_MAJ,
+ INCIDENTS.ROLE_MAJ,
+ INCIDENTS.ORIGINE_MAJ,
+ INCIDENTS.CLE_IMPORT,
+ INCIDENTS.CLE_ABSENCE,
+ INCIDENTS.IDPACMAT,
+ INCIDENTS.ENVOYE,
+ CASE
+ WHEN TGE_REF_ORIGINE_GTA.MODE_T2    ='R'
+ AND TGE_REF_ORIGINE_GTA.ENVOI_MODE_R='N'
+ THEN 'N'
+ ELSE NULL
+ END AS TYPE_writer,
+  CASE WHEN pac.DEB_RETRO IS NOT NULL AND TO_char(incidents.periode,'YYYYMM') < pac.PERIODEENCOURS
+ THEN 'C' ELSE NULL
+ END as ACTION_RETRO,
+ CASE WHEN pac.DEB_RETRO IS NOT NULL AND TO_char(incidents.periode,'YYYYMM') < pac.PERIODEENCOURS
+ THEN sysdate ELSE NULL
+ END as ACTION_RETRO_DATE,
+ 'C' as DERNIER_CODE_OPE
+ FROM
+ (SELECT INCI.numpac              AS NUMPAC,          --numpac
+ INCI.paiezad                   AS PAIEZAD,         --paiezad
+ to_date(INCI.periode,'YYYYMM') AS PERIODE,         --periode
+ INCI.type_traitement           AS TYPE_TRAITEMENT, --type_traitement
+ CASE
+ WHEN (INCI.heures_ip IS NOT NULL
+ OR INCI.code_ip      IS NOT NULL )
+ THEN DECODE (INCI.code_ip,'HP','T',
+ (SELECT p.option_conserv_histo
+ FROM TGE_REF_PRE p
+ WHERE p.numpac     =inci.numpac
+ AND p.code_incident=inci.code_ip
+ ))
+ WHEN INCI.type_heure IN ('T','R')
+ THEN INCI.type_heure
+ END AS type_ip ,--DIT 37186 type_ip
+ CASE
+ WHEN INCI.heures_ip IS NOT NULL
+ OR INCI.CODE_IP     IS NOT NULL
+ THEN INCI.CODE_IP
+ WHEN INCI.type_heure IN ('T','R')
+ THEN DECODE ( INCI.TYPE_HEURE,'R','HT','HP')
+ END                                           AS CODE_IP,  ---code_ip DIT 37186
+ to_date(INCI.date_debut,'yyyymmdd')-1 +a.jour AS DATE_EFFET,--date effet
+ CASE
+ WHEN INCI.heures_ip IS NOT NULL
+ OR INCI.code_ip     IS NOT NULL
+ AND INCI.domaine_imp ='1'
+ THEN INCI.code_imputation
+ WHEN INCI.type_heure IN ('T','R')
+ AND INCI.domaine_imp  ='H'
+ THEN INCI.code_imputation
+ END AS code_imputation,-- code_imputation DIT 37186
+ CASE
+ WHEN INCI.heures_ip IS NOT NULL
+ OR INCI.CODE_IP     IS NOT NULL
+ THEN is_number(INCI.heures_ip)
+ WHEN INCI.type_heure IN ('T','R')
+ THEN is_number(INCI.heures_trav)
+ END          AS heures,       -- heures DIT 37186
+ INCI.origine AS ORIGINE,      --origine
+ INCI.LOGIN   AS LOGIN_CREATE, --login create
+ sysdate      AS DATE_CREATE,  --date_create
+ P_ROLE       AS ROLE_CREATE,
+ P_ORIGINE    AS ORIGINE_CREATE, --'IMPORT_INCIDENT',--origine_create
+ INCI.LOGIN   AS LOGIN_MAJ,      --login maj
+ sysdate      AS DATE_MAJ,       -- date_maj
+ P_ROLE       AS ROLE_MAJ,
+ P_ORIGINE    AS ORIGINE_MAJ,--'IMPORT_INCIDENT',--origine_maj
+ P_LOGIN
+ || '#'
+ ||INCI.DATE_IMPORT
+ || '#'
+ ||INCI.NUMLIGNE AS CLE_IMPORT,--cle_import
+ CASE
+ WHEN INCI.heures_ip IS NOT NULL
+ OR INCI.CODE_IP     IS NOT NULL
+ THEN
+ (SELECT id
+ FROM tge_absences
+ WHERE cle_import =P_LOGIN
+ ||'#'
+ ||INCI.DATE_IMPORT
+ ||'#'
+ ||INCI.NUMLIGNE
+ )
+ WHEN INCI.type_heure IN ('T','R')
+ THEN NULL
+ END AS CLE_ABSENCE ,--cleAbsence
+ CASE
+ WHEN INCI.NUMPAC IS NOT NULL
+ AND INCI.PACMAT  IS NOT NULL
+ THEN RPAD(INCI.NUMPAC,6)
+ || INCI.PACMAT
+ ELSE ' '
+ END  AS IDPACMAT, --idpacmat
+ NULL AS ENVOYE    --envoye
+ FROM TGE_IMPORT_INCIDENTS INCI,
+ -- FVI modif GTA_PAR_ANNEE
+ (
+ SELECT LEVEL "JOUR" FROM dual CONNECT BY LEVEL <=
+ (SELECT MAX(to_number(to_date(date_fin,'YYYYMMDD') - to_date(date_debut,'YYYYMMDD') )) + 1
+ FROM TGE_IMPORT_INCIDENTS
+ WHERE LOGIN    =P_LOGIN
+ AND DATE_IMPORT=P_DATE_IMPORT
+ AND ((ERREURS IS NULL
+ AND STATUT     = 'TRAIT')
+ OR (ERREURS   IS NULL
+ AND STATUT     = 'TRANS'))
+ )
+ ) a
+ WHERE INCI.LOGIN                                      =P_LOGIN
+ AND INCI.DATE_IMPORT                                  =P_DATE_IMPORT
+ AND IS_DATE(INCI.date_debut,'yyyymmdd')               =1
+ AND IS_DATE(INCI.date_fin,'yyyymmdd')                 =1
+ AND (to_date(INCI.date_debut,'yyyymmdd')-1 + a.jour )<=to_date(INCI.date_fin,'yyyymmdd')
+ AND ((INCI.ERREURS                                   IS NULL
+ AND INCI.STATUT                                       = 'TRAIT')
+ OR (INCI.ERREURS                                     IS NULL
+ AND INCI.STATUT                                       = 'TRANS'))
+ UNION ALL
+ SELECT INCI.numpac               AS NUMPAC,          --numpac
+ INCI.paiezad                   AS PAIEZAD,         --paiezad
+ to_date(INCI.periode,'YYYYMM') AS PERIODE,         --periode
+ INCI.type_traitement           AS TYPE_TRAITEMENT, --type_traitement
+ CASE
+ WHEN INCI.type_heure IN ('T','R')
+ THEN INCI.type_heure
+ WHEN (INCI.heures_ip IS NOT NULL
+ OR INCI.code_ip      IS NOT NULL )
+ THEN DECODE (INCI.code_ip,'HP','T',
+ (SELECT p.option_conserv_histo
+ FROM TGE_REF_PRE p
+ WHERE p.numpac     =inci.numpac
+ AND p.code_incident=inci.code_ip
+ ))
+ END AS type_ip ,--DIT 37186 type_ip
+ CASE
+ WHEN INCI.type_heure IN ('T','R')
+ THEN DECODE ( INCI.TYPE_HEURE,'R','HT','HP')
+ WHEN INCI.heures_ip IS NOT NULL
+ OR INCI.CODE_IP     IS NOT NULL
+ THEN INCI.CODE_IP
+ END                                           AS CODE_IP,  ---code_ip DIT 37186
+ to_date(INCI.date_debut,'yyyymmdd')-1 +a.jour AS DATE_EFFET,--date effet
+ CASE
+ WHEN INCI.type_heure IN ('T','R')
+ AND INCI.domaine_imp  ='H'
+ THEN INCI.code_imputation
+ WHEN INCI.heures_ip IS NOT NULL
+ OR INCI.code_ip     IS NOT NULL
+ AND INCI.domaine_imp ='1'
+ THEN INCI.code_imputation
+ END AS code_imputation,-- code_imputation DIT 37186
+ CASE
+ WHEN INCI.type_heure IN ('T','R')
+ THEN is_number(INCI.heures_trav)
+ WHEN INCI.heures_ip IS NOT NULL
+ OR INCI.CODE_IP     IS NOT NULL
+ THEN is_number(INCI.heures_ip)
+ END          AS heures,       -- heures DIT 37186
+ INCI.origine AS ORIGINE,      --origine
+ INCI.LOGIN   AS LOGIN_CREATE, --login create
+ sysdate      AS DATE_CREATE,  --date_create
+ P_ROLE       AS ROLE_CREATE,
+ P_ORIGINE    AS ORIGINE_CREATE, --'IMPORT_INCIDENT',--origine_create
+ INCI.LOGIN   AS LOGIN_MAJ,      --login maj
+ sysdate      AS DATE_MAJ,       -- date_maj
+ P_ROLE       AS ROLE_MAJ,
+ P_ORIGINE    AS ORIGINE_MAJ,--'IMPORT_INCIDENT',--origine_maj
+ P_LOGIN
+ || '#'
+ ||INCI.DATE_IMPORT
+ || '#'
+ ||INCI.NUMLIGNE AS CLE_IMPORT,--cle_import
+ CASE
+ WHEN INCI.type_heure IN ('T','R')
+ THEN NULL
+ WHEN INCI.heures_ip IS NOT NULL
+ OR INCI.CODE_IP     IS NOT NULL
+ THEN
+ (SELECT id
+ FROM tge_absences
+ WHERE cle_import =P_LOGIN
+ ||'#'
+ ||INCI.DATE_IMPORT
+ ||'#'
+ ||INCI.NUMLIGNE
+ )
+ END AS CLE_ABSENCE ,--cleAbsence
+ CASE
+ WHEN INCI.NUMPAC IS NOT NULL
+ AND INCI.PACMAT  IS NOT NULL
+ THEN RPAD(INCI.NUMPAC,6)
+ || INCI.PACMAT
+ ELSE ' '
+ END  AS IDPACMAT, --idpacmat
+ NULL AS ENVOYE    --envoye
+ FROM TGE_IMPORT_INCIDENTS INCI,
+ -- FVI modif GTA_PAR_ANNEE
+ (
+ SELECT LEVEL "JOUR" FROM dual CONNECT BY LEVEL <=
+ (SELECT MAX(to_number(to_date(date_fin,'YYYYMMDD') - to_date(date_debut,'YYYYMMDD') )) + 1
+ FROM TGE_IMPORT_INCIDENTS
+ WHERE LOGIN    =P_LOGIN
+ AND DATE_IMPORT=P_DATE_IMPORT
+ AND ((ERREURS IS NULL
+ AND STATUT     = 'TRAIT')
+ OR (ERREURS   IS NULL
+ AND STATUT     = 'TRANS'))
+ )
+ ) a
+ WHERE INCI.LOGIN                                      =P_LOGIN
+ AND INCI.DATE_IMPORT                                  =P_DATE_IMPORT
+ AND IS_DATE(INCI.date_debut,'yyyymmdd')               =1
+ AND IS_DATE(INCI.date_fin,'yyyymmdd')                 =1
+ AND (to_date(INCI.date_debut,'yyyymmdd')-1 + a.jour )<=to_date(INCI.date_fin,'yyyymmdd')
+ AND ( (INCI.heures_ip                                IS NOT NULL
+ OR INCI.code_ip                                      IS NOT NULL)
+ AND INCI.type_heure                                  IS NOT NULL)
+ AND ((INCI.ERREURS                                   IS NULL
+ AND INCI.STATUT                                       = 'TRAIT')
+ OR (INCI.ERREURS                                     IS NULL
+ AND INCI.STATUT                                       = 'TRANS'))
+ )INCIDENTS,
+ TGE_REF_PAC pac,
+ TGE_REF_ORIGINE_GTA
+ WHERE INCIDENTS.numpac=TGE_REF_ORIGINE_GTA.numpac
+ AND INCIDENTS.ORIGINE =TGE_REF_ORIGINE_GTA.CODE_ORIGINE
+ AND pac.numpac = incidents.numpac;
+ EXCEPTION
+ WHEN OTHERS THEN
+ w_err := SQLCODE;
+ w_err := w_err||'  ' ||sqlerrm;
+ FSED.FSED_ERREUR( id_trt , 'ValidIncidents' , P_LOGIN ||','|| P_DATE_IMPORT ||','|| P_ROLE ||','|| P_ORIGINE ||','|| P_VALIDATION||','|| P_WITH30 ||','|| P_WITH40 , w_err );
+--UN TRAITEMENT DE PAIE EST EN COURS
+ if(SQLCODE='-20000') then 
+  doRollback:=true;
+  GOTO end_proc;
+ end if ;
+ IF (P_LOGIN != 'BATCH') THEN
+ -- On remonte l'erreur à l'application
+ raise;
+ END IF;
+ END ;
+ TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'Trace SYS_TRC_MODIF : insertion TGE_INCIDENTS_PAIE');
+ SYS_TRACE_MODIF(P_LOGIN,dateMaj,'3','SAISIE_IND_INCIDENT',
+ 'CARTE=40&LOGIN='||P_LOGIN||'&DATE_IMPORT='||P_DATE_IMPORT||'&ROLE=3'||'&ORIGINE='||P_ORIGINE,
+ 'Import Batch 40','C',null,null,null,null);
+ -- Mise à jour des lignes d'import qui sont encore en erreur après validation, statut prend TRANS
+ TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,' UPDATE TGE_IMPORT_INCIDENTS');
+ UPDATE TGE_IMPORT_INCIDENTS
+ SET STATUT      ='TRANS'
+ WHERE LOGIN     = P_LOGIN
+ AND DATE_IMPORT = p_date_import
+ AND (ERREURS   IS NOT NULL
+ AND STATUT      = 'TRAIT');
+ 
+ IF INSTR(desactiveTraitements, 'TGE_REGROUPE_ABS') < 1 THEN
+ 	-- Regroupement des absences importé
+ 	TGE_REGROUPE_ABS(P_LOGIN||'#'||P_DATE_IMPORT);
+ END IF;
+ 
+ -- Mise à jour des lignes d'import qui ne sont plus en erreur après validation, statut prend FIN
+ UPDATE TGE_IMPORT_INCIDENTS
+ SET STATUT        ='FIN'
+ WHERE LOGIN     = P_LOGIN
+ AND DATE_IMPORT = p_date_import
+ AND ERREURS  IS NULL;
+ 
+ TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,' UPDATE TGE_IMPORT_LISTE');
+ UPDATE TGE_IMPORT_LISTE
+ SET NBLIGNES_ERR =
+ (SELECT COUNT(*)
+ FROM TGE_IMPORT_INCIDENTS
+ WHERE LOGIN     = P_LOGIN
+ AND DATE_IMPORT = p_date_import
+ AND ERREURS    IS NOT NULL
+ ),
+ NBLIGNES_IMP =
+ (SELECT COUNT(*)
+ FROM TGE_IMPORT_INCIDENTS
+ WHERE LOGIN     = P_LOGIN
+ AND DATE_IMPORT = p_date_import
+ ),
+ STATUT        ='TRANS'
+ WHERE LOGIN     = P_LOGIN
+ AND DATE_IMPORT = p_date_import
+ AND TYPE        = '5';
+ 
+ -- Mise à jour des lignes d'import qui sont encore en erreur après validation, statut prend TRANS
+ TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,' UPDATE TGE_IMPORT_ANNULATION');
+ UPDATE TGE_IMPORT_ANNULATION
+ SET STATUT      ='TRANS'
+ WHERE LOGIN     = P_LOGIN
+ AND DATE_IMPORT = p_date_import
+ AND (ERREURS   IS NOT NULL
+ AND STATUT      = 'TRAIT');
+ 
+ -- Mise à jour des lignes d'import qui ne sont plus en erreur après validation, statut prend FIN
+ UPDATE TGE_IMPORT_ANNULATION
+ SET STATUT        ='FIN'
+ WHERE LOGIN     = P_LOGIN
+ AND DATE_IMPORT = p_date_import
+ AND ERREURS  IS NULL;
+ 
+ UPDATE TGE_IMPORT_LISTE
+ SET NBLIGNES_ERR =
+ (SELECT COUNT(*)
+ FROM TGE_IMPORT_ANNULATION
+ WHERE LOGIN     = P_LOGIN
+ AND DATE_IMPORT = p_date_import
+ AND ERREURS    IS NOT NULL
+ ),
+ NBLIGNES_IMP =
+ (SELECT COUNT(*)
+ FROM TGE_IMPORT_ANNULATION
+ WHERE LOGIN     = P_LOGIN
+ AND DATE_IMPORT = p_date_import
+ ),
+ STATUT        ='TRANS'
+ WHERE LOGIN     = P_LOGIN
+ AND DATE_IMPORT = p_date_import
+ AND TYPE        = '0';
+ 
+ 
+ 
+ END IF;
+ END IF ;
+
+ v_stop := DBMS_UTILITY.GET_TIME;
+ --DBMS_OUTPUT.PUT_LINE(((v_stop-v_start)*10) || ' ms');
+ --FIXME utiliser la procédure trace_dbms_output()
+ <<end_proc>> 
+ if(doRollback) then
+  ROLLBACK;
+  if(P_WITH30=1) then
+    UPDATE TGE_IMPORT_ELEMENTS
+    SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,replace(get_message_erreur('TGE','TGE00352',p_codlang),'',''),NULL,p_codlang)
+    WHERE LOGIN      = P_LOGIN
+    AND DATE_IMPORT  = p_date_import ;
+    end if;
+  if(P_WITH40=1) then
+    UPDATE TGE_IMPORT_INCIDENTS
+    SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,replace(get_message_erreur('TGE','TGE00352',p_codlang),'',''),NULL,p_codlang)
+    WHERE LOGIN      = P_LOGIN
+    AND DATE_IMPORT  = p_date_import ;
+  end if;
+  if(P_WITH50=1) then
+ UPDATE TGE_IMPORT_IMPUTATIONS
+ SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,replace(get_message_erreur('TGE','TGE00352',p_codlang),'',''),NULL,p_codlang)
+ WHERE LOGIN      = P_LOGIN
+ AND DATE_IMPORT  = p_date_import ;
+ end if;
+  if(P_WITH60=1 or P_WITH70=1) then
+  UPDATE TGE_IMPORT_DONNEES
+  SET ERREURS =TGE_GET_MESSAGE_ERREUR(ERREURS,replace(get_message_erreur('TGE','TGE00352',p_codlang),'',''),NULL,p_codlang)
+  WHERE LOGIN      = P_LOGIN
+  AND DATE_IMPORT  = p_date_import ;
+  
+  end if;
+  TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'Rollback de l''import suite à une détection d''un traitement de paie en cours.');
+  FSED.FSED_ERREUR( id_trt , 'TGE3040' , P_LOGIN ||','|| P_DATE_IMPORT ||','|| P_ROLE ||','|| P_ORIGINE ||','|| P_VALIDATION||','|| P_WITH30 ||','|| P_WITH40 , 'Une paie est en cours d''exécution.' );
+ 
+  end if;
+
+ TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'fin TGE_IMPORT_3040 OK');
+ EXCEPTION
+ WHEN OTHERS THEN
+ w_err := SQLCODE;
+ w_err := 'TGE3040 '||w_err|| sqlerrm;
+ TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'fin TGE_IMPORT_3040 KO : '||w_err);
+ FSED.FSED_ERREUR( id_trt , 'TGE3040' , P_LOGIN ||','|| P_DATE_IMPORT ||','|| P_ROLE ||','|| P_ORIGINE ||','|| P_VALIDATION||','|| P_WITH30 ||','|| P_WITH40 , w_err );
+ raise;
+ END TGE_IMPORT_3040;

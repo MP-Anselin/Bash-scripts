@@ -1,0 +1,31 @@
+##
+HR_LINEARISE_SESSION
+=SQL=
+CREATE OR REPLACE
+  FUNCTION HR_LINEARISE_SESSION(
+      param IN VARCHAR2,
+      sep   IN VARCHAR2)
+    RETURN VARCHAR2
+  IS
+  type tcur
+IS
+  ref
+  CURSOR;
+    cur tcur;
+    retourselect VARCHAR2(2000);
+    retour CLOB;
+    requete VARCHAR2(2000) ;
+  BEGIN
+    requete := requete || 'select HR_LINEARISE_SEQUENCE(sq.codfor,sq.codses,sq.occseq,''<br>'') from for_ses FS,seqses SQ where fs.CODFOR= SQ.CODFOR AND FS.CODSES = SQ.CODSES and fs.codfor||''#''||fs.codses in ('||param||')' ;
+    BEGIN
+      OPEN cur FOR requete;
+      LOOP
+        FETCH cur INTO retourselect;
+      EXIT
+    WHEN cur % NOTFOUND;
+      retour := retour || retourselect || sep;
+    END LOOP ;
+    CLOSE cur;
+    RETURN retour;
+  END;
+END ; 

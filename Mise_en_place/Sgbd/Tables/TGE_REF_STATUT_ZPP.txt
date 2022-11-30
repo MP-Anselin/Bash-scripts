@@ -1,0 +1,48 @@
+##
+TAG_CHARSET=@€éèç
+##
+TGE_REF_STATUT_ZPP
+==
+DELETE from TGE_REF_STATUT_ZPP where CODESTATUT in ('XML_DICOZ','XML_RR','XML_RUBRIQUE','XML_RV','XML_VRDES','XML_VRREP','XML_VRVAL')
+'XML_DICOZ','Analyse du dictionnaire Zadig avec perso'
+'XML_RR','Réception du référentiel PMO/PPC'
+'XML_RUBRIQUE','Analyse des rubriques'
+'XML_RV','Réception des valeurs de VR PMO/PPC' 
+'XML_VRDES','Analyse du descriptif des VR'
+'XML_VRREP','Analyse du répertoire des VR'
+'XML_VRVAL','Analyse du contenu des VR'
+##
+TGE_REF_STATUT_ZPP
+=SQL IFEXIST=TGE_REF_STATUT_ZPP=
+UPDATE TGE_REF_STATUT_ZPP SET LIBELLESTATUT = 'Les livrables sont partiellement disponibles' WHERE CODESTATUT = 'CONTAINER_KO'
+##
+TGE_REF_STATUT_ZPP
+==
+DELETE FROM TGE_REF_STATUT_ZPP WHERE CODESTATUT in ('ETAPE_CART30','ETAPE_CART80')
+'ETAPE_CART30','Intégration des informations des matricules RH (carte 30)'
+'ETAPE_CART80','Intégration des rubriques (carte 80)'
+##
+TGE_REF_STATUT_ZPP
+==
+DELETE FROM TGE_REF_STATUT_ZPP WHERE CODESTATUT = 'SELECT_POP'
+'SELECT_POP','Sélection de la population à traiter'
+##
+TGE_REF_STATUT_ZPP
+==
+DELETE FROM TGE_REF_STATUT_ZPP WHERE CODESTATUT = 'GESTIL'
+'GESTIL','Demande d''extraction des données GESTIL'
+##
+TGE_REF_STATUT_ZPP
+==
+DELETE FROM TGE_REF_STATUT_ZPP WHERE CODESTATUT = 'ATTGES'
+'ATTGES','Attente des données de paie GESTIL'
+##
+TGE_REF_STATUT_ZPP
+==
+DELETE FROM TGE_REF_STATUT_ZPP WHERE CODESTATUT = 'SYNCGES'
+'SYNCGES','Synchronisation des matricules avec GESTIL'
+##
+TGE_REF_STATUT_ZPP
+==
+DELETE FROM TGE_REF_STATUT_ZPP WHERE CODESTATUT = 'INTERROMPU'
+'INTERROMPU','Traitement interrompu'

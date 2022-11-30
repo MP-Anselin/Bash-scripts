@@ -1,0 +1,87 @@
+##
+TGE_IMPORT_IMPUTATION
+=SQL=
+CREATE OR REPLACE PROCEDURE TGE_IMPORT_IMPUTATION(
+    P_LOGIN       IN VARCHAR2 ,
+    P_DATE_IMPORT IN VARCHAR2,
+    p_numpac VARCHAR2 )
+AS
+  req CLOB;
+  reqvalues CLOB;
+  reqInsert CLOB;
+BEGIN
+  -- Suppression des lignes dans dans DIC_TGE_IMPUTATION_PERMANENTE
+  DELETE
+  FROM dic_tge_imputations_perm a
+  WHERE EXISTS
+    (SELECT *
+    FROM TGE_IMPORT_ELEMENTS b
+    WHERE a.numpac      =b.numpac
+    AND a.paiezad       =b.paiezad
+    AND b.code_ELEMENT IN ('B690','B691')
+    AND b.LOGIN         = P_LOGIN
+    AND b.DATE_IMPORT   = p_date_import
+    AND code_element   IN ('B690','B691')
+    AND EXISTS
+      (SELECT *
+      FROM TGE_IMPORT_ELEMENTS c
+      WHERE b.login     =c.login
+      AND b.date_import =c.date_import
+      AND b.numpac      =c.numpac
+      AND b.paiezad     =c.paiezad
+      AND c.code_element='B690'
+      AND b.indicatif   =c.indicatif
+      AND ERREURs      IS NULL
+      )
+    AND EXISTS
+      (SELECT *
+      FROM TGE_IMPORT_ELEMENTS c
+      WHERE b.login              =c.login
+      AND b.date_import          =c.date_import
+      AND b.numpac               =c.numpac
+      AND b.paiezad              =c.paiezad
+      AND c.code_element         ='B691'
+      AND is_number(b.indicatif) =is_number(c.indicatif)
+      AND ERREURs               IS NULL
+      )
+    );
+  -- Ajout dans la table  DIC_TGE_IMPUTATION_PERMANENTE
+  req      :='insert into DIC_TGE_IMPUTATIONS_PERM p(numpac,paiezad,MATRIC,pacmat';
+  reqInsert:='select numpac,paiezad,MATRICULE,pacmat,';
+  reqvalues:= ' from (select numpac,paiezad,MATRICULE,pacmat,code_element||''#''||indicatif as el, valeur';
+  reqvalues:= reqvalues|| ' from TGE_IMPORT_ELEMENTS b where login='''||p_login||''' and date_import='''||P_DATE_IMPORT||''' 
+and code_element in (''B690'',''B691'')  and  exists (select * from TGE_IMPORT_ELEMENTS c where b.login=c.login and b.date_import=c.date_import and b.numpac=c.numpac and b.paiezad=c.paiezad and c.code_element=''B690''  and b.indicatif   =c.indicatif and ERREURs is  null) 
+and  exists (select * from TGE_IMPORT_ELEMENTS c where b.login=c.login and b.date_import=c.date_import and b.numpac=c.numpac and b.paiezad=c.paiezad and c.code_element=''B691''  and  b.indicatif   =c.indicatif and ERREURs is  null) ';
+  reqvalues:= reqvalues|| ' ) pivot (max(valeur)   for(el) in (';
+  FOR cur IN
+  (SELECT ELEMENT,
+    occurence,
+    DOnneegxp,
+    tablegxp
+  FROM tge_ref_mapdo
+  WHERE element IN ('B690','B691')
+  AND numpac     =p_numpac
+  UNION
+  SELECT ELEMENT,
+    occurence,
+    DOnneegxp,
+    tablegxp
+  FROM tge_ref_mapdo
+  WHERE element IN ('B690','B691')
+  AND numpac     ='*'
+  )
+  LOOP
+    req           :=req||','||cur.DONNEEGXP;
+    reqvalues     := reqvalues||''''||cur.element||'#'||cur.occurence ||''' as '|| cur.DONNEEGXP||',';
+    IF cur.element ='B690' THEN
+      reqInsert   := reqInsert||cur.DONNEEGXP ||',';
+    ELSE
+      reqInsert:= reqInsert||' IS_NUMBER(replace('||cur.DONNEEGXP ||','','',''.'')) as '||cur.DONNEEGXP ||' ,';
+    END IF;
+  END LOOP;
+  reqvalues:= SUBSTR(reqvalues,1,LENGTH(reqvalues)-1)||'))  ';
+  reqInsert:= SUBSTR(reqInsert,1,LENGTH(reqInsert)-1);
+  req      :=req||')  ';
+  req      :=req||reqInsert|| reqvalues;
+  EXECUTE_IMMEDIATE_STRING( req,0);
+END TGE_IMPORT_IMPUTATION;

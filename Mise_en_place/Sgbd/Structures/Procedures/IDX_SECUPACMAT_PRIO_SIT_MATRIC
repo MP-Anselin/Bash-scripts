@@ -1,0 +1,40 @@
+##
+IDX_SECUPACMAT_PRIO_SIT_MATRIC
+=SQL=
+CREATE or REPLACE PROCEDURE "IDX_SECUPACMAT_PRIO_SIT_MATRIC" 
+AS
+   	indexName VARCHAR2(30);
+BEGIN
+	/* 
+		On recherche s'il existe déjà un index sur les colonnes PRIORITE_SITUATION et MATRIC pour la table SECUPACMAT
+		Si cet index existe (déjà créé par le client), il faut le supprimer pour créer celui mis à disposition par la R&D SECUPACMAT_PRIO_SITU_MATRIC.
+		Lorsque l'index SECUPACMAT_PRIO_SITU_MATRIC sera créé, cette procédure pourra être supprimée.
+	*/
+	BEGIN	
+		SELECT DISTINCT(index_name) INTO indexName
+		FROM user_ind_columns
+	   	WHERE index_name IN (
+	    	SELECT index_name
+	    	FROM user_ind_columns
+	    	WHERE
+	    	table_name = 'SECUPACMAT' 
+	    	AND column_name IN ('MATRIC', 'PRIORITE_SITUATION') 
+	    	GROUP BY index_name 
+			HAVING COUNT(*) = 2
+		) ORDER BY index_name;
+	EXCEPTION WHEN OTHERS THEN
+    	indexName :=NULL;
+	END;
+	
+    IF(indexName IS NOT NULL) THEN
+    	/* Suppression de l'index déjà existant afin de le remplacer par l'index de la R&D */
+    	EXECUTE IMMEDIATE 'DROP INDEX ' ||indexName;
+    	
+    	EXECUTE IMMEDIATE 'CREATE INDEX SECUPACMAT_PRIO_SITU_MATRIC ON SECUPACMAT (PRIORITE_SITUATION, MATRIC)';
+	END IF; 	
+    
+END IDX_SECUPACMAT_PRIO_SIT_MATRIC;
+##
+IDX_SECUPACMAT_PRIO_SIT_MATRIC
+=SQL=
+call IDX_SECUPACMAT_PRIO_SIT_MATRIC()

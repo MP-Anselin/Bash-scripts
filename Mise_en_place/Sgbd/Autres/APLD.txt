@@ -1,0 +1,161 @@
+##
+TAG_CHARSET=@€éèç
+##
+META_DONNEE_ECRAN
+==
+DELETE FROM META_DONNEE_ECRAN where nom_donnee = 'CODE_APLD' and nom_page='*'
+'*','CODE_APLD','*','Codes Activité Partielle Longue Durée','N','text','TAB_RD_CODES_APLD','1','Code,Libellé','CODE_APLD,#OUI','NUMPAC','N',null,'VALO_DEFAUT_APLD',null,null,'NPA_AFFICHAGE',null,null,null,null,null,null,'N','N','N','0','0'
+##
+REF_DONNEE_ECRAN
+==
+DELETE FROM REF_DONNEE_ECRAN where nom_donnee = 'CODE_APLD' and nom_page='*'
+'*','CODE_APLD','*','Codes Activité Partielle Longue Durée','N','text','TAB_RD_CODES_APLD','1','Code,Libellé','CODE_APLD,#OUI','NUMPAC','N',null,'VALO_DEFAUT_APLD',null,null,'NPA_AFFICHAGE',null,null,null,null,null,null,'N','N','N','0','0'
+##
+META_DONNEE_GENERALE
+==
+DELETE FROM META_DONNEE_GENERALE where nom_donnee = 'CODE_APLD'
+'*','CODE_APLD','SALARIE_INCLUS_ACCORD_ACT_PARTIELLE','DIC_ADM_CONTRAT_HISTO','X','3',null,null,null,null,'GZ',null,null,'942',null,null,null,null,'N'
+##
+REF_DONNEE_GENERALE
+==
+DELETE FROM REF_DONNEE_GENERALE where nom_donnee = 'CODE_APLD'
+'*','CODE_APLD','SALARIE_INCLUS_ACCORD_ACT_PARTIELLE','DIC_ADM_CONTRAT_HISTO','X','3',null,null,null,null,'GZ',null,null,'942',null,null,null,null,'N'
+##
+META_GROUPE_DONNEES
+==
+DELETE FROM META_GROUPE_DONNEES where id_groupe='APP_ECR_AUTRES'
+'*','APP_ECR_AUTRES','#LIBELLE_5','69','N','FormTitreµAutres informations',null,null,null,null,null,null,null,'N',null,null,null
+'*','APP_ECR_AUTRES','CODE_APLD','70',null,'FDonneeGµ',null,null,null,null,null,null,null,'N',null,null,null
+##
+REF_GROUPE_DONNEES
+==
+DELETE FROM REF_GROUPE_DONNEES where id_groupe='APP_ECR_AUTRES'
+'*','APP_ECR_AUTRES','#LIBELLE_5','69','N','FormTitreµAutres informations',null,null,null,null,null,null,null,'N',null,null,null
+'*','APP_ECR_AUTRES','CODE_APLD','70',null,'FDonneeGµ',null,null,null,null,null,null,null,'N',null,null,null
+##
+META_GROUPE_DONNEES_INFO
+==
+DELETE FROM META_GROUPE_DONNEES_INFO where id_groupe='APP_ECR_AUTRES'
+'*','APP_ECR_AUTRES','NPA_AFFICHAGE',null,null,'N',null,'942',null,'Appointements - Autres informations','sous groupe Appointement Autres informations',null
+##
+REF_GROUPE_DONNEES_INFO
+==
+DELETE FROM REF_GROUPE_DONNEES_INFO where id_groupe='APP_ECR_AUTRES'
+'*','APP_ECR_AUTRES','NPA_AFFICHAGE',null,null,'N',null,'942',null,'Appointements - Autres informations','sous groupe Appointement Autres informations',null
+##
+META_REGLEGESTION
+==
+DELETE FROM META_REGLEGESTION where id_reglegestion='VALO_DEFAUT_APLD'
+'*','VALO_DEFAUT_APLD','1',null,'£µ£µECR_NWFµ@codeoperation£µVALEUR£ValiderµEQµ#ET#',null,null,'3','5'
+'*','VALO_DEFAUT_APLD','3',null,'DONNEE£CODE_APLDµ@vide£µEQ',null,null,'4','5'
+'*','VALO_DEFAUT_APLD','4','VALEUR£999','VAL','££','DONNEE£CODE_APLD','5','5'
+'*','VALO_DEFAUT_APLD','5',null,'£µ£µECR_WFµ@codeoperation£µVALEUR£SuivantµEQµ#ET#µ@codeoperation£µVALEUR£F11µEQµ#OU#',null,null,'8','FIN'
+'*','VALO_DEFAUT_APLD','8',null,'DONNEE£CODE_APLDµ@vide£µEQ',null,null,'9','FIN'
+'*','VALO_DEFAUT_APLD','9','VALEUR£999','VAL','££','DONNEE£CODE_APLD','FIN','FIN'
+##
+REF_REGLEGESTION
+==
+DELETE FROM REF_REGLEGESTION where id_reglegestion='VALO_DEFAUT_APLD'
+'*','VALO_DEFAUT_APLD','1',null,'£µ£µECR_NWFµ@codeoperation£µVALEUR£ValiderµEQµ#ET#',null,null,'3','5'
+'*','VALO_DEFAUT_APLD','3',null,'DONNEE£CODE_APLDµ@vide£µEQ',null,null,'4','5'
+'*','VALO_DEFAUT_APLD','4','VALEUR£999','VAL','££','DONNEE£CODE_APLD','5','5'
+'*','VALO_DEFAUT_APLD','5',null,'£µ£µECR_WFµ@codeoperation£µVALEUR£SuivantµEQµ#ET#µ@codeoperation£µVALEUR£F11µEQµ#OU#',null,null,'8','FIN'
+'*','VALO_DEFAUT_APLD','8',null,'DONNEE£CODE_APLDµ@vide£µEQ',null,null,'9','FIN'
+'*','VALO_DEFAUT_APLD','9','VALEUR£999','VAL','££','DONNEE£CODE_APLD','FIN','FIN'
+##
+META_REGLEGESTION_DESC
+==
+DELETE FROM META_REGLEGESTION_DESC where id_reglegestion='VALO_DEFAUT_APLD'
+'*','VALO_DEFAUT_APLD','AUT','Valorisation donnée APLD par défaut à 999 (sans accord)',null,'942',null,'[{"TYPE":"SI","OPERANDE_1":"","OPERATEUR":"ECR_NWF","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ET_SI","OPERANDE_1":"@codeoperation£","OPERATEUR":"EQ","OPERANDE_2":"VALEUR£Valider","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SI","OPERANDE_1":"DONNEE£CODE_APLD","OPERATEUR":"EQ","OPERANDE_2":"@vide£","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"OPERATION","OPERANDE_1":"VALEUR£999","OPERATEUR":"VAL","OPERANDE_2":"££","RESULTAT":"DONNEE£CODE_APLD","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SI","OPERANDE_1":"","OPERATEUR":"ECR_WF","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":1,"PAR_FERM":0},{"TYPE":"ET_SI","OPERANDE_1":"@codeoperation£","OPERATEUR":"EQ","OPERANDE_2":"VALEUR£Suivant","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"OU_SI","OPERANDE_1":"@codeoperation£","OPERATEUR":"EQ","OPERANDE_2":"VALEUR£F11","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":1},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SI","OPERANDE_1":"DONNEE£CODE_APLD","OPERATEUR":"EQ","OPERANDE_2":"@vide£","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"OPERATION","OPERANDE_1":"VALEUR£999","OPERATEUR":"VAL","OPERANDE_2":"££","RESULTAT":"DONNEE£CODE_APLD","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0}]','Valorisation donnée APLD par défaut à 999 (sans accord)','N',null,'/*¿ * VALO_DEFAUT_APLD :¿ * Valorisation donnée APLD par défaut à 999 (sans accord)¿ */¿¿if (ECR_NWF() && codeoperation == "Valider") {	if (DIC_ADM_CONTRAT_HISTO.CODE_APLD == vide) {¿		DIC_ADM_CONTRAT_HISTO.CODE_APLD = 999;¿	}}¿if (ECR_WF() && codeoperation == "Suivant" || codeoperation == "F11") {¿	if (DIC_ADM_CONTRAT_HISTO.CODE_APLD == vide) {¿		DIC_ADM_CONTRAT_HISTO.CODE_APLD = 999;	}¿}¿','Valorisation donnée APLD par défaut à 999 (sans accord)'
+##
+REF_REGLEGESTION_DESC
+==
+DELETE FROM REF_REGLEGESTION_DESC where id_reglegestion='VALO_DEFAUT_APLD'
+'*','VALO_DEFAUT_APLD','AUT','Valorisation donnée APLD par défaut à 999 (sans accord)',null,'942',null,'[{"TYPE":"SI","OPERANDE_1":"","OPERATEUR":"ECR_NWF","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ET_SI","OPERANDE_1":"@codeoperation£","OPERATEUR":"EQ","OPERANDE_2":"VALEUR£Valider","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SI","OPERANDE_1":"DONNEE£CODE_APLD","OPERATEUR":"EQ","OPERANDE_2":"@vide£","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"OPERATION","OPERANDE_1":"VALEUR£999","OPERATEUR":"VAL","OPERANDE_2":"££","RESULTAT":"DONNEE£CODE_APLD","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SI","OPERANDE_1":"","OPERATEUR":"ECR_WF","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":1,"PAR_FERM":0},{"TYPE":"ET_SI","OPERANDE_1":"@codeoperation£","OPERATEUR":"EQ","OPERANDE_2":"VALEUR£Suivant","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"OU_SI","OPERANDE_1":"@codeoperation£","OPERATEUR":"EQ","OPERANDE_2":"VALEUR£F11","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":1},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SI","OPERANDE_1":"DONNEE£CODE_APLD","OPERATEUR":"EQ","OPERANDE_2":"@vide£","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"OPERATION","OPERANDE_1":"VALEUR£999","OPERATEUR":"VAL","OPERANDE_2":"££","RESULTAT":"DONNEE£CODE_APLD","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0}]','Valorisation donnée APLD par défaut à 999 (sans accord)','N',null,'/*¿ * VALO_DEFAUT_APLD :¿ * Valorisation donnée APLD par défaut à 999 (sans accord)¿ */¿¿if (ECR_NWF() && codeoperation == "Valider") {	if (DIC_ADM_CONTRAT_HISTO.CODE_APLD == vide) {¿		DIC_ADM_CONTRAT_HISTO.CODE_APLD = 999;¿	}}¿if (ECR_WF() && codeoperation == "Suivant" || codeoperation == "F11") {¿	if (DIC_ADM_CONTRAT_HISTO.CODE_APLD == vide) {¿		DIC_ADM_CONTRAT_HISTO.CODE_APLD = 999;	}¿}¿','Valorisation donnée APLD par défaut à 999 (sans accord)'
+##
+SYS_REQUETES_JSP
+==
+DELETE FROM SYS_REQUETES_JSP where nompage = 'TAB_RD_CODES_APLD'  and idrequete=1
+'TAB_RD_CODES_APLD','1','Utilisateur','TGE_REF_DAP','CODE_DAP,LIBELLE_DAP','CODE_DAP,LIBELLE_DAP','NUMPAC = ''%1''','0','false','CODE_DAP',null,'Activité Partielle Longue Durée',null
+##
+META_DONNEE_ECRAN
+==
+delete from META_DONNEE_ECRAN where NOM_DONNEE = 'NIVFOR_APP' and COMPANY_ID = '*' and NOM_PAGE in ('*','WKF_MODIF_CNT_ECR3')
+'*','NIVFOR_APP','*','Niveau de diplôme préparé','R_AFF_NIVFOR_APP','text','TAB_RD_NIV_FORMATION','1','Code,Libellé','NIVFOR_APP,#OUI',null,'N',null,null,null,null,null,null,null,'NIVFOR_APP_*_OBLIG',null,null,null,'N','N','N','0','0'
+'*','NIVFOR_APP','WKF_MODIF_CNT_ECR3','Niveau formation le plus élevé obtenu','R_AFF_NIVFOR_APP','text','TAB_RD_NIV_FORMATION','1','Code,Libellé','NIVFOR,#OUI',null,'N',null,null,null,null,null,null,null,'NIVFOR_APP_*_OBLIG',null,null,null,'N','N','N','0','0'
+##
+META_DONNEE_GENERALE
+==
+delete from META_DONNEE_GENERALE where NOM_DONNEE = 'NIVFOR_APP' and COMPANY_ID = '*'
+'*','NIVFOR_APP','Niveau de diplôme préparé','DIC_ADM_CONTRAT','X','2',null,null,null,null,'GZ','O','1271','943',null,null,null,null,'N'
+##
+META_GROUPE_DONNEES
+==
+delete from META_GROUPE_DONNEES where ID_GROUPE = 'NIVEAU_FOR_PREP' and COMPANY_ID = '*' and NOM_DONNEE = 'NIVFOR_APP'
+'*','NIVEAU_FOR_PREP','NIVFOR_APP','1',null,'FDonneeGµ',null,null,null,null,null,null,null,'N',null,null,null
+##
+META_GROUPE_DONNEES_INFO
+==
+delete from META_GROUPE_DONNEES_INFO where ID_GROUPE = 'NIVEAU_FOR_PREP' and COMPANY_ID = '*'
+'*','NIVEAU_FOR_PREP','AFF_NIVFOR_APP',null,null,'N',null,'943',null,'Niveau de formation préparé (pour apprentis)','Groupe pour donnée NIVFOR_APP dans onglet DSN avec affichage conditionnel',null
+##
+META_REGLEGESTION
+==
+delete from META_REGLEGESTION where ID_REGLEGESTION in ('AFF_NIVFOR_APP','NIVFOR_APP_*_OBLIG') and COMPANY_ID = '*'
+'*','AFF_NIVFOR_APP','1',null,'DONNEE£ZT061µVALEUR£CAPµEQµDONNEE£ZT061µVALEUR£CDDµEQµDONNEE£ZT061µVALEUR£CDIµEQµ#OU#µDONNEE£ZA700µVALEUR£20,64,65,81£µINµ#ET#µ#OU#',null,null,'FIN','FIN'
+'*','NIVFOR_APP_*_OBLIG','1',null,'DONNEE£ZT061µVALEUR£CAPµEQ',null,null,'2','4'
+'*','NIVFOR_APP_*_OBLIG','2',null,'DONNEE£NIVFOR_APPµ@vide£µEQ',null,null,'3','4'
+'*','NIVFOR_APP_*_OBLIG','3','££','ERR','CODEERREUR£GENDIP07£NOM_DONNEE_FOCUS=DONNEE^NIVFOR_APP','£','FIN','FIN'
+'*','NIVFOR_APP_*_OBLIG','4',null,'DONNEE£ZT061µVALEUR£CDDµEQµDONNEE£ZA700µVALEUR£20,64,65,81£µINµ#ET#',null,null,'6','8'
+'*','NIVFOR_APP_*_OBLIG','6',null,'DONNEE£NIVFOR_APPµ@vide£µEQ',null,null,'7','8'
+'*','NIVFOR_APP_*_OBLIG','7','££','ERR','CODEERREUR£GENDIP07£NOM_DONNEE_FOCUS=DONNEE^NIVFOR_APP','£','FIN','FIN'
+'*','NIVFOR_APP_*_OBLIG','8',null,'DONNEE£ZT061µVALEUR£CDIµEQµDONNEE£ZA700µVALEUR£20,64,65,81£µINµ#ET#',null,null,'10','FIN'
+'*','NIVFOR_APP_*_OBLIG','10',null,'DONNEE£NIVFOR_APPµ@vide£µEQ',null,null,'11','FIN'
+'*','NIVFOR_APP_*_OBLIG','11','££','ERR','CODEERREUR£GENDIP07£NOM_DONNEE_FOCUS=DONNEE^NIVFOR_APP','£','FIN','FIN'
+##
+META_REGLEGESTION_DESC
+==
+delete from META_REGLEGESTION_DESC where ID_REGLEGESTION in ('AFF_NIVFOR_APP','NIVFOR_APP_*_OBLIG') and COMPANY_ID = '*'
+'*','AFF_NIVFOR_APP','AFF','Affichage conditionnel du niveau de formation préparé (pour apprentis)',null,'943',null,'[{"TYPE":"SI","OPERANDE_1":"DONNEE£ZT061","OPERATEUR":"EQ","OPERANDE_2":"VALEUR£CAP","RESULTAT":"","PAR_OUVR":1,"PAR_FERM":0},{"TYPE":"OU_SI","OPERANDE_1":"DONNEE£ZT061","OPERATEUR":"EQ","OPERANDE_2":"VALEUR£CDD","RESULTAT":"","PAR_OUVR":1,"PAR_FERM":0},{"TYPE":"OU_SI","OPERANDE_1":"DONNEE£ZT061","OPERATEUR":"EQ","OPERANDE_2":"VALEUR£CDI","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":1},{"TYPE":"ET_SI","OPERANDE_1":"DONNEE£ZA700","OPERATEUR":"IN","OPERANDE_2":"VALEUR£20,64,65,81£","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":1},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0}]','La donnée NIVFOR_APP (niveau de formation préparé) est obligatoire pour les contrats d''apprentissage.','C',null,'/*¿ * AFF_NIVFOR_APP :¿ * La donnée NIVFOR_APP (niveau de formation préparé) est obligatoire pour les contrats d''apprentissage.¿ */¿¿if ((DIC_ADM_CONTRAT_HISTO.ZT061 == "CAP" || ((DIC_ADM_CONTRAT_HISTO.ZT061 == "CDD" || DIC_ADM_CONTRAT_HISTO.ZT061 == "CDI") && DIC_ADM_CONTRAT_HISTO.ZA700.IN(20, 64, 65, 81)))) {¿}¿','La donnée NIVFOR_APP (niveau de formation préparé) est obligatoire pour les contrats d''apprentissage.'
+'*','NIVFOR_APP_*_OBLIG','CTL','Niveau de formation préparé obligatoire pour contrats apprentis',null,'943',null,'[{"TYPE":"SI","OPERANDE_1":"DONNEE£ZT061","OPERATEUR":"EQ","OPERANDE_2":"VALEUR£CAP","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SI","OPERANDE_1":"DONNEE£NIVFOR_APP","OPERATEUR":"EQ","OPERANDE_2":"@vide£","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"OPERATION","OPERANDE_1":"££","OPERATEUR":"ERR","OPERANDE_2":"CODEERREUR£GENDIP07£NOM_DONNEE_FOCUS=DONNEE^NIVFOR_APP","RESULTAT":"£","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SI","OPERANDE_1":"DONNEE£ZT061","OPERATEUR":"EQ","OPERANDE_2":"VALEUR£CDD","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ET_SI","OPERANDE_1":"DONNEE£ZA700","OPERATEUR":"IN","OPERANDE_2":"VALEUR£20,64,65,81£","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SI","OPERANDE_1":"DONNEE£NIVFOR_APP","OPERATEUR":"EQ","OPERANDE_2":"@vide£","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"OPERATION","OPERANDE_1":"££","OPERATEUR":"ERR","OPERANDE_2":"CODEERREUR£GENDIP07£NOM_DONNEE_FOCUS=DONNEE^NIVFOR_APP","RESULTAT":"£","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SI","OPERANDE_1":"DONNEE£ZT061","OPERATEUR":"EQ","OPERANDE_2":"VALEUR£CDI","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ET_SI","OPERANDE_1":"DONNEE£ZA700","OPERATEUR":"IN","OPERANDE_2":"VALEUR£20,64,65,81£","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SI","OPERANDE_1":"DONNEE£NIVFOR_APP","OPERATEUR":"EQ","OPERANDE_2":"@vide£","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"OPERATION","OPERANDE_1":"££","OPERATEUR":"ERR","OPERANDE_2":"CODEERREUR£GENDIP07£NOM_DONNEE_FOCUS=DONNEE^NIVFOR_APP","RESULTAT":"£","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0}]','Le niveau de formation préparé par l''individu doit être renseignée pour les contrats d''apprentissage','N',null,'/*¿ * NIVFOR_APP_*_OBLIG :¿ * Le niveau de formation préparé par l''individu doit être renseignée pour les contrats d''apprentissage¿ */¿¿if (DIC_ADM_CONTRAT_HISTO.ZT061 == "CAP") {¿	if (DIC_ADM_CONTRAT.NIVFOR_APP == vide) {¿		ERR("GENDIP07", DIC_ADM_CONTRAT.NIVFOR_APP);¿	}¿}¿if (DIC_ADM_CONTRAT_HISTO.ZT061 == "CDD" && DIC_ADM_CONTRAT_HISTO.ZA700.IN(20, 64, 65, 81)) {¿	if (DIC_ADM_CONTRAT.NIVFOR_APP == vide) {¿		ERR("GENDIP07", DIC_ADM_CONTRAT.NIVFOR_APP);¿	}¿}¿if (DIC_ADM_CONTRAT_HISTO.ZT061 == "CDI" && DIC_ADM_CONTRAT_HISTO.ZA700.IN(20, 64, 65, 81)) {¿	if (DIC_ADM_CONTRAT.NIVFOR_APP == vide) {¿		ERR("GENDIP07", DIC_ADM_CONTRAT.NIVFOR_APP);¿	}¿}','Conditions de valorisation du niveau de formation préparé par l''individu (pour CNT Apprentissage)'
+##
+REF_DONNEE_ECRAN
+==
+delete from REF_DONNEE_ECRAN where NOM_DONNEE = 'NIVFOR_APP' and COMPANY_ID = '*' and NOM_PAGE in ('*','WKF_MODIF_CNT_ECR3')
+'*','NIVFOR_APP','*','Niveau de diplôme préparé','R_AFF_NIVFOR_APP','text','TAB_RD_NIV_FORMATION','1','Code,Libellé','NIVFOR_APP,#OUI',null,'N',null,null,null,null,null,null,null,'NIVFOR_APP_*_OBLIG',null,null,null,'N','N','N','0','0'
+'*','NIVFOR_APP','WKF_MODIF_CNT_ECR3','Niveau formation le plus élevé obtenu','R_AFF_NIVFOR_APP','text','TAB_RD_NIV_FORMATION','1','Code,Libellé','NIVFOR,#OUI',null,'N',null,null,null,null,null,null,null,'NIVFOR_APP_*_OBLIG',null,null,null,'N','N','N','0','0'
+##
+REF_DONNEE_GENERALE
+==
+delete from REF_DONNEE_GENERALE where NOM_DONNEE = 'NIVFOR_APP' and COMPANY_ID = '*'
+'*','NIVFOR_APP','Niveau de diplôme préparé','DIC_ADM_CONTRAT','X','2',null,null,null,null,'GZ','O',null,'943',null,null,null,null,'N'
+##
+REF_GROUPE_DONNEES
+==
+delete from REF_GROUPE_DONNEES where ID_GROUPE = 'NIVEAU_FOR_PREP' and COMPANY_ID = '*' and NOM_DONNEE = 'NIVFOR_APP'
+'*','NIVEAU_FOR_PREP','NIVFOR_APP','1',null,'FDonneeGµ',null,null,null,null,null,null,null,'N',null,null,null
+##
+REF_GROUPE_DONNEES_INFO
+==
+delete from REF_GROUPE_DONNEES_INFO where ID_GROUPE = 'NIVEAU_FOR_PREP' and COMPANY_ID = '*'
+'*','NIVEAU_FOR_PREP','AFF_NIVFOR_APP',null,null,'N',null,'943',null,'Niveau de formation préparé (pour apprentis)','Groupe pour donnée NIVFOR_APP dans onglet DSN avec affichage conditionnel',null
+##
+REF_REGLEGESTION
+==
+delete from REF_REGLEGESTION where ID_REGLEGESTION in ('AFF_NIVFOR_APP','NIVFOR_APP_*_OBLIG') and COMPANY_ID = '*'
+'*','AFF_NIVFOR_APP','1',null,'DONNEE£ZT061µVALEUR£CAPµEQµDONNEE£ZT061µVALEUR£CDDµEQµDONNEE£ZT061µVALEUR£CDIµEQµ#OU#µDONNEE£ZA700µVALEUR£20,64,65,81£µINµ#ET#µ#OU#',null,null,'FIN','FIN'
+'*','NIVFOR_APP_*_OBLIG','1',null,'DONNEE£ZT061µVALEUR£CAPµEQ',null,null,'2','4'
+'*','NIVFOR_APP_*_OBLIG','2',null,'DONNEE£NIVFOR_APPµ@vide£µEQ',null,null,'3','4'
+'*','NIVFOR_APP_*_OBLIG','3','££','ERR','CODEERREUR£GENDIP07£NOM_DONNEE_FOCUS=DONNEE^NIVFOR_APP','£','FIN','FIN'
+'*','NIVFOR_APP_*_OBLIG','4',null,'DONNEE£ZT061µVALEUR£CDDµEQµDONNEE£ZA700µVALEUR£20,64,65,81£µINµ#ET#',null,null,'6','8'
+'*','NIVFOR_APP_*_OBLIG','6',null,'DONNEE£NIVFOR_APPµ@vide£µEQ',null,null,'7','8'
+'*','NIVFOR_APP_*_OBLIG','7','££','ERR','CODEERREUR£GENDIP07£NOM_DONNEE_FOCUS=DONNEE^NIVFOR_APP','£','FIN','FIN'
+'*','NIVFOR_APP_*_OBLIG','8',null,'DONNEE£ZT061µVALEUR£CDIµEQµDONNEE£ZA700µVALEUR£20,64,65,81£µINµ#ET#',null,null,'10','FIN'
+'*','NIVFOR_APP_*_OBLIG','10',null,'DONNEE£NIVFOR_APPµ@vide£µEQ',null,null,'11','FIN'
+'*','NIVFOR_APP_*_OBLIG','11','££','ERR','CODEERREUR£GENDIP07£NOM_DONNEE_FOCUS=DONNEE^NIVFOR_APP','£','FIN','FIN'
+##
+REF_REGLEGESTION_DESC
+==
+delete from REF_REGLEGESTION_DESC where ID_REGLEGESTION in ('AFF_NIVFOR_APP','NIVFOR_APP_*_OBLIG') and COMPANY_ID = '*'
+'*','AFF_NIVFOR_APP','AFF','Affichage conditionnel du niveau de formation préparé (pour apprentis)',null,'943',null,'[{"TYPE":"SI","OPERANDE_1":"DONNEE£ZT061","OPERATEUR":"EQ","OPERANDE_2":"VALEUR£CAP","RESULTAT":"","PAR_OUVR":1,"PAR_FERM":0},{"TYPE":"OU_SI","OPERANDE_1":"DONNEE£ZT061","OPERATEUR":"EQ","OPERANDE_2":"VALEUR£CDD","RESULTAT":"","PAR_OUVR":1,"PAR_FERM":0},{"TYPE":"OU_SI","OPERANDE_1":"DONNEE£ZT061","OPERATEUR":"EQ","OPERANDE_2":"VALEUR£CDI","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":1},{"TYPE":"ET_SI","OPERANDE_1":"DONNEE£ZA700","OPERATEUR":"IN","OPERANDE_2":"VALEUR£20,64,65,81£","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":1},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0}]','La donnée NIVFOR_APP (niveau de formation préparé) est obligatoire pour les contrats d''apprentissage.','C',null,'/*¿ * AFF_NIVFOR_APP :¿ * La donnée NIVFOR_APP (niveau de formation préparé) est obligatoire pour les contrats d''apprentissage.¿ */¿¿if ((DIC_ADM_CONTRAT_HISTO.ZT061 == "CAP" || ((DIC_ADM_CONTRAT_HISTO.ZT061 == "CDD" || DIC_ADM_CONTRAT_HISTO.ZT061 == "CDI") && DIC_ADM_CONTRAT_HISTO.ZA700.IN(20, 64, 65, 81)))) {¿}¿','La donnée NIVFOR_APP (niveau de formation préparé) est obligatoire pour les contrats d''apprentissage.'
+'*','NIVFOR_APP_*_OBLIG','CTL','Niveau de formation préparé obligatoire pour contrats apprentis',null,'943',null,'[{"TYPE":"SI","OPERANDE_1":"DONNEE£ZT061","OPERATEUR":"EQ","OPERANDE_2":"VALEUR£CAP","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SI","OPERANDE_1":"DONNEE£NIVFOR_APP","OPERATEUR":"EQ","OPERANDE_2":"@vide£","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"OPERATION","OPERANDE_1":"££","OPERATEUR":"ERR","OPERANDE_2":"CODEERREUR£GENDIP07£NOM_DONNEE_FOCUS=DONNEE^NIVFOR_APP","RESULTAT":"£","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SI","OPERANDE_1":"DONNEE£ZT061","OPERATEUR":"EQ","OPERANDE_2":"VALEUR£CDD","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ET_SI","OPERANDE_1":"DONNEE£ZA700","OPERATEUR":"IN","OPERANDE_2":"VALEUR£20,64,65,81£","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SI","OPERANDE_1":"DONNEE£NIVFOR_APP","OPERATEUR":"EQ","OPERANDE_2":"@vide£","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"OPERATION","OPERANDE_1":"££","OPERATEUR":"ERR","OPERANDE_2":"CODEERREUR£GENDIP07£NOM_DONNEE_FOCUS=DONNEE^NIVFOR_APP","RESULTAT":"£","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SI","OPERANDE_1":"DONNEE£ZT061","OPERATEUR":"EQ","OPERANDE_2":"VALEUR£CDI","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ET_SI","OPERANDE_1":"DONNEE£ZA700","OPERATEUR":"IN","OPERANDE_2":"VALEUR£20,64,65,81£","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SI","OPERANDE_1":"DONNEE£NIVFOR_APP","OPERATEUR":"EQ","OPERANDE_2":"@vide£","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"OPERATION","OPERANDE_1":"££","OPERATEUR":"ERR","OPERANDE_2":"CODEERREUR£GENDIP07£NOM_DONNEE_FOCUS=DONNEE^NIVFOR_APP","RESULTAT":"£","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0}]','Le niveau de formation préparé par l''individu doit être renseignée pour les contrats d''apprentissage','N',null,'/*¿ * NIVFOR_APP_*_OBLIG :¿ * Le niveau de formation préparé par l''individu doit être renseignée pour les contrats d''apprentissage¿ */¿¿if (DIC_ADM_CONTRAT_HISTO.ZT061 == "CAP") {¿	if (DIC_ADM_CONTRAT.NIVFOR_APP == vide) {¿		ERR("GENDIP07", DIC_ADM_CONTRAT.NIVFOR_APP);¿	}¿}¿if (DIC_ADM_CONTRAT_HISTO.ZT061 == "CDD" && DIC_ADM_CONTRAT_HISTO.ZA700.IN(20, 64, 65, 81)) {¿	if (DIC_ADM_CONTRAT.NIVFOR_APP == vide) {¿		ERR("GENDIP07", DIC_ADM_CONTRAT.NIVFOR_APP);¿	}¿}¿if (DIC_ADM_CONTRAT_HISTO.ZT061 == "CDI" && DIC_ADM_CONTRAT_HISTO.ZA700.IN(20, 64, 65, 81)) {¿	if (DIC_ADM_CONTRAT.NIVFOR_APP == vide) {¿		ERR("GENDIP07", DIC_ADM_CONTRAT.NIVFOR_APP);¿	}¿}','Conditions de valorisation du niveau de formation préparé par l''individu (pour CNT Apprentissage)'

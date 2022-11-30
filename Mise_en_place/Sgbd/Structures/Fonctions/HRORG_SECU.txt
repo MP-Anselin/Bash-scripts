@@ -1,0 +1,85 @@
+##
+TAG_CHARSET=@€éèç
+##
+HRORG_SECU 
+=SQL=
+CREATE OR REPLACE FUNCTION "HRORG_SECU"(
+    p_codts       IN std_struc_arbre.codts%TYPE,
+    p_type_entite IN std_struc_entite.type_entite%TYPE,
+    p_entite      IN std_struc_entite.code_entite%TYPE,
+    p_date        IN std_struc_entite.date_eff%TYPE,
+    p_cid         IN std_struc_entite.cid%TYPE default null)
+  RETURN std_struc_entite.code_entite%TYPE
+IS
+  v_retour VARCHAR2(25);
+  v_typent std_struc_entite.type_entite%TYPE;
+  v_cid std_struc_entite.cid%TYPE;
+BEGIN
+	
+  v_cid := p_cid;
+  IF (v_cid IS NULL) THEN
+  	BEGIN
+  		SELECT VALVAR INTO v_cid FROM SYS_VARSYS where CODVAR = 'NS_CLIENT_ID';
+  	EXCEPTION
+  	WHEN NO_DATA_FOUND THEN
+  		v_cid := null;
+  	END;
+  END IF;
+  IF (v_cid IS NULL) THEN
+  	-- En mode multiclient, la varsys peut être null et le passage du paramètre pCid est obligatoire
+  	RETURN null;
+  END IF;
+	
+  SELECT TYPE_ENTITE
+  INTO v_typent
+  FROM STD_STRUC_ENTITE
+  WHERE CODE_ENTITE = p_entite
+  AND CID = v_cid
+  AND p_date BETWEEN date_eff AND date_fin;
+  
+  IF v_typent = p_type_entite THEN
+    RETURN p_entite;
+  END IF;
+  /* lecture du type d'entité */
+  SELECT code_entite
+  INTO v_retour
+  FROM
+    ( WITH entitepere ( code_entite, code_ent_mere ) AS
+    (SELECT a.code_entite,
+      a.code_ent_mere
+    FROM std_struc_arbre a
+    WHERE a.code_entite =p_entite
+    AND a.cid         = v_cid
+    AND a.codts         =p_codts
+    AND p_date BETWEEN a.date_eff AND a.date_fin
+    AND statut = '1'
+    UNION ALL
+    SELECT a.code_entite,
+      a.code_ent_mere
+    FROM std_struc_arbre a,
+      entitepere f
+    WHERE f.code_ent_mere = a.code_entite
+    AND a.cid = v_cid
+    AND a.codts           =p_codts
+    AND p_date BETWEEN a.date_eff AND a.date_fin
+    AND statut = '1'
+    )
+  SELECT a.code_entite
+  FROM entitepere a,
+    std_struc_entite e
+  WHERE a.code_entite = e.code_entite
+  AND e.cid = v_cid
+  AND e.type_entite   = p_type_entite
+  AND p_date BETWEEN e.date_eff AND e.date_fin
+  /* En cas d'occurrences multiples, il est possible d'avoir plusieurs lignes en retour, on retourne alors la première ligne (qui correspond au niveau le plus bas correspondant au type d'entité) */
+  AND ROWNUM = 1
+    ) ;
+  --DBMS_OUTPUT.PUT_LINE('v_retour ' || v_retour);
+  --FIXME utiliser la procédure trace_dbms_output()
+  RETURN v_retour ;
+EXCEPTION
+WHEN OTHERS THEN
+  --DBMS_OUTPUT.PUT_LINE('v_retour ');
+  --FIXME utiliser la procédure trace_dbms_output()
+  RETURN NULL ;
+END HRORG_SECU ;

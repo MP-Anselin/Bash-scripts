@@ -1,0 +1,7 @@
+##
+TAG_CHARSET=@€ιθη
+##
+TGE_REF_TRT_LIB
+==
+delete from TGE_REF_TRT_LIB where nature='RV' and NOM_TRT='Valeurs de VR' and A_AFFICHER='O'
+'RV','Valeurs de VR','O'

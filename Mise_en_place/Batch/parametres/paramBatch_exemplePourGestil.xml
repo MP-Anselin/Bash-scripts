@@ -1,0 +1,63 @@
+        <client idClient="xxxxxx">
+                <nomClient>xxxxx</nomClient>
+                <environnements>
+                        <env idEnv="R">
+                            <nomEnvironnement>recette</nomEnvironnement>
+                            <SGBD_URL>jdbc:oracle:thin:@XXX.XXX.XXX.XXX:XXXX</SGBD_URL>
+                            <SGBD_user>ZTGExxxxx</SGBD_user>
+                            <SGBD_password>ZTxxxxx1</SGBD_password>
+                            <SGBD_decryptage>NON</SGBD_decryptage>
+                            <DocumentSecurityFolder>/ehc/fs1/adp/zadigtge/ZTGxxxxx/GxpFiles/DocumentFolder/</DocumentSecurityFolder>
+                        </env>
+                        <env idEnv="GS">
+                            <nomEnvironnement>Environnement GS</nomEnvironnement>
+                            <SGBD_URL>jdbc:oracle:thin:@XXX.XXX.XXX.XXX:XXXX</SGBD_URL>
+                            <SGBD_user>xxxxx</SGBD_user>
+                            <SGBD_password>xxxx</SGBD_password>
+                            <SGBD_decryptage>NON</SGBD_decryptage>
+                            <service_name>zadigtgefr</service_name>
+                            <service_id>zadigtgefr</service_id>
+                            <actor_id>infog</actor_id>
+                            <clientID>FR201202231738100</clientID>
+                        </env>
+                        <env idEnv="GESTIL-R">
+                            <nomEnvironnement>RECE</nomEnvironnement>
+                            <SGBD_URL>jdbc:oracle:thin:@XXX.XXX.XXX.XXX:XXXX</SGBD_URL>
+                            <SGBD_user>xxxx</SGBD_user>
+                            <SGBD_password>xxxx</SGBD_password>
+                            <documentSecurityFolder>/ehc/fs1/adp/zadigtge/ZTGExxx/GxpFiles/DocumentFolder/</documentSecurityFolder>
+                        </env>
+                        <env idEnv="RESANNU-R">
+                                <nomEnvironnement>RECE</nomEnvironnement>
+                                <annuaireRessources>ldap://EHCLDAPRESS.fr.ehc.adp.com:8389/o=adp-es-europe</annuaireRessources>
+                                <serviceZTGE>GESTIL2ZADIGTGE</serviceZTGE>
+                                <environnementZTGE>RECE</environnementZTGE>
+                                <RESSOURCE_ZTGE_APPLI>ZADIGTGE</RESSOURCE_ZTGE_APPLI>
+                                <RESSOURCE_ZTGE_VERSION>1.00</RESSOURCE_ZTGE_VERSION>
+                        </env>
+                </environnements>
+                <mail>
+                        <ServeurSMTP>smtpgw</ServeurSMTP>
+                        <PortSMTP>25</PortSMTP>
+                        <MailFrom>support.ztge@fr.adp.com</MailFrom>
+                        <listedestinataire></listedestinataire>
+                        <listecopie></listecopie>
+                        <typeEnvoie>toujours</typeEnvoie>
+                </mail>
+                <sasgate>
+                        <SASGATE_AppName>BatchTGEGestil</SASGATE_AppName>
+                        <SASGATE_AppVersion>1.0</SASGATE_AppVersion>
+                        <SASGATE_HostName>lx347</SASGATE_HostName>
+                        <SASGATE_Instance>1</SASGATE_Instance>
+                        <SASGATE_ServeurUrl>http://sasgatefr01.ehc.adp.com:7777</SASGATE_ServeurUrl>
+                </sasgate>
+                <attente>
+                        <tempsControleTraitement>1</tempsControleTraitement>
+                        <tempsAttenteTraitement>60</tempsAttenteTraitement>
+                </attente>
+                <purge>
+                        <NbFichierConservationLog>4</NbFichierConservationLog>
+                        <NbFichierConservationFichier>4</NbFichierConservationFichier>
+                </purge>
+                <RepertoireFichierCommande>/ehc/fs1/adp/zadigtge/common/batch/bin/</RepertoireFichierCommande>
+        </client>

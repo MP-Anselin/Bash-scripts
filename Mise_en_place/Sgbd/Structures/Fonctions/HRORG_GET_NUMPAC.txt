@@ -1,0 +1,64 @@
+##
+TAG_CHARSET=@€éèç
+##
+HRORG_GET_NUMPAC
+=SQL=
+CREATE OR REPLACE FUNCTION HRORG_GET_NUMPAC (
+  p_codts        IN NUMBER,
+  p_code_entite  IN VARCHAR2,
+  p_date_eff     IN VARCHAR2,
+  type_ent_ste IN VARCHAR2,
+  type_ent_etb IN VARCHAR2,
+  p_cid   IN std_struc_entite.cid%TYPE default null)
+  RETURN VARCHAR2
+IS
+  numpac    VARCHAR2(700);
+  numpacSte VARCHAR2(700);
+  numpacEtb VARCHAR2(700);
+  v_cid std_struc_entite.cid%TYPE;
+BEGIN
+  v_cid := p_cid;
+  IF (v_cid IS NULL) THEN
+  	BEGIN
+  		SELECT VALVAR INTO v_cid FROM SYS_VARSYS where CODVAR = 'NS_CLIENT_ID';
+  	EXCEPTION
+  	WHEN NO_DATA_FOUND THEN
+  		v_cid := null;
+  	END;
+  END IF;
+  IF (v_cid IS NULL) THEN
+  	-- En mode multiclient, la varsys peut être null et le passage du paramètre pCid est obligatoire
+  	RETURN null;
+  END IF;
+  
+  numpacSte := NULL;
+  numpacEtb := NULL;
+  for E in (with ENTITES (CODE_ENTITE, CODE_ENT_MERE, LIBELLE, TYPE_ENTITE, NUMPAC) as (
+    select e.CODE_ENTITE, a.CODE_ENT_MERE, e.LIBELLE, e.TYPE_ENTITE, e.NUMPAC 
+    from STD_STRUC_ENTITE e, STD_STRUC_ARBRE a 
+    where
+    a.cid = v_cid and e.cid = v_cid
+    and e.CODE_ENTITE = p_code_entite and p_date_eff between e.DATE_EFF and e.DATE_FIN and e.CODE_ENTITE=a.CODE_ENTITE and a.CODTS = p_codts and p_date_eff between a.DATE_EFF and a.DATE_FIN and a.STATUT=1 
+    union all 
+    select e.CODE_ENTITE, a.CODE_ENT_MERE, e.LIBELLE, e.TYPE_ENTITE, e.NUMPAC 
+    from STD_STRUC_ENTITE e, STD_STRUC_ARBRE a, ENTITES z 
+    where
+    a.cid = v_cid and e.cid = v_cid
+    and e.CODE_ENTITE=z.CODE_ENT_MERE and p_date_eff between e.DATE_EFF and e.DATE_FIN and e.CODE_ENTITE=a.CODE_ENTITE and a.CODTS = p_codts and p_date_eff between a.DATE_EFF and a.DATE_FIN
+  ) select CODE_ENTITE,LIBELLE,TYPE_ENTITE,NUMPAC from ENTITES)
+  LOOP
+    IF E.TYPE_ENTITE=type_ent_ste THEN
+      numpacSte := E.NUMPAC;
+    ELSIF E.TYPE_ENTITE=type_ent_etb THEN
+      numpacEtb := E.NUMPAC;
+    END IF;
+  END LOOP;
+  IF numpacEtb IS NOT NULL THEN
+    numpac := numpacEtb;
+  ELSIF numpacSte IS NOT NULL THEN
+    numpac := numpacSte;
+  ELSE
+  	numpac := NULL;
+  END IF;
+  RETURN numpac;
+END HRORG_GET_NUMPAC;

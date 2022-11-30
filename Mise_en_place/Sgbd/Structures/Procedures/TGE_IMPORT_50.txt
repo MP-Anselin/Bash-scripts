@@ -1,0 +1,169 @@
+##
+TAG_CHARSET=@€éèç
+##
+TGE_IMPORT_50
+=SQL=
+create or replace PROCEDURE TGE_IMPORT_50 (
+ P_LOGIN       IN VARCHAR2 ,
+ P_DATE_IMPORT IN VARCHAR2 ,
+ P_ROLE        IN VARCHAR2 ,
+ -- Origine écran
+ P_ORIGINE     IN VARCHAR2 ,
+ P_VALIDATION  IN VARCHAR2 ,
+ P_WITH50      IN VARCHAR2 ,
+ P_CODLANG     IN VARCHAR2,
+ -- Valeurs attendues : EC -> écran création, EM -> écran modification, GAP -> création en sous-marin, I --> pour le préchargement des imports Web, VI -> pour la validation des imports Web ou Batch
+ P_TYPE_ACTION IN VARCHAR2 ,
+ P_DATE_MAJ    IN SYS_TRC_MODIF.DATEMAJ%type )
+ AS
+ w_err   VARCHAR2(2000);
+ v_start NUMBER;
+ v_stop  NUMBER;
+ req CLOB;
+ reqvalues CLOB;
+ reqInsert CLOB;
+ dateMaj SYS_TRC_MODIF.datemaj%type;
+ BEGIN
+ v_start       := DBMS_UTILITY.GET_TIME;
+ IF P_DATE_MAJ IS NULL THEN
+ SELECT CURRENT_TIMESTAMP INTO dateMaj FROM dual;
+ ELSE
+ dateMaj:= P_DATE_MAJ;
+ END IF;
+ IF ( P_WITH50 =1) THEN
+ BEGIN
+ TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'début controle carte 50');
+ TGE_CONTROLE_50 (p_login, p_date_import, NULL, p_codlang, P_TYPE_ACTION);
+ EXCEPTION
+ WHEN OTHERS THEN
+ w_err := SQLCODE;
+ w_err := w_err||'  '||sqlerrm;
+ TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'imp:TGE_CONTROLE_50 - Erreur : ' || w_err);
+ IF (P_LOGIN != 'BATCH') THEN
+ -- On remonte l'erreur à l'application
+ raise;
+ END IF;
+ END ;
+ END IF;
+ IF p_validation = 1 THEN
+ BEGIN
+ TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'début validation : insertion TGE_IMPUTATIONS');
+ INSERT
+ INTO TGE_IMPUTATIONS
+ (
+ NUMPAC,
+PAIEZAD,
+PERIODE,
+TYPE_TRAITEMENT,
+IMPUTATION,
+NO_SEQUENCE,
+ORIGINE,
+NB_UNITE,
+DERNIER_CODE_OPE,
+LOGIN_MAJ,
+DATE_MAJ,
+IDPACMAT,
+TYPE_WRITER,
+DATE_EFFET,
+CLE_IMPORT
+ )
+ select 
+ IMPU.NUMPAC,
+ IMPU.PAIEZAD,
+ IMPU.PERIODE,
+ IMPU.TYPE_TRAITEMENT,
+ IMPU.CODE_IMPUTATION,
+ is_number(IMPU.NO_SEQUENCE+IMPU.CMPT),
+ IMPU.ORIGINE,
+ IS_NUMBER(IMPU.NOMBRE_UNITE),
+ IMPU.DERNIER_CODE_OPE,
+ IMPU.LOGIN_MAJ,
+ IMPU.DATE_MAJ,
+ IMPU.IDPACMAT,
+ IMPU.TYPE_WRITER,
+ IMPU.DATE_EFFET,
+ IMPU.CLE_IMPORT
+ from (SELECT             dense_rank() over (partition by NUMPAC,PAIEZAD,PERIODE,TYPE_TRAITEMENT,CODE_IMPUTATION  order by NUMLIGNE desc)  as CMPT,
+ NUMPAC ,
+ PAIEZAD ,
+ PERIODE ,
+ TYPE_TRAITEMENT ,
+ CODE_IMPUTATION ,
+ (SELECT NVL(MAX(NO_SEQUENCE),0)
+ FROM TGE_IMPUTATIONS
+ WHERE NUMPAC = I.NUMPAC
+ AND PAIEZAD =I.PAIEZAD
+ AND PERIODE = I.PERIODE
+ AND TYPE_TRAITEMENT = I.TYPE_TRAITEMENT
+ AND IMPUTATION = I.CODE_IMPUTATION ) as NO_SEQUENCE,
+ ORIGINE,
+ NOMBRE_UNITE,
+ 'C' as DERNIER_CODE_OPE,
+ P_LOGIN as LOGIN_MAJ,
+ TO_CHAR (sysdate, 'YYYYMMDDHH24MI') as DATE_MAJ,
+ CASE
+ WHEN I.NUMPAC IS NOT NULL
+ AND PACMAT    IS NOT NULL
+ THEN RPAD(I.NUMPAC,6)
+ || PACMAT
+ ELSE ' '
+ END AS IDPACMAT,
+ CASE
+ WHEN (SELECT O.MODE_T2
+ ||'#'
+ ||O.ENVOI_MODE_R
+ FROM TGE_REF_ORIGINE_GTA O
+ WHERE O.NUMPAC     = I.NUMPAC
+ AND O.CODE_ORIGINE = I.ORIGINE) = 'R#N'
+ THEN 'N'
+ ELSE NULL
+ END AS TYPE_WRITER,
+ TO_DATE(I.DATE_EFFET,'YYYYMMDD') AS DATE_EFFET,
+  CASE
+          WHEN 'VI' = P_TYPE_ACTION
+          THEN P_LOGIN
+            ||'#'
+            ||P_DATE_IMPORT
+            ||'#'
+            ||NUMLIGNE
+          ELSE NULL
+        END AS CLE_IMPORT
+ FROM TGE_IMPORT_IMPUTATIONS I
+ WHERE LOGIN           =P_LOGIN
+ AND DATE_IMPORT       = p_date_import
+ AND ((ERREURS        IS NULL
+ AND STATUT            = 'TRAIT')
+ OR (ERREURS          IS NOT NULL
+ AND STATUT            = 'TRANS')))IMPU;
+ 
+ EXCEPTION
+ WHEN OTHERS THEN
+ w_err := SQLCODE;
+ w_err := w_err||'  ' ||sqlerrm;
+ TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'ValidImputation - Erreur : ' || w_err);
+ IF (P_LOGIN != 'BATCH' or SQLCODE=-20001) THEN
+ -- On remonte l'erreur à l'application
+ raise;
+ END IF;
+ END;
+ 
+ IF P_TYPE_ACTION = 'VI' THEN
+ --- Gestion de la trace : on enregistre une trace généréale lors d'un import car on ne peut pas gérer de trace individuelle
+ TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'Trace SYS_TRC_MODIF : insertion TGE_IMPUTATIONS');
+ SYS_TRACE_MODIF(P_LOGIN,dateMaj,'3','TGE_IMPUTATIONS', 'CARTE=50&LOGIN='||P_LOGIN||'&DATE_IMPORT='||P_DATE_IMPORT||'&ROLE=3'||'&ORIGINE='||P_ORIGINE, 'Import Batch/Web 50','C',NULL,NULL,NULL,NULL);
+ END IF;
+ 
+ ----------------------------------------------------------------------------
+ 
+ TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'début update TGE_IMPUTATIONS');
+ UPDATE TGE_IMPORT_IMPUTATIONS
+ SET ERREURS           ='',
+ STATUT              ='FIN'
+ WHERE LOGIN           = P_LOGIN
+ AND DATE_IMPORT       = p_date_import
+ AND ((ERREURS        IS NULL
+ AND STATUT            = 'TRAIT')
+ OR (ERREURS          IS NOT NULL
+ AND STATUT            = 'TRANS'));
+ END IF ;
+ END TGE_IMPORT_50;

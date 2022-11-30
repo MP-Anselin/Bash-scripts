@@ -1,0 +1,113 @@
+##
+DIC_GESTION_LIVRAISON
+=SQL=
+CREATE OR REPLACE PROCEDURE DIC_GESTION_LIVRAISON AS 
+  nomTable VARCHAR(24); -- Nom de la table définitive (sans le suffix C99)
+  existeTable NUMBER; -- La table définitive existe-t-elle ?
+  existeColonne NUMBER; -- La colonne existe-t-elle dans la table définitive ?
+  existeTableDansMapping NUMBER; -- La table est-elle dans TGE_REF_MAPTA, en aller ou en aller/retour ?
+  existeTablePH_PH NUMBER; -- La table PH_PH existe-t-elle ?
+  existeTablePHOTO NUMBER; -- La table PHOTO existe-t-elle ?
+  theType user_tab_cols.data_type%TYPE;
+  theLength user_tab_cols.data_length%TYPE;
+  thePrecision user_tab_cols.data_precision%TYPE;
+  theScale user_tab_cols.data_scale%TYPE;
+  existeColonnesHORO NUMBER; -- Les colonnes d'horodatage existent-elles ?
+  reqTrgHoro VARCHAR(4000);
+BEGIN
+  -- On parcours les tables C99
+  FOR une_table IN (SELECT table_name FROM user_tables WHERE table_name LIKE 'C99_%')
+  LOOP
+    BEGIN
+      existeTableDansMapping := -1;
+      existeTablePH_PH := -1;
+      existeTablePHOTO := -1;
+      nomTable := SUBSTR(une_table.table_name,INSTR(une_table.table_name,'_')+1);
+      SELECT count(*) INTO existeTable FROM user_tables WHERE table_name= nomTable;
+      IF existeTable=0 THEN
+        -- La table définitive n'existe pas : on renomme la table C99 pour en faire la table définitive
+        EXECUTE_IMMEDIATE_STRING ('ALTER TABLE '||une_table.table_name||' RENAME TO '||nomTable,0);
+        -- On crée les tables photo si besoin
+        DIC_GESTION_PHOTO(nomTable);
+        -- ajoute la creation d'une requète sur la table
+        DIC_AJOUT_TABLE_REQUETE(nomTable,'STD_REQ_' || nomTable);
+      ELSE
+        -- La table définitive existe : on parcours les colonnes de la table C99 pour détecter celles à créer et à modifier
+        FOR une_colonne IN (SELECT column_name, data_type, data_length, data_precision, data_scale FROM user_tab_cols WHERE table_name=une_table.table_name)
+        LOOP
+          SELECT COUNT(*) INTO existeColonne FROM user_tab_cols WHERE table_name=nomTable AND column_name=une_colonne.column_name;
+          IF existeColonne=0 THEN
+            -- Une colonne qui n'existe pas : on la crée
+            DIC_MODIF_STRUCTURE(nomTable, une_colonne.column_name, NULL, NULL, NULL, NULL, une_colonne.data_type, une_colonne.data_length, une_colonne.data_precision, une_colonne.data_scale);
+          ELSE
+            -- Une colonne qui existe : on la modifie si besoin
+            SELECT data_type, data_length, data_precision, data_scale INTO theType, theLength, thePrecision, theScale FROM user_tab_cols WHERE table_name=nomTable AND column_name=une_colonne.column_name;
+            DIC_MODIF_STRUCTURE(nomTable, une_colonne.column_name, theType, theLength, thePrecision, theScale, une_colonne.data_type, une_colonne.data_length, une_colonne.data_precision, une_colonne.data_scale);
+          END IF;
+          IF existeTableDansMapping = -1 THEN
+            -- On ne va chercher l'info qu'une seule fois par table, et pas une fois par colonne de la table
+            SELECT COUNT(*) INTO existeTableDansMapping FROM TGE_REF_MAPDO DO, TGE_REF_MAPTA TA WHERE TA.tablephy=nomTable AND DO.tablegxp=TA.tableparam AND TA.allerretour in ('A','2');
+            SELECT COUNT(*) INTO existeTablePH_PH FROM user_tables WHERE table_name='PH_PH_'||nomTable;
+            SELECT COUNT(*) INTO existeTablePHOTO FROM user_tables WHERE table_name='PHOTO_'||nomTable;
+          END IF;
+          IF existeTableDansMapping=0 THEN
+            -- La table définitive n'est pas dans le mapping : on supprime les tables photos si elles existent
+            IF existeTablePH_PH>0 THEN
+              EXECUTE_IMMEDIATE_STRING('DROP TABLE PH_PH_'||nomTable,0);
+              existeTablePH_PH := 0;
+            END IF;
+            IF existeTablePHOTO>0 THEN
+              EXECUTE_IMMEDIATE_STRING( 'DROP TABLE PHOTO_'||nomTable,0);
+              existeTablePHOTO := 0;
+            END IF;
+          ELSE
+            -- La table définitive est dans le mapping : on crée/modifie les tables photos
+            IF existeTablePH_PH=0 OR existeTablePHOTO=0 THEN
+              -- Si il manque une des 2 tables photo, pas de pitié, on recrée les 2
+              DIC_GESTION_PHOTO(nomTable);
+              existeTablePH_PH := 1;
+              existeTablePHOTO := 1;
+            ELSE
+              SELECT COUNT(*) INTO existeColonne FROM user_tab_cols WHERE table_name='PH_PH_'||nomTable AND column_name=une_colonne.column_name;
+              IF existeColonne=0 THEN
+                -- Une colonne qui n'existe pas : on la crée (pour les colonnes CURRENT_IDPACMAT et IDPACMAT, on force en VARCHAR2(14) car dans les tables DIC c'est une colonne calculée)
+                IF une_colonne.column_name = 'CURRENT_IDPACMAT' OR une_colonne.column_name = 'IDPACMAT' THEN
+                  DIC_MODIF_STRUCTURE('PH_PH_'||nomTable, une_colonne.column_name, NULL, NULL, NULL, NULL, 'VARCHAR', 14, NULL, NULL);
+                ELSE
+                  DIC_MODIF_STRUCTURE('PH_PH_'||nomTable, une_colonne.column_name, NULL, NULL, NULL, NULL, une_colonne.data_type, une_colonne.data_length, une_colonne.data_precision, une_colonne.data_scale);
+                END IF;
+              ELSE
+                -- Une colonne qui existe : on la modifie si besoin
+                SELECT data_type, data_length, data_precision, data_scale INTO theType, theLength, thePrecision, theScale FROM user_tab_cols WHERE table_name='PH_PH_'||nomTable AND column_name=une_colonne.column_name;
+                DIC_MODIF_STRUCTURE('PH_PH_'||nomTable, une_colonne.column_name, theType, theLength, thePrecision, theScale, une_colonne.data_type, une_colonne.data_length, une_colonne.data_precision, une_colonne.data_scale);
+              END IF;
+              
+              SELECT COUNT(*) INTO existeColonne FROM user_tab_cols WHERE table_name='PHOTO_'||nomTable AND column_name=une_colonne.column_name;
+              IF existeColonne=0 THEN
+                -- Une colonne qui n'existe pas : on la crée (pour les colonnes CURRENT_IDPACMAT et IDPACMAT, on force en VARCHAR2(14) car dans les tables DIC c'est une colonne calculée)
+                IF une_colonne.column_name = 'CURRENT_IDPACMAT' OR une_colonne.column_name = 'IDPACMAT' THEN
+                  DIC_MODIF_STRUCTURE('PHOTO_'||nomTable, une_colonne.column_name, NULL, NULL, NULL, NULL, 'VARCHAR', 14, NULL, NULL);
+                ELSE
+                  DIC_MODIF_STRUCTURE('PHOTO_'||nomTable, une_colonne.column_name, NULL, NULL, NULL, NULL, une_colonne.data_type, une_colonne.data_length, une_colonne.data_precision, une_colonne.data_scale);
+                END IF;
+              ELSE
+                -- Une colonne qui existe : on la modifie si besoin
+                SELECT data_type, data_length, data_precision, data_scale INTO theType, theLength, thePrecision, theScale FROM user_tab_cols WHERE table_name='PHOTO_'||nomTable AND column_name=une_colonne.column_name;
+                DIC_MODIF_STRUCTURE('PHOTO_'||nomTable, une_colonne.column_name, theType, theLength, thePrecision, theScale, une_colonne.data_type, une_colonne.data_length, une_colonne.data_precision, une_colonne.data_scale);
+              END IF;
+            END IF;
+          END IF;
+        END LOOP;
+      END IF;
+    EXCEPTION 
+      WHEN OTHERS THEN
+        --dbms_output.put_line('Erreur avec la table : ' || nomTable || ' (' || SQLERRM || ')');
+        --FIXME utiliser la procédure trace_dbms_ouput()
+        CONTINUE;
+    END;
+    IF existeTable=1 THEN
+      EXECUTE_IMMEDIATE_STRING( 'DROP TABLE '||une_table.table_name,0);
+    END IF;
+    DIC_CREATE_TRG_HORO(nomTable);
+  END LOOP;
+END DIC_GESTION_LIVRAISON;

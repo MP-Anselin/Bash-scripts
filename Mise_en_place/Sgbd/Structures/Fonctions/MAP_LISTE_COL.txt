@@ -1,0 +1,37 @@
+##
+MAP_LISTE_COL
+=SQL=
+create or replace FUNCTION MAP_LISTE_COL RETURN TYP_TAB AS
+  p_retour TYP_TAB := TYP_TAB();
+  n INTEGER := 0;
+BEGIN
+  FOR une_ligne IN (SELECT DISTINCT TABLEGXP, DONNEEGXP, TABLE_NAME, NUMPAC, ELEMENT
+                    FROM TGE_REF_MAPDO, USER_TAB_COLS
+                    WHERE (TABLEGXP, DONNEEGXP) NOT IN (SELECT TABLE_NAME, COLUMN_NAME
+                                                          FROM USER_TAB_COLS)
+                    AND (TABLEGXP=TABLE_NAME
+                    OR TABLE_NAME='PH_PH_'||TABLEGXP
+                    OR TABLE_NAME='PHOTO_'||TABLEGXP
+                    OR (DONNEEGXP IS NULL AND TABLEGXP IS NOT NULL))
+                    UNION
+                    SELECT DISTINCT TABLEGXP,DONNEEGXP,TABLE_NAME,D.NUMPAC,M.ELEMENT
+                    FROM TGE_REF_MAPDO M, USER_TAB_COLS U ,TGE_REF_DICOZ D
+                    WHERE 
+                    D.ELEMENT     = M.ELEMENT
+                    AND (M.TABLEGXP  = U.TABLE_NAME --OR U.TABLE_NAME  ='PH_PH_'||M.TABLEGXP OR U.TABLE_NAME='PHOTO_' ||M.TABLEGXP
+                    )
+                    AND  M.DONNEEGXP = U.COLUMN_NAME
+                    AND (
+                    (D.TYPE  = 'N' AND D.MASQUE in (1,2,3,4,5,6,7)  AND DATA_TYPE  <> 'DATE')
+                    OR (D.TYPE      = 'A' AND (DATA_TYPE <> 'VARCHAR2' OR D.LONGUEUR > DATA_LENGTH))
+                    OR ((D.TYPE     = 'N' AND D.MASQUE NOT in (1,2,3,4,5,6,7)  OR D.TYPE          = 'P') AND (DATA_TYPE    <> 'NUMBER' OR DATA_LENGTH < LONGUEUR OR DATA_PRECISION < NBDECI))
+                   )
+                   ORDER BY TABLEGXP,TABLE_NAME,DONNEEGXP)
+  LOOP
+    p_retour.extend;
+    n := n + 1;
+    --retour(n) := typ_obj(une_ligne.TABLEGXP, une_ligne.DONNEEGXP, une_ligne.TABLE_NAME, une_ligne.NUMPAC, une_ligne.ELEMENT);
+    p_retour(p_retour.count) := TYP_OBJ(une_ligne.DONNEEGXP, une_ligne.TABLEGXP, une_ligne.TABLE_NAME, une_ligne.NUMPAC, une_ligne.ELEMENT);
+  END LOOP;
+  RETURN p_retour;
+END MAP_LISTE_COL;

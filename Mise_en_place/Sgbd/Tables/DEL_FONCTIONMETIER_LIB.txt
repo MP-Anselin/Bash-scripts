@@ -1,0 +1,29 @@
+##
+TAG_CHARSET=@€éèç
+##
+DEL_FONCTIONMETIER_LIB
+==
+DELETE FROM DEL_FONCTIONMETIER_LIB  WHERE CODE_FCTMETIER =-1
+-1,'Gestion des dossiers de mon équipe',0,'UX - Gestion des dossiers'
+##
+DEL_FONCTIONMETIER_LIB
+==
+DELETE FROM DEL_FONCTIONMETIER_LIB  WHERE CODE_FCTMETIER =-2
+-2,'Gestion des temps de mon équipe',0,'UX - Gestion des temps'
+##
+DEL_FONCTIONMETIER_LIB
+==
+DELETE FROM DEL_FONCTIONMETIER_LIB  WHERE CODE_FCTMETIER =-1
+-1,'Gestion des dossiers',0,'UX - Gestion des dossiers'
+##
+DEL_FONCTIONMETIER_LIB
+==
+DELETE FROM DEL_FONCTIONMETIER_LIB  WHERE CODE_FCTMETIER =-2
+-2,'Gestion des temps',0,'UX - Gestion des temps'
+##
+DEL_FONCTIONMETIER_LIB
+==
+DELETE FROM DEL_FONCTIONMETIER_LIB  WHERE CODE_FCTMETIER in (-1,-3,-4)
+-1,'Gestion des données personnelles',0,'UX -  Gestion des données personnelles'
+-3,'Gestion des acomptes',0,'UX -  Gestion des acomptes'
+-4,'Gestion des attestations',0,'UX -  Gestion des attestations'

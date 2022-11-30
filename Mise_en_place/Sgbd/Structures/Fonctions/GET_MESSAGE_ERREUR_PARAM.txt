@@ -1,0 +1,28 @@
+##
+GET_MESSAGE_ERREUR_PARAM
+=SQL=
+create or replace FUNCTION GET_MESSAGE_ERREUR_PARAM 
+(
+  P_MESSAGE IN VARCHAR2 
+, PARAMS IN VARCHAR2 
+) RETURN VARCHAR2 AS 
+
+message varchar2(3000);
+param varchar2(100);
+position number;
+v_params varchar2(1000);
+BEGIN
+  message:=p_message;
+  v_params:=params;
+    while instr(message,'#')>0 
+      loop
+        position:=INSTR(v_params,'|',1)-1;
+        if position=-1 then
+        position:= length(v_params);
+        end if;
+        param:=substr(v_params,0,position);
+        v_params:=substr(v_params,position+2);
+        message:= REGEXP_REPLACE(message,'#[1-9]?', param,1,1);      
+      end loop;
+  return message;  
+END GET_MESSAGE_ERREUR_PARAM;

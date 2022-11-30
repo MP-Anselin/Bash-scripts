@@ -1,0 +1,20 @@
+##
+TAG_CHARSET=@€éèç
+##
+SYS_TRT_TYPE
+=SQL IFEXIST=SYS_TRT_TYPE=
+DELETE FROM SYS_TRT_TYPE WHERE TYPE_TRAITEMENT = 'Traitement_PropagerCAD'
+##
+SYS_TRT_TYPE
+=SQL IFEXIST=SYS_TRT_TYPE=
+INSERT INTO SYS_TRT_TYPE VALUES ('Traitement_PropagerCAD','Traitement de propagation des CAD après import GAP',null)
+##
+SYS_TRT_TYPE
+==
+DELETE FROM SYS_TRT_TYPE WHERE TYPE_TRAITEMENT = 'Traitement_ControleMail'
+'Traitement_ControleMail','Conformité des adresses mails à la norme.',NULL
+##
+SYS_TRT_TYPE
+==
+DELETE FROM SYS_TRT_TYPE WHERE TYPE_TRAITEMENT = 'Traitement_ExportDocumentsSignes'
+'Traitement_ExportDocumentsSignes','Export externe des documents signés en paquet zip.',NULL

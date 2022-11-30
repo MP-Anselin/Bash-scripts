@@ -1,0 +1,125 @@
+##
+MAJ_WKF_METIER_GENERIQUE
+=SQL=
+create or replace PROCEDURE MAJ_WKF_METIER_GENERIQUE(
+    P_NOM_DIC      IN VARCHAR2 ,
+    P_NOM_DONNEE   IN VARCHAR2 ,
+    P_VALUE        IN VARCHAR2 ,
+    P_CLAUSE_WHERE IN VARCHAR2 ,
+    P_WHERE_PARAMS IN VARCHAR2)
+AS
+  CURSOR cur_wkf
+  IS
+    SELECT * FROM WKF_METIER_GENERIQUE ;
+  CURSOR cur_node (p_dosnum IN VARCHAR2,p_nomDic IN VARCHAR2)
+  IS
+    SELECT node_name
+    FROM XMLTable('/DATA_DOS/*' passing
+      (SELECT xml_datas FROM WKF_METIER_GENERIQUE WHERE dos_num= p_dosnum
+      ) columns node_name VARCHAR2(30) path 'name(.)' , node_value VARCHAR2(30) path '.')
+    WHERE node_name LIKE (p_nomDic
+      ||'_%');
+    err_msg   VARCHAR(200);
+    err_code  VARCHAR(200);
+    w_nbligne NUMBER := 0 ;
+    params    tab_varchar;
+    w_donnee  tab_varchar;
+    requete   CLOB;
+    w_value   VARCHAR2(1000);
+  BEGIN
+    IF P_WHERE_PARAMS IS NOT NULL THEN
+    
+      requete         := 'WITH test AS (SELECT  ' ||P_WHERE_PARAMS;
+      requete         := requete||' str FROM dual  )select ROWNUM, regexp_substr (str, ''[^,]+'', 1, rownum) split  from test connect by level <= length (regexp_replace (str, ''[^,]+''))  + 1';
+      EXECUTE immediate requete bulk collect INTO w_donnee ;
+      params:= tab_varchar ();
+      
+    END IF;
+    FOR C IN cur_wkf
+    LOOP
+      IF w_donnee.exists(1) THEN
+        FOR j IN w_donnee.first..w_donnee.last
+        LOOP
+          params.extend;
+          BEGIN
+            SELECT extractvalue(wkf.xml_datas,'/DATA_DOS/'
+              ||P_NOM_DIC
+              ||'/'
+              ||w_donnee(j))
+            INTO params(j)
+            FROM WKF_METIER_GENERIQUE wkf
+            WHERE dos_num= C.dos_num
+            AND wkf.xml_datas.existsnode('/DATA_DOS/'
+              ||P_NOM_DIC
+              ||'/'
+              ||w_donnee(j)) = 1;
+          EXCEPTION
+          WHEN OTHERS THEN
+            err_msg := SQLERRM;
+          END;
+        END LOOP;
+      END IF;
+      IF params.exists(1) THEN
+        NULL;
+        requete := 'SELECT  ' ||P_CLAUSE_WHERE||'    FROM dual ';
+        EXECUTE immediate requete INTO w_value ;
+      END IF;
+      FOR K IN cur_node (C.dos_num,P_NOM_DIC)
+      LOOP
+        BEGIN
+          SELECT extractvalue(wkf.xml_datas,'/DATA_DOS/'
+            ||K.node_name
+            ||'/'
+            ||K.node_name
+            ||'_NB_LIGNES')
+          INTO w_nbligne
+          FROM WKF_METIER_GENERIQUE wkf
+          WHERE dos_num= C.dos_num
+          AND wkf.xml_datas.existsnode('/DATA_DOS/'
+            ||K.node_name
+            ||'/'
+            ||K.node_name
+            ||'_NB_LIGNES') = 1;
+        EXCEPTION
+        WHEN OTHERS THEN
+          w_nbligne := 0;
+          err_msg   := SQLERRM;
+        END;
+        IF w_nbligne =0 THEN
+          UPDATE WKF_METIER_GENERIQUE
+          SET xml_datas = INSERTCHILDXML(xml_datas, '/DATA_DOS/'
+            ||K.node_name, P_NOM_DONNEE, XMLType('<'
+            ||P_NOM_DONNEE
+            ||'>'
+            ||NVL(w_value,P_VALUE)
+            ||'</'
+            ||P_NOM_DONNEE
+            ||'>'))
+          WHERE dos_num = C.dos_num;
+        ELSE
+          FOR i IN 0..w_nbligne- 1
+          LOOP
+            UPDATE WKF_METIER_GENERIQUE
+            SET xml_datas = INSERTCHILDXML(xml_datas, '/DATA_DOS/'
+              ||K.node_name
+              ||'/'
+              ||K.node_name
+              ||'_LIGNE_'
+              ||i, P_NOM_DONNEE, XMLType('<'
+              ||P_NOM_DONNEE
+              ||'>'
+              ||NVL(w_value,P_VALUE)
+              ||'</'
+              ||P_NOM_DONNEE
+              ||'>'))
+            WHERE dos_num = C.dos_num;
+          END LOOP;
+        END IF;
+      END LOOP;
+    END LOOP;
+  EXCEPTION
+  WHEN OTHERS THEN
+    err_code := SQLCODE;
+    err_msg  := SQLERRM;
+    raise_application_error(-20000, 'MAJ_WKF_METIER_GENERIQUE'|| sqlerrm);
+  END MAJ_WKF_METIER_GENERIQUE;
