@@ -1,6 +1,7 @@
 #!/bin/bash
 
 GIT_DIR=$(git rev-parse --show-toplevel)
+GIT_CURRENT_BRANCH=$(git symbolic-ref HEAD 2>/dev/null | cut -d"/" -f 3)
 
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 regexWithoutLastFolder="s,/*[^/]\+/*$,,"
@@ -32,9 +33,8 @@ FOLDER_STRUCTURES_FILES_PARSED="$FOLDER_FILES_PARSED/$STRUCTURES_FILES_PARSED"
 AUTRES_FILES_PARSED="autres-files-parsed.txt"
 FOLDER_AUTRES_FILES_PARSED="$FOLDER_FILES_PARSED/$AUTRES_FILES_PARSED"
 
-## Credential of your git repository
-GIT_USERNAME=""
-GIT_PWD=""
+INSTALL_FOLDER="Install"
+REPORTS_FOLDER="Reports"
 
 ##Function create array of special folder, if there is special folder to extract the data on special order
 ## attention to the order inside of the array the script will merge the data related to the order of the array
@@ -43,6 +43,10 @@ function arrayOfSpecialFolder() {
   SpecialFolder[0]="$folderFilesPath/$STRUCTURES_FOLDER $FOLDER_STRUCTURES_FILES_PARSED $STRUCTURES_FILES_PARSED"
   SpecialFolder[1]="$folderFilesPath/$TABLES_FOLDER $FOLDER_TABLES_FILES_PARSED $TABLES_FILES_PARSED "
   SpecialFolder[2]="$folderFilesPath/$AUTRES_FOLDER $FOLDER_AUTRES_FILES_PARSED $AUTRES_FILES_PARSED"
+
+  ## null represent the folder to dont parse
+  SpecialFolder[3]="$folderFilesPath/$INSTALL_FOLDER null null"
+  SpecialFolder[4]="$folderFilesPath/$REPORTS_FOLDER null null"
 }
 
 #Function to check if the line receive as param content the git annotation of differences:
@@ -135,7 +139,7 @@ lineStartByHeaderHash() {
   local length=${#line}
   local SUB='##'
 
-  if [[ $length -eq 2 && "$line" == "$SUB"* ]]; then
+  if [ "$length" == 2 ] && [[ "$line" == "$SUB"* ]]; then
     return 0
   fi
   return 1
@@ -150,16 +154,16 @@ lineContentGitAnnotationAdd() {
   local SUB='--- /dev/null'
   local SUB2='+++ /dev/null'
 
-  if [[ ${#line} -eq 13 ]] && [[ "$line" == "$SUB"* ]]; then
+  if [ ${#line} == 13 ] && [[ "$line" == "$SUB"* ]]; then
     lineContentFileNameB "$nextLine"
     isPrv=$?
-    if [[ isPrv -eq 0 ]]; then
+    if [ $isPrv == 0 ]; then
       return 0
     fi
-  elif [[ ${#line} -eq 13 ]] && [[ "$line" == "$SUB2"* ]]; then
+  elif [ ${#line} == 13 ] && [[ "$line" == "$SUB2"* ]]; then
     lineContentFileNameA "$prvLine"
     isPrv=$?
-    if [[ isPrv -eq 0 ]]; then
+    if [ $isPrv == 0 ]; then
       return 2
     fi
   else
@@ -174,10 +178,12 @@ mergeFileOfSpecialFolder() {
   echo -e "\n" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
   for spcElement in "${specialFolderList[@]}"; do
     IFS=' ' read -r -a folderInfoArray <<<"$spcElement"
-    cat "${folderInfoArray[1]}" >>"$MERGE_PATH"
-    echo "SCRIPT MERGE FILE: ${folderInfoArray[2]} into $MERGE_FILE" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
-    rm -rf "${folderInfoArray[1]}"
-    echo "SCRIPT DELETE FILE: ${folderInfoArray[1]}" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
+    if [ "${folderInfoArray[1]}" != "null" ]; then
+      cat "${folderInfoArray[1]}" >>"$MERGE_PATH"
+      echo "SCRIPT MERGE FILE: ${folderInfoArray[2]} into $MERGE_FILE" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
+      rm -rf "${folderInfoArray[1]}"
+      echo "SCRIPT DELETE FILE: ${folderInfoArray[1]}" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
+    fi
   done
 
   rmdir "$FOLDER_FILES_PARSED"
@@ -229,7 +235,8 @@ getModifFromFile() {
   local specialCharNotPrint='[[:print:]]'
   local linePosition=1
 
-  if [[ "$line" != "" ]]; then
+  #echo "getModifFromFile LINE => $line"
+  if [ "$line" != "" ]; then
     line=$(tr -dc "$specialCharNotPrint" <<<"$line")
     line=$(echo "$line" | sed "$specialCharBeforeDoteDote")
     linePosition=$(echo "$line" | sed "$specialCharGetNum")
@@ -239,29 +246,33 @@ getModifFromFile() {
   local length=${#_fileContent[@]}
   local firstHash=0
 
-  for ((l = $((linePosition - 1)); l < "$length"; )); do
+  for ((l = $((linePosition - 1)); l < "$length" && l >= 0; )); do
     local lineChangedData=${_fileContent[l]}
-
     ## check if we fund '##' 2 to stop the loop 0 to check on the lines above 1 to go to look for a second line with '##'
-    if [[ $firstHash -lt 2 ]] && lineStartByHeaderHash "$lineChangedData"; then
+    lineStartByHeaderHash "$lineChangedData"
+    local isHash=$?
+    if [ $firstHash == 0 ] || [ $firstHash == 1 ] && [ $isHash == 0 ]; then
       firstHash=$((firstHash + 1))
     fi
 
-    if [[ $firstHash -eq 0 ]]; then
+    #echo "getModifFromFile firstHash => $firstHash lineChangedData => $lineChangedData"
+    if [ $firstHash == 0 ]; then
       l=$((l - 1))
-    elif [[ $firstHash -eq 2 ]]; then
+    elif [ $firstHash == 2 ]; then
       break
     else
       ## If firstHash == 1 mean we have found one line with '##' and we add the content between the line of '##'
       echo "$lineChangedData" >>"$fileRedirect"
+      ##echo "INSERT >>$lineChangedData<<"
       l=$((l + 1))
     fi
     countOfLine=$((countOfLine + 1))
   done
 
   echo -e "ADD new file block \t=> linePosition: $((linePosition - 1)) length: $length end L: $l" >>"$GIT_DIFF_BRANCH_PATH"
+  #read -rp "next ": dd
   ## if the l is equal to the number of line of the file we inform we have finished to read the file.
-  if [[ $l -eq $length ]]; then
+  if [ $l == "$length" ]; then
     return 0
   fi
   return 1
@@ -279,7 +290,7 @@ printLineInfo() {
   local nextLineIsDiff=${args[5]}
   local fileExtractDataPath=${args[6]}
 
-  if [[ ${args[4]} == 0 ]]; then
+  if [ "${args[4]}" == 0 ]; then
     endOfFile=true
   fi
   {
@@ -314,10 +325,10 @@ mainLoop() {
   ## Read the file differences.log line.
   for ((dl = 0; dl < "$length"; dl++)); do
     line=${_differencesFileData[dl]}
-    if [[ $((dl - 1)) -gt 0 ]]; then
+    if (($((dl - 1)) > 0)); then
       previousLine=${_differencesFileData[$((dl - 1))]}
     fi
-    if [[ $((dl + 1)) -lt $length ]]; then
+    if (($((dl + 1)) < "$length")); then
       nextLine=${_differencesFileData[$((dl + 1))]}
     fi
     printLineInfo $((dl + 1)) "$line" "$previousLine" "$nextLine" "$endOfFile" "$nextLineIsDiff" "$fileExtractDataPath"
@@ -327,7 +338,7 @@ mainLoop() {
     lineContentGitAnnotationAdd "$line" "$previousLine"
     local isGitAnnotationAdd=$?
     local isGitAnnotation=1
-    if [[ $isGitAnnotationAdd -eq 1 ]]; then
+    if [ $isGitAnnotationAdd == 1 ]; then
       lineContentGitAnnotation "$line"
       local isGitAnnotation=$?
     fi
@@ -338,68 +349,73 @@ mainLoop() {
     local isPrvTeamAnnotation=1
     local isContentFileName=1
 
-    if [[ endOfFile -eq 1 ]] && [[ "$isGitAnnotation" == 1 ]]; then
+    if [ $endOfFile == 1 ] && [ $isGitAnnotation == 1 ]; then
       lineTeamAnnotationHash "$line"
       isTeamAnnotation=$?
     fi
-    if [[ endOfFile -eq 1 ]] && [[ "$isPrvGitAnnotation" == 1 ]]; then
+    if [ $endOfFile == 1 ] && [ $isPrvGitAnnotation == 1 ]; then
       lineTeamAnnotationHash "$previousLine"
       isPrvTeamAnnotation=$?
     fi
-    if [[ $passOnce -eq 1 ]] || [[ "$endOfFile" == 0 ]]; then
+    if [ $passOnce == 1 ] || [ $endOfFile == 0 ]; then
       lineContentFileNameB "$line"
       isContentFileName=$?
     fi
     echo -en "--------------\tisGitAnnotation: $isGitAnnotation \tisTeamAnnotation: $isTeamAnnotation \tisPrvGitAnnotation: $isPrvGitAnnotation \tisPrvTeamAnnotation: $isPrvTeamAnnotation \tisContentFileName: $isContentFileName \tisGitAnnotationAdd: $isGitAnnotationAdd isNewFile $isNewFile" >>"$GIT_DIFF_BRANCH_PATH"
     #____________________________________________________________________________________________________________________#
 
-    if [[ $isContentFileName -eq 0 && $isGitAnnotationAdd -eq 1 ]] || [[ $isGitAnnotationAdd -ne 1 && $isNewFile -eq 1 ]]; then
+    if (("$isContentFileName" == 0 && "$isGitAnnotationAdd" == 1)) || (("$isGitAnnotationAdd" != 1 && "$isNewFile" == 1)); then
 
       local isSpcFolderName=""
       isSpcFolderName=$(lineContentSpecialFolderName "$line")
       echo -e "isSpcFolderName: $isSpcFolderName " >>"$GIT_DIFF_BRANCH_PATH"
-      if [[ -n "$isSpcFolderName" ]]; then
+      if [ -n "$isSpcFolderName" ] && [ "$isSpcFolderName" != "null" ]; then
         fileRedirectExtractData="$isSpcFolderName"
+      elif [ -n "$isSpcFolderName" ] && [ "$isSpcFolderName" == "null" ]; then
+        fileRedirectExtractData=""
       else
         fileRedirectExtractData="$MERGE_PATH"
       fi
 
-      ## If to get the path of the file to extract
-      local fileNameParse
-      if [[ $isGitAnnotationAdd -eq 2 ]]; then
-        fileNameParse=$previousLine
-      elif [[ $isGitAnnotationAdd -eq 0 ]]; then
-        fileNameParse=$nextLine
-      else
-        fileNameParse=$line
-      fi
-
-      filePath="${fileNameParse:6}"
-      local folderName=${filePath%/*}
-      fileExtractDataPath="$filePath"
-
-      ## Check if the parsed folder is inside of the given path param
-      if [[ "$folderName" =~ .*"$folderFilesPath".* ]]; then
-        local branchToExtractFileData=$branchB
-        if [[ $isGitAnnotationAdd -eq 2 ]]; then
-          branchToExtractFileData=$branchA
+      if [ -n "$fileRedirectExtractData" ]; then
+        ## If to get the path of the file to extract
+        local fileNameParse
+        if [ $isGitAnnotationAdd == 2 ]; then
+          fileNameParse=$previousLine
+        elif [ $isGitAnnotationAdd == 0 ]; then
+          fileNameParse=$nextLine
+        else
+          fileNameParse=$line
         fi
 
-        ## Get The content of the file we want to parse
-        fileContent=()
-        while read -r line || [ -n "$line" ]; do
-          fileContent+=("$line")
-        done < <(git show "$branchToExtractFileData:$filePath")
-        endOfFile=1
-        passOnce=0
-        if [[ $isGitAnnotationAdd -ne 1 ]]; then
-          isNewFile=0
+        filePath="${fileNameParse:6}"
+        local folderName=${filePath%/*}
+        fileExtractDataPath="$filePath"
+
+        ## Check if the parsed folder is inside of the given path param
+        if [[ "$folderName" =~ .*"$folderFilesPath".* ]]; then
+          local branchToExtractFileData=$branchB
+          if [ $isGitAnnotationAdd == 2 ]; then
+            branchToExtractFileData=$branchA
+          fi
+
+          ## Get The content of the file we want to parse
+          fileContent=()
+          while read -r line || [ -n "$line" ]; do
+            fileContent+=("$line")
+          done < <(git show "$branchToExtractFileData:$filePath")
+          echo "SCRIPT RUN: git show $branchToExtractFileData:$filePath" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
+          endOfFile=1
+          passOnce=0
+          if [ $isGitAnnotationAdd != 1 ]; then
+            isNewFile=0
+          fi
+          echo "SCRIPT PARSED FILE: $fileExtractDataPath" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
         fi
-        echo "SCRIPT PARSED FILE: $fileExtractDataPath" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
       fi
-    elif $nextLineIsDiff && [[ $endOfFile -eq 1 ]]; then
+    elif $nextLineIsDiff && [ "$endOfFile" == 1 ]; then
       ## File to extract the information from the file changed
-      if [[ $isNewFile -eq 0 ]]; then
+      if [ $isNewFile == 0 ]; then
         transferAllFileContent fileContent "$fileRedirectExtractData"
         isNewFile=1
         endOfFile=0
@@ -408,8 +424,8 @@ mainLoop() {
         endOfFile=$?
       fi
       nextLineIsDiff=false
-    elif [[ $isGitAnnotation -eq 0 || $isNewFile -eq 0 ]] ||
-      [[ $dl -ge 0 && $isPrvGitAnnotation -eq 1 && $isTeamAnnotation -eq 0 ]]; then
+    elif (("$isGitAnnotation" == 0 || "$isNewFile" == 0)) ||
+      (("$dl" >= 0 && "$isPrvGitAnnotation" == 1 && "$isTeamAnnotation" == 0)); then
       nextLineIsDiff=true
     else
       nextLineIsDiff=false
@@ -418,50 +434,37 @@ mainLoop() {
   done
 
   mergeFileOfSpecialFolder
-
   printEnd
-}
-
-expectCredentialPull() {
-  expect <<END
-          set timeout -1
-          spawn git pull origin "$branchA"
-expect {
-    "*?sername*" { send "$GIT_USERNAME\r"; incr i; exp_continue }
-    "*?assword*" { send "$GIT_PWD\r"; incr i; exp_continue }
-    eof
-}
-END
-}
-
-expectCredentialFetch() {
-  expect <<END
-          set timeout -1
-          spawn git fetch
-
-expect {
-    "*?sername*" { send "$GIT_USERNAME\r"; incr i; exp_continue }
-    "*?assword*" { send "$GIT_PWD\r"; incr i; exp_continue }
-    eof
-}
-END
 }
 
 ##Function to get the last version of branch A
 pullBranch() {
   {
+    ## Git config set credentials
+    git config --local credential.helper '!f() { sleep 1; echo "username=$userGit"; echo "password=$passwordGit"; }; f' >/dev/null 2>&1
+    echo "SCRIPT RUN: git config --local credential.helper for $userGit@$passwordGit" 2>&1
     ## Well get all the new branches
+    git fetch --all >/dev/null 2>&1
     echo "SCRIPT RUN: git fetch" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
-    expectCredentialFetch
+
     ## Git checkout the branchA
-    echo "SCRIPT RUN: git checkout $branchA" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
     git checkout "$branchA" >/dev/null 2>&1
+    echo "SCRIPT RUN: git checkout $branchA" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
     ## Git pull the branchA to get the last version
-    expectCredentialPull
-    ## Git checkout the the previous branch
-    git checkout - >/dev/null 2>&1
-    echo "SCRIPT RUN: git pull origin $branchA" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
-    echo "SCRIPT RUN: git checkout -" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
+    git pull origin "$branchA" >/dev/null 2>&1
+
+    ## Git checkout the branchB
+    git checkout "$branchB" >/dev/null 2>&1
+    echo "SCRIPT RUN: git checkout $branchB" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
+    ## Git pull the branchB to get the last version
+    git pull origin "$branchB" >/dev/null 2>&1
+
+    git checkout "$GIT_CURRENT_BRANCH" >/dev/null 2>&1
+    echo "SCRIPT RUN: git checkout $GIT_CURRENT_BRANCH" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
+
+    ## Git config reset credentials
+    git config --local --unset credential.helper
+    echo "SCRIPT RUN: config --local --unset credential.helper" 2>&1
   } || {
     echo "SCRIPT ERROR: git pull $branchA or git checkout $branchA having a issue, please confirm that the branches are correct" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
     exit 1
@@ -469,7 +472,7 @@ pullBranch() {
 }
 
 setFilesDifference() {
-  pullBranch
+  pullBranch "$branchA" "$branchB" "$folderFilesPath"
 
   {
     echo "SCRIPT RUN: git diff $branchA $branchB -- $folderFilesPath/*.txt | $PATH_FIRST_SCRIPT &> $DIFFERENCE_PATH" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
@@ -513,6 +516,22 @@ executeAlgorithm() {
   mainLoop differencesFileData "$folderFilesPath"
 }
 
+createSpecialFile() {
+  local specialFolderList
+  arrayOfSpecialFolder specialFolderList
+
+  mkdir -p "$FOLDER_FILES_PARSED"
+
+  touch "$GIT_DIFF_BRANCH_PATH"
+  for spcElement in "${specialFolderList[@]}"; do
+    IFS=' ' read -r -a folderInfoArray <<<"$spcElement"
+    if [ "${folderInfoArray[1]}" != "null" ]; then
+      echo "SCRIPT CREATE FILE: ${folderInfoArray[1]}" 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
+      touch "${folderInfoArray[1]}"
+    fi
+  done
+}
+
 #Function to create the different main folders
 createDiffFolder() {
   local deleteDir
@@ -527,12 +546,7 @@ createDiffFolder() {
   createLogPath="The folder $LOG_PATH has been created"
   touch "$MERGE_PATH"
 
-  mkdir -p "$FOLDER_FILES_PARSED"
-
-  touch "$GIT_DIFF_BRANCH_PATH"
-  touch "$FOLDER_TABLES_FILES_PARSED"
-  touch "$FOLDER_STRUCTURES_FILES_PARSED"
-  touch "$FOLDER_AUTRES_FILES_PARSED"
+  createSpecialFile
 
   {
     echo "$deleteDir"
@@ -566,8 +580,8 @@ help() {
   echo "param1: { branch to be compare A }"
   echo "param2: {branch to compare B }"
   echo "param3: { folder where are the files }"
-  echo "param4: { git username of the repository }"
-  echo "param5: { git password of the repository }"
+  echo "param4: { username git }"
+  echo "param5: { password git }"
   exit 0
 }
 
@@ -579,40 +593,35 @@ welcome() {
 
 main() {
   welcome
-  if [[ $1 == "--help" ]]; then
+  if [ "$1" == "--help" ]; then
     help
   fi
 
   local branchA=$1
   local branchB=$2
   local folderFilesPath=$3
-  GIT_USERNAME=$4
-  GIT_PWD=$5
+  local userGit=$4
+  local passwordGit=$5
 
   # asking for the name of the branches to be compared
-  if [[ -z "$branchA" ]]; then
+  if [ -z "$branchA" ]; then
     read -rp 'What is the name of the branch A ?: ' branchA
-  fi
-  if [[ -z "$branchB" ]]; then
+  elif [ -z "$branchB" ]; then
     read -rp 'What is the name of the branch B ?: ' branchB
-  fi
-  if [[ -z "$folderFilesPath" ]]; then
+  elif [ -z "$folderFilesPath" ]; then
     read -rp 'What is the name of the folder where there is the files ?: ' folderFilesPath
-  fi
-  if [[ -z "$GIT_USERNAME" ]]; then
-    read -rp 'What is the name git username: ' GIT_USERNAME
-  fi
-  if [[ -z "$GIT_PWD" ]]; then
-    read -rp 'What is the name git password: ' GIT_PWD
+  elif [ -z "$userGit" ]; then
+    read -rp 'What is the git user ?: ' userGit
+  elif [ -z "$passwordGit" ]; then
+    read -rp 'What is the git password ?: ' passwordGit
   fi
 
   {
     echo -e "\tParameter #1 branch A is: $branchA"
     echo -e "\tParameter #2 branch B is: $branchB"
-    echo -e "\tParameter #3 folder is: $folderFilesPath"
-    echo -e "\tParameter #4 username is: $GIT_USERNAME"
-    echo -e "\tParameter #5 password is: $GIT_PWD\n"
-    exit 8
+    echo -e "\tParameter #3 folder is: $folderFilesPath\n"
+    echo -e "\tParameter #4 userGit is: $userGit\n"
+    echo -e "\tParameter #5 passwordGit is: $passwordGit\n"
   } 2>&1 | tee -a "$GIT_DIFF_BRANCH_PATH"
 
   sleep 1
@@ -621,7 +630,7 @@ main() {
   fi
 
   createDiffFolder
-  executeAlgorithm "$branchA" "$branchB" "$folderFilesPath"
+  executeAlgorithm "$branchA" "$branchB" "$folderFilesPath" "$userGit" "$passwordGit"
 }
 
 main "$1" "$2" "$3" "$4" "$5"
