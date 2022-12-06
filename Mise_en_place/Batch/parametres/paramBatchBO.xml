@@ -1,0 +1,26 @@
+<interface idInterface="BO">
+	<nomInterface>BO</nomInterface>
+	<descriptionInterface>Chargement des tables GESTIL</descriptionInterface>
+	<traitements>
+		<traitement>
+			<descriptionTraitement>Chargement des tables GESTIL</descriptionTraitement>
+			<typeTraitement>BO</typeTraitement>
+			<!--
+			true:="Annule et Remplace"
+			false:=Les tables TGE_GESTIL_MATJOU\TGE_GESTIL_MATJOUD\TGE_GESTIL_MATCPT
+			seront mises à jour à partir des tables xxxxx_BIS , xxxxx et xxxxx_TER (xxxxx_HIS exclues )
+			-->	
+			<chargementInitial>false</chargementInitial>
+			<!--
+				Indiquer le jour de mise à jour des  données issues des tables GESTIL BIS
+				1=Lundi 2=Mardi 3=Mercredi 4=Jeudi 5=Vendredi 6=Samedi 7=Dimanche
+			-->	
+			<jourMajBIS>6</jourMajBIS>
+			<!--
+				Période de rétention (en Mois)des données issues des tables ADPLink TGE_GESTIL_MATCPT TGE_GESTIL_MATJOU TGE_GESTIL_MATJOUD 
+				Exemple: 24 correspond à 2 ans d'historique
+			-->	
+			<periodeRetentionEnMois>24</periodeRetentionEnMois>
+		</traitement>
+	</traitements>
+</interface>

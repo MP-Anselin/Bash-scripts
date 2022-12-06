@@ -1,0 +1,63 @@
+##
+TAG_CHARSET=@€éèç
+##
+HELPDESK_TYPE
+=SQL IFNOTEXIST=HELPDESK_TYPE=ESERVICE_EN=
+ALTER TABLE HELPDESK_TYPE ADD (ESERVICE_EN VARCHAR2(50))
+##
+HELPDESK_TYPE
+==
+UPDATE HELPDESK_TYPE SET ESERVICE_EN = 'Report an Issue' WHERE UPPER(TYPFICHE) IN ('A')
+##
+HELPDESK_TYPE
+==
+UPDATE HELPDESK_TYPE SET ESERVICE_EN = 'Request For Change' WHERE UPPER(TYPFICHE) IN ('E')
+##
+HELPDESK_TYPE
+=SQL IFNOTEXIST=HELPDESK_TYPE=ESTACTIF=
+ALTER TABLE HELPDESK_TYPE ADD (ESTACTIF VARCHAR2(1))
+##
+HELPDESK_TYPE
+==
+DELETE FROM HELPDESK_TYPE WHERE TYPFICHE in ('A','E','Q','D')
+'A','Anomalie',1,'Report an Issue','O'
+'E','Evolution',2,'Request For Change','O'
+'Q','Question',3,'Request for Information','O'
+'D','Demande de service',4,'Process Request','O'
+##
+HELPDESK_TYPE
+=SQL IFNOTEXIST=HELPDESK_TYPE=ESERVICE_FR=
+ALTER TABLE HELPDESK_TYPE ADD (ESERVICE_FR VARCHAR2(50))
+##
+HELPDESK_TYPE
+==
+DELETE FROM HELPDESK_TYPE WHERE TYPFICHE in ('A','E','Q','D')
+'A','Anomalie',1,'Report an Issue','O','Anomalie / Incident'
+'E','Evolution',2,'Request For Change','O','Changement / Evolution'
+'Q','Question',3,'Request for Information','O','Assistance / Question'
+'D','Demande de service',4,'Process Request','O','Demande de service'
+##
+HELPDESK_TYPE
+=SQL IFNOTEXIST=HELPDESK_TYPE=VALDEFAUTCOLLAB=
+ALTER TABLE HELPDESK_TYPE ADD VALDEFAUTCOLLAB VARCHAR2(1) DEFAULT 'O'
+##
+HELPDESK_TYPE
+==
+UPDATE HELPDESK_TYPE SET VALDEFAUTCOLLAB='N' WHERE TYPFICHE='E'
+##
+HELPDESK_TYPE
+==
+DELETE FROM HELPDESK_TYPE WHERE TYPFICHE in ('A','E','Q','D')
+'A','Anomalie rencontrée',1,'Report an Issue','O','Anomalie / Incident','O'
+'E','Evolution',2,'Request For Change','O','Changement / Evolution','N'
+'Q','Demande d''information',3,'Request for Information','O','Assistance / Question','O'
+'D','Demande de service',4,'Process Request','O','Demande de service','O'
+##
+HELPDESK_TYPE
+==
+DELETE FROM HELPDESK_TYPE WHERE TYPFICHE in ('T')
+'T','Transmission d''un document','5',null,'O',null,'O'
+##
+HELPDESK_TYPE
+=SQL IFNOTEXIST=HELPDESK_TYPE=EST_PROCESSUS=
+ALTER TABLE HELPDESK_TYPE ADD EST_PROCESSUS varchar2(1)

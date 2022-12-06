@@ -1,0 +1,6 @@
+##
+TAG_CHARSET=@€ιθη
+##
+TGE_CTRL40_info_absence
+=SQL IF_TYPE_NOTEXIST=TGE_CTRL40_info_absence=
+create or replace TYPE TGE_CTRL40_info_absence AS OBJECT (          fin_ma      VARCHAR2(1),          debut_ma    VARCHAR2(1),          HEURES_IP	VARCHAR2(500));

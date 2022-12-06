@@ -1,0 +1,4 @@
+##
+DONPAIE
+==
+CREATE OR REPLACE FORCE VIEW DONPAIE AS SELECT s.matric,  nom AS nomfam,  prenom ,titre AS TCIVI ,  TO_CHAR (d.DTDEB_HISTO, 'YYYY') AS an,  TO_CHAR (d.DTDEB_HISTO, 'MM')   AS mois,  0 as HLEG,  0 as HTOT,  0 as MLEG,  0 as MTOT,  0 as MNET, 0 as MBRUT, 0 as HBRUT FROM secupacmat s,  dic_tge_respaie_histo d WHERE s.pacmat      =d.pacmat AND s.numpac      =d.numpac AND priorite_situation='0' UNION SELECT s.matric,  nom AS nomfam,  prenom ,  titre   AS TCIVI ,  TO_CHAR (d.DTDEB_HISTO, 'YYYY') AS an ,  'A'    AS mois,  0 as HLEG,  0 as HTOT,  0 as MLEG,  0 as MTOT,  0 as MNET, 0 as MBRUT, 0 as HBRUT FROM secupacmat s,  dic_tge_respaie_histo d WHERE s.pacmat      =d.pacmat AND s.numpac      =d.numpac AND priorite_situation= '0'  UNION SELECT SEC.MATRIC,NOM AS NOMFAM, PRENOM, TITRE AS TCIVI, AN ,MOIS,HLEG, HTOT, MLEG,MTOT,MNET,MBRUT,HBRUT  FROM SECUMATRIC SEC, FOR_DONPAIE_REPRISE R WHERE SEC.MATRIC=R.MATRIC

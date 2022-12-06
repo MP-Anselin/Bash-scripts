@@ -1,0 +1,63 @@
+<interface idInterface="EXTHRTR">
+	<nomInterface>Chargement de l'Extractor [hr]</nomInterface>
+	<descriptionInterface>Extractor [hr]Organisation</descriptionInterface>
+	<racineInterface>XXXX</racineInterface>
+	<traitements>
+		<traitement>
+			<descriptionTraitement>Chargement de la table STD_STRUC_NIVSECU</descriptionTraitement>
+			<typeTraitement>InterfaceNivSecuHRO</typeTraitement>
+		</traitement>
+		<traitement>
+			<descriptionTraitement>Extraction des donnees du [Hr] Organisation</descriptionTraitement>
+			<desactive>NON</desactive>
+			<typeTraitement>EXTHR</typeTraitement>
+			<path>XXXX</path>
+			<module>HRO</module>
+			<theme>EXTR_HRO</theme>
+			<outputFileType>module</outputFileType>
+			<separateurChamps>^</separateurChamps>
+			<secu1>ADP</secu1>
+			<langue>1</langue>
+			<secu2>*</secu2>
+			<delimiteurChamps>'</delimiteurChamps>
+			<caractereSautLigneDansTexte>¿</caractereSautLigneDansTexte>
+			<templateDate>dd/mm/yyyy</templateDate>
+			<rowNum>2500</rowNum>
+			<arretExtracteurSiErreur>N</arretExtracteurSiErreur>
+			<ediExtracttBuild>Y</ediExtracttBuild>
+			<nomTableCibleDesTablesDeLibelles></nomTableCibleDesTablesDeLibelles>
+			<prefixTableCibleDesLibelles></prefixTableCibleDesLibelles>
+			<nomTableStruct></nomTableStruct>
+			<dateFinSiNull>20991231</dateFinSiNull>
+			<requeteControle>Y</requeteControle>
+			<userExitJavaActivate>N</userExitJavaActivate>
+			<includeDateInFile>N</includeDateInFile>
+		</traitement>
+		<traitement>
+			<descriptionTraitement>Extraction des donnees du [HR]training [Hr] Organisation</descriptionTraitement>
+			<desactive>NON</desactive>
+			<typeTraitement>EXTHR</typeTraitement>
+			<path>XXXX</path>
+			<module>HRTrainingHRO</module>
+			<theme></theme>
+			<outputFileType>module</outputFileType>
+			<separateurChamps>^</separateurChamps>
+			<secu1>ADP</secu1>
+			<langue>1</langue>
+			<secu2>*</secu2>
+			<delimiteurChamps>'</delimiteurChamps>
+			<caractereSautLigneDansTexte>¿</caractereSautLigneDansTexte>
+			<templateDate>dd/mm/yyyy</templateDate>
+			<rowNum>2500</rowNum>
+			<ArretExtracteurSiErreur>Y</ArretExtracteurSiErreur>
+			<ediExtracttBuild>Y</ediExtracttBuild>
+			<nomTableCibleDesTablesDeLibelles></nomTableCibleDesTablesDeLibelles>
+			<prefixTableCibleDesLibelles></prefixTableCibleDesLibelles>
+			<nomTableStruct></nomTableStruct>
+			<dateFinSiNull>20991231</dateFinSiNull>
+			<requeteControle>Y</requeteControle>
+			<userExitJavaActivate>Y</userExitJavaActivate>
+			<includeDateInFile>N</includeDateInFile>
+		</traitement>
+	</traitements>
+</interface>

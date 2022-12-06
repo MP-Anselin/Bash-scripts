@@ -1,0 +1,207 @@
+##
+TAG_CHARSET=@€éèç
+##
+MP_REF_EVENTS
+=SQL IFEXIST=UX_EVENTS=
+RENAME UX_EVENTS TO MP_REF_EVENTS
+##
+MP_REF_EVENTS 
+==
+DELETE FROM MP_REF_EVENTS WHERE EVENT LIKE '/events/benefits/v1/placement-fin-periode.request'
+'/events/benefits/v1/placement-fin-periode.request',NULL,'Placement fin pèriode',NULL,NULL,'N'
+##
+MP_REF_EVENTS
+==
+DELETE FROM MP_REF_EVENTS WHERE EVENT='/events/hr/v1/worker.work-assignment.assigned-work-location.change'
+'/events/hr/v1/worker.work-assignment.assigned-work-location.change',16,'Modification du n° de bureau',NULL,'Employee - Work Location','O'
+##
+MP_REF_EVENTS (EVENT,EVENT_ID,LIBELLE,OP_NUM,UX_EVENTNAME,IS_NOTIFICATION)
+==
+DELETE FROM MP_REF_EVENTS WHERE EVENT IN ('/events/hr/v1/worker.hire')
+'/events/hr/v1/worker.hire',NULL,'Création d''une demande d''embauche',null,NULL,NULL
+##
+MP_REF_EVENTS (EVENT,EVENT_ID,LIBELLE,OP_NUM,UX_EVENTNAME,IS_NOTIFICATION)
+==
+DELETE FROM MP_REF_EVENTS WHERE EVENT IN ('/events/hr/v1/worker.immigration-document.change')
+'/events/hr/v1/worker.immigration-document.change',NULL,'Modification Carte salarié étranger',null,NULL,NULL
+##
+MP_REF_EVENTS (EVENT,EVENT_ID,LIBELLE,OP_NUM,UX_EVENTNAME,IS_NOTIFICATION)
+==
+DELETE FROM MP_REF_EVENTS WHERE EVENT IN ('/events/payroll/v1/worker.payroll-statement-preferences.modify')
+'/events/payroll/v1/worker.payroll-statement-preferences.modify',120,'Modification refus de dématérialisation',null,'Employee - Payroll Statement Preferences','O'
+##
+MP_REF_EVENTS (EVENT,EVENT_ID,LIBELLE,OP_NUM,UX_EVENTNAME,IS_NOTIFICATION)
+==
+DELETE FROM MP_REF_EVENTS WHERE EVENT IN ('/events/hr/v1/worker.work-assignment.modify/terminate')
+'/events/hr/v1/worker.work-assignment.modify/terminate',NULL,'Départ DEX',50110,'Employee - Termination',NULL
+##
+MP_REF_EVENTS (EVENT,EVENT_ID,LIBELLE,OP_NUM,UX_EVENTNAME,IS_NOTIFICATION)
+==
+DELETE FROM MP_REF_EVENTS WHERE EVENT IN ('/events/hr/v1/worker.work-assignment.modify/termination-modify')
+'/events/hr/v1/worker.work-assignment.modify/termination-modify',NULL,'Annulation/Modification départ DEX',53310,'Employee - Termination',NULL
+##
+MP_REF_EVENTS (EVENT,EVENT_ID,LIBELLE,OP_NUM,UX_EVENTNAME,IS_NOTIFICATION)
+==
+DELETE FROM MP_REF_EVENTS WHERE EVENT IN ('/events/hr/v1/worker.work-assignment.modify/hire-modify')
+'/events/hr/v1/worker.work-assignment.modify/hire-modify',NULL,'Annulation/Modification embauche DEX',54010,'Employee - Hire',NULL
+##
+MP_REF_EVENTS (EVENT,EVENT_ID,LIBELLE,OP_NUM,UX_EVENTNAME,IS_NOTIFICATION)
+==
+DELETE FROM MP_REF_EVENTS WHERE EVENT IN ('/events/hr/v1/worker.work-assignment.modify')
+'/events/hr/v1/worker.work-assignment.modify',NULL,'Annulation/Modifications des informations contractuelles DEX',50210,'Employee - Contract Information',NULL
+##
+MP_REF_EVENTS (EVENT,EVENT_ID,LIBELLE,OP_NUM,UX_EVENTNAME,IS_NOTIFICATION)
+==
+DELETE FROM MP_REF_EVENTS WHERE EVENT IN ('/events/benefits/v1/benefit-coverages-enrollment.modify')
+'/events/benefits/v1/benefit-coverages-enrollment.modify',130,'Souscription à une mutuelle',55300,'Employee - Benefit Coverages','O'
+##
+MP_REF_EVENTS (EVENT,EVENT_ID,LIBELLE,OP_NUM,UX_EVENTNAME,IS_NOTIFICATION)
+==
+DELETE FROM MP_REF_EVENTS WHERE EVENT IN ('/events/hr/v1/worker.hire')
+'/events/hr/v1/worker.hire',NULL,'Création d''une demande d''embauche','53703',NULL,NULL
+##
+MP_REF_EVENTS (EVENT,EVENT_ID,LIBELLE,OP_NUM,UX_EVENTNAME,IS_NOTIFICATION)
+==
+DELETE FROM MP_REF_EVENTS WHERE EVENT IN ('/events/hr/v1/worker.rehire')
+'/events/hr/v1/worker.rehire',NULL,'Création d''une demande d''embauche','53703',NULL,NULL
+##
+MP_REF_EVENTS
+==
+delete from MP_REF_EVENTS where event = '/events/benefits/v1/accrued-time-automatic-investment.request'
+'/events/benefits/v1/accrued-time-automatic-investment.request',null,'Modification du placement fin de période',null,null,'N'
+##
+MP_REF_EVENTS 
+==
+DELETE FROM MP_REF_EVENTS WHERE EVENT LIKE '/events/benefits/v1/placement-fin-periode.request'
+##
+MP_REF_EVENTS
+==
+DELETE FROM MP_REF_EVENTS WHERE EVENT='/events/hr/v1/commuter-expense-report-expense.submit'
+'/events/hr/v1/commuter-expense-report-expense.submit',0,'Demande d''indemnité de transport',40000,'Employee - Pay commute expense','N'
+##
+MP_REF_EVENTS
+==
+DELETE FROM MP_REF_EVENTS WHERE EVENT in ('/events/hr/v1/worker.work-assignment.assigned-work-location.change','/events/benefits/v1/benefit-coverages-enrollment.modify')
+'/events/hr/v1/worker.work-assignment.assigned-work-location.change','16','Modification du numéro de bureau',null,'Employee - Work Location','O'
+'/events/benefits/v1/benefit-coverages-enrollment.modify','130','Souscription à une mutuelle','55300','Employee - Benefit Coverages','O'
+##
+MP_REF_EVENTS (EVENT,EVENT_ID,LIBELLE,OP_NUM,UX_EVENTNAME,IS_NOTIFICATION)
+==
+DELETE FROM MP_REF_EVENTS WHERE EVENT IN ('/events/hr/v1/worker.immigration-document.remove','/events/hr/v1/worker.immigration-document.add','/events/hr/v1/worker.immigration-document.change')
+'/events/hr/v1/worker.immigration-document.remove',NULL,'suppression Carte salarié étranger','40203',NULL,NULL
+'/events/hr/v1/worker.immigration-document.add',NULL,'ajout Carte salarié étranger','40203',NULL,NULL
+'/events/hr/v1/worker.immigration-document.change',NULL,'Modification Carte salarié étranger','40203',NULL,NULL
+##
+MP_REF_EVENTS
+==
+delete from MP_REF_EVENTS where EVENT in ('/events/hr/v1/worker.custom-field.number.change','/events/hr/v1/worker.custom-field.date.change','/events/hr/v1/worker.custom-field.string.change')
+'/events/hr/v1/worker.custom-field.number.change',null,'Modification de mes infos supplémentaires',null,'Employee - Infos supplémentaires',null	
+'/events/hr/v1/worker.custom-field.date.change',null,'Modification de mes infos supplémentaires',null,'Employee - Infos supplémentaires',null
+'/events/hr/v1/worker.custom-field.string.change',null,'Modification de mes infos supplémentaires',null,'Employee - Infos supplémentaires',null
+##
+MP_REF_EVENTS
+==
+DELETE FROM MP_REF_EVENTS WHERE EVENT IN ('/events/payroll/v1/worker.payroll-statement-preferences.modify')
+'/events/payroll/v1/worker.payroll-statement-preferences.modify',120,'Modification refus de dématérialisation',55000,'Employee - Payroll Statement Preferences','O'
+##
+MP_REF_EVENTS (EVENT,EVENT_ID,LIBELLE,OP_NUM,UX_EVENTNAME,IS_NOTIFICATION)
+==
+DELETE FROM MP_REF_EVENTS WHERE EVENT IN ('/events/benefits/v1/benefit-coverages-enrollment.modify')
+'/events/benefits/v1/benefit-coverages-enrollment.modify','130','Souscription à une mutuelle',53203,'Employee - Benefit Coverages','O'
+##
+MP_REF_EVENTS
+==
+delete from MP_REF_EVENTS where EVENT in ('/events/core/v1/documents/document.upload')
+'/events/core/v1/documents/document.upload',null,'Dépôt de documents',51500,'Profil - dépôt de documents',null
+##
+MP_REF_EVENTS
+==
+delete from MP_REF_EVENTS where EVENT in ('/events/hr/v1/worker.work-assignment.terminate','/events/hr/v1/worker-hire.cancel','/events/hr/v1/worker-termination.cancel','/events/hr/v1/worker-rehire.cancel')
+'/events/hr/v1/worker.work-assignment.terminate',null,'Départ avec ou sans STC',null,null,null	
+'/events/hr/v1/worker-hire.cancel',null,'Annulation d''embauche',null,null,null	
+'/events/hr/v1/worker-termination.cancel',null,'Annulation de départ avec ou sans STC',null,null,null	
+'/events/hr/v1/worker-rehire.cancel',null,'Annulation de réembauche',null,null,null
+##
+MP_REF_EVENTS
+==
+ALTER TABLE MP_REF_EVENTS MODIFY IS_NOTIFICATION varchar2(200 BYTE)
+##
+MP_REF_EVENTS
+==
+UPDATE MP_REF_EVENTS SET IS_NOTIFICATION='Employee - Emergency Contacts' WHERE EVENT LIKE '/events/hr/v1/worker.personal-contact.%'
+##
+MP_REF_EVENTS
+==
+UPDATE MP_REF_EVENTS SET IS_NOTIFICATION='Employee - Investment Plans Request' WHERE EVENT='/events/benefits/v1/investment-plan-allocation.change.modify'
+##
+MP_REF_EVENTS
+==
+delete from MP_REF_EVENTS where EVENT in ('/events/hr/v1/worker.personal-communication.mobile.remove','/events/hr/v1/worker.personal-communication.landline.remove','/events/hr/v1/worker.personal-communication.email.remove')
+'/events/hr/v1/worker.personal-communication.email.remove','3','Suppression de l''adresse mail personnelle','50307','Employee - Personal Information Email','O'
+'/events/hr/v1/worker.personal-communication.landline.remove','1','Suppression du numéro fixe personnel','50305','Employee - Personal Information Landline','O'
+'/events/hr/v1/worker.personal-communication.mobile.remove','2','Suppression du numéro mobile personnel','50306','Employee - Personal Information Mobile','O'
+##
+MP_REF_EVENTS
+==
+delete from MP_REF_EVENTS where EVENT in ('/events/hr/v1/worker.business-communication.mobile.add','/events/hr/v1/worker.business-communication.landline.add','/events/hr/v1/worker.business-communication.fax.add','/events/hr/v1/worker.business-communication.email.add')
+'/events/hr/v1/worker.business-communication.email.add','13','Ajout de l''adresse mail professionnelle','50310','Employee - Business Information Email','O'
+'/events/hr/v1/worker.business-communication.fax.add','14','Ajout du numéro de fax','50311','Employee - Business Information Fax','O'
+'/events/hr/v1/worker.business-communication.landline.add','11','Ajout du numéro fixe professionnel','50308','Employee - Business Information Landline','O'
+'/events/hr/v1/worker.business-communication.mobile.add','12','Ajout du numéro mobile professionnel','50309','Employee - Business Information Mobile','O'
+##
+MP_REF_EVENTS
+==
+delete from MP_REF_EVENTS where EVENT in ('/events/hr/v1/worker.business-communication.email.remove','/events/hr/v1/worker.business-communication.fax.remove','/events/hr/v1/worker.business-communication.landline.remove','/events/hr/v1/worker.business-communication.mobile.remove')
+'/events/hr/v1/worker.business-communication.email.remove','13','Suppression de l''adresse mail professionnelle','50310','Employee - Business Information Email','O'
+'/events/hr/v1/worker.business-communication.fax.remove','14','Suppression du numéro de fax','50311','Employee - Business Information Fax','O'
+'/events/hr/v1/worker.business-communication.landline.remove','11','Suppression du numéro fixe professionnel','50308','Employee - Business Information Landline','O'
+'/events/hr/v1/worker.business-communication.mobile.remove','12','Suppression du numéro mobile professionnel','50309','Employee - Business Information Mobile','O'
+##
+MP_REF_EVENTS
+==
+delete from MP_REF_EVENTS where EVENT = '/events/hr/v1/worker.work-assignment.modify/terminate'
+##
+MP_REF_EVENTS
+==
+UPDATE MP_REF_EVENTS SET OP_NUM=53803 WHERE EVENT='/events/hr/v1/worker.work-assignment.terminate' AND OP_NUM IS NULL
+##
+MP_REF_EVENTS
+==
+UPDATE MP_REF_EVENTS SET OP_NUM=50317 WHERE EVENT='/events/hr/v1/worker.work-assignment.assigned-work-location.change' AND OP_NUM IS NULL
+##
+MP_REF_EVENTS
+==
+delete from MP_REF_EVENTS where EVENT in ('/events/hr/v1/worker.legal-address.add')
+'/events/hr/v1/worker.legal-address.add','4','Ajout de l''adresse fiscale','50312','Employee - Personal Information Legal Address','O'
+##
+MP_REF_EVENTS
+==
+delete from MP_REF_EVENTS where EVENT in ('/events/hr/v1/worker.personal-address.add')
+'/events/hr/v1/worker.personal-address.add','5','Ajout de l''adresse personnelle','50313','Employee - Personal Information Personal Address','O'
+##
+MP_REF_EVENTS
+==
+delete from MP_REF_EVENTS where EVENT in ('/events/hr/v1/worker.personal-address.remove')
+'/events/hr/v1/worker.personal-address.remove','5','Suppression de l''adresse personnelle','50313','Employee - Personal Information Personal Address','O'
+##
+MP_REF_EVENTS
+==
+update MP_REF_EVENTS set op_num=50203 where event='/events/hr/v1/worker.work-assignment.modify' and nvl(op_num,50210)=50210
+##
+MP_REF_EVENTS
+==
+update MP_REF_EVENTS set UX_EVENTNAME=NULL where event in ('/events/hr/v1/worker.work-assignment.modify','/events/hr/v1/worker.work-assignment.modify/hire-modify','/events/hr/v1/worker.work-assignment.modify/termination-modify')
+##
+MP_REF_EVENTS
+==
+delete from MP_REF_EVENTS where EVENT in ('/hr/v1/workers/{aoid}/remote-work-arrangements')
+'/hr/v1/workers/{aoid}/remote-work-arrangements',null,'Demande de Télétravail Contractuel','50160','Remote work arrangement request for the specified worker','O'
+##
+MP_REF_EVENTS
+==
+delete from MP_REF_EVENTS where EVENT in ('/events/hr/v1/worker.citizenship.change')
+'/events/hr/v1/worker.citizenship.change',null,'Modification du pays de nationalité',null,'Employee - Modification du pays de nationalité',null
+##
+MP_REF_EVENTS
+=IF_ROW_NOTEXIST=
+'/events/hr/v1/worker.identity-document.change',null,'Modification du numéro de sécurité sociale',null,'Employee - Modification du numéro de sécurité sociale',null

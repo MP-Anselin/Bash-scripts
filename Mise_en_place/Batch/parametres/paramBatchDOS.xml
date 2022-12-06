@@ -1,0 +1,72 @@
+<interface idInterface="INDIV">
+	<nomInterface>Realignement des dossiers salaries</nomInterface>
+	<descriptionInterface></descriptionInterface>
+	<alerteSiFichierNonDisponible>OUI</alerteSiFichierNonDisponible>
+	<listeDependancesFichiers>
+		<nomFichierDep>INDIV.TXT</nomFichierDep>
+	</listeDependancesFichiers>
+	<traitements>
+		<traitement>
+			<descriptionTraitement>Script SQL specifique avant chargement du fichier INDIV</descriptionTraitement>
+			<typeTraitement>SCRIPT</typeTraitement>
+			<nomFichier>sql_CLI_avant_INDIV.sql</nomFichier>
+			<typeFichier>SQL</typeFichier>
+			<continueSiErreur>OUI</continueSiErreur>
+		</traitement>
+		<traitement>
+			<descriptionTraitement>Chargement des donnees</descriptionTraitement>
+			<typeTraitement>CHARGEMENT</typeTraitement>
+			<nbcommit>1000</nbcommit>
+			<nomFichier>INDIV.TXT</nomFichier>
+			<typeFichier>MAJBASE</typeFichier>
+			<modeChargement>AER</modeChargement>
+			<continueSiErreur>OUI</continueSiErreur>
+		</traitement>
+		<traitement>
+			<descriptionTraitement>Script SQL standard apres chargement du fichier INDIV</descriptionTraitement>
+			<typeTraitement>SCRIPT</typeTraitement>
+			<nomFichier>sql_RD_apres_INDIV.sql</nomFichier>
+			<typeFichier>SQL</typeFichier>
+			<continueSiErreur>OUI</continueSiErreur>
+		</traitement>
+		<traitement>
+			<descriptionTraitement>Script SQL specifique apres chargement du fichier INDIV</descriptionTraitement>
+			<typeTraitement>SCRIPT</typeTraitement>
+			<nomFichier>sql_CLI_apres_INDIV.sql</nomFichier>
+			<typeFichier>SQL</typeFichier>
+			<continueSiErreur>OUI</continueSiErreur>
+		</traitement>
+		<traitement>
+			<descriptionTraitement>Chargement ROLORG</descriptionTraitement>
+			<typeTraitement>AutreInterface</typeTraitement>
+			<nomInterface>ROLORG</nomInterface>
+			<continueSiErreurBloquante>OUI</continueSiErreurBloquante>
+		</traitement>
+		<traitement>
+			<descriptionTraitement>Script SQL standard avant lancement de l'interface HrHis</descriptionTraitement>
+			<typeTraitement>SCRIPT</typeTraitement>
+			<nomFichier>sql_RD_avant_HRHIS.sql</nomFichier>
+			<typeFichier>SQL</typeFichier>
+			<continueSiErreur>OUI</continueSiErreur>
+		</traitement>
+		<traitement>
+			<descriptionTraitement>Interface HrHis</descriptionTraitement>
+			<typeTraitement>InterfaceHRHIS</typeTraitement>
+			<fichierConfig>paramHRHIS.xml</fichierConfig>
+			<continueSiErreur>NON</continueSiErreur>
+		</traitement>
+		<traitement>
+			<descriptionTraitement>Script SQL standard apres lancement de l'interface HrHis</descriptionTraitement>
+			<typeTraitement>SCRIPT</typeTraitement>
+			<nomFichier>sql_RD_apres_HRHIS.sql</nomFichier>
+			<typeFichier>SQL</typeFichier>
+			<continueSiErreur>OUI</continueSiErreur>
+		</traitement>
+		<traitement>
+			<descriptionTraitement>Script SQL specifique apres lancement de l'interface HrHis</descriptionTraitement>
+			<typeTraitement>SCRIPT</typeTraitement>
+			<nomFichier>sql_CLI_apres_HRHIS.sql</nomFichier>
+			<typeFichier>SQL</typeFichier>
+		</traitement>
+	</traitements>
+</interface>

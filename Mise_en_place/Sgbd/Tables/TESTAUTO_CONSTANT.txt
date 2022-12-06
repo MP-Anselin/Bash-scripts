@@ -1,0 +1,19 @@
+##
+TAG_CHARSET=@€éèç
+##
+TESTAUTO_CONSTANT
+=SQL IFNOTEXIST=TESTAUTO_CONSTANT=
+CREATE TABLE TESTAUTO_CONSTANT ( NAME VARCHAR2(30), QUERY VARCHAR2(4000), DESCRIPTION VARCHAR2(200), PRIMARY KEY (NAME))
+##
+TESTAUTO_CONSTANT
+==
+DELETE FROM TESTAUTO_CONSTANT
+'#DOS_NUM',NULL,'Numéro de dossier affiché dans la fenêtre de fin de processus'
+'#FIRST_DAY_MONTH','select ''01.''||TO_CHAR(SYSDATE,''MM.YYYY'') from DUAL','Premier jour du mois au format DD.MM.YYYY'
+'#FIRST_DAY_YEAR','select ''01.01.''||TO_CHAR(SYSDATE,''YYYY'') from DUAL','Premier jour de l''année au format DD.MM.YYYY'
+'#IDRH',NULL,'Identifiant RH affiché dans le bandeau'
+'#LAST_DAY_MONTH','select TO_CHAR(LAST_DAY(SYSDATE),''DD.MM.YYYY'') from DUAL','Dernier jour du mois au format DD.MM.YYYY'
+'#LAST_DAY_YEAR','select ''31.12.''||TO_CHAR(SYSDATE,''YYYY'') from DUAL','Dernier jour de l''année au format DD.MM.YYYY'
+'#MONTH','select TO_CHAR(SYSDATE,''MM.YYYY'') from DUAL','Mois en cours au format MM.YYYY'
+'#TODAY','select TO_CHAR(SYSDATE,''DD.MM.YYYY'') from DUAL','Date du jour au format DD.MM.YYYY'
+'#VIDE',NULL,'Valeur vide'

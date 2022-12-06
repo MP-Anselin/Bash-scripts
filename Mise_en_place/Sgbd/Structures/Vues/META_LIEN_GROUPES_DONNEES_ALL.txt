@@ -1,0 +1,16 @@
+##
+META_LIEN_GROUPES_DONNEES_ALL
+=SQL=
+CREATE OR REPLACE FORCE VIEW "META_LIEN_GROUPES_DONNEES_ALL" ("COMPANY_ID", "ID_GROUPE", "NOM_DONNEE", "SUFFIXE_OU_LIBELLE", "ORDRE", "ID_GROUPE_DONNEES") 
+AS   
+WITH liensDonneesGroupes(company_id, id_groupe, nom_donnee, id_groupe_donnees, suffixe_ou_libelle) 
+AS (
+	SELECT gd.company_id, gd.id_groupe, CASE WHEN SUBSTR(gd.nom_donnee,1,1)='#' THEN gd.nom_donnee||'£'||gd.id_groupe ELSE gd.nom_donnee END AS nom_donnee, gd.id_groupe, gd.suffixe_ou_libelle 
+	FROM meta_groupe_donnees gd 
+	UNION ALL 
+	SELECT l.company_id, l.id_groupe, CASE WHEN SUBSTR(gd.nom_donnee,1,1)='#' THEN gd.nom_donnee||'£'||gd.id_groupe ELSE gd.nom_donnee END AS nom_donnee, gd.id_groupe, gd.suffixe_ou_libelle 
+	FROM meta_groupe_donnees gd, liensDonneesGroupes l 
+	WHERE gd.company_id=l.company_id AND gd.id_groupe   =l.suffixe_ou_libelle AND l.nom_donnee LIKE '#GROUPE%' 
+) 
+SELECT company_id, id_groupe, CASE WHEN INSTR(nom_donnee,'£')=0 THEN nom_donnee ELSE SUBSTR(nom_donnee,1,INSTR(nom_donnee,'£')-1) END as nom_donnee, suffixe_ou_libelle, META_ORDRE_DONNEE_IN_GROUPE(company_id, id_groupe, nom_donnee) as ordre, id_groupe_donnees 
+FROM liensDonneesGroupes

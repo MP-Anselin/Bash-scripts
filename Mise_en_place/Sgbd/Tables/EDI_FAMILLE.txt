@@ -1,0 +1,7 @@
+##
+TAG_CHARSET=@€ιθη
+##
+EDI_FAMILLE
+==
+DELETE FROM EDI_FAMILLE WHERE FAMEDI = 'IDD'
+'IDD','Comptabilisation de l''IDD','0','O'

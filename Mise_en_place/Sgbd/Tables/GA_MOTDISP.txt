@@ -1,0 +1,18 @@
+##
+TAG_CHARSET=@€éèç
+##
+GA_MOTDISP
+=SQL IFNOTEXIST=GA_MOTDISP=
+CREATE TABLE GA_MOTDISP (CODE VARCHAR2(2 BYTE) NOT NULL ENABLE,LIBELLE VARCHAR2(100 BYTE), PRIMARY KEY (CODE))
+##
+GA_MOTDISP (CODE,LIBELLE)
+==
+DELETE FROM GA_MOTDISP WHERE CODE IN ('1','2','3','4','5','6','7','8')
+'1','Salariés embauchés avant mise en place du régime'
+'2','Salariés en CDD ou en CNT de mission avec couverture C&O <  3mois'
+'3','Salarié bénéficiaire de la CMU_C ou de l''ACS'
+'4','Salarié déjà couvert par un contrat individuel à la mise en place des garanties'
+'5','Salarié bénéficiaire d''une couverture spécifique'
+'6','Apprentis ou CDD ou Intérimaires < 12 mois sans couverture individuelle'
+'7','Apprentis ou CDD ou Intérimaires >= 12 mois avec couverture individuelle'
+'8','Salariés temps partiels ou Apprentis avec cotisation >= 10% rémun. Brute'

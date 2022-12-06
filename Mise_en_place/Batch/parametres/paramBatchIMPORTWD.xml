@@ -1,0 +1,13 @@
+<interface idInterface="IMPORTWD">
+	<nomInterface>IMPORTWD</nomInterface>
+	<descriptionInterface>Mise des fichier WD (specif)</descriptionInterface>
+	<traitements>
+		<traitement>
+			<descriptionTraitement>IMPORTWD</descriptionTraitement>
+			<typeTraitement>TraitementClient</typeTraitement>
+			<classTraitement>fr.adp.com.gxp.clt.modules.lib.specif.importgap.InterfaceImport</classTraitement>
+			<modeDebug>true</modeDebug>
+			<continueSiErreur>OUI</continueSiErreur>
+		</traitement>
+	</traitements>
+</interface>

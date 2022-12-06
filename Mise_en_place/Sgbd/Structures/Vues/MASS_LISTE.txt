@@ -1,0 +1,23 @@
+##
+MASS_LISTE
+=SQL=
+create or replace view MASS_LISTE as 
+SELECT M.NUM_SAISIE,
+  L.nom_page as NOMPAGE,
+  M.LOGIN,
+  TO_CHAR(M.DTMODIF,'DD.MM.YYYY') as DTMODIF,
+  TO_CHAR(M.DTCREAT,'DD.MM.YYYY') as DTCREAT,
+  NVL(RTRIM((SELECT H.NOM||' '||H.PRENOM FROM SYS_USR_CONFIG_IHM H WHERE H.LOGIN =M.LOGINCREAT)),M.LOGINCREAT) as LOGINCREAT,
+  nvl(M.NBTOT,0) as NBTOT,
+  nvl(M.NBERR,0) as NBERR,
+  M.NUM_SAISIE_ORIGIN,
+  (select max(L.libelle_saisie) from mass_liste_saisies L where L.nompage like '%'||M.nompage||'%'  and L.num_saisie = M.num_saisie ) as libelle,
+ nvl((CASE
+  when (select count(*) from mass_saisies_ligne S where s.num_saisie=M.num_saisie )>0 then 
+    (select count(*) from mass_saisies_ligne S where s.num_saisie=M.num_saisie and valide is not null ) 
+  ELSE
+    0
+    END),0) as  NBVALIDE,
+    L.LIBELLE as libelle_page
+FROM MASS_LISTE_SAISIES M LEFT JOIN sys_sch_element L ON  L.nom_page like 'Ext%'||M.nompage and L.nom_page not like 'Ext%BacASable%'||M.nompage
+WHERE NOMPAGE is not null and DTCREAT is not null 

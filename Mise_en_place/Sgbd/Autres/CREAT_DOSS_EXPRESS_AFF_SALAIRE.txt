@@ -1,0 +1,34 @@
+##
+TAG_CHARSET=@€éèç
+##
+META_REGLEGESTION_DESC
+==
+DELETE FROM META_REGLEGESTION_DESC WHERE ID_REGLEGESTION IN ('RD_AFF_SAFBA','RD_AFF_SALNET') AND COMPANY_ID='*'
+##
+META_REGLEGESTION_DESC (COMPANY_ID,ID_REGLEGESTION,TYPE_REGLE,LIBELLE,ID_PROJET,NUM_VERSION_RD,EST_SUPPRIME,REGLES_ECR,DESCRIPTION,FLAG_SPECIF_TYPE_REGLE,PERSONNALISE,REGLES_ALGO,REGLE_SYNTHETIQUE)
+'*','RD_AFF_SAFBA','AFF','Au moins un des salaires (net ou brut) est obligatoire (dossier express)',NULL,'1109',NULL,'[{"TYPE":"SI","OPERANDE_1":"DONNEE£RD_SALNET","OPERATEUR":"EQ","OPERANDE_2":"@vide£","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0}]','Dans Création dossier express, au moins un des salaires (RD_SALNET ou SAFBA) est obligatoire','M',NULL,'/*¿ * RD_AFF_SAFBA :¿ * Dans Création dossier express, au moins un des salaires (RD_SALNET ou SAFBA) est obligatoire¿ */¿¿if (DIC_ADM_CONTRAT_HISTO.RD_SALNET == vide) {¿}¿','Dans Création dossier express, au moins un des salaires (RD_SALNET ou SAFBA) est obligatoire'
+'*','RD_AFF_SALNET','AFF','Au moins un des salaires (net ou brut) est obligatoire (dossier express)',NULL,'1109',NULL,'[{"TYPE":"SI","OPERANDE_1":"DONNEE£SAFBA","OPERATEUR":"EQ","OPERANDE_2":"@vide£","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0}]','Dans Création dossier express, au moins un des salaires (RD_SALNET ou SAFBA) est obligatoire','M',NULL,'/*¿ * RD_AFF_SALNET :¿ * Dans Création dossier express, au moins un des salaires (RD_SALNET ou SAFBA) est obligatoire¿ */¿¿if (DIC_ADM_CONTRAT_HISTO.SAFBA == vide) {¿}¿','Dans Création dossier express, au moins un des salaires (RD_SALNET ou SAFBA) est obligatoire '
+##
+REF_REGLEGESTION_DESC
+==
+DELETE FROM REF_REGLEGESTION_DESC WHERE ID_REGLEGESTION IN ('RD_AFF_SAFBA','RD_AFF_SALNET') AND COMPANY_ID='*'
+##
+REF_REGLEGESTION_DESC (COMPANY_ID,ID_REGLEGESTION,TYPE_REGLE,LIBELLE,ID_PROJET,NUM_VERSION_RD,EST_SUPPRIME,REGLES_ECR,DESCRIPTION,FLAG_SPECIF_TYPE_REGLE,PERSONNALISE,REGLES_ALGO,REGLE_SYNTHETIQUE)
+'*','RD_AFF_SAFBA','AFF','Au moins un des salaires (net ou brut) est obligatoire (dossier express)',NULL,'1109',NULL,'[{"TYPE":"SI","OPERANDE_1":"DONNEE£RD_SALNET","OPERATEUR":"EQ","OPERANDE_2":"@vide£","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0}]','Dans Création dossier express, au moins un des salaires (RD_SALNET ou SAFBA) est obligatoire','M',NULL,'/*¿ * RD_AFF_SAFBA :¿ * Dans Création dossier express, au moins un des salaires (RD_SALNET ou SAFBA) est obligatoire¿ */¿¿if (DIC_ADM_CONTRAT_HISTO.RD_SALNET == vide) {¿}¿','Dans Création dossier express, au moins un des salaires (RD_SALNET ou SAFBA) est obligatoire'
+'*','RD_AFF_SALNET','AFF','Au moins un des salaires (net ou brut) est obligatoire (dossier express)',NULL,'1109',NULL,'[{"TYPE":"SI","OPERANDE_1":"DONNEE£SAFBA","OPERATEUR":"EQ","OPERANDE_2":"@vide£","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"ALORS","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"SINON","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0},{"TYPE":"FINSI","OPERANDE_1":"","OPERATEUR":"","OPERANDE_2":"","RESULTAT":"","PAR_OUVR":0,"PAR_FERM":0}]','Dans Création dossier express, au moins un des salaires (RD_SALNET ou SAFBA) est obligatoire','M',NULL,'/*¿ * RD_AFF_SALNET :¿ * Dans Création dossier express, au moins un des salaires (RD_SALNET ou SAFBA) est obligatoire¿ */¿¿if (DIC_ADM_CONTRAT_HISTO.SAFBA == vide) {¿}¿','Dans Création dossier express, au moins un des salaires (RD_SALNET ou SAFBA) est obligatoire '
+##
+META_REGLEGESTION
+==
+DELETE FROM META_REGLEGESTION WHERE ID_REGLEGESTION IN ('RD_AFF_SAFBA','RD_AFF_SALNET') AND COMPANY_ID='*'
+##
+META_REGLEGESTION (COMPANY_ID,ID_REGLEGESTION,NUM_LIGNE,OPERANDE1,OPERATEUR,OPERANDE2,RESULTAT,BRANCHE_SI,BRANCHE_SINON)
+'*','RD_AFF_SAFBA','1',NULL,'DONNEE£RD_SALNETµ@vide£µEQ',NULL,NULL,'FIN','FIN'
+'*','RD_AFF_SALNET','1',NULL,'DONNEE£SAFBAµ@vide£µEQ',NULL,NULL,'FIN','FIN'
+##
+REF_REGLEGESTION
+==
+DELETE FROM REF_REGLEGESTION WHERE ID_REGLEGESTION IN ('RD_AFF_SAFBA','RD_AFF_SALNET') AND COMPANY_ID='*'
+##
+REF_REGLEGESTION (COMPANY_ID,ID_REGLEGESTION,NUM_LIGNE,OPERANDE1,OPERATEUR,OPERANDE2,RESULTAT,BRANCHE_SI,BRANCHE_SINON)
+'*','RD_AFF_SAFBA','1',NULL,'DONNEE£RD_SALNETµ@vide£µEQ',NULL,NULL,'FIN','FIN'
+'*','RD_AFF_SALNET','1',NULL,'DONNEE£SAFBAµ@vide£µEQ',NULL,NULL,'FIN','FIN'

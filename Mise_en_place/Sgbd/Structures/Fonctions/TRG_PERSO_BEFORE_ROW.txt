@@ -1,0 +1,82 @@
+##
+TAG_CHARSET=@€éèç
+##
+TRG_PERSO_BEFORE_ROW
+=SQL=
+CREATE OR REPLACE FUNCTION TRG_PERSO_BEFORE_ROW RETURN CLOB AS 
+BEGIN
+  RETURN '
+  IF INSERTING THEN
+    -- On vérifie que le NUMPAC soit renseigné : si ce n''est pas le cas, on positionne un NUMPAC temporaire
+    IF v_ligNew.CURRENT_NUMPAC IS NULL THEN
+      :NEW.CURRENT_NUMPAC:=''TMPPAC'';
+      v_ligNew.CURRENT_NUMPAC:=:NEW.CURRENT_NUMPAC;
+    END IF;
+    -- On vérifie que le PACMAT soit renseigné : si ce n''est pas le cas, on va cherche le prochain PACMAT du NUMPAC
+    IF v_ligNew.CURRENT_PACMAT IS NULL THEN
+      :NEW.CURRENT_PACMAT:=PAC_SEQUENCE_GET_NEXT(v_ligNew.CURRENT_NUMPAC);
+      v_ligNew.CURRENT_PACMAT:=:NEW.CURRENT_PACMAT;
+    END IF;
+    -- On regarde si le couple NUMPAC/PACMAT n''existe pas déjà dans SECUPACMAT pour un autre MATRIC
+    BEGIN
+      SELECT NVL(MATRIC,''NO_MATRIC'') INTO v_matricForPacmat FROM SECUPACMAT WHERE NUMPAC=v_ligNew.CURRENT_NUMPAC AND PACMAT=v_ligNew.CURRENT_PACMAT;
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN v_matricForPacmat:=NULL;
+      WHEN OTHERS THEN RAISE;
+    END;
+    IF v_matricForPacmat IS NOT NULL AND NOT v_matricForPacmat=v_ligNew.MATRIC THEN
+      -- Le couple NUMPAC/PACMAT existe pour un autre MATRIC
+      RAISE_APPLICATION_ERROR(-20000,''Erreur lors de l''''attribution du PACMAT pour le matricule ''||v_ligNew.MATRIC||'' sur le PAC ''||v_ligNew.CURRENT_NUMPAC||'' : le PACMAT ''||v_ligNew.CURRENT_PACMAT||'' est déjà associé au matricule ''||v_matricForPacmat);
+    END IF;
+    -- On insère dans SECUPACMAT
+    --INSERT INTO SECUPACMAT (NUMPAC, PACMAT, MATRIC, PRIORITE_SITUATION) VALUES (v_ligNew.CURRENT_NUMPAC, v_ligNew.CURRENT_PACMAT, v_ligNew.MATRIC, 0);
+    merge into SECUPACMAT a using (select v_ligNew.CURRENT_NUMPAC as numpac, v_ligNew.CURRENT_PACMAT as pacmat, v_ligNew.MATRIC as matric , 0 as PRIORITE_SITUATION from dual) b on (a.numpac=b.numpac and a.pacmat=b.pacmat )
+    when not matched then
+    insert (a.NUMPAC, a.PACMAT, a.MATRIC, a.PRIORITE_SITUATION) values (b.NUMPAC, b.PACMAT, b.MATRIC, b.PRIORITE_SITUATION);
+
+    -- On stocke la liste des MATRIC modifiés
+    IF v_type_writer<>''N'' AND v_type_writer<>''M'' AND (v_listMatricToUpdate IS NULL OR INSTR(v_listMatricToUpdate,v_ligNew.MATRIC)<=0) THEN
+      IF v_nbMatricToUpdate=1000 THEN
+        v_nbMatricToUpdate := 0;
+        v_listMatricToUpdate := v_listMatricToUpdate||'') OR MATRIC IN ('';
+      ELSIF v_nbMatricToUpdate>0 THEN
+        v_listMatricToUpdate := v_listMatricToUpdate||'','';
+      END IF;
+      v_listMatricToUpdate := v_listMatricToUpdate||''''''''||v_ligNew.MATRIC||'''''''';
+      v_nbMatricToUpdate := v_nbMatricToUpdate+1;
+    END IF;
+  ELSIF UPDATING THEN
+    -- On vérifie qu''on ne modifie pas le RHID
+    IF NOT v_ligOld.MATRIC=v_ligNew.MATRIC THEN
+      -- Message d''erreur --> On interdit la mise à jour du RHID : il faut faire un delete puis un insert
+      RAISE_APPLICATION_ERROR(-20000,''La mise à jour de la colonne MATRIC n''''est pas autorisée : vous devez supprimer puis recréer le dossier'');
+    END IF;
+    IF (NOT UPDATING(''DATE_EFF_PERSO'') AND NOT UPDATING(''CURRENT_NUMPAC'') AND NOT UPDATING(''CURRENT_PACMAT'') AND NOT UPDATING(''CURRENT_NUMCNT'') AND NOT UPDATING(''DATE_EFF_CONTRAT'')) THEN
+      -- On considère que c''est une "vraie" mise à jour si ce n''est pas de la mise à jour de DATE_EFF_PERSO, CURRENT_NUMPAC, CURRENT_PACMAT, CURRENT_NUMCNT ou DATE_EFF_CONTRAT
+      -- On stocke la liste des MATRIC modifiés
+      IF v_type_writer<>''N'' AND v_type_writer<>''M'' AND (v_listMatricToUpdate IS NULL OR INSTR(v_listMatricToUpdate,v_ligNew.MATRIC)<=0) THEN
+        IF v_nbMatricToUpdate=1000 THEN
+          v_nbMatricToUpdate := 0;
+          v_listMatricToUpdate := v_listMatricToUpdate||'') OR MATRIC IN ('';
+        ELSIF v_nbMatricToUpdate>0 THEN
+          v_listMatricToUpdate := v_listMatricToUpdate||'','';
+        END IF;
+        v_listMatricToUpdate := v_listMatricToUpdate||''''''''||v_ligNew.MATRIC||'''''''';
+        v_nbMatricToUpdate := v_nbMatricToUpdate+1;
+      END IF;
+    END IF;
+  ELSIF DELETING THEN
+    -- On stocke la liste des MATRIC supprimés
+    IF v_listMatricToDelete IS NULL OR INSTR(v_listMatricToDelete,v_ligOld.MATRIC)<=0 THEN
+      IF v_nbMatricToDelete=1000 THEN
+        v_nbMatricToDelete := 0;
+        v_listMatricToDelete := v_listMatricToDelete||'') OR MATRIC IN ('';
+      ELSIF v_nbMatricToDelete>0 THEN
+        v_listMatricToDelete := v_listMatricToDelete||'','';
+      END IF;
+      v_listMatricToDelete := v_listMatricToDelete||''''''''||v_ligOld.MATRIC||'''''''';
+      v_nbMatricToDelete := v_nbMatricToDelete+1;
+    END IF;
+  END IF;
+';
+END TRG_PERSO_BEFORE_ROW;

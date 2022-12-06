@@ -1,0 +1,6 @@
+##
+TAG_CHARSET=@€ιθη
+##
+T_SYS_USR_CID
+==
+create or replace TYPE T_SYS_USR_CID FORCE AS TABLE OF T_SYS_USR_CID_OBJ

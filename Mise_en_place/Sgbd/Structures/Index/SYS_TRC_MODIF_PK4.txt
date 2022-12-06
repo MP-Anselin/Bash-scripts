@@ -1,0 +1,55 @@
+##
+TAG_CHARSET=@€éèç
+##
+SYS_TRC_MODIF_PK4
+=SQL=
+DECLARE
+     existIndex NUMBER;
+     indexNameToDrop VARCHAR2(4000);
+     req VARCHAR2(4000);
+BEGIN
+    -- Chez certains clients, l'index a été supprimé pour pouvoir enregistrer des doublons, il faut le remettre
+    select count(*) into existIndex from all_constraints where constraint_name = 'SYS_TRC_MODIF_PK4';
+    
+    IF (existIndex = 0) THEN 
+        -- Si l'index "SYS_TRC_MODIF_PK4" n'existe pas, il faut : 
+        -- supprimer les doublons qui pourraient exister
+        -- recréer l'index pour les clés primaires SYS_TRC_MODIF_PK4
+        req := 'delete from SYS_TRC_MODIF';
+        req:= req || ' where ROWID in (';
+        req:= req ||   ' select ROWID';
+        req:= req ||   ' from (';
+        req:= req ||     ' select ROWID, LOGIN || DATEMAJ || KEYS_VALUES || ACTION, ROW_NUMBER ( ) OVER ( PARTITION BY LOGIN || DATEMAJ || KEYS_VALUES || ACTION ';
+        req:= req ||       ' ORDER BY LOGIN || DATEMAJ || KEYS_VALUES || ACTION ) num_ligne';
+        req:= req ||     ' from SYS_TRC_MODIF';
+        req:= req ||   ') t2';
+        req:= req ||   ' where num_ligne > 1';
+        req:= req || ')';
+        execute immediate req;
+        
+        -- Chez certains clients, un autre index non unique a été créé, on le supprime 
+        BEGIN
+            select index_name into indexNameToDrop from user_indexes i 
+            -- Recherche d'un index sur la table SYS_TRC_MODIF
+            where table_name='SYS_TRC_MODIF' 
+            -- Qui porte sur 4 colonnes
+            and (select count(*) from user_ind_columns ic where i.index_name=ic.index_name)=4 
+            -- LOGIN
+            and exists (select 1 from user_ind_columns ic where i.index_name=ic.index_name and column_name='LOGIN') 
+            -- DATEMAJ
+            and exists (select 1 from user_ind_columns ic where i.index_name=ic.index_name and column_name='DATEMAJ') 
+            -- KEYS_VALUES
+            and exists (select 1 from user_ind_columns ic where i.index_name=ic.index_name and column_name='KEYS_VALUES') 
+            -- ACTION
+            and exists (select 1 from user_ind_columns ic where i.index_name=ic.index_name and column_name='ACTION');
+        EXCEPTION 
+            WHEN OTHERS THEN indexNameToDrop:=NULL;
+        END;
+        IF indexNameToDrop IS NOT NULL THEN
+            execute immediate 'drop index '||indexNameToDrop;
+        END IF;
+        
+        -- Création de la pk
+        execute immediate 'alter table SYS_TRC_MODIF add constraint SYS_TRC_MODIF_PK4 primary key (LOGIN, DATEMAJ, KEYS_VALUES, ACTION)';
+    END IF;
+END;

@@ -1,0 +1,37 @@
+##
+TAG_CHARSET=@€éèç
+##
+R_CREATE_TRIGGER
+=SQL=
+CREATE OR REPLACE PROCEDURE R_CREATE_TRIGGER AS 
+  w_err VARCHAR2(2000);
+  --Curseur sur les tables codées dans MAPTA
+  CURSOR cur_table IS
+    SELECT DISTINCT TABLEPHY
+    FROM TGE_REF_MAPTA
+    WHERE ALLERRETOUR IN ('A','2','I')
+    ORDER BY TABLEPHY;
+  lig_table cur_table%ROWTYPE;
+
+BEGIN
+  TGE_IMPORT_AVANCEMENT_PROC('R_CREATE_TRIGGER','*** Début *** Fabrication de tous les triggers');
+  OPEN cur_table;
+  --Boucle sur les tables codées dans MAPTA
+  LOOP 
+    FETCH cur_table INTO lig_table;
+    EXIT WHEN cur_table%NOTFOUND ;
+    TGE_IMPORT_AVANCEMENT_PROC('R_CREATE_TRIGGER','TGE_CREATE_TRIGGER('||lig_table.tablephy||')');
+    BEGIN
+      --Génération du trigger d'une table
+      TGE_CREATE_TRIGGER(lig_table.tablephy);
+    EXCEPTION
+      WHEN OTHERS THEN
+        w_err := SQLCODE;
+        w_err := '*** ERREUR *** '||lig_table.tablephy||' : '||w_err|| SQLERRM;
+        TGE_IMPORT_AVANCEMENT_PROC('R_CREATE_TRIGGER', SUBSTR(w_err,1,2000));
+    END;
+  END LOOP;
+  CLOSE cur_table;
+  TGE_IMPORT_AVANCEMENT_PROC('R_CREATE_TRIGGER','*** Fin ***');
+  COMMIT;
+END R_CREATE_TRIGGER;

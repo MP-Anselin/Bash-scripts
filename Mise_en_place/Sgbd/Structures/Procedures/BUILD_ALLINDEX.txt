@@ -1,0 +1,29 @@
+##
+BUILD_ALLINDEX
+=SQL=
+create or replace PROCEDURE "BUILD_ALLINDEX"
+AS
+/**
+ * Procédure de mise à jour complète de la table STD_STRUC_INDEX
+ * ATTENTION, cette procédure peut se réveler très longue et doit être appelée rarement
+ * (Ex : modification structure de la table STD_STRUC_INDEX)
+ */
+  CURSOR tabCodts
+  IS
+    SELECT codts FROM std_struc_type;
+  vcodts NUMBER;
+ 
+BEGIN
+  -- On commence par vider complètement la table STD_STRUC_INDEX
+  EXECUTE_IMMEDIATE_STRING('TRUNCATE TABLE std_struc_index',0);
+  -- On boucle sur les différents codTs
+  OPEN tabCodts;
+  LOOP
+    FETCH tabCodts INTO vcodts;
+    EXIT
+  WHEN tabCodts%NOTFOUND ;
+    build_index(vcodts, null) ;
+  END LOOP;
+  CLOSE tabCodts;
+END BUILD_ALLINDEX;
+ 

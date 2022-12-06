@@ -1,0 +1,13 @@
+##
+TAG_CHARSET=@€éèç
+##
+CFE
+=SQL IFNOTEXIST=CFE=
+CREATE TABLE "CFE" (	"CODE" VARCHAR2(1) NOT NULL ENABLE, "LIBELLE" VARCHAR2(32) NOT NULL ENABLE, PRIMARY KEY(CODE))		 
+##
+CFE
+==
+DELETE FROM CFE WHERE CODE IN ('0', '1', '2')
+'0','Pas d''adhésion'
+'1','Assiette individuelle'
+'2','Pourcentage selon tranche'

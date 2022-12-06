@@ -1,0 +1,172 @@
+##
+TAG_CHARSET=@€éèç
+##
+BUILD_TABLE_INDEX
+=SQL=
+create or replace FUNCTION "BUILD_TABLE_INDEX"(p_cid IN std_struc_arbre.cid%TYPE, p_codts IN std_struc_arbre.codts%TYPE ,p_date_eff IN std_struc_arbre.date_eff%TYPE ,p_date_fin IN std_struc_arbre.date_fin%TYPE) RETURN INTEGER IS retour INTEGER; 
+req CLOB;
+
+BEGIN
+ 
+ req:=' insert into STD_STRUC_INDEX (CID, CODTS, LAST_ENTITE, DATE_EFF, DATE_FIN, NIV_TECH, IDX_CODE_ENTITE, NIV1, NIV2, NIV3, NIV4, NIV5, NIV6, NIV7, NIV8, NIV9, NIV10,';
+ req:=req||'NIV11, NIV12, NIV13, NIV14, NIV15, NIV16, NIV17, NIV18, NIV19, NIV20, NIV21, NIV22, NIV23, NIV24, NIV25, NIV26, NIV27, NIV28, NIV29, NIV30, NIV31, NIV32, NIV33,';
+ req:=req||'NIV34, NIV35, NIV36, NIV37, NIV38, NIV39, NIV40)';
+ req:=req||' select '''||p_cid||''', '||p_codts||',code_entite,'''||p_date_eff||''','''||p_date_fin||''',niv_tech,chaine_entite,';
+ req:=req||'NVL(';
+      -- Si un code entité est défini pour le niveau, on le prend
+ req:=req||' trim(SUBSTR(CHAINE_ENTITE, 1, 25))';
+      -- S'il n'y a pas de code entité défini, mais par contre qu'il y a des codes entités définis après ce niveau, alors on écrit @NON_AFFECTE@
+ req:=req||',NVL2( trim(SUBSTR(CHAINE_ENTITE, 26)) ,''@NON_AFFECTE@''';
+      -- Sinon on met null
+ req:=req||',''@VIDE@'' ) ),';
+ req:=req||'NVL( trim(SUBSTR(CHAINE_ENTITE, 26, 25)) ,NVL2( trim(SUBSTR(CHAINE_ENTITE, 51)) ,''@NON_AFFECTE@'' ,''@VIDE@'' ) ),';
+ req:=req||'NVL( trim(SUBSTR(CHAINE_ENTITE, 51, 25)) ,NVL2( trim(SUBSTR(CHAINE_ENTITE, 76)) ,''@NON_AFFECTE@'' ,''@VIDE@'' ) ),';
+ req:=req||'NVL( trim(SUBSTR(CHAINE_ENTITE, 76, 25)) ,NVL2( trim(SUBSTR(CHAINE_ENTITE, 101)) ,''@NON_AFFECTE@'' ,''@VIDE@'' ) ),';
+ req:=req||'NVL( trim(SUBSTR(CHAINE_ENTITE, 101, 25)) ,NVL2( trim(SUBSTR(CHAINE_ENTITE, 126)) ,''@NON_AFFECTE@'' ,''@VIDE@'' ) ),';
+ req:=req||'NVL( trim(SUBSTR(CHAINE_ENTITE, 126, 25)) ,NVL2( trim(SUBSTR(CHAINE_ENTITE, 151)) ,''@NON_AFFECTE@'' ,''@VIDE@'' ) ),';
+ req:=req||'NVL( trim(SUBSTR(CHAINE_ENTITE, 151, 25)) ,NVL2( trim(SUBSTR(CHAINE_ENTITE, 176)) ,''@NON_AFFECTE@'' ,''@VIDE@'' ) ),';
+ req:=req||'NVL( trim(SUBSTR(CHAINE_ENTITE, 176, 25)) ,NVL2( trim(SUBSTR(CHAINE_ENTITE, 201)) ,''@NON_AFFECTE@'' ,''@VIDE@'' ) ),';
+ req:=req||'NVL( trim(SUBSTR(CHAINE_ENTITE, 201, 25)) ,NVL2( trim(SUBSTR(CHAINE_ENTITE, 226)) ,''@NON_AFFECTE@'' ,''@VIDE@'' ) ),';
+ req:=req||'NVL( trim(SUBSTR(CHAINE_ENTITE, 226, 25)) ,NVL2( trim(SUBSTR(CHAINE_ENTITE, 251)) ,''@NON_AFFECTE@'' ,''@VIDE@'' ) ),';
+ req:=req||'NVL( trim(SUBSTR(CHAINE_ENTITE, 251, 25)) ,NVL2( trim(SUBSTR(CHAINE_ENTITE, 276)) ,''@NON_AFFECTE@'' ,''@VIDE@'' ) ),';
+ req:=req||'NVL( trim(SUBSTR(CHAINE_ENTITE, 276, 25)) ,NVL2( trim(SUBSTR(CHAINE_ENTITE, 301)) ,''@NON_AFFECTE@'' ,''@VIDE@'' ) ),';
+ req:=req||'NVL( trim(SUBSTR(CHAINE_ENTITE, 301, 25)) ,NVL2( trim(SUBSTR(CHAINE_ENTITE, 326)) ,''@NON_AFFECTE@'' ,''@VIDE@'' ) ),';
+ req:=req||'NVL( trim(SUBSTR(CHAINE_ENTITE, 326, 25)) ,NVL2( trim(SUBSTR(CHAINE_ENTITE, 351)) ,''@NON_AFFECTE@'' ,''@VIDE@'' ) ),';
+ req:=req||'NVL( trim(SUBSTR(CHAINE_ENTITE, 351, 25)) ,NVL2( trim(SUBSTR(CHAINE_ENTITE, 376)) ,''@NON_AFFECTE@'' ,''@VIDE@'' ) ),';
+ req:=req||'NVL( trim(SUBSTR(CHAINE_ENTITE, 376, 25)) ,NVL2( trim(SUBSTR(CHAINE_ENTITE, 401)) ,''@NON_AFFECTE@'' ,''@VIDE@'' ) ),';
+ req:=req||'NVL( trim(SUBSTR(CHAINE_ENTITE, 401, 25)) ,NVL2( trim(SUBSTR(CHAINE_ENTITE, 426)) ,''@NON_AFFECTE@'' ,''@VIDE@'' ) ),';
+ req:=req||'NVL( trim(SUBSTR(CHAINE_ENTITE, 426, 25)) ,NVL2( trim(SUBSTR(CHAINE_ENTITE, 451)) ,''@NON_AFFECTE@'' ,''@VIDE@'' ) ),';
+ req:=req||'NVL( trim(SUBSTR(CHAINE_ENTITE, 451, 25)) ,NVL2( trim(SUBSTR(CHAINE_ENTITE, 476)) ,''@NON_AFFECTE@'' ,''@VIDE@'' ) ),';
+ req:=req||'NVL( trim(SUBSTR(CHAINE_ENTITE, 476, 25)) ,NVL2( trim(SUBSTR(CHAINE_ENTITE, 501)) ,''@NON_AFFECTE@'' ,''@VIDE@'' ) ),';
+ req:=req||'NVL( trim(SUBSTR(CHAINE_ENTITE, 501, 25)) ,NVL2( trim(SUBSTR(CHAINE_ENTITE, 526)) ,''@NON_AFFECTE@'' ,''@VIDE@'' ) ),';
+ req:=req||'NVL( trim(SUBSTR(CHAINE_ENTITE, 526, 25)) ,NVL2( trim(SUBSTR(CHAINE_ENTITE, 551)) ,''@NON_AFFECTE@'' ,''@VIDE@'' ) ),';
+ req:=req||'NVL( trim(SUBSTR(CHAINE_ENTITE, 551, 25)) ,NVL2( trim(SUBSTR(CHAINE_ENTITE, 576)) ,''@NON_AFFECTE@'' ,''@VIDE@'' ) ),';
+ req:=req||'NVL( trim(SUBSTR(CHAINE_ENTITE, 576, 25)) ,NVL2( trim(SUBSTR(CHAINE_ENTITE, 601)) ,''@NON_AFFECTE@'' ,''@VIDE@'' ) ),';
+ req:=req||'NVL( trim(SUBSTR(CHAINE_ENTITE, 601, 25)) ,NVL2( trim(SUBSTR(CHAINE_ENTITE, 626)) ,''@NON_AFFECTE@'' ,''@VIDE@'' ) ),';
+ req:=req||'NVL( trim(SUBSTR(CHAINE_ENTITE, 626, 25)) ,NVL2( trim(SUBSTR(CHAINE_ENTITE, 651)) ,''@NON_AFFECTE@'' ,''@VIDE@'' ) ),';
+ req:=req||'NVL( trim(SUBSTR(CHAINE_ENTITE, 651, 25)) ,NVL2( trim(SUBSTR(CHAINE_ENTITE, 676)) ,''@NON_AFFECTE@'' ,''@VIDE@'' ) ),';
+ req:=req||'NVL( trim(SUBSTR(CHAINE_ENTITE, 676, 25)) ,NVL2( trim(SUBSTR(CHAINE_ENTITE, 701)) ,''@NON_AFFECTE@'' ,''@VIDE@'' ) ),';
+ req:=req||'NVL( trim(SUBSTR(CHAINE_ENTITE, 701, 25)) ,NVL2( trim(SUBSTR(CHAINE_ENTITE, 726)) ,''@NON_AFFECTE@'' ,''@VIDE@'' ) ),';
+ req:=req||'NVL( trim(SUBSTR(CHAINE_ENTITE, 726, 25)) ,NVL2( trim(SUBSTR(CHAINE_ENTITE, 751)) ,''@NON_AFFECTE@'' ,''@VIDE@'' ) ),';
+ req:=req||'NVL( trim(SUBSTR(CHAINE_ENTITE, 751, 25)) ,NVL2( trim(SUBSTR(CHAINE_ENTITE, 776)) ,''@NON_AFFECTE@'' ,''@VIDE@'' ) ),';
+ req:=req||'NVL( trim(SUBSTR(CHAINE_ENTITE, 776, 25)) ,NVL2( trim(SUBSTR(CHAINE_ENTITE, 801)) ,''@NON_AFFECTE@'' ,''@VIDE@'' ) ),';
+ req:=req||'NVL( trim(SUBSTR(CHAINE_ENTITE, 801, 25)) ,NVL2( trim(SUBSTR(CHAINE_ENTITE, 826)) ,''@NON_AFFECTE@'' ,''@VIDE@'' ) ),';
+ req:=req||'NVL( trim(SUBSTR(CHAINE_ENTITE, 826, 25)) ,NVL2( trim(SUBSTR(CHAINE_ENTITE, 851)) ,''@NON_AFFECTE@'' ,''@VIDE@'' ) ),';
+ req:=req||'NVL( trim(SUBSTR(CHAINE_ENTITE, 851, 25)) ,NVL2( trim(SUBSTR(CHAINE_ENTITE, 876)) ,''@NON_AFFECTE@'' ,''@VIDE@'' ) ),';
+ req:=req||'NVL( trim(SUBSTR(CHAINE_ENTITE, 876, 25)) ,NVL2( trim(SUBSTR(CHAINE_ENTITE, 901)) ,''@NON_AFFECTE@'' ,''@VIDE@'' ) ),';
+ req:=req||'NVL( trim(SUBSTR(CHAINE_ENTITE, 901, 25)) ,NVL2( trim(SUBSTR(CHAINE_ENTITE, 926)) ,''@NON_AFFECTE@'' ,''@VIDE@'' ) ),';
+ req:=req||'NVL( trim(SUBSTR(CHAINE_ENTITE, 926, 25)) ,NVL2( trim(SUBSTR(CHAINE_ENTITE, 951)) ,''@NON_AFFECTE@'' ,''@VIDE@'' ) ),';
+ req:=req||'NVL( trim(SUBSTR(CHAINE_ENTITE, 951, 25)) ,NVL2( trim(SUBSTR(CHAINE_ENTITE, 976)) ,''@NON_AFFECTE@'' ,''@VIDE@'' ) ),';
+      -- Dernier niveau pas besoin de regarder s'il y a des codes entités après
+ req:=req||'NVL(trim(SUBSTR(CHAINE_ENTITE, 976, 25)),''@VIDE@'')';
+ req:=req||' from ( ';
+ req:=req||' with ARBRE(CODE_ENTITE, CID, TYPE_ENTITE, NIVEAU, NB_OCC_MEME_TYPE, CODE_ENT_MERE, TYPE_ENTITE_MERE, NIVEAU_ENTITE_MERE, NB_OCC_ENTITE_MERE, NB_OCC_MEME_TYPE_MERE, CHAINE_ENTITE, NIV_TECH, CODTS) as (';
+ req:=req||'  select';
+ req:=req||'   A.CODE_ENTITE';
+ req:=req||'   , A.CID';
+ req:=req||'   , E.TYPE_ENTITE';
+ req:=req||'   , N.NIVEAU';
+ req:=req||'   , 1 as NB_OCC_MEME_TYPE';
+ req:=req||'   , A.CODE_ENT_MERE';
+ req:=req||'   , (';
+ req:=req||'     select TYPE_ENTITE';
+ req:=req||'     from STD_STRUC_ENTITE E1';
+ req:=req||'     where E1.CODE_ENTITE = A.CODE_ENT_MERE';
+ req:=req||'     and A.DATE_EFF between E1.DATE_EFF and E1.DATE_FIN';
+ req:=req||'     and E1.CID = '''||p_cid||'''';
+ req:=req||'   ) as TYPE_ENTITE_MERE';
+ req:=req||'   , 0 as NIVEAU_ENTITE_MERE';
+ req:=req||'   , 0 as NB_OCC_ENTITE_MERE';
+ req:=req||'   , 0 as NB_OCC_MEME_TYPE_MERE'; -- Calcule le nombre d'entité de même type qui se suivent (pour les occurrences multiples)
+ req:=req||'   , RPAD('' '',(25*(n.niveau-1)))||RPAD(a.code_entite,25)';
+ req:=req||'   , N.NIVEAU as NIV_TECH';
+ req:=req||'   , a.codts';
+ req:=req||'  from';
+ req:=req||'   STD_STRUC_ARBRE A';
+ req:=req||'   , STD_STRUC_ENTITE E';
+ req:=req||'   , STD_STRUC_NIV N';
+ req:=req||'  where';
+ req:=req||'   A.CID = '''||p_cid||'''';
+ req:=req||'   and E.CID = '''||p_cid||'''';
+ req:=req||'   and A.CODTS = '||p_codts;
+ req:=req||'   and A.CODE_ENT_MERE is null';
+ req:=req||'   and '''||p_date_eff||''' between A.DATE_EFF and A.DATE_FIN';
+ req:=req||'   and '''||p_date_eff||''' between E.DATE_EFF and E.DATE_FIN';
+ req:=req||'   and '''||p_date_eff||''' between N.DATE_EFF and N.DATE_FIN';
+ req:=req||'   and A.CODE_ENTITE = E.CODE_ENTITE';
+ req:=req||'   and E.TYPE_ENTITE = N.TYPE_ENTITE';
+ req:=req||'   and A.CODTS = N.CODTS';
+ req:=req||'   and A.STATUT = ''1''';
+ req:=req||' union all';
+ req:=req||'  select';
+ req:=req||'   A.CODE_ENTITE';
+ req:=req||'   , A.CID';
+ req:=req||'   , E.TYPE_ENTITE';
+ req:=req||'   , N.NIVEAU';
+ req:=req||'   , case';
+ req:=req||'      when E.TYPE_ENTITE = RECUR.TYPE_ENTITE';
+ req:=req||'       then RECUR.NB_OCC_MEME_TYPE + 1';
+ req:=req||'      else 1';
+ req:=req||'   end as NB_OCC_MEME_TYPE';
+ req:=req||'   , A.CODE_ENT_MERE';
+ req:=req||'   , (';
+ req:=req||'     select TYPE_ENTITE';
+ req:=req||'     from STD_STRUC_ENTITE E1';
+ req:=req||'     where';
+ req:=req||'      E1.CODE_ENTITE = A.CODE_ENT_MERE';
+ req:=req||'      and A.DATE_EFF between E1.DATE_EFF and E1.DATE_FIN';
+ req:=req||'     and E1.CID = '''||p_cid||'''';
+ req:=req||'   ) as TYPE_ENTITE_MERE';
+ req:=req||'   , RECUR.NIVEAU as NIVEAU_ENTITE_MERE';
+ req:=req||'   , NIM.NB_OCCURRENCES as NB_OCC_ENTITE_MERE';
+ req:=req||'   , RECUR.NB_OCC_MEME_TYPE as NB_OCC_MEME_TYPE_MERE';
+ req:=req||'   , case';
+ -- L'entité mère n'a pas d'occurrences multiples : l'écart entre les entités mère et fille correspond à la différence entre le niveau de l'entité mère et celui de la fille
+ req:=req||'      when NIM.NB_OCCURRENCES = 1';
+ req:=req||'       then CHAINE_ENTITE||RPAD('' '',(25*((N.NIVEAU - RECUR.NIVEAU)-1)))||RPAD(A.CODE_ENTITE,25)';
+ -- L'entité mère a des occurrences multiples et l'entité mère et fille sont de même type : il n'y a pas d'écart entre les codes entité
+ req:=req||'      when NIM.NB_OCCURRENCES > 1 and E.TYPE_ENTITE = RECUR.TYPE_ENTITE';
+ req:=req||'       then CHAINE_ENTITE||RPAD(A.CODE_ENTITE, 25)';
+ -- Les autres cas : on calcule l'écart entre l'entité mère et sa fille à partir du nombre d'occurrences de l'entité mère, du nombre d'occurrences de même type de l'entité mère,
+ -- du niveau de l'entité fille, du niveau de l'entité mère et du nombre d'occurrences de l'entité mère
+ req:=req||'      else CHAINE_ENTITE||RPAD('' '',(25*(NIM.NB_OCCURRENCES - RECUR.NB_OCC_MEME_TYPE + (N.NIVEAU - RECUR.NIVEAU - NIM.NB_OCCURRENCES))))||RPAD(A.CODE_ENTITE, 25)';
+ req:=req||'   end';
+ req:=req||'   ,case';
+ req:=req||'     when E.TYPE_ENTITE = RECUR.TYPE_ENTITE';
+ req:=req||'      then RECUR.NB_OCC_MEME_TYPE + N.NIVEAU';
+ req:=req||'     else N.NIVEAU';
+ req:=req||'   end as NIV_TECH';
+ req:=req||'   , A.CODTS';
+ req:=req||'  from';
+ req:=req||'   STD_STRUC_ARBRE A';
+ req:=req||'   , STD_STRUC_ENTITE E';
+ req:=req||'   , STD_STRUC_NIV N';
+ req:=req||'   , STD_STRUC_ENTITE EM';
+ req:=req||'   , STD_STRUC_NIV_INFO NIM';
+ req:=req||'   ,ARBRE RECUR';
+ req:=req||'  where';
+ req:=req||'   A.CODTS = RECUR.CODTS';
+ req:=req||'   and A.CODE_ENT_MERE = RECUR.CODE_ENTITE';
+ req:=req||'   and A.CID = RECUR.CID';
+ req:=req||'   and E.CID = RECUR.CID';
+ req:=req||'   and '''||p_date_eff||''' between A.DATE_EFF and A.DATE_FIN ';
+ req:=req||'   and '''||p_date_eff||''' between E.DATE_EFF and E.DATE_FIN';
+ req:=req||'   and '''||p_date_eff||''' between N.DATE_EFF and N.DATE_FIN';
+ req:=req||'   and '''||p_date_eff||''' between EM.DATE_EFF and EM.DATE_FIN';
+ req:=req||'   and A.CODE_ENTITE = E.CODE_ENTITE';
+ req:=req||'   and E.TYPE_ENTITE = N.TYPE_ENTITE';
+ req:=req||'   and A.CODTS = N.CODTS';
+ req:=req||'   and EM.CODE_ENTITE = A.CODE_ENT_MERE';
+ req:=req||'   and EM.CID = '''||p_cid||'''';
+ req:=req||'   and A.CODTS = NIM.CODTS';
+ req:=req||'   and EM.TYPE_ENTITE = NIM.TYPE_ENTITE';
+ req:=req||' )';
+ req:=req||' select * from arbre )';
+ req:=req||' ';
+ 
+ EXECUTE_IMMEDIATE_STRING(req,0) ;
+ 
+ retour := retour +SQL%ROWCOUNT;
+ return retour ;
+ END BUILD_TABLE_INDEX;
+ 

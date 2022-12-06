@@ -1,0 +1,49 @@
+##
+EXTR_HRO_CORR
+=SQL=
+CREATE OR REPLACE
+PROCEDURE "EXTR_HRO_CORR"
+AS
+  CURSOR cur
+  IS
+    SELECT * FROM extr_hro_correspondance ORDER BY codts, code_entite,date_eff;
+  ligne extr_hro_correspondance%rowtype ;
+  exit_function EXCEPTION;
+  colonne       VARCHAR2(25);
+  code_ent      VARCHAR2(25);
+  req           VARCHAR2(4000);
+  niveau_entite std_struc_niv.niveau%type;
+BEGIN
+  EXECUTE_IMMEDIATE_STRING ('truncate table extr_hro_correspondance',0);
+  EXECUTE_IMMEDIATE_STRING ('insert into extr_hro_correspondance  (codts,code_entite, date_eff) select distinct codts, code_entite, date_eff from std_struc_arbre_ratt_indirect',0) ;
+  OPEN cur;
+  LOOP
+    BEGIN
+      FETCH cur INTO ligne;
+      EXIT
+    WHEN cur % NOTFOUND;
+      EXECUTE_IMMEDIATE_STRING ('update extr_hro_correspondance set date_fin=(select max(date_fin) from std_struc_arbre_ratt_indirect where codts = '||ligne.codts||'  and code_entite= '''||ligne.code_entite||'''                and date_eff='''||ligne.date_eff||''') where codts = '||ligne.codts||'  and code_entite= '''||ligne.code_entite||''' and date_eff='''||ligne.date_eff||'''',0);
+      SELECT DISTINCT niveau
+      INTO niveau_entite
+      FROM std_struc_niv niv,
+        std_struc_entite e
+      WHERE niv.codts     = ligne.codts
+      AND niv.type_entite = e.type_entite
+      AND e.code_entite   = ligne.code_entite
+      AND ligne.date_eff BETWEEN e.date_eff AND NVL(e.date_fin,'20991231')
+      AND ligne.date_eff BETWEEN niv.date_eff AND NVL(niv.date_fin,'20991231') ;
+      code_ent := 'CODNIV'||niveau_entite;
+      EXECUTE_IMMEDIATE_STRING ( 'update extr_hro_correspondance set '||code_ent||'='''|| ligne.code_entite||''' where codts = '||ligne.codts||'  and code_entite= '''||ligne.code_entite||'''                and date_eff='''||ligne.date_eff||'''                and date_fin='''|| ligne.date_fin||'''' ,0);
+      FOR i IN 1..niveau_entite-1
+      LOOP
+        colonne := 'CODNIV'||i;
+        req     := 'update extr_hro_correspondance corr  set '||colonne||' =  (select s.code_ent_mere from ( select code_ent_mere, niveau from std_struc_arbre_ratt_indirect ratt,std_struc_niv niv  where ratt.codts = niv.codts and  ratt.type_ent_mere = niv.type_entite and  ratt.codts ='||ligne.codts||'        and ratt.code_entite= '''||ligne.code_entite||'''        and ratt.date_eff='''||ligne.date_eff||'''               and ratt.date_eff between niv.date_eff and nvl (niv.date_fin,''20991231'') )s         where s.niveau = ' || i ||' )        where corr.codts = '||ligne.codts||'        and corr.code_entite= '''||ligne.code_entite||'''        and corr.date_eff='''||ligne.date_eff||'''        and corr.date_fin='''|| ligne.date_fin||'''';
+       EXECUTE_IMMEDIATE_STRING ('update extr_hro_correspondance corr  set '||colonne||' =  (select s.code_ent_mere from ( select code_ent_mere, niveau from std_struc_arbre_ratt_indirect ratt,std_struc_niv niv  where ratt.codts = niv.codts and  ratt.type_ent_mere = niv.type_entite and  ratt.codts ='||ligne.codts||'        and ratt.code_entite= '''||ligne.code_entite||'''        and ratt.date_eff='''||ligne.date_eff||'''              and ratt.date_eff between niv.date_eff and nvl (niv.date_fin,''20991231'') )s         where s.niveau = ' || i ||' )        where corr.codts = '||ligne.codts||'        and corr.code_entite= '''||ligne.code_entite||'''        and corr.date_eff='''||ligne.date_eff||'''        and corr.date_fin='''|| ligne.date_fin||'''',0);
+      END LOOP;
+    EXCEPTION
+    WHEN OTHERS THEN
+      RAISE exit_function;
+    END;
+  END LOOP;
+  CLOSE cur;
+END;

@@ -1,0 +1,19 @@
+##
+DELETE_TRG_TABLE_IN_MAPTA
+=SQL=
+create or replace PROCEDURE DELETE_TRG_TABLE_IN_MAPTA
+AS
+ req                        CLOB;
+ table_exist                INTEGER;
+BEGIN
+  FOR i IN (SELECT trigger_name, table_name FROM user_triggers 
+            WHERE table_name NOT IN (SELECT tablephy FROM tge_ref_mapta WHERE allerretour IN('A', '2','I')) 
+            AND table_name LIKE 'DIC_%'
+            AND trigger_name = 'TRG_' || table_name)
+  LOOP
+    req := 'DROP TRIGGER ' || i.trigger_name;
+    EXECUTE_IMMEDIATE_STRING( req,0);
+  END LOOP;
+  EXCEPTION WHEN OTHERS THEN
+    raise_application_error(-20000, 'Problème(s) durant la suppression des triggers: ' || SQLCODE || '-' || sqlerrm); 
+END DELETE_TRG_TABLE_IN_MAPTA;

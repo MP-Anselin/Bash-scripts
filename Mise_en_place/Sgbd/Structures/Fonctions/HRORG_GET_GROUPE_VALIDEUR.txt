@@ -1,0 +1,131 @@
+##
+TAG_CHARSET=@€éèç
+##
+HRORG_GET_GROUPE_VALIDEUR
+=SQL=
+CREATE OR REPLACE
+  FUNCTION HRORG_GET_GROUPE_VALIDEUR(
+      p_codts  IN STD_STRUC_ARBRE.codts%TYPE,
+      p_opnum  IN WKF_OPERATIONS.op_num%TYPE,
+      p_date   IN STD_STRUC_ENTITE.date_eff%TYPE,
+      p_entite IN STD_STRUC_ENTITE.code_entite%TYPE, 
+      p_cid     IN STD_STRUC_ARBRE.cid%TYPE default null
+      )
+    RETURN SYS_GROUPE_VALIDEURS.GROUPE_VALIDEURS%TYPE
+  IS
+  TYPE tcur
+IS
+  REF
+  CURSOR;
+    curentite1 tcur;
+    ventite     VARCHAR2 (100);
+    vgroupe_val VARCHAR2 (100);
+    vlogin      VARCHAR2 (100);
+    vniv        NUMBER;
+    vnbhab      NUMBER;
+    vcodts      NUMBER;
+    vdate       NUMBER;
+    vnbfctrole  NUMBER;
+    v_cid        STD_STRUC_ARBRE.cid%TYPE;
+  BEGIN
+    IF (p_opnum IS NULL) THEN
+      RETURN NULL;
+    END IF;
+    IF (p_entite IS NULL) THEN
+      RETURN NULL;
+    END IF;
+    vdate     := p_date;
+    IF (vdate IS NULL) THEN
+      SELECT TO_CHAR(SYSDATE,'yyyymmdd') INTO vdate FROM DUAL;
+  	END IF;
+  	
+  	v_cid := p_cid;
+  	IF (v_cid IS NULL) THEN
+  		BEGIN
+  			SELECT VALVAR INTO v_cid FROM SYS_VARSYS where CODVAR = 'NS_CLIENT_ID';
+  		EXCEPTION
+  		WHEN NO_DATA_FOUND THEN
+  			v_cid := null;
+  		END;
+  	END IF;
+  	IF (v_cid IS NULL) THEN
+  		-- En mode multiclient, la varsys peut être null et le passage du paramètre p_cid est obligatoire
+  		RETURN NULL;
+  	END IF;
+  	
+  vcodts     := p_codts;
+  IF (vcodts IS NULL) THEN
+    SELECT CODTS INTO vcodts FROM STD_STRUC_TYPE WHERE CRITERE_VALIDEURS='1';
+  END IF;
+  IF (vcodts IS NULL) THEN
+    RETURN NULL;
+  END IF;
+  SELECT COUNT(*)
+  INTO vnbfctrole
+  FROM WKF_OP_ROLE
+  WHERE OP_NUM    =p_opnum
+  AND NOT FCT_ROLE='*';
+  OPEN curentite1 FOR
+WITH entitepere (code_entite, code_ent_mere, groupe_valideurs, login, niveau) AS
+  (SELECT std_struc_arbre.code_entite,
+    std_struc_arbre.code_ent_mere,
+    std_struc_arbre.groupe_valideurs,
+    sys_groupe_valideurs.login,
+    0 niveau
+  FROM std_struc_arbre
+  LEFT OUTER JOIN sys_groupe_valideurs
+  ON std_struc_arbre.groupe_valideurs=sys_groupe_valideurs.groupe_valideurs
+  WHERE
+  std_struc_arbre.cid = v_cid
+  AND std_struc_arbre.code_entite  =p_entite
+  AND vdate BETWEEN std_struc_arbre.date_eff AND std_struc_arbre.date_fin
+  AND std_struc_arbre.codts=vcodts
+  UNION ALL
+  SELECT std_struc_arbre.code_entite,
+    std_struc_arbre.code_ent_mere,
+    std_struc_arbre.groupe_valideurs,
+    sys_groupe_valideurs.login,
+    niveau-1
+  FROM std_struc_arbre
+  LEFT OUTER JOIN sys_groupe_valideurs
+  ON std_struc_arbre.groupe_valideurs=sys_groupe_valideurs.groupe_valideurs,
+    entitepere
+  WHERE 
+  std_struc_arbre.cid = v_cid
+  AND std_struc_arbre.code_entite=entitepere.code_ent_mere
+  AND vdate BETWEEN std_struc_arbre.date_eff AND std_struc_arbre.date_fin
+  AND std_struc_arbre.codts=vcodts
+  )
+SELECT DISTINCT code_entite,
+  groupe_valideurs,
+  login,
+  niveau
+FROM entitepere
+WHERE groupe_valideurs IS NOT NULL
+AND login              IS NOT NULL
+AND login              IN
+  (SELECT login FROM sys_usr_config
+  )
+ORDER BY niveau DESC,
+  login;
+LOOP
+  FETCH curentite1 INTO ventite, vgroupe_val, vlogin, vniv;
+  EXIT
+WHEN curentite1%NOTFOUND;
+  IF (vnbfctrole=0) THEN
+    RETURN vgroupe_val;
+  END IF;
+  SELECT COUNT(*)
+  INTO vnbhab
+  FROM SYS_USR_PROFIL UP,
+    WKF_OP_ROLE WOR
+  WHERE TO_CHAR(UP.CODE_PROFIL)=WOR.fct_role
+  AND UP.LOGIN                 =vlogin
+  AND wor.op_num               =p_opnum;
+  IF (vnbhab                   >0) THEN
+    RETURN vgroupe_val;
+  END IF;
+END LOOP;
+CLOSE curentite1;
+RETURN NULL;
+END hrorg_get_groupe_valideur;

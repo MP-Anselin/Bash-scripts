@@ -1,0 +1,93 @@
+##
+TGE_DROP_PHOTO_A310
+=SQL=
+create or replace PROCEDURE TGE_DROP_PHOTO_A310 
+(
+  P_ID IN NUMBER 
+, P_NUMPAC IN VARCHAR2 
+, P_PERIODEPAIE IN VARCHAR2 
+) AS 
+/********************************************************************************
+ Version     : V5.05.000
+ Historique  : - RSI DIT  50818 : Impacts évolution MDD table DACS
+*********************************************************************************/
+CURSOR cur_mapta
+  IS
+    SELECT a.*
+    FROM tge_ref_mapta a,
+      (SELECT * FROM user_tables
+      ) b
+  WHERE a.numpac     =p_numpac
+  AND b.table_name   =a.tablephy
+  AND a.allerretour IN ('A','2')
+  UNION ALL
+  SELECT a.*
+  FROM tge_ref_mapta a,
+    (SELECT * FROM user_tables
+    ) b
+  WHERE a.numpac        ='*'
+  AND b.table_name      =a.tablephy
+  AND a.allerretour    IN ('A','2')
+  AND (tableparam) NOT IN
+    (SELECT tableparam
+    FROM tge_ref_mapta a,
+      (SELECT * FROM user_tables
+      ) b
+    WHERE a.numpac  =p_numpac
+    AND b.table_name=a.tablephy
+    ) ;
+    
+ CURSOR cur_element 
+ IS
+  select * from (
+  SELECT distinct c.element,c.tablegxp,c.DONNEEGXP
+    FROM 
+      (SELECT * FROM user_tables
+      ) b,tge_ref_mapdo c
+  WHERE C.numpac     =p_numpac
+  AND b.table_name   =c.TABLEGXP 
+  AND c.element in ('A310','X500')
+  UNION ALL
+  SELECT distinct c.element,c.tablegxp,c.DONNEEGXP
+  FROM 
+    (SELECT * FROM user_tables
+    ) b,tge_ref_mapdo c
+  WHERE C.numpac        ='*'
+  AND b.table_name      =c.TABLEGXP
+  AND c.element in ('A310','X500')
+
+  AND (TABLEGXP,ELEMENT) NOT IN
+    (SELECT a.TABLEGXP,a.element
+    FROM tge_ref_mapdo a,
+      (SELECT * FROM user_tables
+      ) b
+    WHERE a.numpac  =p_numpac
+    AND b.table_name=a.TABLEGXP
+    AND a.ELEMENT IN ('A310','X500')
+    ) )  pivot ( max(DONNEEGXP) AS DONNEE FOR (element) IN('A310'as A310 ,'X500' as X500));
+    
+  lig_mapta cur_mapta%rowtype;
+  clWhere CLOB;
+BEGIN
+
+For C in cur_element LOOP 
+   
+   clWhere := '(select distinct numpac,pacmat from dic_adm_contrat_situ where numpac = '''||p_numpac||''' AND paiezad IN (select distinct paiezad from '||c.tablegxp||' WHERE ';
+   clWhere := clWhere ||c.X500_DONNEE||' = ''A'' AND '||c.A310_DONNEE||'<=last_day(ADD_MONTHS(to_date('''||P_PERIODEPAIE||''',''YYYYMM''),1)) AND numpac = '''||p_numpac||'''))';
+ 
+OPEN cur_mapta;
+  LOOP
+    FETCH cur_mapta
+    INTO lig_mapta ;
+    EXIT
+  WHEN cur_mapta%NOTFOUND ;  
+  
+ EXECUTE_IMMEDIATE_STRING( 'delete FROM PHOTO_'||lig_mapta.tablephy||'  where  (numpac,pacmat) in '||clWhere,0);    
+  END LOOP;
+  CLOSE cur_mapta;
+END LOOP; 
+EXCEPTION
+WHEN OTHERS THEN
+  FSED.FSED_ERREUR(p_id,'TGE_DROP_PHOTO_A310',P_NUMPAC,SQLCODE||'-'||SQLERRM);
+  raise;
+END TGE_DROP_PHOTO_A310;

@@ -1,0 +1,19 @@
+##
+IS_DATE
+=SQL=
+create or replace FUNCTION IS_DATE ( p_string in varchar2, p_fmt in varchar2 := null) return number 
+AS 
+ retour number;
+ d_date date;
+begin
+ retour :=0;
+ IF (p_string is not null) THEN 
+   d_date := to_date(p_string,p_fmt);
+   retour := 1;
+ END IF;
+ return retour;
+ 
+exception
+ when others then
+   return 0;
+end;

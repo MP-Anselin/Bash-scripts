@@ -1,0 +1,25 @@
+<interface idInterface="IMPORT_GAP">
+	<nomInterface>Import des fichiers GAP</nomInterface>
+	<descriptionInterface>Cette interface permet d'importer des elements GAP</descriptionInterface>
+	<SupprimerFichier>OUI</SupprimerFichier>
+	<parametreParDefaut>
+		<defauttypeFichier>CSV</defauttypeFichier>
+		<defautmodeChargement>NON</defautmodeChargement>
+		<defautcontinueSiErreur>OUI</defautcontinueSiErreur>
+		<defautpresenceEntete>OUI</defautpresenceEntete>
+		<defautimportanceEntete>NON</defautimportanceEntete>
+		<defautseparateurChamp>;</defautseparateurChamp>
+		<defautencapsuleurChamp>"</defautencapsuleurChamp>
+		<defautseparateurDecimal>.</defautseparateurDecimal>
+		<defautfichierLigneNonTraite>OUI</defautfichierLigneNonTraite>
+	</parametreParDefaut>
+	<traitements>
+		<traitement>
+			<descriptionTraitement>Premier Traitement d'import element GAP</descriptionTraitement>
+			<typeTraitement>IMPORT_ELEMENT_GAP</typeTraitement>
+			<repImport>/ehc/fs1/adp/adplink/adplink_ic/domain1/GxpFiles/batch/interface/temp</repImport>
+			<interpreterConfigFile>/ehc/fs1/adp/adplink/adplink_ic/domain1/GxpFiles/ServiceletList.xml</interpreterConfigFile>
+			<repApplicatif>/ehc/fs1/adp/adplink/adplink_ic/domain1/applications/Cougar/Modules/RD</repApplicatif>
+		</traitement>
+	</traitements>
+</interface>

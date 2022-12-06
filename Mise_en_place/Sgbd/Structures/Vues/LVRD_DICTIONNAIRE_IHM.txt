@@ -1,0 +1,58 @@
+##
+LVRD_DICTIONNAIRE_IHM
+=SQL=
+Create or replace view LVRD_DICTIONNAIRE_IHM (COMPANY_ID, NOM_DICTIONNAIRE, LIBELLE_DICTIONNAIRE, TYPE_CLE_SALARIE, CHAMPS_CLE, EST_SUPPRIME,NUM_LIVRABLE) AS 
+(SELECT COMPANY_ID,
+  NOM_DICTIONNAIRE,
+  LIBELLE_DICTIONNAIRE,
+  TYPE_CLE_SALARIE,
+  CHAMPS_CLE,  
+  EST_SUPPRIME,
+  NUM_LIVRABLE
+FROM LVRD_DICTIONNAIRE
+UNION
+SELECT 'TGE',
+  'DIC_ADM_PERSO',
+  'Données administratives personnelles',
+  'R',
+  NULL,
+  NULL,
+  NULL
+FROM DUAL
+UNION
+SELECT 'TGE',
+  'DIC_ADM_PERSO_HISTO',
+  'Données administratives personnelles (historisées)',
+  'R',
+  NULL,
+  NULL,
+  NULL
+FROM DUAL
+UNION
+SELECT 'TGE',
+  'DIC_ADM_CONTRAT',
+  'Données administratives contractuelles',
+  'P',
+  NULL,
+  NULL,
+  NULL
+FROM DUAL
+UNION
+SELECT 'TGE',
+  'DIC_ADM_CONTRAT_HISTO',
+  'Données administratives contractuelles (historisées)',
+  'P',
+  NULL,
+  NULL,
+  NULL
+FROM DUAL
+UNION
+SELECT 'TGE',
+  'DIC_DONNEES_VIRTUELLES',
+  'Données virtuelles (non-stockées)',
+  NULL,
+  NULL,
+  NULL,
+  NULL
+FROM DUAL
+)

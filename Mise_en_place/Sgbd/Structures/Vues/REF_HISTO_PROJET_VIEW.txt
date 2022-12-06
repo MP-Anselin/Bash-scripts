@@ -1,0 +1,85 @@
+##
+TAG_CHARSET=@€éèç
+##
+REF_HISTO_PROJET_VIEW
+=SQL=
+CREATE OR REPLACE FORCE VIEW "REF_HISTO_PROJET_VIEW" ("COMPANY_ID", "NUM_DIT", "NUM_VERSION", "ID_PROJET", "LIBELLE_PROJET", "DATE_VERSION", "USER_VERSION", "DESCRIPTION", "DATE_CREATION", "TERMINE", "AFFICHEBTN", "ENATTENTE", "RAPPORT", "AFFICHEDLSCRIPT") AS
+WITH LIST_PROJ_EN_COURS AS (
+  SELECT * from BATCH_LIST where PARAM_LIST like '%ID_PROJET%' AND FAMILLE = 'BATCH_GEN')  
+  SELECT P.COMPANY_ID,
+  P.NUM_DIT,
+ (SELECT M.NUM_VERSION
+ FROM REF_OBJ_MISEAUPRODUIT M
+ WHERE M.COMPANY_ID = P.COMPANY_ID
+ AND M.ID_PROJET    = P.ID_PROJET
+ ) AS NUM_VERSION,
+ P.ID_PROJET,
+ P.LIBELLE_PROJET ,
+ (SELECT TO_CHAR(to_date (M.DATE_VERSION, 'YYYYMMDDHH24MISS'),'DD.MM.YYYY HH24:MI:SS')
+ FROM REF_OBJ_MISEAUPRODUIT M
+ WHERE M.COMPANY_ID = P.COMPANY_ID
+ AND M.ID_PROJET    = P.ID_PROJET
+ ) AS DATE_VERSION,
+ (SELECT M.USER_VERSION
+ FROM REF_OBJ_MISEAUPRODUIT M
+ WHERE M.COMPANY_ID = P.COMPANY_ID
+ AND M.ID_PROJET    = P.ID_PROJET
+ ) AS USER_VERSION ,
+ P.DESCRIPTION ,
+ TO_CHAR(to_date ( P.DATE_CREATION, 'YYYYMMDDHH24MISS'),'DD.MM.YYYY HH24:MI:SS'),
+ CASE P.TERMINE
+ WHEN 'O'
+ THEN 'Terminé'
+ WHEN 'N'
+ THEN ''
+ WHEN 'W'
+ THEN 'Warning'
+WHEN 'E' THEN 'En cours...'
+ WHEN 'E1' THEN 'Etape 1/6 '
+ WHEN 'E2' THEN 'Etape 2/6 '
+ WHEN 'E3' THEN 'Etape 3/6 '
+ WHEN 'E4' THEN 'Etape 4/6 '
+ WHEN 'E5' THEN 'Etape 5/6 '
+ WHEN 'E6' THEN 'Etape 6/6 '
+ WHEN 'S'
+ THEN 'Supprimé'
+ END TERMINE,
+ CASE WHEN P.TERMINE='N' THEN 'visible' ELSE 'invisible' END AFFICHEBTN,
+ CASE
+ WHEN  EXISTS (select 1 from  batch_list L,
+ batch_queue B
+ WHERE L.id_trt = B.id_trt
+ AND L.famille  = B.famille
+ AND L.famille  ='BATCH_GEN' 
+ and L.param_list like concat ('%ID_PROJET=',concat (P.ID_PROJET, ';%'))and B.state = 'WAIT' AND L.classe_name= 'fr.adp.com.gxp.std.mot_tech.lib.deploiement.Traitement_bacASable') THEN 'Bac à Sable en attente...'
+ WHEN   EXISTS (select 1 from  batch_list L,
+ batch_queue B
+ WHERE L.id_trt = B.id_trt
+ AND L.famille  = B.famille
+ AND L.famille  ='BATCH_GEN' 
+ and L.param_list like concat ('%ID_PROJET=',concat (P.ID_PROJET, ';%')) and B.state = 'WAIT' AND L.classe_name= 'fr.adp.com.gxp.std.mot_tech.lib.deploiement.Traitement_updateProduct') THEN 'Mise au produit en attente...'
+ WHEN   EXISTS (select 1 from  batch_list L,
+ batch_queue B
+ WHERE L.id_trt = B.id_trt
+ AND L.famille  = B.famille
+ AND L.famille  ='BATCH_GEN' 
+ and L.param_list like concat ('%ID_PROJET=',concat (P.ID_PROJET, ';%')) and B.state = 'WAIT' AND L.classe_name= 'fr.adp.com.gxp.std.mot_tech.lib.deploiement.Traitement_deploiement') THEN 'Livraison en attente...'
+ else ''
+ END 
+ AS ENATTENTE,
+ (SELECT
+ CASE
+ WHEN NVL(LENGTH(M.RAPPORT),0) >0
+ THEN 'Rapport'
+ ELSE ''
+ END RAPPORT
+ FROM REF_OBJ_MISEAUPRODUIT M
+ WHERE M.COMPANY_ID = P.COMPANY_ID
+ AND M.ID_PROJET    = P.ID_PROJET
+ ) AS RAPPORT,
+ CASE WHEN P.TERMINE='O' THEN 'visible' ELSE 'invisible' END AFFICHEDLSCRIPT
+ FROM META_PROJET P
+ WHERE P.COMPANY_ID ='*'
+ ORDER BY DATE_VERSION DESC,
+ NUM_VERSION DESC ,
+ ID_PROJET DESC

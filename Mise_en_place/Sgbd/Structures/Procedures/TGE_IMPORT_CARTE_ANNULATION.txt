@@ -1,0 +1,348 @@
+##
+TAG_CHARSET=@€éèç
+##
+TGE_IMPORT_CARTE_ANNULATION
+=SQL=
+create or replace PROCEDURE TGE_IMPORT_CARTE_ANNULATION( P_LOGIN IN VARCHAR2, P_DATE_IMPORT IN VARCHAR2)
+ AS
+ 
+
+BEGIN
+	/*
+	 * ELEMENTS DE PAIE
+	 */
+	TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'Début SYS_TRC_MODIF pour annulation EZ');
+	-- On trace l'annulation des éléments (TGE_REF_TYPES_GTA.MATRIC_GTA = PACMAT)
+	insert into SYS_TRC_MODIF (LOGIN, DATEMAJ, ROLE, FUNCTIONNALITY, KEYS_VALUES, SHORT_NAME, ACTION, 
+		NAMES_VALUES_HAVE_CHANGED, BEFORE_CHANGE, NUMPAC, PACMAT, PAIEZAD, MATRIC, DATE_EFFET)
+	select distinct A.LOGIN, SYSDATE, '3', 'IMPORT_ELEMENT_PAIE', 
+	-- KEY_VALUES
+	'numPac='||E.NUMPAC||'&paieZad='||E.PAIEZAD||'&periode='||E.PERIODE||'&type_traitement='||E.TYPE_TRAITEMENT||
+	'&code_element='||E.CODE_ELEMENT||'&indicatif='||E.INDICATIF||'&'||'code_remplacement='||E.CODE_REMPLACEMENT,
+	-- SHORT_NAME : on gère si c'est un élément de remplacement ou non
+	'Suppression d''un EZ' || decode(E.CODE_REMPLACEMENT, '*', '', ' rempl.'),
+	-- ACTION
+	'S',
+	-- NAMES_VALUES_HAVE_CHANGED 
+	'numPac^paieZad^periode^type_traitement^code_element^indicatif^valeur^origine^dernier_code_ope^login_maj^date_maj^idPacMat^code_remplacement^date_effet^cle_import',
+	-- BEFORE_CHANGE
+	E.NUMPAC||'^'||E.PAIEZAD||'^'||E.PERIODE||'^'||E.TYPE_TRAITEMENT||'^'||E.CODE_ELEMENT||'^'||E.INDICATIF||'^'||E.VALEUR
+	||'^'||E.ORIGINE||'^'||E.DERNIER_CODE_OPE||'^'||E.LOGIN_MAJ||'^'||E.DATE_MAJ||'^'||E.IDPACMAT
+	||'^'||E.CODE_REMPLACEMENT||'^'||E.DATE_EFFET||'^'||E.CLE_IMPORT,
+	-- NUMPAC / PACMAT / PAIEZAD / MATRIC / DATE_EFFET
+	E.NUMPAC, A.PACMAT, E.PAIEZAD, A.MATRICULE, E.DATE_EFFET
+	from TGE_ELEMENTS_PAIE E, TGE_IMPORT_ANNULATION A, TGE_REF_TYPES_GTA GTA
+	where A.LOGIN = P_LOGIN
+	and A.DATE_IMPORT = P_DATE_IMPORT
+	and A.NUMPAC = E.NUMPAC
+	and GTA.NUMPAC = E.NUMPAC
+	and A.ERREURS is null
+	and GTA.CODE_GTA =(select CODE_GTA from TGE_REF_ORIGINE_GTA where NUMPAC = A.NUMPAC and CODE_ORIGINE = A.ORIGINE)
+	and nvl(GTA.MATRIC_GTA,'PAIEZAD')='PACMAT'
+	and A.PAIEZAD = E.PAIEZAD
+	and(exists (
+		select C.PAIEZAD
+		from DIC_ADM_CONTRAT_SITU C
+		where C.NUMPAC = A.NUMPAC
+		and C.NUMPAC = E.NUMPAC
+		and C.PAIEZAD = E.PAIEZAD
+		and C.PACMAT = A.PACMAT
+		)
+	)
+	and A.ORIGINE =E.ORIGINE
+	and A.PERIODE = E.PERIODE
+	and (
+		(exists (
+			select 1
+			from TGE_REF_ORIGINE_GTA 
+			where A.ORIGINE = CODE_ORIGINE
+			and NUMPAC = E.NUMPAC
+			and CODE_ORIGINE = E.ORIGINE
+			and MODE_3060 != 'F'
+			)
+		and E.CODE_REMPLACEMENT = 'R'
+		)
+		or E.CODE_REMPLACEMENT = '*'
+	);
+	
+	-- On trace l'annulation des éléments (TGE_REF_TYPES_GTA.MATRIC_GTA = PAIEZAD)
+	insert into SYS_TRC_MODIF (LOGIN, DATEMAJ, ROLE, FUNCTIONNALITY, KEYS_VALUES, SHORT_NAME, ACTION, 
+		NAMES_VALUES_HAVE_CHANGED, BEFORE_CHANGE, NUMPAC, PACMAT, PAIEZAD, MATRIC, DATE_EFFET)
+	select distinct A.LOGIN, SYSDATE, '3', 'IMPORT_ELEMENT_PAIE', 
+	-- KEY_VALUES
+	'numPac='||E.NUMPAC||'&paieZad='||E.PAIEZAD||'&periode='||E.PERIODE||'&type_traitement='||E.TYPE_TRAITEMENT||
+	'&code_element='||E.CODE_ELEMENT||'&indicatif='||E.INDICATIF||'&'||'code_remplacement='||E.CODE_REMPLACEMENT,
+	-- SHORT_NAME : on gère si c'est un élément de remplacement ou non
+	'Suppression d''un EZ' || decode(E.CODE_REMPLACEMENT, '*', '', ' rempl.'),
+	-- ACTION
+	'S',
+	-- NAMES_VALUES_HAVE_CHANGED 
+	'numPac^paieZad^periode^type_traitement^code_element^indicatif^valeur^origine^dernier_code_ope^login_maj^date_maj^idPacMat^code_remplacement^date_effet^pacMat^cle_import',
+	-- BEFORE_CHANGE
+	E.NUMPAC||'^'||E.PAIEZAD||'^'||E.PERIODE||'^'||E.TYPE_TRAITEMENT||'^'||E.CODE_ELEMENT||'^'||E.INDICATIF||'^'||E.VALEUR
+	||'^'||E.ORIGINE||'^'||E.DERNIER_CODE_OPE||'^'||E.LOGIN_MAJ||'^'||E.DATE_MAJ||'^'||E.IDPACMAT
+	||'^'||E.CODE_REMPLACEMENT||'^'||E.DATE_EFFET||'^'||A.PACMAT||'^'||E.CLE_IMPORT,
+	-- NUMPAC / PACMAT / PAIEZAD / MATRIC / DATE_EFFET
+	E.NUMPAC, A.PACMAT, E.PAIEZAD, A.MATRICULE, E.DATE_EFFET
+	from TGE_ELEMENTS_PAIE E, TGE_IMPORT_ANNULATION A, TGE_REF_TYPES_GTA GTA
+	where A.LOGIN = P_LOGIN
+	and A.DATE_IMPORT = P_DATE_IMPORT
+	and A.NUMPAC = E.NUMPAC
+	and GTA.NUMPAC = E.NUMPAC
+	and A.ERREURS is null
+	and GTA.CODE_GTA =(select CODE_GTA from TGE_REF_ORIGINE_GTA where NUMPAC = A.NUMPAC and CODE_ORIGINE = A.ORIGINE)
+	and nvl(GTA.MATRIC_GTA,'PAIEZAD')='PAIEZAD'
+	and A.PAIEZAD = E.PAIEZAD
+	and A.ORIGINE =E.ORIGINE
+	and A.PERIODE = E.PERIODE
+	and (
+		(exists (
+	    	select 1
+	        from TGE_REF_ORIGINE_GTA 
+	        where A.ORIGINE = CODE_ORIGINE
+	        and NUMPAC = E.NUMPAC
+	        and CODE_ORIGINE = E.ORIGINE
+	        and MODE_3060 != 'F'
+	        )
+		and E.CODE_REMPLACEMENT = 'R'
+	    )
+		or E.CODE_REMPLACEMENT = '*'
+	);
+	TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'Début annulation EZ'); 
+	-- Suppression dans TGE_ELEMENTS_PAIE des cartes d'annulation (TGE_REF_TYPES_GTA.MATRIC_GTA = PACMAT)
+	delete from TGE_ELEMENTS_PAIE E
+	where exists(
+		select 1
+		from TGE_IMPORT_ANNULATION A, TGE_REF_TYPES_GTA GTA
+		where A.LOGIN = P_LOGIN
+		and A.DATE_IMPORT = P_DATE_IMPORT
+		and A.NUMPAC = E.NUMPAC
+		and GTA.NUMPAC = E.NUMPAC
+		and A.ERREURS is null
+		and GTA.CODE_GTA = (select CODE_GTA from TGE_REF_ORIGINE_GTA where NUMPAC = A.NUMPAC and CODE_ORIGINE = A.ORIGINE)
+		and nvl(GTA.MATRIC_GTA,'PAIEZAD') = 'PACMAT'
+		and A.PAIEZAD = E.PAIEZAD
+		and (exists (
+			select C.PAIEZAD
+			from DIC_ADM_CONTRAT_SITU C
+			where C.NUMPAC = A.NUMPAC
+			and C.NUMPAC = E.NUMPAC
+			and C.PAIEZAD = E.PAIEZAD
+			and C.PACMAT = A.PACMAT
+			)
+		)
+		and A.ORIGINE = E.ORIGINE
+		and A.PERIODE = E.PERIODE
+	)
+	and (
+		(exists (
+			select 1
+			from TGE_REF_ORIGINE_GTA 
+			where NUMPAC = E.NUMPAC
+			and CODE_ORIGINE = E.ORIGINE
+			and MODE_3060 != 'F'
+			)
+		and E.CODE_REMPLACEMENT = 'R'
+		)
+		or E.CODE_REMPLACEMENT = '*'
+	);
+	--Suppression dans TGE_ELEMENTS_PAIE des cartes d'annulation (TGE_REF_TYPES_GTA.MATRIC_GTA = PAIZAD)
+	delete from TGE_ELEMENTS_PAIE E
+	where exists (
+		select 1
+		from TGE_IMPORT_ANNULATION A, TGE_REF_TYPES_GTA GTA
+	 	where A.LOGIN = P_LOGIN
+	 	and A.DATE_IMPORT = P_DATE_IMPORT
+	 	and A.NUMPAC = E.NUMPAC
+	 	and GTA.NUMPAC = E.NUMPAC
+	 	and A.ERREURS is null
+	 	and GTA.CODE_GTA = (select CODE_GTA from TGE_REF_ORIGINE_GTA where NUMPAC = A.NUMPAC and CODE_ORIGINE = A.ORIGINE)
+	 	and nvl(GTA.MATRIC_GTA,'PAIEZAD') = 'PAIEZAD'
+	 	and A.PAIEZAD = E.PAIEZAD
+	 	and A.ORIGINE= E.ORIGINE
+	 	and A.PERIODE = E.PERIODE
+	)
+	and (
+		(exists (
+			select 1
+			from TGE_REF_ORIGINE_GTA 
+			where NUMPAC = E.NUMPAC
+			and CODE_ORIGINE = E.ORIGINE
+			and MODE_3060 != 'F'
+			)
+		and E.CODE_REMPLACEMENT = 'R'
+		)
+		or E.CODE_REMPLACEMENT = '*'
+	);
+	
+	/**
+	 * DONNEES DE PAIE
+	 */
+	TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'Début SYS_TRC_MODIF pour annulation DV/DR');
+	-- On trace l'annulation des données de paie (TGE_REF_TYPES_GTA.MATRIC_GTA = PACMAT)
+	insert into SYS_TRC_MODIF (LOGIN, DATEMAJ, ROLE, FUNCTIONNALITY, KEYS_VALUES, SHORT_NAME, ACTION, 
+		NAMES_VALUES_HAVE_CHANGED, BEFORE_CHANGE, NUMPAC, PACMAT, PAIEZAD, MATRIC, DATE_EFFET)
+	select distinct A.LOGIN, SYSDATE, '3', 'IMPORT_DONNEE_ELT_PAIE', 
+	-- KEY_VALUES
+	'numPac='||D.NUMPAC||'&paieZad='||D.PAIEZAD||'&periode='||D.PERIODE||'&type_traitement='||D.TYPE_TRAITEMENT
+	||'&type_donnee='||D.TYPE_DONNEE||'&code_rubrique='||D.CODE_RUBRIQUE||'&code_caisse='||D.CODE_CAISSE||'&no_sequence='||D.NO_SEQUENCE,
+	-- SHORT_NAME : on gère si c'est une DV, DR, DR Cotis. et si elle est de remplacement ou non
+	'Suppression d''une ' || decode(D.TYPE_DONNEE, '1', 'DV', '2', 'DR', 'DR cotis.') || decode(D.CODE_REMPLACEMENT, '*', '', ' rempl.'),
+	-- ACTION
+	'S',
+	-- NAMES_VALUES_HAVE_CHANGED 
+	'numPac^paieZad^periode^type_traitement^type_donnee^code_rubrique^code_caisse^no_sequence^sens^code_imputation^nombre^taux^montant^pourcentage^domaine_prcte^periode_rattach_deb^periode_rattach_fin^date_deb_arret^periode_affectation^origine^dernier_code_ope^login_maj^date_maj^code_remplacement^date_effet^idPacMat^cle_import',
+	-- BEFORE_CHANGE
+	D.NUMPAC||'^'||D.PAIEZAD||'^'||D.PERIODE||'^'||D.TYPE_TRAITEMENT||'^'||D.TYPE_DONNEE||'^'||D.CODE_RUBRIQUE||'^'||D.CODE_CAISSE
+	||'^'||D.NO_SEQUENCE||'^'||D.SENS||'^'||D.CODE_IMPUTATION||'^'||D.NOMBRE||'^'||D.TAUX||'^'||D.MONTANT||'^'||D.POURCENTAGE
+	||'^'||D.DOMAINE_PRCTE||'^'||D.PERIODE_RATTACH_DEB||'^'||D.PERIODE_RATTACH_FIN||'^'||D.DATE_DEB_ARRET||'^'||D.PERIODE_AFFECTATION
+	||'^'||D.ORIGINE||'^'||D.DERNIER_CODE_OPE||'^'||D.LOGIN_MAJ||'^'||D.DATE_MAJ
+	||'^'||D.CODE_REMPLACEMENT||'^'||D.DATE_EFFET||'^'||D.IDPACMAT||'^'||D.CLE_IMPORT,
+	-- NUMPAC / PACMAT / PAIEZAD / MATRIC / DATE_EFFET
+	D.NUMPAC, A.PACMAT, D.PAIEZAD, A.MATRICULE, D.DATE_EFFET
+	from TGE_DONNEES_PAIE D, TGE_IMPORT_ANNULATION A, TGE_REF_TYPES_GTA GTA
+	where A.LOGIN = P_LOGIN
+	and A.DATE_IMPORT = P_DATE_IMPORT
+	and A.NUMPAC = D.NUMPAC
+	and GTA.NUMPAC = D.NUMPAC
+	and A.ERREURS is null
+	and GTA.CODE_GTA =(select CODE_GTA from TGE_REF_ORIGINE_GTA where NUMPAC = A.NUMPAC and CODE_ORIGINE = A.ORIGINE)
+	and nvl(GTA.MATRIC_GTA,'PAIEZAD')='PACMAT'
+	and A.PAIEZAD = D.PAIEZAD
+	and(exists (
+		select C.PAIEZAD
+		from DIC_ADM_CONTRAT_SITU C
+		where C.NUMPAC = A.NUMPAC
+		and C.NUMPAC = D.NUMPAC
+		and C.PAIEZAD = D.PAIEZAD
+		and C.PACMAT = A.PACMAT
+		)
+	)
+	and A.ORIGINE = D.ORIGINE
+	and A.PERIODE = D.PERIODE
+	and (
+		(exists (
+			select 1
+			from TGE_REF_ORIGINE_GTA 
+			where A.ORIGINE = CODE_ORIGINE
+			and NUMPAC = D.NUMPAC
+			and CODE_ORIGINE = D.ORIGINE
+			and MODE_3060 != 'F'
+			)
+		and D.CODE_REMPLACEMENT ='R'
+		)
+		or D.CODE_REMPLACEMENT is null
+	);
+	
+	-- On trace l'annulation des données de paie (TGE_REF_TYPES_GTA.MATRIC_GTA = PAIEZAD)
+	insert into SYS_TRC_MODIF (LOGIN, DATEMAJ, ROLE, FUNCTIONNALITY, KEYS_VALUES, SHORT_NAME, ACTION, 
+		NAMES_VALUES_HAVE_CHANGED, BEFORE_CHANGE, NUMPAC, PACMAT, PAIEZAD, MATRIC, DATE_EFFET)
+	select distinct A.LOGIN, SYSDATE, '3', 'IMPORT_DONNEE_ELT_PAIE', 
+	-- KEY_VALUES
+	'numPac='||D.NUMPAC||'&paieZad='||D.PAIEZAD||'&periode='||D.PERIODE||'&type_traitement='||D.TYPE_TRAITEMENT||'&type_donnee='||D.TYPE_DONNEE||'&code_rubrique='||D.CODE_RUBRIQUE||'&code_caisse='||D.CODE_CAISSE||'&no_sequence='||D.NO_SEQUENCE,
+	-- SHORT_NAME : on gère si c'est une DV, DR, DR Cotis. et si elle est de remplacement ou non
+	'Suppression d''un ' || decode(D.TYPE_DONNEE, '1', 'DV', '2', 'DR', 'DR cotis.') ||  decode(D.CODE_REMPLACEMENT, '*', '', ' rempl.'),
+	-- ACTION
+	'S',
+	-- NAMES_VALUES_HAVE_CHANGED 
+	'numPac^paieZad^periode^type_traitement^type_donnee^code_rubrique^code_caisse^no_sequence^sens^code_imputation^nombre^taux^montant^pourcentage^domaine_prcte^periode_rattach_deb^periode_rattach_fin^date_deb_arret^periode_affectation^origine^dernier_code_ope^login_maj^date_maj^code_remplacement^date_effet^idPacMat^cle_import',
+	-- BEFORE_CHANGE
+	D.NUMPAC||'^'||D.PAIEZAD||'^'||D.PERIODE||'^'||D.TYPE_TRAITEMENT||'^'||D.TYPE_DONNEE||'^'||D.CODE_RUBRIQUE||'^'||D.CODE_CAISSE
+	||'^'||D.NO_SEQUENCE||'^'||D.SENS||'^'||D.CODE_IMPUTATION||'^'||D.NOMBRE||'^'||D.TAUX||'^'||D.MONTANT||'^'||D.POURCENTAGE
+	||'^'||D.DOMAINE_PRCTE||'^'||D.PERIODE_RATTACH_DEB||'^'||D.PERIODE_RATTACH_FIN||'^'||D.DATE_DEB_ARRET||'^'||D.PERIODE_AFFECTATION
+	||'^'||D.ORIGINE||'^'||D.DERNIER_CODE_OPE||'^'||D.LOGIN_MAJ||'^'||D.DATE_MAJ
+	||'^'||D.CODE_REMPLACEMENT||'^'||D.DATE_EFFET||'^'||D.IDPACMAT||'^'||D.CLE_IMPORT,
+	-- NUMPAC / PACMAT / PAIEZAD / MATRIC / DATE_EFFET
+	D.NUMPAC, A.PACMAT, D.PAIEZAD, A.MATRICULE, D.DATE_EFFET
+	from TGE_DONNEES_PAIE D, TGE_IMPORT_ANNULATION A, TGE_REF_TYPES_GTA GTA
+	where A.LOGIN = P_LOGIN
+	and A.DATE_IMPORT = P_DATE_IMPORT
+	and A.NUMPAC = D.NUMPAC
+	and GTA.NUMPAC = D.NUMPAC
+	and A.ERREURS is null
+	and GTA.CODE_GTA =(select CODE_GTA from TGE_REF_ORIGINE_GTA where NUMPAC = A.NUMPAC and CODE_ORIGINE = A.ORIGINE)
+	and nvl(GTA.MATRIC_GTA,'PAIEZAD')='PAIEZAD'
+	and A.PAIEZAD = D.PAIEZAD
+	and A.ORIGINE =D.ORIGINE
+	and A.PERIODE = D.PERIODE
+	and (
+		(exists (
+			select 1
+			from TGE_REF_ORIGINE_GTA 
+			where A.ORIGINE = CODE_ORIGINE
+			and NUMPAC = D.NUMPAC
+			and CODE_ORIGINE = D.ORIGINE
+			and MODE_3060 != 'F'
+			)
+		and D.CODE_REMPLACEMENT ='R'
+		)
+		or D.CODE_REMPLACEMENT is null
+	);
+	TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'Début annulation DV/DR');
+	-- Suppression dans TGE_DONNEES_PAIE des cartes d'annulation (TGE_REF_TYPES_GTA.MATRIC_GTA = PACMAT)
+	delete from TGE_DONNEES_PAIE D
+	where exists(
+		select 1
+		from TGE_IMPORT_ANNULATION A, TGE_REF_TYPES_GTA GTA
+		where A.LOGIN = P_LOGIN
+		and A.DATE_IMPORT = P_DATE_IMPORT
+		and A.NUMPAC = D.NUMPAC
+		and GTA.NUMPAC = D.NUMPAC
+		and A.ERREURS is null
+		and GTA.CODE_GTA = (select CODE_GTA from TGE_REF_ORIGINE_GTA where NUMPAC = A.NUMPAC and CODE_ORIGINE = A.ORIGINE)
+		and nvl(GTA.MATRIC_GTA,'PAIEZAD') = 'PACMAT'
+		and A.PAIEZAD = D.PAIEZAD
+		and (exists (
+			select C.PAIEZAD
+			from DIC_ADM_CONTRAT_SITU C
+			where C.NUMPAC = A.NUMPAC
+			and C.NUMPAC = D.NUMPAC
+			and C.PAIEZAD = D.PAIEZAD
+			and C.PACMAT = A.PACMAT
+			)
+		)
+		and A.ORIGINE = D.ORIGINE
+		and A.PERIODE = D.PERIODE
+	)
+	and (
+		(exists (
+			select 1
+			from TGE_REF_ORIGINE_GTA 
+			where NUMPAC = D.NUMPAC
+			and CODE_ORIGINE = D.ORIGINE
+			and MODE_3060 != 'F'
+			)
+		and D.CODE_REMPLACEMENT = 'R'
+		)
+		or D.CODE_REMPLACEMENT is null
+	);
+	--Suppression dans TGE_DONNEES_PAIE des cartes d'annulation (TGE_REF_TYPES_GTA.MATRIC_GTA = PAIZAD)
+	delete from TGE_DONNEES_PAIE D
+	where exists (
+		select 1
+		from TGE_IMPORT_ANNULATION A, TGE_REF_TYPES_GTA GTA
+	 	where A.LOGIN = P_LOGIN
+	 	and A.DATE_IMPORT = P_DATE_IMPORT
+	 	and A.NUMPAC = D.NUMPAC
+	 	and GTA.NUMPAC = D.NUMPAC
+	 	and A.ERREURS is null
+	 	and GTA.CODE_GTA = (select CODE_GTA from TGE_REF_ORIGINE_GTA where NUMPAC = A.NUMPAC and CODE_ORIGINE = A.ORIGINE)
+	 	and nvl(GTA.MATRIC_GTA,'PAIEZAD') = 'PAIEZAD'
+	 	and A.PAIEZAD = D.PAIEZAD
+	 	and A.ORIGINE= D.ORIGINE
+	 	and A.PERIODE = D.PERIODE
+	)
+	and (
+		(exists (
+			select 1
+			from TGE_REF_ORIGINE_GTA 
+			where NUMPAC = D.NUMPAC
+			and CODE_ORIGINE = D.ORIGINE
+			and MODE_3060 != 'F'
+			)
+		and D.CODE_REMPLACEMENT = 'R'
+		)
+		or D.CODE_REMPLACEMENT is null
+	);
+	 
+ END TGE_IMPORT_CARTE_ANNULATION;

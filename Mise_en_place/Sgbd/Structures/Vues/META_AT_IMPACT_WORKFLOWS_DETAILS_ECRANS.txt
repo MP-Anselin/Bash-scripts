@@ -1,0 +1,46 @@
+##
+TAG_CHARSET=@€éèç
+##
+META_AT_IMPACT_WORKFLOWS_DETAILS_ECRANS
+=SQL=
+BEGIN
+  EXECUTE_IMMEDIATE_STRING('DROP MATERIALIZED VIEW "META_AT_IMPACT_WORKFLOWS_DETAILS_ECRANS"',0);
+EXCEPTION WHEN OTHERS THEN NULL;
+END;
+##
+META_AT_IMPACT_WORKFLOWS_DETAILS_ECRANS
+=SQL=
+CREATE MATERIALIZED VIEW "META_AT_IMPACT_WORKFLOWS_DETAILS_ECRANS" ("DATE_MAJ", "PROC_NUM", "PROC_LIBELLE", "OP_NUM", "OP_LIBELLE", "TYPE_ECRAN", "ECRAN_NOM", "ECRAN_LIBELLE", "ORDRE", "ECRAN_RECHERCHE", "ECRAN_RECAP_GRP1", "ECRAN_RECAP_GRP2", "ORDRE_REQ")
+BUILD IMMEDIATE
+USING INDEX 
+REFRESH FORCE ON DEMAND START WITH sysdate+5/1400 NEXT SYSDATE + 1
+AS 
+  select
+    sysdate date_maj,
+    to_char(p.proc_num) proc_num, 
+    p.proc_libelle, 
+    to_char(o.op_num) op_num, 
+    o.op_libelle, 
+    meta_wkf_operation_ecrans.TYPE_ECRAN,
+    CASE
+      WHEN meta_wkf_operation_ecrans.TYPE_ECRAN='RECAP' THEN 'GEN_PAGE_RECAP_' || META_WKF_OPERATION_ECRANS.OP_NUM || '_' || META_WKF_OPERATION_ECRANS.ID_GEN_PAGE
+      ELSE  meta_wkf_operation_ecrans.ecran_nom_page
+    END ecran_nom,
+    CASE
+      WHEN meta_wkf_operation_ecrans.TYPE_ECRAN='RECH' THEN NVL(meta_wkf_operation_ecrans.libelle_ecran_recap, 'Recherche d''homonymie')
+      WHEN meta_wkf_operation_ecrans.TYPE_ECRAN='RECAP' THEN NVL(meta_wkf_operation_ecrans.libelle_ecran_recap, 'Récapitulatif de la saisie')
+      ELSE e.libelle_page    
+    END ecran_libelle,
+    meta_wkf_operation_ecrans.ordre,
+    CASE 
+      WHEN RECHERCHE_REQUETE_NOMPAGE IS NOT NULL THEN RECHERCHE_REQUETE_NOMPAGE || ' - ' || RECHERCHE_REQUETE_IDREQUETE 
+      ELSE '' 
+    END ECRAN_RECHERCHE,
+    recap_id_groupe_1 ECRAN_RECAP_GRP1,
+    recap_id_groupe_2 ECRAN_RECAP_GRP2,
+    row_number() over (order by p.proc_libelle, CASE WHEN o.op_statutproc like '%I%' THEN 1 WHEN o.op_statutproc='N' THEN 2 WHEN o.op_statutproc like '%F%' THEN 3 ELSE 9 END, o.op_num, meta_wkf_operation_ecrans.ordre) ordre_req
+  from 
+    META_WKF_OPERATION_ECRANS
+    LEFT OUTER JOIN WKF_OPERATIONS o on o.op_num=meta_wkf_operation_ecrans.op_num
+    LEFT OUTER JOIN WKF_PROCESSUS p on o.proc_num=p.proc_num
+    LEFT OUTER JOIN REF_ECRAN e on e.company_id='*' and e.nom_page=meta_wkf_operation_ecrans.ecran_nom_page

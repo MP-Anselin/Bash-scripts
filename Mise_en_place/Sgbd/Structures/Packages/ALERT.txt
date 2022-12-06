@@ -1,0 +1,761 @@
+##
+PACKAGE_BODY_ALERT
+=SQL=
+create or replace PACKAGE Alert IS
+  PROCEDURE exec(pDateExec VARCHAR2,pAlertID VARCHAR2);
+  PROCEDURE exec_login(pDateExec VARCHAR2,pAlertID VARCHAR2);
+  PROCEDURE exec_user(pLogin VARCHAR2,pDateExec VARCHAR2);
+END Alert;
+##
+PACKAGE_ALERT
+=SQL=
+create or replace PACKAGE BODY Alert IS
+  
+  FUNCTION notify_Alert_Begin(pDateExec DATE , pAlertNbToExecute INTEGER) RETURN BOOLEAN;
+  
+  FUNCTION notify_Alert_User_Begin(pLogin VARCHAR2 , pDateExec DATE) RETURN BOOLEAN;
+
+  FUNCTION notify_LoginAlert_Begin(pDateExec DATE , pAlertLoginNbToExecute INTEGER) RETURN BOOLEAN;
+
+  FUNCTION notify_Alert_Processed(pDateExec DATE , pAlertProcessed INTEGER ) RETURN BOOLEAN;
+  
+  FUNCTION notify_LoginAlert_Processed(pDateExec DATE , pLoginAlertProcessed INTEGER ) RETURN BOOLEAN;
+
+  FUNCTION set_Alert_Elapsed_Time(pDateExec DATE , pOrderNb INTEGER , pElapsedTime INTEGER)  RETURN BOOLEAN;
+  
+  FUNCTION set_Alert_User_Elapsed_Time(pLogin VARCHAR2 , pDateExec DATE , pOrderNb INTEGER , pElapsedTime INTEGER)  RETURN BOOLEAN;
+
+  FUNCTION notify_Alert_End_OK(pDateExec DATE) RETURN BOOLEAN;
+  
+  FUNCTION notify_Alert_User_End_OK(pLogin VARCHAR2,pDateExec DATE) RETURN BOOLEAN;
+
+  PROCEDURE notify_Alert_End_KO(pDateExec DATE , pErrorMessage VARCHAR2 , pErrorParams VARCHAR2);
+  
+  FUNCTION notify_LoginAlert_End_OK(pDateExec DATE) RETURN BOOLEAN;
+
+  PROCEDURE notify_LoginAlert_End_KO(pDateExec DATE , pErrorMessage VARCHAR2 , pErrorParams VARCHAR2);
+
+  PROCEDURE insert_Error(pDateExec DATE , pErrorMessage VARCHAR2 , pErrorParams VARCHAR2);
+
+  PROCEDURE update_User_Error (pLogin VARCHAR2 , pDateExec DATE , pErrorMessage VARCHAR2 , pErrorParams VARCHAR2);
+  
+/*
+Cette procédure est lancée par fr.adp.com.gxp.std.modules.lib.alert.batch.Traitement_Alerte
+Elle a pour but d'exécuter les requêtes de ALERT_BATCH_EXEC
+*/
+  PROCEDURE exec(pDateExec VARCHAR2,pAlertID VARCHAR2) IS 
+  PRAGMA AUTONOMOUS_TRANSACTION ;
+    dateExec DATE;
+    endProcForced BOOLEAN;
+    TYPE TypeAlertBatchExec IS TABLE OF ALERT_BATCH_EXEC%ROWTYPE;
+    listAlertBatchExec TypeAlertBatchExec;
+    CURSOR cursorAlertBatchExec (pDate DATE) IS 
+    SELECT * FROM ALERT_BATCH_EXEC WHERE DATE_EXEC = pDate ORDER BY ORDER_NB;
+    alertNb INTEGER  := 0;
+    alertProcessed INTEGER := 0;
+    elapsedTime NUMBER;
+    orderNb NUMBER;
+    time01 NUMBER;
+    time02 NUMBER;
+    rowNb INTEGER;
+    params VARCHAR2(1000);
+    stSql CLOB;
+  
+  BEGIN
+    --DBMS_OUTPUT.PUT_LINE('BEGIN exec:'||TO_CHAR(SYSDATE,'YYYYMMDDHH24MISS'));
+    --FIXME utiliser la procédure trace_dbms_output()
+    dateExec := TO_DATE(pDateExec,'YYYYMMDDHH24MISS');
+
+    OPEN cursorAlertBatchExec(dateExec);
+    FETCH cursorAlertBatchExec BULK COLLECT INTO listAlertBatchExec;
+    CLOSE cursorAlertBatchExec;
+
+    endProcForced := notify_Alert_Begin(dateExec,listAlertBatchExec.COUNT);
+    IF (endProcForced) THEN
+      GOTO END_EXEC;
+    END IF;
+
+    BEGIN
+      DELETE FROM ALERT_BATCH WHERE DATE_EXEC < TRUNC(ADD_MONTHS(SYSDATE,-2));
+      DELETE FROM ALERT_BATCH_STATS WHERE DATE_EXEC < ADD_MONTHS(TRUNC (SYSDATE, 'month'),-25);
+    EXCEPTION
+      WHEN OTHERS THEN
+        insert_Error(dateExec,'Erreur de suppression des traitements obsolètes: ' || SQLERRM,'');
+        GOTO END_EXEC;
+    END;
+    
+    BEGIN
+      DELETE FROM ALERT_BATCH_ERROR WHERE DATE_EXEC = dateExec;
+    EXCEPTION
+      WHEN OTHERS THEN
+        insert_Error(dateExec,'Erreur de suppression des erreurs batch: ' || SQLERRM,'');
+        GOTO END_EXEC;
+    END;
+
+    IF pAlertID IS NULL THEN
+      BEGIN
+        EXECUTE_IMMEDIATE_STRING('TRUNCATE TABLE ALERT_BATCH1',0);
+      EXCEPTION
+        WHEN OTHERS THEN
+          insert_Error(dateExec,'Erreur de suppression (PLSQL001) : ' || SQLERRM,'');
+          GOTO END_EXEC;
+      END;
+    ELSE
+      BEGIN
+        DELETE FROM ALERT_BATCH1 WHERE ALERT_ID = pAlertID;
+        COMMIT;
+      EXCEPTION
+        WHEN OTHERS THEN
+          insert_Error(dateExec,'Erreur de suppression (PLSQL002) : ' || SQLERRM,'');
+          GOTO END_EXEC;
+      END;
+    END IF;
+
+    rowNb := -1;
+    IF (listAlertBatchExec.FIRST IS NOT NULL) THEN
+      BEGIN
+        FOR i IN listAlertBatchExec.FIRST..listAlertBatchExec.LAST LOOP
+          rowNb := i;
+          orderNb := listAlertBatchExec(rowNb).ORDER_NB;
+          time01 := TO_CHAR(SYSDATE,'SSSSS');
+          EXECUTE_IMMEDIATE_STRING( listAlertBatchExec(rowNb).ALERT_SQL,0);
+          alertNb := SQL%ROWCOUNT;
+          time02 := TO_CHAR(SYSDATE,'SSSSS');
+          IF (time01 > time02) THEN
+            elapsedTime := 86400 - time01 + time02;
+          ELSE
+           elapsedTime := time02 - time01;
+          END IF;
+          endProcForced := set_Alert_Elapsed_Time(dateExec,orderNb,elapsedTime);
+          IF (endProcForced) THEN
+           GOTO END_EXEC;
+          END IF;
+          alertProcessed := alertProcessed + 1;
+          endProcForced := notify_Alert_Processed(dateExec,alertProcessed);
+          IF (endProcForced) THEN
+            GOTO END_EXEC;
+          END IF;
+        END LOOP;
+      EXCEPTION
+        WHEN OTHERS THEN
+          ROLLBACK;
+          IF (rowNb > -1) THEN
+            params := '[ORDER_NB=' || listAlertBatchExec(rowNb).ORDER_NB || ';ALERT_ID=' || listAlertBatchExec(rowNb).ALERT_ID || ']';
+          END IF;
+          notify_Alert_End_KO(dateExec,SQLERRM,params);
+          GOTO END_EXEC;
+      END;
+    END IF;
+
+    COMMIT;
+
+    IF pAlertID IS NULL THEN
+      INSERT INTO ALERT_BATCH_STATS SELECT dateExec ,ALERT_ID,COUNT(*) FROM ALERT_BATCH1 GROUP BY ALERT_ID;
+      COMMIT;
+    END IF;
+    
+    endProcForced := notify_Alert_End_OK(dateExec);
+    IF (endProcForced) THEN
+      GOTO END_EXEC;
+    END IF;
+    
+    exec_login(pDateExec,pAlertID);
+    <<END_EXEC>>
+    --DBMS_OUTPUT.PUT_LINE('END exec:'||TO_CHAR(SYSDATE,'YYYYMMDDHH24MISS'));
+    --FIXME utiliser la procédure trace_dbms_output()
+    NULL;
+  EXCEPTION
+    WHEN OTHERS THEN
+      ROLLBACK;
+      insert_Error(dateExec,SQLERRM,'[exec]');
+  END exec;
+
+  PROCEDURE exec_login(pDateExec VARCHAR2,pAlertID VARCHAR2) IS 
+  PRAGMA AUTONOMOUS_TRANSACTION ;
+    dateExec DATE;
+    endProcForced BOOLEAN;
+    TYPE TypeLoginAlert IS RECORD (login SYS_USR_PROFIL.LOGIN%TYPE ,alertID ALERT_PROP.ALERT_ID%TYPE ,stWhere ALERT_PROP.SQL_WHERE_2%TYPE,peopleID ALERT_PROP.PEOPLE_ID%TYPE,pacmatID ALERT_PROP.PACMAT_ID%TYPE,strID ALERT_PROP.STR_ID%TYPE);
+    TYPE TypeTableLoginAlert IS TABLE OF TypeLoginAlert;
+    listLoginAlert TypeTableLoginAlert;
+
+    CURSOR cursorLoginAlert1 IS 
+    SELECT DISTINCT SYS_USR_PROFIL.LOGIN,ALERT_PROP.ALERT_ID,ALERT_PROP.SQL_WHERE_2,ALERT_PROP.PEOPLE_ID,ALERT_PROP.PACMAT_ID,ALERT_PROP.STR_ID
+    FROM SYS_USR_PROFIL
+    JOIN SYS_USR_CONNU ON (SYS_USR_PROFIL.LOGIN = SYS_USR_CONNU.LOGIN)
+    JOIN ALERT_PROFILE ON (SYS_USR_PROFIL.CODE_PROFIL = ALERT_PROFILE.PROFILE_ID)
+    JOIN ALERT_BATCH1 ON (ALERT_PROFILE.ALERT_ID = ALERT_BATCH1.ALERT_ID)
+    JOIN ALERT_PROP ON (ALERT_BATCH1.ALERT_ID = ALERT_PROP.ALERT_ID)
+    WHERE SYS_USR_CONNU.ACTIF = '1'
+    ORDER BY SYS_USR_PROFIL.LOGIN,ALERT_PROP.ALERT_ID;
+
+    CURSOR cursorLoginAlert2(pAlertID VARCHAR2) IS 
+    SELECT DISTINCT SYS_USR_PROFIL.LOGIN,ALERT_PROP.ALERT_ID,ALERT_PROP.SQL_WHERE_2,ALERT_PROP.PEOPLE_ID,ALERT_PROP.PACMAT_ID,ALERT_PROP.STR_ID
+    FROM SYS_USR_PROFIL
+    JOIN SYS_USR_CONNU ON (SYS_USR_PROFIL.LOGIN = SYS_USR_CONNU.LOGIN)
+    JOIN ALERT_PROFILE ON (SYS_USR_PROFIL.CODE_PROFIL = ALERT_PROFILE.PROFILE_ID)
+    JOIN ALERT_BATCH1 ON (ALERT_PROFILE.ALERT_ID = ALERT_BATCH1.ALERT_ID)
+    JOIN ALERT_PROP ON (ALERT_BATCH1.ALERT_ID = ALERT_PROP.ALERT_ID)
+    WHERE SYS_USR_CONNU.ACTIF = '1' AND ALERT_BATCH1.ALERT_ID = pAlertID
+    ORDER BY SYS_USR_PROFIL.LOGIN,ALERT_PROP.ALERT_ID;
+
+    varsysCodts INTEGER;
+    found INTEGER;
+    alertNb INTEGER  := 0;
+    loginAlertProcessed INTEGER := 0;
+    rowNb INTEGER;
+    params VARCHAR2(1000);
+    currentLogin SYS_USR_PROFIL.LOGIN%TYPE;
+    previousLogin SYS_USR_PROFIL.LOGIN%TYPE;
+    alertID ALERT_PROP.ALERT_ID%TYPE;
+    STSQL_LOGIN CLOB :='INSERT INTO ALERT_BATCH2_TMP SELECT :1 ,ALERT_BATCH1.ALERT_ID,ALERT_BATCH1.ID1,ALERT_BATCH1.ID2,ALERT_BATCH1.ID3,ALERT_BATCH1.ID4,ALERT_BATCH1.ID5,ALERT_BATCH1.ID6 FROM ALERT_BATCH1 WHERE ALERT_BATCH1.ALERT_ID = :2';
+    stSql CLOB;
+    stPeople VARCHAR2(4000);
+    stPacmat VARCHAR2(4000);
+    stStr VARCHAR2(4000);
+    securityPeople INTEGER;
+    securityStr INTEGER;
+    schemaDB VARCHAR2(250);
+  BEGIN
+    --DBMS_OUTPUT.PUT_LINE('BEGIN exec_login:'||TO_CHAR(SYSDATE,'YYYYMMDDHH24MISS'));
+    --FIXME utiliser la procédure trace_dbms_output()
+    dateExec := TO_DATE(pDateExec,'YYYYMMDDHH24MISS');
+    
+    BEGIN
+      SELECT TO_NUMBER(NVL(VALVAR,'0')) INTO varsysCodts FROM SYS_VARSYS WHERE MODULE = 'STD' AND CODVAR = 'DEFAULT_CODTS' ;
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        BEGIN
+          SELECT TO_NUMBER(NVL(VALVAR,'0')) INTO varsysCodts FROM SYS_VARSYS WHERE MODULE = 'SYS' AND CODVAR = 'DEFAULT_CODTS' ;
+        EXCEPTION
+          WHEN OTHERS THEN
+            insert_Error(dateExec,'Erreur d''accès (PLSQL003) : ' || SQLERRM,'');
+            GOTO END_EXEC;
+        END;
+      WHEN OTHERS THEN
+        insert_Error(dateExec,'Erreur d''accès (PLSQL004) : ' || SQLERRM,'');
+        GOTO END_EXEC;
+    END;
+
+    IF pAlertID IS NULL THEN
+      OPEN cursorLoginAlert1;
+      FETCH cursorLoginAlert1 BULK COLLECT INTO listLoginAlert;
+      CLOSE cursorLoginAlert1;
+    ELSE
+      OPEN cursorLoginAlert2(pAlertID);
+      FETCH cursorLoginAlert2 BULK COLLECT INTO listLoginAlert;
+      CLOSE cursorLoginAlert2;
+    END IF;
+    IF pAlertID IS NULL THEN
+      BEGIN
+        EXECUTE_IMMEDIATE_STRING('TRUNCATE TABLE ALERT_BATCH2_TMP',0);
+      EXCEPTION
+        WHEN OTHERS THEN
+          insert_Error(dateExec,'Erreur de suppression (PLSQL005) : ' || SQLERRM,'');
+          GOTO END_EXEC;
+      END;
+    ELSE
+      BEGIN
+        DELETE FROM ALERT_BATCH2_TMP WHERE ALERT_ID = pAlertID;
+        COMMIT;
+      EXCEPTION
+        WHEN OTHERS THEN
+          insert_Error(dateExec,'Erreur de suppression (PLSQL006) : ' || SQLERRM,'');
+          GOTO END_EXEC;
+      END;
+    END IF;
+    endProcForced := notify_LoginAlert_Begin(dateExec,listLoginAlert.COUNT);
+    IF (endProcForced) THEN
+      GOTO END_EXEC;
+    END IF;
+
+    rowNb := -1;
+    currentLogin := NULL;
+    previousLogin := NULL;
+
+    IF (listLoginAlert.FIRST IS NOT NULL) THEN
+      BEGIN
+        FOR i IN listLoginAlert.FIRST..listLoginAlert.LAST LOOP
+          rowNb := i;
+          currentLogin := listLoginAlert(rowNb).login;
+          alertID := listLoginAlert(rowNb).alertID;
+          IF previousLogin IS NULL OR currentLogin != previousLogin THEN
+            BEGIN
+              SELECT ID_SECU INTO securityPeople FROM SYS_SEC_RESOLUE_POP_REQ WHERE LOGIN = currentLogin;
+            EXCEPTION
+              WHEN NO_DATA_FOUND THEN
+                securityPeople := NULL;
+              WHEN OTHERS THEN
+                params := '[LOGIN=' || currentLogin || ';ALERT_ID=' || alertID || ']';
+                notify_LoginAlert_End_KO(dateExec,SQLERRM,params);
+                GOTO END_EXEC;
+            END;
+            BEGIN
+              SELECT ID_SECU INTO securityStr FROM SYS_SEC_RESOLUE_STRUCT_REQ WHERE LOGIN = currentLogin AND CODTS = varsysCodts;
+            EXCEPTION
+              WHEN NO_DATA_FOUND THEN
+                securityStr := NULL;
+              WHEN OTHERS THEN
+                params := '[LOGIN=' || currentLogin || ';ALERT_ID=' || alertID || ']';
+                notify_LoginAlert_End_KO(dateExec,SQLERRM,params);
+                GOTO END_EXEC;
+            END;
+          END IF;
+
+          IF listLoginAlert(rowNb).peopleID IS NULL OR listLoginAlert(rowNb).peopleID = 0 THEN
+            stPeople := '';
+          ELSE
+            IF securityPeople IS NULL OR securityPeople = -1 THEN
+              GOTO NEXT_LOGIN_ALERT;
+            ELSIF securityPeople = 0 THEN
+              stPeople := '';
+            ELSE
+              stPeople := ' AND ID' || listLoginAlert(rowNb).peopleID || ' IN ( SELECT MATRIC FROM SYS_SEC_RESOLUE_POP_MAT WHERE ID_SECU = '||securityPeople||')';
+            END IF;
+          END IF;
+          
+          IF listLoginAlert(rowNb).pacmatID IS NULL OR listLoginAlert(rowNb).pacmatID = 0 THEN
+            stPacmat := '';
+          ELSE
+            IF securityPeople IS NULL OR securityPeople = -1 THEN
+              GOTO NEXT_LOGIN_ALERT;
+            ELSIF securityPeople = 0 THEN
+              stPacmat := '';
+            ELSE
+              stPacmat := ' AND ID' || listLoginAlert(rowNb).pacmatID || ' IN ( SELECT IDPACMAT FROM SYS_SEC_RESOLUE_POP_PAC WHERE ID_SECU = '||securityPeople||')';
+            END IF;
+          END IF;
+
+          IF listLoginAlert(rowNb).strID IS NULL OR listLoginAlert(rowNb).strID = 0 THEN
+            stStr := '';
+          ELSE
+            IF securityStr IS NULL OR securityStr = -1 THEN
+              GOTO NEXT_LOGIN_ALERT;
+            ELSIF securityStr = 0 THEN
+              stStr := '';
+            ELSE
+              stStr := ' AND ID' || listLoginAlert(rowNb).strID || ' IN ( SELECT CODE_ENTITE FROM SYS_SEC_RESOLUE_STRUCT WHERE ID_SECU = '||securityStr||' AND CODTS = '|| varsysCodts || ')';
+            END IF;
+          END IF;
+          
+          stSql := STSQL_LOGIN || stPeople || stPacmat || stStr;
+          
+          IF listLoginAlert(rowNb).stWhere IS NOT NULL THEN
+             stSql := stSql  || ' AND ( ' || REPLACE(listLoginAlert(rowNb).stWhere,'$LOGIN','''' ||currentLogin ||'''') || ' ) ';
+          END IF;
+          
+          EXECUTE IMMEDIATE stSql USING currentLogin,alertID;
+          <<NEXT_LOGIN_ALERT>>
+          previousLogin :=currentLogin;
+          loginAlertProcessed := loginAlertProcessed + 1;
+          MERGE INTO ALERT_BATCH_USER USING (SELECT 1 FROM DUAL) ON (ALERT_BATCH_USER.LOGIN = previousLogin AND ALERT_BATCH_USER.DATE_EXEC = dateExec)
+          WHEN MATCHED THEN
+            UPDATE SET DATE_BEGIN = NULL, DATE_END = NULL, STATUS_ID = 'END_OK', ERROR_MESSAGE = NULL, ERROR_PARAMS = NULL
+          WHEN NOT MATCHED THEN INSERT VALUES (previousLogin,dateExec,NULL,NULL,NULL,NULL,NULL);
+          endProcForced := notify_LoginAlert_Processed(dateExec,loginAlertProcessed);
+          IF (endProcForced) THEN
+            GOTO END_EXEC;
+          END IF;
+        END LOOP;
+      EXCEPTION
+        WHEN OTHERS THEN
+          ROLLBACK;
+          IF (rowNb > -1) THEN
+            params := '[LOGIN=' || currentLogin || ';ALERT_ID=' || alertID || ']';
+          END IF;
+          notify_LoginAlert_End_KO(dateExec,SQLERRM,params);
+          GOTO END_EXEC;
+      END;
+    END IF;
+    
+    COMMIT;--COMMIT ALERT_BATCH2_TMP
+    
+    BEGIN
+      IF pAlertID IS NULL THEN
+          EXECUTE_IMMEDIATE_STRING('TRUNCATE TABLE ALERT_BATCH2',0);
+          INSERT INTO ALERT_BATCH2 SELECT * FROM ALERT_BATCH2_TMP;
+      ELSE
+        DELETE FROM ALERT_BATCH2 WHERE ALERT_ID = pAlertID;
+        INSERT INTO ALERT_BATCH2 SELECT * FROM ALERT_BATCH2_TMP WHERE ALERT_ID = pAlertID;
+      END IF;
+    EXCEPTION
+      WHEN OTHERS THEN
+        insert_Error(dateExec,'Erreur de bascule (PLSQL015) : ' || SQLERRM,'[ALERT_ID=' || pAlertID || ']');
+        GOTO END_EXEC;
+    END;
+
+    endProcForced := notify_LoginAlert_End_OK(dateExec);
+    <<END_EXEC>>
+
+    COMMIT;
+    SELECT SYS_CONTEXT('USERENV','CURRENT_SCHEMA') INTO schemaDB FROM DUAL;
+    --DBMS_STATS.GATHER_TABLE_STATS(schemaDB,'ALERT_BATCH2', ESTIMATE_PERCENT=>NULL,METHOD_OPT=>'FOR ALL COLUMNS SIZE 1',CASCADE=>FALSE);
+    --DBMS_OUTPUT.PUT_LINE('END exec_login:'||TO_CHAR(SYSDATE,'YYYYMMDDHH24MISS'));
+    --FIXME utiliser la procédure trace_dbms_output()
+  EXCEPTION
+    WHEN OTHERS THEN
+      ROLLBACK;
+      insert_Error(dateExec,SQLERRM,'[exec_login]');
+  END exec_login;
+
+  PROCEDURE exec_user(pLogin VARCHAR2,pDateExec VARCHAR2) IS 
+  PRAGMA AUTONOMOUS_TRANSACTION ;
+    dateExec DATE;
+    endProcForced BOOLEAN;
+    TYPE TypeAlertBatchUserExec IS TABLE OF ALERT_BATCH_USER_EXEC%ROWTYPE;
+    listAlertBatchUserExec TypeAlertBatchUserExec;
+    CURSOR cursorAlertBatchUserExec (pLogin VARCHAR2,pDateExec DATE) IS 
+    SELECT * FROM ALERT_BATCH_USER_EXEC WHERE LOGIN = pLogin AND DATE_EXEC = pDateExec ORDER BY ORDER_NB;
+    elapsedTime NUMBER;
+    orderNb NUMBER;
+    time01 NUMBER;
+    time02 NUMBER;
+    rowNb INTEGER;
+    params VARCHAR2(1000);
+    stSql CLOB;
+  
+  BEGIN
+    --DBMS_OUTPUT.PUT_LINE('BEGIN exec_user:'||TO_CHAR(SYSDATE,'YYYYMMDDHH24MISS'));
+    --FIXME utiliser la procédure trace_dbms_output()
+    dateExec := TO_DATE(pDateExec,'YYYYMMDDHH24MISS');
+
+    OPEN cursorAlertBatchUserExec(pLogin,dateExec);
+    FETCH cursorAlertBatchUserExec BULK COLLECT INTO listAlertBatchUserExec;
+    CLOSE cursorAlertBatchUserExec;
+
+    endProcForced := notify_Alert_User_Begin(pLogin,dateExec);
+    IF (endProcForced) THEN
+      GOTO END_EXEC;
+    END IF;
+
+    BEGIN
+      DELETE FROM ALERT_BATCH_USER WHERE DATE_EXEC < TRUNC(ADD_MONTHS(SYSDATE,-2));
+    EXCEPTION
+      WHEN OTHERS THEN
+        --DBMS_OUTPUT.PUT_LINE('exec_user : Erreur de suppression des traitements obsolètes [pLogin='|| pLogin || ';pDateExec=' || TO_CHAR(pDateExec,'YYYYMMDDHH24MISS') || ']: ' || SQLERRM);
+        --FIXME utiliser la procédure trace_dbms_output()
+        GOTO END_EXEC;
+    END;
+    
+    DELETE FROM ALERT_BATCH2 WHERE LOGIN = pLogin;
+    
+    rowNb := -1;
+    IF (listAlertBatchUserExec.FIRST IS NOT NULL) THEN
+      BEGIN
+        FOR i IN listAlertBatchUserExec.FIRST..listAlertBatchUserExec.LAST LOOP
+          rowNb := i;
+          orderNb := listAlertBatchUserExec(rowNb).ORDER_NB;
+          time01 := TO_CHAR(SYSDATE,'SSSSS');
+          EXECUTE_IMMEDIATE_STRING( listAlertBatchUserExec(rowNb).ALERT_SQL,0);
+          time02 := TO_CHAR(SYSDATE,'SSSSS');
+          IF (time01 > time02) THEN
+            elapsedTime := 86400 - time01 + time02;
+          ELSE
+           elapsedTime := time02 - time01;
+          END IF;
+          endProcForced := set_Alert_User_Elapsed_Time(pLogin,dateExec,orderNb,elapsedTime);
+          IF (endProcForced) THEN
+           GOTO END_EXEC;
+          END IF;
+        END LOOP;
+      EXCEPTION
+        WHEN OTHERS THEN
+          ROLLBACK;
+          IF (rowNb > -1) THEN
+            params := '[ORDER_NB=' || listAlertBatchUserExec(rowNb).ORDER_NB || ';ALERT_ID=' || listAlertBatchUserExec(rowNb).ALERT_ID || ']';
+          END IF;
+          update_User_Error(pLogin,dateExec,SQLERRM,params);
+          GOTO END_EXEC;
+      END;
+    END IF;
+    
+    endProcForced := notify_Alert_User_End_OK(pLogin,dateExec);
+    COMMIT;
+    
+    <<END_EXEC>>
+    --DBMS_OUTPUT.PUT_LINE('END exec_user:'||TO_CHAR(SYSDATE,'YYYYMMDDHH24MISS'));
+    --FIXME utiliser la procédure trace_dbms_output()
+    NULL;
+  EXCEPTION
+    WHEN OTHERS THEN
+      ROLLBACK;
+      update_User_Error(pLogin,dateExec,SQLERRM,'[exec_user]');
+  END exec_user;
+
+  FUNCTION notify_Alert_Begin(pDateExec DATE , pAlertNbToExecute INTEGER) RETURN BOOLEAN IS
+  PRAGMA AUTONOMOUS_TRANSACTION ;
+  BEGIN
+    UPDATE ALERT_BATCH SET DATE_BEGIN_1 = SYSDATE , STATUS_ID = 'EXEC_1_P' , EXEC_NB_12 = pAlertNbToExecute WHERE DATE_EXEC = pDateExec;
+
+    IF (SQL%ROWCOUNT <=0 ) THEN
+      RAISE NO_DATA_FOUND;
+    END IF;
+    COMMIT;
+    RETURN FALSE;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      ROLLBACK;
+      insert_Error(pDateExec,'Batch absent (PLSQL007).','');
+      RETURN TRUE;
+    WHEN OTHERS THEN
+      ROLLBACK;
+      insert_Error(pDateExec,SQLERRM,'');
+      RETURN TRUE;
+  END notify_Alert_Begin;
+
+  FUNCTION notify_Alert_User_Begin(pLogin VARCHAR2 , pDateExec DATE) RETURN BOOLEAN IS
+  PRAGMA AUTONOMOUS_TRANSACTION ;
+  BEGIN
+    UPDATE ALERT_BATCH_USER SET DATE_BEGIN = SYSDATE , STATUS_ID = 'EXEC_1_P' WHERE LOGIN = pLogin AND DATE_EXEC = pDateExec;
+
+    IF (SQL%ROWCOUNT <=0 ) THEN
+      RAISE NO_DATA_FOUND;
+    END IF;
+    COMMIT;
+    RETURN FALSE;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      ROLLBACK;
+      --DBMS_OUTPUT.PUT_LINE('notify_Alert_User_Begin NO_DATA_FOUND :[pLogin='|| pLogin || ';pDateExec=' || TO_CHAR(pDateExec,'YYYYMMDDHH24MISS') || ']');
+      --FIXME utiliser la procédure trace_dbms_output()
+      RETURN TRUE;
+    WHEN OTHERS THEN
+      ROLLBACK;
+      update_User_Error(pLogin,pDateExec,SQLERRM,'');
+      RETURN TRUE;
+  END notify_Alert_User_Begin;
+
+  FUNCTION notify_LoginAlert_Begin(pDateExec DATE , pAlertLoginNbToExecute INTEGER) RETURN BOOLEAN IS
+  PRAGMA AUTONOMOUS_TRANSACTION ;
+  BEGIN
+    UPDATE ALERT_BATCH SET DATE_BEGIN_2 = SYSDATE , STATUS_ID = 'EXEC_2_P' , EXEC_NB_22 = pAlertLoginNbToExecute WHERE DATE_EXEC = pDateExec;
+
+    IF (SQL%ROWCOUNT <=0 ) THEN
+      RAISE NO_DATA_FOUND;
+    END IF;
+    COMMIT;
+    RETURN FALSE;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      ROLLBACK;
+      insert_Error(pDateExec,'Batch absent (PLSQL008).','');
+      RETURN TRUE;
+    WHEN OTHERS THEN
+      ROLLBACK;
+      insert_Error(pDateExec,SQLERRM,'');
+      RETURN TRUE;
+  END notify_LoginAlert_Begin;
+
+  FUNCTION set_Alert_Elapsed_Time(pDateExec DATE , pOrderNb INTEGER , pElapsedTime INTEGER)  RETURN BOOLEAN IS
+  PRAGMA AUTONOMOUS_TRANSACTION ;
+  params VARCHAR2(1000);
+  BEGIN
+    UPDATE ALERT_BATCH_EXEC SET ELAPSED_TIME = pElapsedTime WHERE DATE_EXEC = pDateExec AND ORDER_NB = pOrderNb;
+    
+    IF (SQL%ROWCOUNT <=0 ) THEN
+      RAISE NO_DATA_FOUND;
+    END IF;
+    COMMIT;
+    RETURN FALSE;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      ROLLBACK;
+      params := '[DATE_EXEC=' || pDateExec || ';ORDER_NB=' || pOrderNb || ']';
+      insert_Error(pDateExec,'Batch absent (PLSQL009).',params);
+      RETURN TRUE;
+    WHEN OTHERS THEN
+      ROLLBACK;
+      params := '[DATE_EXEC=' || pDateExec || ';ORDER_NB=' || pOrderNb || ']';
+      insert_Error(pDateExec,SQLERRM,params);
+      RETURN TRUE;
+  END set_Alert_Elapsed_Time;
+
+  FUNCTION set_Alert_User_Elapsed_Time(pLogin VARCHAR2 , pDateExec DATE , pOrderNb INTEGER , pElapsedTime INTEGER)  RETURN BOOLEAN IS
+  PRAGMA AUTONOMOUS_TRANSACTION ;
+  params VARCHAR2(1000);
+  BEGIN
+    UPDATE ALERT_BATCH_USER_EXEC SET ELAPSED_TIME = pElapsedTime WHERE LOGIN = pLogin AND DATE_EXEC = pDateExec AND ORDER_NB = pOrderNb;
+    
+    IF (SQL%ROWCOUNT <=0 ) THEN
+      RAISE NO_DATA_FOUND;
+    END IF;
+    COMMIT;
+    RETURN FALSE;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      ROLLBACK;
+      --DBMS_OUTPUT.PUT_LINE('set_Alert_User_Elapsed_Time NO_DATA_FOUND :[pLogin='|| pLogin || ';pDateExec=' || TO_CHAR(pDateExec,'YYYYMMDDHH24MISS')  || ';pOrderNb=' || pOrderNb ||']');
+      --FIXME utiliser la procédure trace_dbms_output()
+      RETURN TRUE;
+    WHEN OTHERS THEN
+      ROLLBACK;
+      update_User_Error(pLogin,pDateExec,SQLERRM,'[ORDER_NB=' || pOrderNb || ']');
+      RETURN TRUE;
+  END set_Alert_User_Elapsed_Time;
+
+  FUNCTION notify_Alert_Processed(pDateExec DATE , pAlertProcessed INTEGER)  RETURN BOOLEAN IS
+  PRAGMA AUTONOMOUS_TRANSACTION ;
+  BEGIN
+    UPDATE ALERT_BATCH SET EXEC_NB_11 = pAlertProcessed WHERE DATE_EXEC = pDateExec;
+
+    IF (SQL%ROWCOUNT <=0 ) THEN
+      RAISE NO_DATA_FOUND;
+    END IF;
+    COMMIT;
+    RETURN FALSE;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      ROLLBACK;
+      insert_Error(pDateExec,'Batch absent (PLSQL010).','');
+      RETURN TRUE;
+    WHEN OTHERS THEN
+      ROLLBACK;
+      insert_Error(pDateExec,SQLERRM,'');
+      RETURN TRUE;
+  END notify_Alert_Processed;
+
+  FUNCTION notify_LoginAlert_Processed(pDateExec DATE , pLoginAlertProcessed INTEGER)  RETURN BOOLEAN IS
+  PRAGMA AUTONOMOUS_TRANSACTION ;
+  BEGIN
+    UPDATE ALERT_BATCH SET EXEC_NB_21 = pLoginAlertProcessed WHERE DATE_EXEC = pDateExec;
+
+    IF (SQL%ROWCOUNT <=0 ) THEN
+      RAISE NO_DATA_FOUND;
+    END IF;
+    COMMIT;
+    RETURN FALSE;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      ROLLBACK;
+      insert_Error(pDateExec,'Batch absent (PLSQL011).','');
+      RETURN TRUE;
+    WHEN OTHERS THEN
+      ROLLBACK;
+      insert_Error(pDateExec,SQLERRM,'');
+      RETURN TRUE;
+  END notify_LoginAlert_Processed;
+
+  FUNCTION notify_Alert_End_OK(pDateExec DATE)  RETURN BOOLEAN IS
+  PRAGMA AUTONOMOUS_TRANSACTION ;
+  
+  ERRMSG VARCHAR2(4000);
+  
+  BEGIN
+    UPDATE ALERT_BATCH SET DATE_END_1 = SYSDATE , STATUS_ID = 'EXEC_1_OK' , TOTAL_ALERT = (SELECT COUNT(*) FROM ALERT_BATCH1) WHERE DATE_EXEC = pDateExec;
+
+    IF (SQL%ROWCOUNT <=0 ) THEN
+      RAISE NO_DATA_FOUND;
+    END IF;
+    COMMIT;
+    RETURN FALSE;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      ROLLBACK;
+      insert_Error(pDateExec,'Batch absent (PLSQL012).','');
+      RETURN TRUE;
+    WHEN OTHERS THEN
+      ROLLBACK;
+      insert_Error(pDateExec,SQLERRM,'');
+      RETURN TRUE;
+  END notify_Alert_End_OK;
+
+  FUNCTION notify_Alert_User_End_OK(pLogin VARCHAR2,pDateExec DATE)  RETURN BOOLEAN IS
+  PRAGMA AUTONOMOUS_TRANSACTION ;
+  
+  ERRMSG VARCHAR2(4000);
+  
+  BEGIN
+    UPDATE ALERT_BATCH_USER SET DATE_END = SYSDATE , STATUS_ID = 'END_OK' WHERE LOGIN = pLogin AND DATE_EXEC = pDateExec;
+
+    IF (SQL%ROWCOUNT <=0 ) THEN
+      RAISE NO_DATA_FOUND;
+    END IF;
+    COMMIT;
+    RETURN FALSE;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      ROLLBACK;
+      --DBMS_OUTPUT.PUT_LINE('notify_Alert_User_End_OK NO_DATA_FOUND :[pLogin='|| pLogin || ';pDateExec=' || TO_CHAR(pDateExec,'YYYYMMDDHH24MISS')  ||']');
+      --FIXME utiliser la procédure trace_dbms_output()
+      RETURN TRUE;
+    WHEN OTHERS THEN
+      ROLLBACK;
+       update_User_Error(pLogin,pDateExec,SQLERRM,'[notify_Alert_User_End_OK]');
+      RETURN TRUE;
+  END notify_Alert_User_End_OK;
+
+  PROCEDURE notify_Alert_End_KO (pDateExec DATE , pErrorMessage VARCHAR2 , pErrorParams VARCHAR2) IS 
+  PRAGMA AUTONOMOUS_TRANSACTION ;
+  BEGIN
+    UPDATE ALERT_BATCH SET DATE_END_1 = SYSDATE ,STATUS_ID = 'EXEC_1_KO' WHERE DATE_EXEC = pDateExec;
+    INSERT INTO ALERT_BATCH_ERROR VALUES(pDateExec,pErrorMessage,pErrorParams);
+    COMMIT;
+  EXCEPTION
+    WHEN OTHERS THEN
+      --DBMS_OUTPUT.PUT_LINE('notify_Alert_End_KO='|| SQLERRM);
+      --FIXME utiliser la procédure trace_dbms_output()
+      ROLLBACK;
+  END notify_Alert_End_KO;
+
+  FUNCTION notify_LoginAlert_End_OK(pDateExec DATE)  RETURN BOOLEAN IS
+  PRAGMA AUTONOMOUS_TRANSACTION ;
+  
+  ERRMSG VARCHAR2(4000);
+  
+  BEGIN
+    UPDATE ALERT_BATCH SET DATE_END_2 = SYSDATE , STATUS_ID = 'END_OK' WHERE DATE_EXEC = pDateExec;
+
+    IF (SQL%ROWCOUNT <=0 ) THEN
+      RAISE NO_DATA_FOUND;
+    END IF;
+    COMMIT;
+    RETURN FALSE;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      ROLLBACK;
+      insert_Error(pDateExec,'Batch absent (PLSQL013).','');
+      RETURN TRUE;
+    WHEN OTHERS THEN
+      ROLLBACK;
+      insert_Error(pDateExec,SQLERRM,'');
+      RETURN TRUE;
+  END notify_LoginAlert_End_OK;
+
+  PROCEDURE notify_LoginAlert_End_KO (pDateExec DATE , pErrorMessage VARCHAR2 , pErrorParams VARCHAR2) IS 
+  PRAGMA AUTONOMOUS_TRANSACTION ;
+  BEGIN
+    UPDATE ALERT_BATCH SET DATE_END_2 = SYSDATE ,STATUS_ID = 'EXEC_2_KO' WHERE DATE_EXEC = pDateExec;
+    INSERT INTO ALERT_BATCH_ERROR VALUES(pDateExec,pErrorMessage,pErrorParams);
+    COMMIT;
+  EXCEPTION
+    WHEN OTHERS THEN
+      --DBMS_OUTPUT.PUT_LINE('notify_LoginAlert_End_KO='|| SQLERRM);
+      --FIXME utiliser la procédure trace_dbms_output()
+      ROLLBACK;
+  END notify_LoginAlert_End_KO;
+
+  PROCEDURE insert_Error (pDateExec DATE , pErrorMessage VARCHAR2 , pErrorParams VARCHAR2) IS 
+  PRAGMA AUTONOMOUS_TRANSACTION ;
+  BEGIN
+    UPDATE ALERT_BATCH SET STATUS_ID = 'END_KO' WHERE DATE_EXEC = pDateExec;
+    INSERT INTO ALERT_BATCH_ERROR VALUES(pDateExec,pErrorMessage,pErrorParams);
+    COMMIT;
+  EXCEPTION
+    WHEN OTHERS THEN
+      --DBMS_OUTPUT.PUT_LINE('insert_Error='|| SQLERRM);
+      --FIXME utiliser la procédure trace_dbms_output()
+      ROLLBACK;
+  END insert_Error;
+
+  PROCEDURE update_User_Error (pLogin VARCHAR2 , pDateExec DATE , pErrorMessage VARCHAR2 , pErrorParams VARCHAR2) IS 
+  PRAGMA AUTONOMOUS_TRANSACTION ;
+  BEGIN
+    UPDATE ALERT_BATCH_USER SET STATUS_ID = 'END_KO',ERROR_MESSAGE = pErrorMessage,ERROR_PARAMS = pErrorParams WHERE LOGIN = pLogin AND DATE_EXEC = pDateExec;
+    COMMIT;
+  EXCEPTION
+    WHEN OTHERS THEN
+      --DBMS_OUTPUT.PUT_LINE('update_User_Error_End_KO='|| SQLERRM);
+      --FIXME utiliser la procédure trace_dbms_output()
+      ROLLBACK;
+  END update_User_Error;
+
+END Alert;

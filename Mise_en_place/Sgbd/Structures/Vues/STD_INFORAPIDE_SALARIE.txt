@@ -1,0 +1,4 @@
+##
+STD_INFORAPIDE_SALARIE
+==
+CREATE OR REPLACE FORCE VIEW "STD_INFORAPIDE_SALARIE" ("MATRIC", "INFORMATION") AS   (SELECT matric, '' AS information FROM secumatric UNION SELECT matric, '' AS information FROM for_ext_agt)  

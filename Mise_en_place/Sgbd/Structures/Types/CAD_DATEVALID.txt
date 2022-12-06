@@ -1,0 +1,17 @@
+##
+CAD_DATEVALID
+=SQL=
+BEGIN 
+EXECUTE_IMMEDIATE_STRING ('DROP TYPE TAB_CAD_DATEVALID',0);
+EXCEPTION  WHEN OTHERS THEN  NULL; end ;
+##
+CAD_DATEVALID
+=SQL=
+create or replace TYPE CAD_DATEVALID AS OBJECT  
+(Code_Compteur  VARCHAR2(5), 
+Code_element  VARCHAR2(4), 
+paiezad   VARCHAR2(8),
+ Matricule    VARCHAR2(32), 
+ Periode_Recueil   DATE,
+ DATE_DEBUT  DATE,
+ unite VARCHAR2(1));

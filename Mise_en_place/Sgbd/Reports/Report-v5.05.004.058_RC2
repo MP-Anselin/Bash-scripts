@@ -1,0 +1,806 @@
+##
+TAG_IMPORT=5.05.004.R058_RC2
+##
+TAG_CHARSET=@€éèç
+##
+MP_MAPPING_EVENT_DATA
+==
+delete from  MP_MAPPING_EVENT_DATA WHERE SPECIF = 'N' and EVENT = 'worker.workAssignment.terminate'
+'worker.workAssignment.terminate','worker.terminate','N','E','N'
+##
+MP_REF_STD_CUSTOMFIELD
+==
+DELETE FROM MP_REF_STD_CUSTOMFIELD WHERE CUSTOMFIELD_ID IN ('gtaCode','diplomePlusEleveObtenu','natureExoPro','niveauFormation','categorieSalarieAbattementFraisPro','pourcentageImpositionCICE','situationAvantContrat','tpsPartielCotisTxPlein','txEmploiAide','txTransportEtab','lotPermanent','RAZPourcentageImpositionCICE','exoTaxeTransport')
+'gtaCode','tlmCode'
+'diplomePlusEleveObtenu','highestDegreeObtained'
+'natureExoPro','professionalExemptionType'
+'niveauFormation','trainingLevel'
+'categorieSalarieAbattementFraisPro','professionalExpenseAllowanceType'
+'pourcentageImpositionCICE','CICETaxPercentage'
+'situationAvantContrat','situationBeforeContract'
+'tpsPartielCotisTxPlein','partTimeContributorAtFullRate'
+'txEmploiAide','supportedEmploymentRate'
+'txTransportEtab','workLocationTransportPaymentRate'
+'lotPermanent','permanentLot'
+'RAZPourcentageImpositionCICE','CICETaxPercentageReset'
+'exoTaxeTransport','transportPaymentExemption'
+##
+MP_REF_DATA_ALP
+==
+DELETE FROM MP_REF_DATA_ALP WHERE DATA_NAME_MP IN ('DependentsPersonSocialInsuranceProgramsSocialSecurityCoveredIndicator','DependentsPersonSocialInsurancePrograms0CoveredIndicator','DependentsPersonSocialInsuranceProgramsHealthInsuranceCoveredIndicator','DependentsPersonSocialInsurancePrograms1CoveredIndicator')
+'DependentsPersonSocialInsuranceProgramsSocialSecurityCoveredIndicator','dependentEnfantSocialSecurityCoveredIndicator'
+'DependentsPersonSocialInsuranceProgramsHealthInsuranceCoveredIndicator','dependentConjointHealthInsuranceCoveredIndicator'
+'DependentsPersonSocialInsuranceProgramsHealthInsuranceCoveredIndicator','dependentEnfantHealthInsuranceCoveredIndicator'
+##
+MP_REF_DATA_ALP
+==
+DELETE FROM MP_REF_DATA_ALP WHERE DATA_NAME_MP IN ('PersonImmigrationDocument0TypeCode','WorkAssignmentAssignedWorkLocationsAddressLineFive','WorkAssignmentAssignedWorkLocationsAddressBuildingNumber','WorkAssignmentWorkLocationsNameCodeLongName','WorkAssignmentWorkLevelCodeCodeValue','WorkAssignmentOccupationalClassificationsClassificationClassificationCodeCodeValue','WorkAssignmentOccupationalClassificationsOccupationalClassificationFieldClassificationCodeCodeValue','WorkAssignmentOccupationalClassificationsOccupationalClassificationFamilyClassificationCodeCodeValue','WorkAssignmentOccupationalClassificationsOccupationalClassificationProfessionClassificationCodeCodeValue','WorkAssignmentCustomFieldGroupIndicatorFieldsAlsaceMoselleIndicatorValue','WorkAssignmentCustomFieldGroupDateFieldsDateEntryCompanyDateValue','WorkAssignmentCustomFieldGroupDateFieldsApprenticeContractStartDateDateValue','WorkAssignmentCustomFieldGroupIndicatorFieldsManagementPositionIndicatorIndicatorValue','WorkAssignmentCustomFieldGroupIndicatorFieldsProbationPeriodIndicatorValue','WorkAssignmentCustomFieldGroupStringFieldsApprenticeContractDurationCodeStringValue','WorkAssignmentCustomFieldGroupStringFieldsAdmSituationStringValue','WorkAssignmentWorkerGroupsCPNCodeGroupCodeCodeValue','WorkAssignmentWorkerGroupsPCSComplementGroupCodeCodeValue','WorkAssignmentWorkerGroupsEchelonLevelGroupCodeCodeValue','WorkAssignmentWorkerGroupsInseeCodeGroupCodeCodeValue','WorkAssignmentCustomFieldGroupStringFieldsMSACatStatusStringValue','WorkAssignmentCustomFieldGroupStringFieldsTlmCodeStringValue','WorkAssignmentCustomFieldGroupStringFieldsHighestDegreeObtainedStringValue','WorkAssignmentCustomFieldGroupStringFieldsProfessionalExemptionTypeStringValue','WorkAssignmentCustomFieldGroupStringFieldsTrainingLevelStringValue','WorkAssignmentCustomFieldGroupStringFieldsProfessionalExpenseAllowanceTypeStringValue','WorkAssignmentCustomFieldGroupNumberFieldsCICETaxPercentageNumberValue','WorkAssignmentCustomFieldGroupStringFieldsSituationBeforeContractStringValue','WorkAssignmentCustomFieldGroupStringFieldsPartTimeContributorAtFullRateStringValue','WorkAssignmentCustomFieldGroupNumberFieldsSupportedEmploymentRateNumberValue','WorkAssignmentCustomFieldGroupNumberFieldsWorkLocationTransportPaymentRateNumberValue','WorkAssignmentCustomFieldGroupStringFieldsPermanentLotStringValue','WorkAssignmentCustomFieldGroupIndicatorFieldsCICETaxPercentageResetIndicatorValue','WorkAssignmentCustomFieldGroupIndicatorFieldsTransportPaymentExemptionIndicatorValue')
+'PersonImmigrationDocument0TypeCode','typeCodeImmDoc'
+'WorkAssignmentAssignedWorkLocationsAddressLineFive','complementAdresseEtab'
+'WorkAssignmentAssignedWorkLocationsAddressBuildingNumber','numeroVoieAdresseEtab'
+'WorkAssignmentWorkLocationsNameCodeLongName','longNameEtab'
+'WorkAssignmentWorkLevelCodeCodeValue','MotifTempsPartiel'
+'WorkAssignmentOccupationalClassificationsClassificationClassificationCodeCodeValue','classification'
+'WorkAssignmentOccupationalClassificationsOccupationalClassificationFieldClassificationCodeCodeValue','occupationalClassificationField'
+'WorkAssignmentOccupationalClassificationsOccupationalClassificationFamilyClassificationCodeCodeValue','occupationalClassificationFamily'
+'WorkAssignmentOccupationalClassificationsOccupationalClassificationProfessionClassificationCodeCodeValue','occupationalClassificationProfession'
+'WorkAssignmentCustomFieldGroupIndicatorFieldsAlsaceMoselleIndicatorValue','alsaceMoselle'
+'WorkAssignmentCustomFieldGroupDateFieldsDateEntryCompanyDateValue','dateEntryCompany'
+'WorkAssignmentCustomFieldGroupDateFieldsApprenticeContractStartDateDateValue','apprenticeContractStartDate'
+'WorkAssignmentCustomFieldGroupIndicatorFieldsManagementPositionIndicatorIndicatorValue','managementPositionIndicator'
+'WorkAssignmentCustomFieldGroupIndicatorFieldsProbationPeriodIndicatorValue','probationPeriod'
+'WorkAssignmentCustomFieldGroupStringFieldsApprenticeContractDurationCodeStringValue','apprenticeContractDurationCode'
+'WorkAssignmentCustomFieldGroupStringFieldsAdmSituationStringValue','admSituation'
+'WorkAssignmentWorkerGroupsCPNCodeGroupCodeCodeValue','CPNCode'
+'WorkAssignmentWorkerGroupsPCSComplementGroupCodeCodeValue','PCSComplement'
+'WorkAssignmentWorkerGroupsEchelonLevelGroupCodeCodeValue','echelonLevel'
+'WorkAssignmentWorkerGroupsInseeCodeGroupCodeCodeValue','inseeCode'
+'WorkAssignmentCustomFieldGroupStringFieldsMSACatStatusStringValue','MSACatStatus'
+'WorkAssignmentCustomFieldGroupStringFieldsTlmCodeStringValue','gtaCode'
+'WorkAssignmentCustomFieldGroupStringFieldsHighestDegreeObtainedStringValue','diplomePlusEleveObtenu'
+'WorkAssignmentCustomFieldGroupStringFieldsProfessionalExemptionTypeStringValue','natureExoPro'
+'WorkAssignmentCustomFieldGroupStringFieldsTrainingLevelStringValue','niveauFormation'
+'WorkAssignmentCustomFieldGroupStringFieldsProfessionalExpenseAllowanceTypeStringValue','categorieSalarieAbattementFraisPro'
+'WorkAssignmentCustomFieldGroupNumberFieldsCICETaxPercentageNumberValue','pourcentageImpositionCICE'
+'WorkAssignmentCustomFieldGroupStringFieldsSituationBeforeContractStringValue','situationAvantContrat'
+'WorkAssignmentCustomFieldGroupStringFieldsPartTimeContributorAtFullRateStringValue','tpsPartielCotisTxPlein'
+'WorkAssignmentCustomFieldGroupNumberFieldsSupportedEmploymentRateNumberValue','txEmploiAide'
+'WorkAssignmentCustomFieldGroupNumberFieldsWorkLocationTransportPaymentRateNumberValue','txTransportEtab'
+'WorkAssignmentCustomFieldGroupStringFieldsPermanentLotStringValue','lotPermanent'
+'WorkAssignmentCustomFieldGroupIndicatorFieldsCICETaxPercentageResetIndicatorValue','RAZPourcentageImpositionCICE'
+'WorkAssignmentCustomFieldGroupIndicatorFieldsTransportPaymentExemptionIndicatorValue','exoTaxeTransport'
+##
+MP_REF_DATA_ALP
+==
+DELETE FROM MP_REF_DATA_ALP WHERE DATA_NAME_MP IN ('WorkAssignmentCustomFieldGroupDateFieldsTerminationDateAdmDateValue','WorkAssignmentCustomFieldGroupDateFieldsLastPayedDayDateValue','WorkAssignmentCustomFieldGroupDateFieldsTerminationProcedureDateDateValue')
+'WorkAssignmentCustomFieldGroupDateFieldsTerminationDateAdmDateValue','terminationDateAdm'
+'WorkAssignmentCustomFieldGroupDateFieldsLastPayedDayDateValue','lastPayedDay'
+'WorkAssignmentCustomFieldGroupDateFieldsTerminationProcedureDateDateValue','terminationProcedureDate'
+##
+TGE_REF_MAPVR
+==
+delete from TGE_REF_MAPVR where NUMPAC = '*' and TABLEZADIG = 'ATA' AND CHAMPZADIG  = 'V01'
+##
+TGE_REF_MAPVR
+==
+insert into TGE_REF_MAPVR(NUMPAC, TABLEZADIG, CHAMPZADIG, TABLEGXP, DONNEEGXP, TYPEGXP, LONGUEURGXP) VALUES ('*','ATA','V01','TGE_REF_ATA', 'CODE_STATUT','A','2')
+##
+TGE_REF_MAPVR
+==
+delete from TGE_REF_MAPVR where NUMPAC = '*' and TABLEZADIG = 'ATA' AND CHAMPZADIG  = 'V02'
+##
+TGE_REF_MAPVR
+==
+insert into TGE_REF_MAPVR(NUMPAC, TABLEZADIG, CHAMPZADIG, TABLEGXP, DONNEEGXP, TYPEGXP, LONGUEURGXP) VALUES ('*','ATA','V02','TGE_REF_ATA','LIBELLE1','A','32')
+##
+TGE_REF_MAPVR
+==
+delete from TGE_REF_MAPVR where NUMPAC = '*' and TABLEZADIG = 'ATA' AND CHAMPZADIG  = 'V03'
+##
+TGE_REF_MAPVR
+==
+insert into TGE_REF_MAPVR(NUMPAC, TABLEZADIG, CHAMPZADIG, TABLEGXP, DONNEEGXP, TYPEGXP, LONGUEURGXP) VALUES ('*','ATA','V03','TGE_REF_ATA','LIBELLE2','A','32')
+##
+TGE_REF_MAPVR
+==
+delete from TGE_REF_MAPVR where NUMPAC = '*' and TABLEZADIG = 'ATA' AND CHAMPZADIG  = 'V04'
+##
+TGE_REF_MAPVR
+==
+insert into TGE_REF_MAPVR(NUMPAC, TABLEZADIG, CHAMPZADIG, TABLEGXP, DONNEEGXP, TYPEGXP, LONGUEURGXP) VALUES ('*','ATA','V04','TGE_REF_ATA','CODE_DSN','A','3')
+##
+TGE_REF_ATA
+=SQL IFNOTEXIST=TGE_REF_ATA=
+CREATE TABLE TGE_REF_ATA(CODE_STATUT VARCHAR2(2 BYTE),LIBELLE1 VARCHAR2(32 BYTE),LIBELLE2 VARCHAR2(32 BYTE),CODE_DSN VARCHAR2(3 BYTE),UTILISE VARCHAR2(1 BYTE), primary key(CODE_STATUT) )
+##
+TGE_REF_ATA
+==
+delete from TGE_REF_ATA WHERE CODE_STATUT IN ('01','02','03','04','05','06','07','09','10','11','12','13','14','15','16')
+'01','Gérant ou collège de gérance','','01','O'
+'02','Administrateur','','02','O'
+'03','Directeur Général','','03','O'
+'04','Président Directeur Général','','04','O'	
+'05','Membre du Directoire','','05','O'	
+'06','Président du Directoire','','06','O'
+'07','Membre du Conseil','de surveillance','07','O'
+'09','Contrôleur de gestion, membre o','u administrateur membre d''un GIE','09','O'
+'10','Associé, actionnaire','','10','O'	
+'11','Salarié en portage ','salarial','11','O'
+'12','ADMINISTRATEUR/PDG/DG','','','N'
+'13','MEMBRE PDT DU DIRECTOIRE','','','N'
+'14','DG NON ADMINISTRATEUR','','','N'
+'15','DIRECTEUR GENERAL UNIQUE','','','N'
+'16','MANDATAIRE SOCIAL','','','N'
+##
+sys_requetes_jsp
+==
+DELETE FROM sys_requetes_jsp WHERE nompage = 'TracesInterpreter.jsp' and idrequete = '2'
+'TracesInterpreter.jsp','2','Utilisateur', '(SELECT DISTINCT r.nom    AS NOM,  r.prenom AS PRENOM,   nvl(e.EMAIL ,sx.EMAIL) AS EMAIL  FROM  sys_usr_config_ihm r LEFT JOIN etat_civ  e ON e.matric = r.requetematric LEFT JOIN sys_usr_externe    sx ON sx.login = r.login)', 'PRENOM,NOM,EMAIL' , 'PRENOM,NOM,EMAIL', NULL, 0, 'Login', NULL, NULL, NULL,'PRENOM,NOM,EMAIL' 
+##
+SYS_REQUETES_JSP (NOMPAGE,IDREQUETE,NOMBASE,NOMTABLE,LISTCOLAFF,LISTCOLSET,CLAUSEWHERE,CLAUSEMAX,CLAUSEDISTINCT,CLAUSEORDRE,DESCREQ,LIBREQ,LISTLIBCOLAFF)
+==
+delete from SYS_REQUETES_JSP where NOMPAGE IN ('TAB_RD_WKF_PERIODE_EMPLOI_RETRO','REG_RD_WKF_PERIODE_EMPLOI_RETRO') and IDREQUETE = '1'
+'TAB_RD_WKF_PERIODE_EMPLOI_RETRO','1','Utilisateur','DIC_ADM_CONTRAT_HISTO H¿ INNER JOIN DIC_ADM_CONTRAT C¿ ON C.NUMPAC =H.NUMPAC¿ AND C.PACMAT =H.PACMAT¿ AND C.NUMCNT = H.NUMCNT¿ AND NVL(C.DSFCN,TO_DATE(''31.12.2099'',''dd.MM.yyyy'')) = NVL(H.DATE_FIN,TO_DATE(''31.12.2099'',''dd.MM.yyyy''))¿ INNER JOIN TGE_REF_PAC P¿ ON P.NUMPAC = C.NUMPAC¿ AND NOT NVL(MPE,''N'')=''N''¿ LEFT JOIN TGE_REF_TDR T¿ ON C.TYPE_REEMBAUCHE = T.TYPE_REEMBAUCHE¿ AND C.NUMPAC = T.NUMPAC','C.NUMCNT, TO_CHAR(C.DSDCN^''dd.MM.yyyy''), TO_CHAR(C.DSFCN^''dd.MM.yyyy''), H.ZT061, C.TYPE_REEMBAUCHE, T.LIBELLE','C.NUMCNT, TO_CHAR(C.DSDCN^''dd.MM.yyyy''), TO_CHAR(C.DSFCN^''dd.MM.yyyy''), H.ZT061, C.TYPE_REEMBAUCHE,TO_CHAR(H.DATE_EFF^''dd.MM.yyyy''),H.PAIEZAD','CASE ¿  WHEN P.DEB_HISTO_RETRO IS NULL THEN ''O'' ¿  WHEN P.NB_MOIS_RETRO IS NULL THEN ''O'' ¿  WHEN C.DSDCN >= TO_DATE(GREATEST(DEB_HISTO_RETRO, TO_CHAR(ADD_MONTHS(TO_DATE(PERIODEENCOURS, ''YYYYMM''), -NB_MOIS_RETRO), ''YYYYMM'')), ''YYYYMM'') THEN ''O'' ¿  WHEN NOT EXISTS ( ¿    SELECT 1 ¿    FROM PHOTO_DIC_ADM_CONTRAT PH ¿    WHERE PH.NUMPAC=C.NUMPAC ¿    AND PH.PACMAT =C.PACMAT ¿    AND PH.NUMCNT =C.NUMCNT ¿    AND PH.DSDCN =C.DSDCN ¿  ) THEN ''O'' ¿  ELSE ''N'' ¿END = ''O'' ¿AND H.MATRIC = ''@GEN_MATRIC@''','0',NULL,'C.DSDCN ASC',NULL,'Périodes d''emploi dont la date d''embauche est incluse dans la profondeur de rétro','numéro de contrat, date début contrat, date fin contrat, nature de contrat, type de réembauche, libellé type de réembauche'
+'REG_RD_WKF_PERIODE_EMPLOI_RETRO','1','Utilisateur','DIC_ADM_CONTRAT_HISTO H¿ INNER JOIN DIC_ADM_CONTRAT C¿ ON C.NUMPAC =H.NUMPAC¿ AND C.PACMAT =H.PACMAT¿ AND C.NUMCNT = H.NUMCNT¿ AND NVL(C.DSFCN,TO_DATE(''31.12.2099'',''dd.MM.yyyy'')) = NVL(H.DATE_FIN,TO_DATE(''31.12.2099'',''dd.MM.yyyy''))¿ INNER JOIN TGE_REF_PAC P¿ ON P.NUMPAC = C.NUMPAC¿ AND NOT NVL(MPE,''N'')=''N''¿ LEFT JOIN TGE_REF_TDR T¿ ON C.TYPE_REEMBAUCHE = T.TYPE_REEMBAUCHE¿ AND C.NUMPAC = T.NUMPAC','C.NUMCNT, TO_CHAR(C.DSDCN^''dd.MM.yyyy''), TO_CHAR(C.DSFCN^''dd.MM.yyyy''), H.ZT061, C.TYPE_REEMBAUCHE, T.LIBELLE','C.NUMCNT, TO_CHAR(C.DSDCN^''dd.MM.yyyy''), TO_CHAR(C.DSFCN^''dd.MM.yyyy''), H.ZT061, C.TYPE_REEMBAUCHE,TO_CHAR(H.DATE_EFF^''dd.MM.yyyy''),H.PAIEZAD','CASE ¿  WHEN P.DEB_HISTO_RETRO IS NULL THEN ''O'' ¿  WHEN P.NB_MOIS_RETRO IS NULL THEN ''O'' ¿  WHEN C.DSDCN >= TO_DATE(GREATEST(DEB_HISTO_RETRO, TO_CHAR(ADD_MONTHS(TO_DATE(PERIODEENCOURS, ''YYYYMM''), -NB_MOIS_RETRO), ''YYYYMM'')), ''YYYYMM'') THEN ''O'' ¿  WHEN NOT EXISTS ( ¿    SELECT 1 ¿    FROM PHOTO_DIC_ADM_CONTRAT PH ¿    WHERE PH.NUMPAC=C.NUMPAC ¿    AND PH.PACMAT =C.PACMAT ¿    AND PH.NUMCNT =C.NUMCNT ¿    AND PH.DSDCN =C.DSDCN ¿  ) THEN ''O'' ¿  ELSE ''N'' ¿END = ''O'' ¿AND H.MATRIC = ''%1''','0','false','C.DSDCN ASC',null,'Périodes d''emploi dont la date d''embauche est incluse dans la profondeur de rétro','numéro de contrat, date début contrat, date fin contrat, nature de contrat, type de réembauche, libellé type de réembauche');
+##
+sys_requetes_jsp
+==
+DELETE FROM sys_requetes_jsp WHERE nompage = 'TAB_RD_STAT_PART' and idrequete = '1'
+'TAB_RD_STAT_PART','1','Utilisateur','(select CODE_STATUT, CONCAT (LIBELLE1,LIBELLE2) AS LIBELLE, CODE_DSN, UTILISE  FROM TGE_REF_ATA)','CODE_STATUT,LIBELLE, CODE_DSN, UTILISE ','CODE_STATUT','UTILISE = ''O''','0',null,null,null,null,'CODE_STATUT'
+##
+sys_varsys
+==
+DELETE FROM sys_varsys WHERE codvar = 'HELDPESK_OFFRE_SIEBEL' and module = 'STD'
+'STD','HELDPESK_OFFRE_SIEBEL','','Texte','Paramétrer par client l''offre relative au produit ADP Link à envoyer lors de la création d''un ticket Siebel depuis le HelpDesk'
+##
+SYS_VARSYS
+==
+call ADM_ADD_OR_UPDATE_VARSYS ('SYS', 'ALL_SERVICELET', 'true','Booléen', 'true : la totalité du contenu des tables SYS_SERVICELET/SYS_SERVICELET_CLIENT sont chargées au start de la console. false : les éléments (servicelet,jsonservelt,etc..) sont chargés au fur et à mesure lors de leur premier appel.')
+##
+SYS_DEF_PURGE_TBL
+==
+DELETE FROM SYS_DEF_PURGE_TBL WHERE NOM_TABLE = 'GAP_TRT'
+'GAP_TRT','DATE_PLANIF_TRT','010000',NULL,NULL
+##
+SYS_DEF_PURGE_TBL
+==
+DELETE FROM SYS_DEF_PURGE_TBL WHERE NOM_TABLE IN ('GAP_TRT_SUIVI','GAP_TRT_LISTE_MAT')
+##
+SYS_TRT_TOMAKE
+==
+DELETE FROM SYS_TRT_TOMAKE WHERE ID_TRT = 'Traitement_ExportDroitACE'
+'Traitement_ExportDroitACE','00'
+##
+SYS_TRT_TOMAKE
+==
+DELETE FROM SYS_TRT_TOMAKE WHERE ID_TRT like 'Traitement_Purge_TablesDePaie%'
+'Traitement_Purge_TablesDePaie?WithOrphanPartitions=true','00'
+##
+SYS_DEF_PURGE_TBL_LINK
+==
+DELETE FROM SYS_DEF_PURGE_TBL_LINK WHERE NOM_TABLE = 'GAP_TRT' AND NOM_TABLE_LINK IN ('GAP_TRT_SUIVI','GAP_TRT_LISTE_MAT')
+'GAP_TRT','ID_TRT','GAP_TRT_SUIVI','ID_TRT',NULL
+'GAP_TRT','ID_TRT','GAP_TRT_LISTE_MAT','ID_TRT',NULL
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME= 'Traitement_ExportDroitACE'
+'T','Traitement_ExportDroitACE','fr.adp.com.gxp.std.mot_tech.lib.ace.Traitement_ExportDroitACE','O'
+##
+SYS_SERVICELET
+==
+DELETE FROM SYS_SERVICELET WHERE SYNONYME = 'Traitement_Purge_TablesDePaie' AND TYP = 'T'
+'T','Traitement_Purge_TablesDePaie','fr.adp.com.gxp.std.mot_met.lib.objects.purge.Traitement_Purge_TablesDePaie','O'
+##
+SYS_DEF_ERREURS
+==
+delete from SYS_DEF_ERREURS where CODMOD = 'GEN' and CODLANG = 'fr_fr' and NIV_DEFINITION = '0' and CODERR IN ('GENWK126','GENWK127')
+'GENWK126','GEN','fr_fr','0','L''embauche étant présente dans les fichiers paie, il est peut-être nécessaire de saisir des rappels de paie.','2'
+'GENWK127','GEN','fr_fr','0','Modification impossible car la date d''embauche est postérieure à la date initiale et n''est pas sur le même mois de paie.','1'
+##
+SYS_DEF_ERREURS
+==
+DELETE FROM SYS_DEF_ERREURS WHERE CODERR = 'STDNULL' AND CODLANG = 'fr_fr' AND NIV_DEFINITION = 0
+'STDNULL','STD','fr_fr','0','(vide)','3'
+##
+TGE_CREATE_TRIGGER_RECYCLAGE
+=SQL=
+CREATE OR REPLACE FUNCTION TGE_CREATE_TRIGGER_RECYCLAGE(NOM_TABLE IN VARCHAR2)
+RETURN CLOB
+AS
+  v_retour CLOB;
+
+  v_typeTable VARCHAR(1);
+  date_eff_exists NUMBER;
+  nom_col_date_test_recycl VARCHAR2(30);
+  condition CLOB;
+
+  CURSOR cur_mapdo IS
+    SELECT LISTAGG(numpac,',') WITHIN GROUP (ORDER BY numpac) as numpacs, donneegxp, data_type from (
+      with donnees_paie (numpac, donneegxp, tablegxp, data_type) as (
+        SELECT numpac, donneegxp, tablegxp, data_type
+        FROM TGE_REF_MAPDO_RESOLVED,user_tab_cols
+        WHERE 
+          column_name=donneegxp and table_name=nom_table and
+          TABLEGXP IN (
+            SELECT tableparam
+            FROM tge_ref_mapta
+            WHERE 
+              tablephy = nom_table
+              --RSI DIT 39298 MPE : Fonction d'envoi inconditionnel pour la table TGE_REF_MAPDO
+              --Ajout du type 'I'
+              AND allerretour IN ('A','2','I')
+              -- les occurences !! sont désactivés 
+              AND tge_ref_mapdo_resolved.occurence != '!!'
+          )
+        UNION 
+        SELECT numpac,donneegxp,(select min(tableparam) from tge_ref_mapta where tablephy = nom_table) as tablegxp,data_type 
+        FROM TABLE(GET_GXP_TRT_PARTICULIER_DATAS(nom_table)),user_tab_cols
+        WHERE 
+          column_name=donneegxp and table_name=nom_table
+      )
+      SELECT distinct 
+        case when not exists (select 1 from tge_ref_pac where numpac not in (select numpac from donnees_paie m where donneegxp=t.donneegxp and TABLEGXP=t.TABLEGXP)) then '*' else numpac end as numpac
+        , donneegxp, data_type
+      from donnees_paie t
+    )
+    GROUP BY donneegxp, data_type
+    ORDER BY donneegxp;
+  lig_mapdo cur_mapdo%rowtype;
+  vFunctionCompare VARCHAR2(10);
+  vFunctionCompareParam3 VARCHAR2(50);
+
+BEGIN
+
+  BEGIN EXECUTE_IMMEDIATE_STRING( 'DROP PROCEDURE CHECK_RECYCLAGE_'||NOM_TABLE,0); EXCEPTION WHEN OTHERS THEN NULL; END;
+
+  v_retour := NULL;
+  v_typeTable := fsed.getTypeTable(NOM_TABLE);
+
+  date_eff_exists := 0;
+  nom_col_date_test_recycl := NULL;
+  IF nom_table='DIC_ADM_CONTRAT' THEN
+    -- Pour DIC_ADM_CONTRAT c'est DSDCN qui fera office de DATE_EFF pour tester s'il faut mettre en recyclage
+    nom_col_date_test_recycl := 'DSDCN';
+  ELSE
+    SELECT COUNT(*)
+    INTO date_eff_exists
+    FROM user_tab_cols
+    WHERE column_name     = 'DATE_EFF'
+    AND table_name        = NOM_TABLE;
+    IF date_eff_exists>0 THEN
+      nom_col_date_test_recycl := 'DATE_EFF';
+    END IF;
+  END IF;
+
+  v_retour := 'CREATE OR REPLACE PROCEDURE CHECK_RECYCLAGE_'||NOM_TABLE||'(v_ligOld '||NOM_TABLE||'%ROWTYPE, v_ligNew IN OUT '||NOM_TABLE||'%ROWTYPE, v_numpac IN OUT VARCHAR2, v_pacmat IN OUT VARCHAR2, v_paiezad IN OUT VARCHAR2, tabRefPacByNumpac IN OUT ALIM_IDX.T_REF_PAC_BY_NUMPAC) IS 
+ v_matric VARCHAR2(32);
+type pacmats IS record (R_numpac VARCHAR2(6), R_pacmat VARCHAR2(8), R_periode_recycl VARCHAR2(1)); 
+TYPE TAB_pacmats IS TABLE OF pacmats INDEX BY binary_integer; 
+tab TAB_pacmats; 
+v_recycl varchar2(1); 
+v_periode_recycl varchar2(1); 
+v_error_periode_recycl_3 number; 
+v_retro VARCHAR2(1); 
+v_nbOccForCnt number;
+';
+
+  IF nom_col_date_test_recycl IS NOT NULL THEN
+    v_retour := v_retour||'
+date_test_recycl DATE;
+';
+  END IF;
+
+    v_retour := v_retour||'
+BEGIN
+ v_matric := NVL(v_ligNew.MATRIC,v_ligOld.MATRIC); ';
+
+  -- Récupération du numpac si besoin
+  IF v_typeTable = 'z' THEN
+    v_retour := v_retour||' 
+SELECT DISTINCT D.numpac as R_numpac, 
+D.pacmat as R_pacmat, 
+T.PERIODE_RECYCLAGE as R_periode_recycl bulk collect 
+INTO tab 
+FROM DIC_ADM_CONTRAT_SITU D ,SECUPACMAT T 
+WHERE D.NUMPAC=v_numpac AND D.PAIEZAD=v_paiezad AND D.NUMPAC=T.NUMPAC AND D.PACMAT=T.PACMAT;';
+  elsif v_typeTable = 'm' THEN
+    v_retour := v_retour||' 
+SELECT numpac as R_numpac, 
+pacmat as R_pacmat , 
+PERIODE_RECYCLAGE as R_periode_recycl bulk collect 
+INTO tab 
+FROM SECUPACMAT 
+WHERE matric=v_matric;';
+  elsif v_typeTable = 'p' THEN
+    v_retour := v_retour||' 
+SELECT numpac as R_numpac, 
+pacmat as R_pacmat , 
+PERIODE_RECYCLAGE as R_periode_recycl bulk collect 
+INTO tab 
+FROM SECUPACMAT 
+WHERE NUMPAC=v_numpac AND PACMAT=v_pacmat;';
+  END IF;
+
+  v_retour := v_retour||'
+if not tab.exists(1) then
+ return;
+end if;
+
+v_retro := ''N'';
+ FOR i IN 1..tab.last LOOP
+  v_numpac:=tab(i).r_numpac;
+   IF NOT v_numpac = ''TMPPAC'' THEN
+    v_pacmat:=tab(i).r_pacmat;
+    v_periode_recycl:=nvl(tab(i).R_periode_recycl,''1'');
+';
+
+  IF NOT nom_table ='DIC_ADM_CONTRAT_HISTO' THEN
+    -- une valeur '3' dans PERIODE_RECYCLAGE retourne une erreur
+    -- sauf en cas de réembauche (insertion dans DIC_ADM_CONTRAT et DIC_ADM_CONTRAT_HISTO)
+    v_retour := v_retour||' IF v_periode_recycl = ''3'' THEN';
+    IF nom_table ='DIC_ADM_CONTRAT' THEN
+      v_retour := v_retour||'     IF UPDATING OR DELETING THEN';
+    END IF;
+    v_retour := v_retour||'     RAISE_APPLICATION_ERROR(-20001,''CODERR=GENREC02'');';
+    IF nom_table ='DIC_ADM_CONTRAT' THEN
+      v_retour := v_retour||'     END IF;';
+    END IF;
+    v_retour := v_retour||' END IF;';
+  ELSE
+    -- on positionne PERIODE_RECYCLAGE à '1' en cas de réembauche d'un salarié ayant une valeur '0' ou '3' dans PERIODE_RECYCLAGE et répondant aux critères suivants :
+    -- - DRPAI2 est non-vide et différent de 'B'
+    -- - NATCOL vaut 'SAL' ou 'STA'
+    -- - DSDCN est antérieure ou égale à la période en cours
+    v_retour := v_retour||'
+IF v_periode_recycl IN (''0'',''3'') THEN
+ IF v_periode_recycl = ''3'' THEN
+  -- si PERIODE_RECYCLAGE vaut ''3'', on prévoit qu''il va falloir retourner une erreur (modification d''un contrat existant)
+  v_error_periode_recycl_3 := 1;
+ ELSE
+  v_error_periode_recycl_3 := 0;
+ END IF;
+ IF INSERTING THEN
+  -- insertion d''un historique de contrat : on vérifie s''il s''agit de la première occurrence du contrat (réembauche)
+  v_nbOccForCnt := GET_NB_LIGNES(''DIC_ADM_CONTRAT_HISTO'', ''NUMPAC=''''''||v_ligNew.NUMPAC||'''''' AND PACMAT=''''''||v_ligNew.PACMAT||'''''' AND NUMCNT=''||v_ligNew.NUMCNT);
+  IF v_nbOccForCnt = 0 THEN
+   -- première occurrence du contrat (réembauche) : on ne retourne pas d''erreur, et, si PERIODE_RECYCLAGE = ''3'', on va réactiver le dossier
+   IF v_periode_recycl = ''3'' THEN
+    v_error_periode_recycl_3 := 0;
+    v_ligNew.ZREACT := TO_DATE(TO_CHAR(v_ligNew.DATE_EFF,''yyyy'')||''0101'',''yyyymmdd'');
+   END IF; -- FIN v_periode_recycl = ''3''
+   -- vérification des critères pour positionner PERIODE_RECYCLAGE à ''1''
+   IF CHECK_FORCAGE_RECYCLAGE(v_ligNew.NUMPAC, v_ligNew.PACMAT, v_ligNew.NUMCNT, v_ligNew.DRPAI2, NULL) = 1 THEN
+    -- OK pour PERIODE_RECYCLAGE = ''1''
+    v_periode_recycl := ''1'';
+   END IF; -- FIN CHECK_FORCAGE_RECYCLAGE
+  END IF; -- FIN v_nbOccForCnt = 0
+ ELSIF UPDATING THEN
+  -- un update : on va vérifier si on doit réactiver le dossier
+  IF UPDATING(''DRPAI2'') AND (NVL(v_ligOld.DRPAI2, ''B'') <> NVL(v_ligNew.DRPAI2, ''B'') AND (NVL(v_ligOld.DRPAI2, ''B'') =''B'' OR NVL(v_ligNew.DRPAI2, ''B'')=''B'')) THEN
+   -- update de DRPAI2 pour déblocage paie : on ne retourne pas d''erreur, et on va réactiver le dossier
+   v_error_periode_recycl_3 := 0;
+   IF CHECK_FORCAGE_RECYCLAGE(v_ligNew.NUMPAC, v_ligNew.PACMAT, v_ligNew.NUMCNT, v_ligNew.DRPAI2, NULL) = 1 THEN
+    -- OK pour PERIODE_RECYCLAGE = ''1''
+    v_periode_recycl := ''1'';
+   END IF; -- FIN CHECK_FORCAGE_RECYCLAGE
+  ELSIF UPDATING(''ZREACT'') AND v_ligOld.ZREACT IS NULL AND v_ligNew.ZREACT IS NOT NULL THEN
+   -- update de ZREACT pour réactivation : si l''année de ZREACT est inférieure ou égale à l''année de la période en cours, on ne retourne pas d''erreur
+   BEGIN
+    IF NOT tabRefPacByNumpac.exists(v_ligNew.NUMPAC) THEN
+     select * into tabRefPacByNumpac(v_ligNew.NUMPAC) from tge_ref_pac where numpac = v_ligNew.NUMPAC;
+    END IF;
+    IF TO_CHAR(v_ligNew.ZREACT,''yyyy'') <= SUBSTR(tabRefPacByNumpac(v_ligNew.NUMPAC).PERIODEENCOURS,1,4) THEN
+     v_error_periode_recycl_3 := 0;
+     IF CHECK_FORCAGE_RECYCLAGE(v_ligNew.NUMPAC, v_ligNew.PACMAT, v_ligNew.NUMCNT, v_ligNew.DRPAI2, tabRefPacByNumpac(v_ligNew.NUMPAC).PERIODEENCOURS) = 1 THEN
+      -- OK pour PERIODE_RECYCLAGE = ''1''
+      v_periode_recycl := ''1'';
+     END IF; -- FIN CHECK_FORCAGE_RECYCLAGE
+    END IF; -- FIN ZREACT <= PERIODEENCOURS
+   EXCEPTION WHEN OTHERS THEN NULL; END;
+  END IF; -- FIN UPDATING DRPAI2 ou ZREACT
+ END IF; -- FIN INSERTING/UPDATING
+ IF v_error_periode_recycl_3 = 1 THEN
+  RAISE_APPLICATION_ERROR(-20001,''CODERR=GENREC02'');
+ END IF;
+END IF; -- FIN v_periode_recycl = 0 ou 3
+';
+  END IF;
+
+  v_retour := v_retour||'
+IF v_periode_recycl = ''2'' THEN
+ RAISE_APPLICATION_ERROR(-20001,''CODERR=GENREC01'');
+ELSIF v_periode_recycl = ''1'' THEN
+';
+
+  -- on vérifie si des colonnes paies ont été modifié
+  v_retour := v_retour||' v_recycl:=''N'';';
+  IF nom_col_date_test_recycl IS NOT NULL THEN
+    v_retour := v_retour||'
+IF NOT tabRefPacByNumpac.exists(v_numpac) THEN
+ select * into tabRefPacByNumpac(v_numpac) from tge_ref_pac where numpac = v_numpac;
+END IF;
+IF DELETING THEN
+ date_test_recycl := v_ligOld.'||nom_col_date_test_recycl||';
+ELSE
+ date_test_recycl := v_ligNew.'||nom_col_date_test_recycl||';
+END IF;
+IF (NVL(TO_CHAR(date_test_recycl,''yyyymm''),''000000'') <= tabRefPacByNumpac(v_numpac).PERIODEENCOURS) THEN
+';
+  END IF;
+
+  v_retour := v_retour||'
+IF (INSERTING and v_ligOld.MATRIC IS NULL) OR (DELETING and v_ligNew.MATRIC IS NULL) THEN 
+ -- En insertion, si on n''a pas récupéré de ''OLD'' (seulement dans le cas de DIC_ADM_CONTRAT_HISTO), on inscrit forcément en recyclage
+ -- En suppression, si on n''a pas récupéré de ''NEW'' (seulement dans le cas de DIC_ADM_CONTRAT_HISTO), on inscrit forcément en recyclage
+ v_recycl:=''O'';
+ELSE 
+  -- Sinon, on compare ''OLD'' et ''NEW''
+';
+  condition := NULL;
+  OPEN cur_mapdo;
+  LOOP FETCH cur_mapdo INTO lig_mapdo ;
+
+    IF cur_mapdo%NOTFOUND AND condition IS NOT NULL THEN
+      condition := condition||' 
+END IF;';
+    END IF;
+
+    EXIT WHEN cur_mapdo%NOTFOUND;
+
+    IF lig_mapdo.donneegxp IS NOT NULL THEN
+      IF condition IS NOT NULL THEN
+        condition := condition||' 
+ELSIF ';
+      ELSE
+        condition := ' IF ';
+        IF NOM_TABLE ='DIC_ADM_CONTRAT_HISTO' THEN
+          condition := condition||' NVL(v_ligOld.DRPAI2, ''B'') <> NVL(v_ligNew.DRPAI2, ''B'') AND (NVL(v_ligOld.DRPAI2, ''B'') =''B'' OR NVL(v_ligNew.DRPAI2, ''B'')=''B'') THEN 
+ v_recycl:=''O'';
+ELSIF ';
+        END IF;
+      END IF;
+
+      IF NOT lig_mapdo.numpacs = '*' THEN
+        condition := condition||'INSTR('''||lig_mapdo.numpacs||''',v_numpac)>0 AND ';
+      END IF;
+
+      vFunctionCompare := 'IS_EQ';
+      vFunctionCompareParam3 := NULL;
+      IF lig_mapdo.data_type = 'DATE' THEN
+        vFunctionCompare := 'IS_EQ_DATE';
+        vFunctionCompareParam3 := ',''yyyymmddhh24miss''';
+      END IF;
+      condition := condition||' NOT '||vFunctionCompare||'(v_ligNew.'||lig_mapdo.donneegxp||',v_ligOld.'||lig_mapdo.donneegxp||vFunctionCompareParam3||') THEN
+ v_recycl:=''O''; ';
+    END IF;
+
+  END LOOP;
+  CLOSE cur_mapdo;
+
+  IF condition IS NULL THEN
+    RETURN NULL;
+  END IF;
+
+  v_retour := v_retour||condition;
+  
+  -- traitement du matricule pour recyclage
+  v_retour := v_retour||'
+END IF; -- FIN updating
+IF v_recycl=''O'' THEN 
+ MERGE INTO GAP_RECYCL_MATRIC a
+  USING (SELECT v_numpac AS numpac,v_pacmat AS pacmat FROM dual) b
+  ON (a.pacmat=b.pacmat AND a.numpac=b.numpac)
+  WHEN NOT MATCHED THEN INSERT (a.numpac,a.pacmat) VALUES (b.numpac,b.pacmat);
+
+ MERGE INTO TGE_MODIF_PACMAT_TORESEND a
+  USING (SELECT v_numpac AS numpac,v_pacmat AS pacmat, '''||NOM_TABLE||''' as TABLE_TO_SEND FROM dual) b
+  ON (a.pacmat=b.pacmat AND a.numpac=b.numpac and a.TABLE_TO_SEND=b.TABLE_TO_SEND)
+  WHEN MATCHED THEN update set a.DATE_MAJ=sysdate 
+  WHEN NOT MATCHED THEN INSERT (a.numpac,a.pacmat,a.TABLE_TO_SEND,a.DATE_MAJ) VALUES (b.numpac,b.pacmat,b.TABLE_TO_SEND, sysdate);
+END IF; -- FIN v_recycl
+';
+
+  IF nom_col_date_test_recycl IS NOT NULL THEN
+    v_retour := v_retour||' END IF; -- FIN test date recycl';
+  END IF;
+  v_retour := v_retour||'
+END IF; -- FIN v_periode_recycl IN (''0'',''3'')
+'|| TGE_CREATE_TRIGGER_RETRO(NOM_TABLE) ||'
+END IF; -- FIN NOT v_numpac = ''TMPPAC''
+END LOOP; -- FIN tab
+END CHECK_RECYCLAGE_'||NOM_TABLE||';
+';
+
+  EXECUTE_IMMEDIATE_STRING( v_retour,0);
+
+  v_retour := '
+-- DEBUT TRAITEMENT RECYCLAGE
+if v_type_writer<>''N'' AND v_type_writer<>''M'' THEN 
+ CHECK_RECYCLAGE_'||NOM_TABLE||'(v_ligOld, v_ligNew, v_numpac, v_pacmat, v_paiezad, tabRefPacByNumpac); ';
+  IF nom_table ='DIC_ADM_CONTRAT_HISTO' THEN
+    v_retour := v_retour || '
+ IF INSERTING THEN 
+  -- On récupère la valeur de ZREACT potentiellement mise à jour
+  :NEW.ZREACT := v_ligNew.ZREACT; 
+ END IF; ';
+  END IF;
+  v_retour := v_retour || '
+end if;
+-- FIN TRAITEMENT RECYCLAGE';
+ 
+  return v_retour;
+END TGE_CREATE_TRIGGER_RECYCLAGE;
+##
+SECNAV_MAJ_ALL
+=SQL=
+CREATE OR REPLACE PROCEDURE SECNAV_MAJ_ALL(p_doRaz NUMBER) IS 
+  TYPE TYP_COL_ROW IS TABLE OF USER_TAB_COLS%Rowtype ;
+  Tabcol  TYP_COL_ROW ;
+  v_listeColonnesSECUPACMAT CLOB;
+BEGIN
+  IF p_doRaz=1 THEN
+    DELETE FROM SECUPACMAT_TMP;
+    -- On insère les couples NUMPAC/PACMAT ayant un contrat
+    INSERT INTO SECUPACMAT_TMP (NUMPAC,PACMAT,MATRIC) SELECT NUMPAC,PACMAT,MIN(MATRIC) FROM DIC_ADM_CONTRAT GROUP BY NUMPAC,PACMAT;
+    -- On insère les couples NUMPAC/PACMAT présents dans DIC_ADM_PERSO (colonnes CURRENT_NUMPAC/CURRENT_PACMAT) n'existant pas dans SECUPACMAT_TMP (NUMPAC='TMPPAC' ou couple NUMPAC/PACMAT pour lequel un contrat a été créé puis supprimé)
+    INSERT INTO SECUPACMAT_TMP (NUMPAC,PACMAT,MATRIC) SELECT CURRENT_NUMPAC, CURRENT_PACMAT, MATRIC FROM DIC_ADM_PERSO WHERE CURRENT_NUMPAC IS NOT NULL AND CURRENT_PACMAT IS NOT NULL AND (CURRENT_NUMPAC, CURRENT_PACMAT) NOT IN (SELECT NUMPAC, PACMAT FROM SECUPACMAT_TMP);
+    --Recalcul des stats de SECUPACMAT_TMP
+    SYS_RECALCUL_STATS('SECUPACMAT_TMP');
+  END IF;
+
+  -- On insère une valeur bidon dans SECUPACMAT_TMP.MATRIC : ça sert de flag pour savoir que la procédure est en cours
+  INSERT INTO SECUPACMAT_TMP (MATRIC,NUMPAC,PACMAT) VALUES ('SECNAV','SECNAV','SECNAV');
+  -- On commite pour que le flag soit visible de suite par les autres sessions
+  COMMIT;
+
+  DELETE FROM SECUPACMAT_TMP_PERSO;
+  -- DIT 47820 : SECUPACMAT_TMP_CONTRAT is a temporary table 
+  -- Truncate table instead of deleting 
+  EXECUTE_IMMEDIATE_STRING( 'TRUNCATE  TABLE SECUPACMAT_TMP_CONTRAT',0);
+  INSERT INTO SECUPACMAT_TMP_PERSO (MATRIC) SELECT DISTINCT MATRIC FROM DIC_ADM_PERSO;
+  INSERT INTO SECUPACMAT_TMP_CONTRAT (NUMPAC, PACMAT, MATRIC) SELECT NUMPAC, PACMAT, MIN(MATRIC) FROM DIC_ADM_CONTRAT GROUP BY NUMPAC,PACMAT;
+  --Recalcul des stats de SECUPACMAT_TMP_PERSO & SECUPACMAT_TMP_CONTRAT
+  SYS_RECALCUL_STATS('SECUPACMAT_TMP_CONTRAT');
+  SYS_RECALCUL_STATS('SECUPACMAT_TMP_PERSO');
+
+  -- On supprime le flag pour ne pas bloquer les mises à jour depuis les procédures SECNAV_MAJ_CURRENT_CONTRAT et SECNAV_MAJ_CURRENT_PERSO
+  DELETE FROM SECUPACMAT_TMP WHERE MATRIC='SECNAV';
+
+  -- 1) On met à jour les clés de la situation CONTRAT courante, avec mise à jour des données CONTRAT et CONTRAT_HISTO
+  SECNAV_MAJ_CURRENT_CONTRAT('DO_MAJ', 1, 1, p_doRaz);
+  -- 2) On met à jour les clés de la situation PERSO courante, avec mise à jour des données PERSO et PERSO_HISTO
+  SECNAV_MAJ_CURRENT_PERSO('DO_MAJ', 1, 1, p_doRaz);
+
+  -- On ré-insère le flag
+  INSERT INTO SECUPACMAT_TMP (MATRIC,NUMPAC,PACMAT) VALUES ('SECNAV','SECNAV','SECNAV');
+
+  DELETE FROM SECUPACMAT_TMP_PERSO;
+  EXECUTE_IMMEDIATE_STRING( 'TRUNCATE  TABLE SECUPACMAT_TMP_CONTRAT',0);
+  --Recalcul des stats de SECUPACMAT_TMP_PERSO & SECUPACMAT_TMP_CONTRAT
+  SYS_RECALCUL_STATS('SECUPACMAT_TMP_CONTRAT');
+  SYS_RECALCUL_STATS('SECUPACMAT_TMP_PERSO');
+  
+  IF p_doRaz=1 THEN
+    -- Pour toutes les colonnes de SECUPACMAT qui ne sont pas issues de DIC_ADM (et qui ne sont pas des colonnes calculées par le traitement : NUMPAC, PACMAT, CURRENT_NUMCNT, DATE_EFF_CONTRAT, MATRIC, DATE_EFF_PERSO, PRIORITE_SITUATION, IDPACMAT), on récupère les valeurs avant écrasement
+    SELECT * BULK COLLECT Into Tabcol FROM USER_TAB_COLS WHERE TABLE_NAME='SECUPACMAT' AND COLUMN_NAME NOT IN (SELECT COLUMN_NAME FROM USER_TAB_COLS WHERE TABLE_NAME LIKE 'DIC_ADM%') AND COLUMN_NAME NOT IN ('NUMPAC','PACMAT','CURRENT_NUMCNT','DATE_EFF_CONTRAT','MATRIC','DATE_EFF_PERSO','PRIORITE_SITUATION','IDPACMAT') AND COLUMN_ID IS NOT NULL;
+    FOR i IN Tabcol.first..Tabcol.last LOOP
+      -- On appelle DIC_MODIF_STRUCTURE pour ajouter la colonne a SECUPACMAT_TMP, au cas où elle n'existe pas (si elle existe, il n'y a pas de plantage)
+      DIC_MODIF_STRUCTURE('SECUPACMAT_TMP', Tabcol(i).COLUMN_NAME, NULL, NULL, NULL, NULL, Tabcol(i).DATA_TYPE, Tabcol(i).DATA_LENGTH, Tabcol(i).DATA_PRECISION, Tabcol(i).DATA_SCALE);
+      EXECUTE_IMMEDIATE_STRING( 'UPDATE SECUPACMAT_TMP SET ' || Tabcol(i).COLUMN_NAME || '=(SELECT ' || Tabcol(i).COLUMN_NAME || ' FROM SECUPACMAT WHERE SECUPACMAT.NUMPAC=SECUPACMAT_TMP.NUMPAC AND SECUPACMAT.PACMAT=SECUPACMAT_TMP.PACMAT)',0);
+    END LOOP;
+    DELETE FROM SECUPACMAT;
+    SELECT * BULK COLLECT Into Tabcol FROM USER_TAB_COLS WHERE TABLE_NAME='SECUPACMAT' AND VIRTUAL_COLUMN='NO' AND COLUMN_ID IS NOT NULL ORDER BY COLUMN_ID;
+    v_listeColonnesSECUPACMAT := NULL;
+    FOR i IN Tabcol.first..Tabcol.last LOOP
+      -- On appelle DIC_MODIF_STRUCTURE pour ajouter la colonne a SECUPACMAT_TMP, au cas où elle n'existe pas (si elle existe, il n'y a pas de plantage)
+      DIC_MODIF_STRUCTURE('SECUPACMAT_TMP', Tabcol(i).COLUMN_NAME, NULL, NULL, NULL, NULL, Tabcol(i).DATA_TYPE, Tabcol(i).DATA_LENGTH, Tabcol(i).DATA_PRECISION, Tabcol(i).DATA_SCALE);
+      IF v_listeColonnesSECUPACMAT IS NOT NULL THEN
+        v_listeColonnesSECUPACMAT := v_listeColonnesSECUPACMAT||',';
+      END IF;
+      v_listeColonnesSECUPACMAT := v_listeColonnesSECUPACMAT || Tabcol(i).COLUMN_NAME;
+    END LOOP;
+    -- On supprime le flag avant l'insertion dans SECUPACMAT (sinon on va l'insérer aussi)
+    DELETE FROM SECUPACMAT_TMP WHERE MATRIC='SECNAV';
+    EXECUTE_IMMEDIATE_STRING( 'INSERT INTO SECUPACMAT (' || v_listeColonnesSECUPACMAT || ') SELECT ' || v_listeColonnesSECUPACMAT || ' FROM SECUPACMAT_TMP',0);
+    EXECUTE_IMMEDIATE_STRING( 'ALTER TABLE SECUPACMAT ENABLE ROW MOVEMENT',0);
+    EXECUTE_IMMEDIATE_STRING( 'ALTER TABLE SECUPACMAT SHRINK SPACE',0);
+    EXECUTE_IMMEDIATE_STRING( 'CALL DBMS_STATS.UNLOCK_TABLE_STATS(USER,''SECUPACMAT'')',0);
+    EXECUTE_IMMEDIATE_STRING( 'CALL DBMS_STATS.GATHER_TABLE_STATS(USER,''SECUPACMAT'')',0);
+  END IF;
+  -- On supprime le flag
+  DELETE FROM SECUPACMAT_TMP WHERE MATRIC='SECNAV';
+EXCEPTION
+  WHEN OTHERS THEN
+    -- Erreur
+    -- On rollback tout ce qui a été fait depuis le COMMIT de l'insertion de 'SECNAV' dans SECUPACMAT_TMP
+    ROLLBACK;
+    -- On supprime le flag en cas d'exception (pour ne pas tout bloquer)
+    DELETE FROM SECUPACMAT_TMP WHERE MATRIC='SECNAV';
+    -- On commit la suppression du flag, sinon il reste
+    COMMIT;
+    Raise;
+END SECNAV_MAJ_ALL;
+##
+SYS_SCH_PAGE_INITIALIZER
+=SQL=
+delete FROM SYS_SCH_PAGE_INITIALIZER where NOM_PAGE = 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInAjoutBridgingModel'
+##
+SYS_SCH_PAGE_INITIALIZER
+==
+delete from SYS_SCH_PAGE_INITIALIZER where NOM_PAGE in ('Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInAjoutBridging')
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInAjoutBridging', null, 'ADMPD201', 'TOOLS_ML'
+##
+SYS_DEF_LIBELLE_ML
+==
+delete FROM SYS_DEF_LIBELLE_ML where TYPE = 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageEcransExtjs' and CODE_LANGUE='fr_fr' and CODE_LIBELLE in ('paramEcran_bridging_SlideinTitle','paramEcran_bridging_ButtonText')
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageEcransExtjs','fr_fr', 'paramEcran_bridging_ButtonText','Paramétrer le bridging'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageEcransExtjs','fr_fr', 'paramEcran_bridging_SlideinTitle', 'Paramétrage du bridging de l''écran '
+##
+SYS_DEF_LIBELLE_ML
+==
+delete FROM SYS_DEF_LIBELLE_ML where TYPE = 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInAjoutBridging' and CODE_LANGUE='fr_fr' and CODE_LIBELLE in ('Slidein_bridging_no_zip','paramEcran_bridging_warn1','paramEcran_bridging_menu1','paramEcran_bridging_menu2','paramEcran_bridging_menu3','paramEcran_bridging_menu4','paramEcran_bridging_menu5','paramEcran_bridging_menu6','Slidein_bridging_help_libel','Slidein_bridging_no_ref','Slidein_bridging_link_type1','Slidein_bridging_content_footer','Slidein_bridging_link_type_code','Slidein_bridging_content_title','Slidein_bridging_embedded_data','Slidein_bridging_content_subtitle')
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInAjoutBridging','fr_fr', 'Slidein_bridging_content_title', 'Libellé'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInAjoutBridging','fr_fr', 'Slidein_bridging_embedded_data', 'Description'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInAjoutBridging','fr_fr', 'Slidein_bridging_content_subtitle', 'Icône'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInAjoutBridging','fr_fr', 'Slidein_bridging_link_type_code', 'Point de menu MonADP'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInAjoutBridging','fr_fr', 'Slidein_bridging_content_footer', 'Libellé du bouton'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInAjoutBridging','fr_fr', 'Slidein_bridging_link_type1', 'accueil'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInAjoutBridging','fr_fr', 'Slidein_bridging_no_ref', 'Vous devez mettre au produit avant de paramétrer le Bridging.'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInAjoutBridging','fr_fr', 'Slidein_bridging_help_libel', 'Ce champs provient du paramétrage de l''écran après mise au produit.'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInAjoutBridging','fr_fr', 'paramEcran_bridging_menu1','accueil'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInAjoutBridging','fr_fr', 'paramEcran_bridging_menu2','temps'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInAjoutBridging','fr_fr', 'paramEcran_bridging_menu3','profil'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInAjoutBridging','fr_fr', 'paramEcran_bridging_menu4','entreprise'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInAjoutBridging','fr_fr', 'paramEcran_bridging_warn1','Les paramètres de bridging seront opérationnels dans les autres environnements dès le prochain livrable, indépendamment du projet en cours.'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInAjoutBridging','fr_fr', 'Slidein_bridging_no_zip', 'Vous devez d''abord générer un livrable avant de paramétrer le Bridging.'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInAjoutBridging','fr_fr', 'paramEcran_bridging_menu5','paie'
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.SlideInAjoutBridging','fr_fr', 'paramEcran_bridging_menu6','équipe'
+##
+SYS_DEF_LIBELLE_ML
+==
+delete FROM SYS_DEF_LIBELLE_ML where TYPE = 'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.ObjetsComplementairesALivrerSlide' and CODE_LANGUE='fr_fr' and CODE_LIBELLE in ('GestionLivrable.schema')
+'Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.slidein.ObjetsComplementairesALivrerSlide','fr_fr', 'GestionLivrable.schema','Schéma et bridging'
+##
+SYS_SCH_JSON
+==
+delete from SYS_SCH_JSON where NOM_PAGE = 'Moteur/ADP_ONLY/ParamEcranDyn/WkfOperationEcrans.jsp' and NOM_JSON = 'BridgingJsonServlet'
+'Moteur/ADP_ONLY/ParamEcranDyn/WkfOperationEcrans.jsp', 'BridgingJsonServlet'
+##
+STD_STRUC_ENTITE
+=SQL IFEXIST=STD_STRUC_ENTITE=LIBRE01=
+alter table STD_STRUC_ENTITE modify (LIBRE01 VARCHAR2(32 BYTE))
+##
+STD_STRUC_ENTITE
+=SQL IFEXIST=STD_STRUC_ENTITE=LIBRE02=
+alter table STD_STRUC_ENTITE modify (LIBRE02 VARCHAR2(32 BYTE))
+##
+STD_STRUC_ENTITE
+=SQL IFEXIST=STD_STRUC_ENTITE=LIBRE03=
+alter table STD_STRUC_ENTITE modify (LIBRE03 VARCHAR2(32 BYTE))
+##
+STD_STRUC_ENTITE
+=SQL IFEXIST=STD_STRUC_ENTITE=LIBRE04=
+alter table STD_STRUC_ENTITE modify (LIBRE04 VARCHAR2(32 BYTE))
+##
+STD_STRUC_ENTITE
+=SQL IFEXIST=STD_STRUC_ENTITE=LIBRE05=
+alter table STD_STRUC_ENTITE modify (LIBRE05 VARCHAR2(32 BYTE))
+##
+STD_STRUC_ENTITE
+=SQL IFEXIST=STD_STRUC_ENTITE=LIBRE06=
+alter table STD_STRUC_ENTITE modify (LIBRE06 VARCHAR2(32 BYTE))
+##
+STD_STRUC_ENTITE
+=SQL IFEXIST=STD_STRUC_ENTITE=LIBRE07=
+alter table STD_STRUC_ENTITE modify (LIBRE07 VARCHAR2(32 BYTE))
+##
+STD_STRUC_ENTITE
+=SQL IFEXIST=STD_STRUC_ENTITE=LIBRE08=
+alter table STD_STRUC_ENTITE modify (LIBRE08 VARCHAR2(32 BYTE))
+##
+STD_STRUC_ENTITE
+=SQL IFEXIST=STD_STRUC_ENTITE=LIBRE09=
+alter table STD_STRUC_ENTITE modify (LIBRE09 VARCHAR2(32 BYTE))
+##
+STD_STRUC_ENTITE
+=SQL IFEXIST=STD_STRUC_ENTITE=LIBRE10=
+alter table STD_STRUC_ENTITE modify (LIBRE10 VARCHAR2(32 BYTE))
+##
+STD_STRUC_ENTITE
+=SQL IFEXIST=STD_STRUC_ENTITE=LIBRE11=
+alter table STD_STRUC_ENTITE modify (LIBRE11 VARCHAR2(32 BYTE))
+##
+STD_STRUC_ENTITE
+=SQL IFEXIST=STD_STRUC_ENTITE=LIBRE12=
+alter table STD_STRUC_ENTITE modify (LIBRE12 VARCHAR2(32 BYTE))
+##
+STD_STRUC_ENTITE
+=SQL IFEXIST=STD_STRUC_ENTITE=LIBRE13=
+alter table STD_STRUC_ENTITE modify (LIBRE13 VARCHAR2(32 BYTE))
+##
+STD_STRUC_ENTITE
+=SQL IFEXIST=STD_STRUC_ENTITE=LIBRE14=
+alter table STD_STRUC_ENTITE modify (LIBRE14 VARCHAR2(32 BYTE))
+##
+STD_STRUC_ENTITE
+=SQL IFEXIST=STD_STRUC_ENTITE=LIBRE15=
+alter table STD_STRUC_ENTITE modify (LIBRE15 VARCHAR2(32 BYTE))
+##
+STD_STRUC_ENTITE
+=SQL IFEXIST=STD_STRUC_ENTITE=LIBRE16=
+alter table STD_STRUC_ENTITE modify (LIBRE16 VARCHAR2(32 BYTE))
+##
+STD_STRUC_ENTITE
+=SQL IFEXIST=STD_STRUC_ENTITE=LIBRE17=
+alter table STD_STRUC_ENTITE modify (LIBRE17 VARCHAR2(32 BYTE))
+##
+STD_STRUC_ENTITE
+=SQL IFEXIST=STD_STRUC_ENTITE=LIBRE18=
+alter table STD_STRUC_ENTITE modify (LIBRE18 VARCHAR2(32 BYTE))
+##
+STD_STRUC_ENTITE
+=SQL IFEXIST=STD_STRUC_ENTITE=LIBRE19=
+alter table STD_STRUC_ENTITE modify (LIBRE19 VARCHAR2(32 BYTE))
+##
+STD_STRUC_ENTITE
+=SQL IFEXIST=STD_STRUC_ENTITE=LIBRE20=
+alter table STD_STRUC_ENTITE modify (LIBRE20 VARCHAR2(32 BYTE))
+##
+TRG_CONTRAT_HISTO_BEFORE_ROW
+=SQL=
+CREATE OR REPLACE FUNCTION TRG_CONTRAT_HISTO_BEFORE_ROW RETURN CLOB AS 
+BEGIN
+  RETURN '
+  -- On vérifie qu''on ne modifie ni le NUMPAC, ni le PACMAT, ni le NUMCNT, ni la date d''effet
+  IF UPDATING AND (NOT v_ligOld.NUMPAC=v_ligNew.NUMPAC OR NOT v_ligOld.PACMAT=v_ligNew.PACMAT OR NOT v_ligOld.NUMCNT=v_ligNew.NUMCNT OR NOT v_ligOld.DATE_EFF=v_ligNew.DATE_EFF) THEN
+    -- Message d''erreur --> On interdit la mise à jour du NUMPAC, du PACMAT et de la date d''effet : il faut faire un delete puis un insert
+    RAISE_APPLICATION_ERROR(-20000,''La mise à jour des colonnes NUMPAC, PACMAT, NUMCNT et DATE_EFF n''''est pas autorisée : vous devez supprimer puis recréer l''''occurrence'');
+  END IF;
+  IF INSERTING OR UPDATING THEN
+    IF v_ligNew.DATE_FIN IS NULL THEN
+      :NEW.DATE_FIN := TO_DATE(''20991231'',''yyyymmdd'');
+      v_ligNew.DATE_FIN := :NEW.DATE_FIN;
+    END IF;
+  END IF;
+  IF v_type_writer<>''N'' AND v_type_writer<>''M'' THEN
+    IF v_listMatricToUpdate IS NULL OR INSTR(v_listMatricToUpdate,NVL(v_ligNew.MATRIC,v_ligOld.MATRIC))<=0 THEN
+      -- On stocke la liste des NUMPAC/PACMAT modifiés
+      IF v_nbMatricToUpdate=1000 THEN
+        v_nbMatricToUpdate := 0;
+        v_listMatricToUpdate := v_listMatricToUpdate||'') OR MATRIC IN ('';
+      ELSIF v_nbMatricToUpdate>0 THEN
+        v_listMatricToUpdate := v_listMatricToUpdate||'','';
+      END IF;
+      v_listMatricToUpdate := v_listMatricToUpdate||''''''''||NVL(v_ligNew.MATRIC,v_ligOld.MATRIC)||'''''''';
+      v_nbMatricToUpdate := v_nbMatricToUpdate+1;
+    END IF;
+    -- On stocke la liste des NUMPAC/PACMAT/NUMCNT/DATE_EFF insérés/modifiés/supprimés
+    IF DELETING THEN
+     v_date_eff := v_ligOld.DATE_EFF;
+    ELSE
+     v_date_eff := v_ligNew.DATE_EFF;
+    END IF;
+    v_cle_idx_contrat := T_CLE_IDX_CONTRAT_HISTO(NVL(v_ligNew.MATRIC,v_ligOld.MATRIC), NVL(v_ligNew.NUMPAC,v_ligOld.NUMPAC), NVL(v_ligNew.PACMAT,v_ligOld.PACMAT), NVL(v_ligNew.NUMCNT,v_ligOld.NUMCNT), v_date_eff);
+    v_cles_idx_contrat.extend;
+    v_cles_idx_contrat(v_cles_idx_contrat.last) := v_cle_idx_contrat;
+  END IF;
+  v_isDeleting := 0;
+  IF DELETING THEN
+    v_isDeleting := 1; 
+  END IF;
+  v_lanceRecalculHp := FALSE;
+  IF IS_EQ(v_ligNew.ZA996,''Z'') AND ( NOT IS_EQ(v_ligNew.ZA820,v_ligOld.ZA820) OR NOT IS_EQ(v_ligNew.PAIEZAD,v_ligOld.PAIEZAD) OR NOT IS_EQ(v_ligNew.ZA819,v_ligOld.ZA819)) THEN
+    v_lanceRecalculHp:=true;
+  END IF;
+';
+END TRG_CONTRAT_HISTO_BEFORE_ROW;
+##
+TGE_REF_HPR
+=SQL IFEXIST=TGE_REF_HPR=
+ALTER TABLE TGE_REF_HPR MODIFY NB_JOURS_TRAV NUMBER(3,2)
+##
+SYS_TRT_TOMAKELIB
+==
+DELETE FROM SYS_TRT_TOMAKELIB WHERE ID_TRT = 'Traitement_ExportDroitACE'
+'Traitement_ExportDroitACE','Traitement d''export des droits ACE'

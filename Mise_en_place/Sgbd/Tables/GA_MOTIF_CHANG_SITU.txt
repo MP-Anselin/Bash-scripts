@@ -1,0 +1,17 @@
+##
+TAG_CHARSET=@€éèç
+##
+GA_MOTIF_CHANG_SITU
+=SQL IFNOTEXIST=GA_MOTIF_CHANG_SITU=
+CREATE TABLE GA_MOTIF_CHANG_SITU(MOTIF_CHANGE_SITU VARCHAR2 (2) NOT NULL,  LIBELLE VARCHAR2(255) NOT NULL, CONSTRAINT GA_MOTIF_CHANG_SITU_PK PRIMARY KEY (MOTIF_CHANGE_SITU))
+##
+GA_MOTIF_CHANG_SITU (MOTIF_CHANGE_SITU,LIBELLE)
+==
+DELETE FROM GA_MOTIF_CHANG_SITU WHERE MOTIF_CHANGE_SITU IN ('01','02','03','04','05','06','07')
+'01','Changement de rémunération'
+'02','Changement d''horaire'
+'03','Changement d''établissement'
+'04','Changement de rémunération et d''horaire'
+'05','Changement de rémunération et d''établissement'
+'06','Changement d''établissement et d''horaire'
+'07','Changement de rémunération, d''horaire et d''établissement'

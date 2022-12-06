@@ -1,0 +1,43 @@
+##
+LISTE_TAB_PH_ABS
+=SQL=
+CREATE OR REPLACE FUNCTION LISTE_TAB_PH_ABS RETURN TAB_PH_ABS AS 
+  retour TAB_PH_ABS := TAB_PH_ABS();
+  nom_table VARCHAR2(50);
+  n INTEGER;
+  v_quote VARCHAR2(1) := chr(39);
+  p_where VARCHAR2(50);
+  p_phph VARCHAR2(10) := 'PH_PH_';
+  p_photo VARCHAR2(10) := 'PHOTO_';
+BEGIN
+  FOR une_ligne IN (SELECT DISTINCT TABLEPHY, ALLERRETOUR
+                   FROM TGE_REF_MAPTA
+                    WHERE ALLERRETOUR IN ('A','2'))
+  LOOP
+    BEGIN
+      nom_table := NULL;
+      n := 0;
+      p_where := NULL;
+      
+      p_where := p_phph || une_ligne.TABLEPHY;
+      SELECT COUNT(*) INTO n FROM USER_TAB_COLS WHERE TABLE_NAME = p_where;
+      IF n = 0 THEN
+        retour.extend;
+        retour(retour.count) := TYP_TAB_ABS(p_where);
+      END IF;
+      
+      n := 0;
+      
+      p_where := p_photo || une_ligne.TABLEPHY;
+      SELECT COUNT(*) INTO n FROM USER_TAB_COLS WHERE TABLE_NAME = p_where;
+      IF n = 0 THEN
+        retour.extend;
+        retour(retour.count) := TYP_TAB_ABS(p_where);
+      END IF;
+      EXCEPTION
+        WHEN OTHERS THEN
+          RAISE;
+      END;
+  END LOOP;
+  RETURN retour;
+END LISTE_TAB_PH_ABS;

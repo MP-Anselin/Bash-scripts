@@ -1,0 +1,25 @@
+##
+CONVERSIONSECONDESHHCC
+=SQL=
+create or replace FUNCTION conversionSecondesHHCC(
+  p_seconde       IN NUMBER)
+  RETURN VARCHAR2
+IS
+  v_h             NUMBER;
+  v_m             NUMBER;
+BEGIN
+  v_h := TRUNC(p_seconde / 3600);
+  v_m := TRUNC(MOD(p_seconde, 3600) / 60 * 100 / 60);
+  IF v_h IS NULL THEN
+    v_h := '0';
+  END IF;
+  IF v_m IS NULL THEN
+    v_m := '00';
+  END IF;
+  IF (v_m < 0 AND v_h >= 0) THEN
+    RETURN('-' || v_h || ',' || TRIM(TO_CHAR(ABS(v_m), '00')));
+  ELSIF (v_m < 0 AND v_h < 0) THEN
+    RETURN (v_h || ',' || TRIM(TO_CHAR(ABS(v_m), '00')));
+  END IF;
+  RETURN (v_h || ',' || TRIM(TO_CHAR(v_m, '00')));
+END;

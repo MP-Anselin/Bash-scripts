@@ -1,0 +1,29 @@
+##
+TAG_CHARSET=@€ιθη
+##
+STD_STRUC_ENTITE_BO
+=SQL=
+create or replace view std_struc_entite_bo
+as(
+select e.*, o.date_ouv, o.date_ferm, 
+case when to_date(date_ouv,'yyyymmdd')>sysdate then 'P' when to_date(nvl(date_ferm,'20991231'),'yyyymmdd')<sysdate then 'F' else 'O' end as statut_open
+from std_struc_entite e, std_struc_entite_open o 
+where e.cid = o.cid and e.code_entite=o.code_entite
+union all
+select '@NON_AFFECTE@','19000101','20991231', null,
+null,null,null,null,null,null,null,null,null,null,
+null,null,null,null,null,null,null,null,null,null,
+null,null,null,null,null,null,null,null,null,null,
+null,null,null,null,null,null,null,null,null,null,
+null,null,null,null,null,null,null,null,null,null,
+null,null,null,'O'
+from dual
+union all
+select '@VIDE@','19000101','20991231', null,
+null,null,null,null,null,null,null,null,null,null,
+null,null,null,null,null,null,null,null,null,null,
+null,null,null,null,null,null,null,null,null,null,
+null,null,null,null,null,null,null,null,null,null,
+null,null,null,null,null,null,null,null,null,null,
+null,null,null,'O'
+from dual)

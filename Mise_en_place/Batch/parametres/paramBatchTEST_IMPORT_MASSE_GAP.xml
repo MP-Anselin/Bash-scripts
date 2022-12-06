@@ -1,0 +1,14 @@
+<interface idInterface="TEST_IMPORT_MASSE_GAP">
+	<nomInterface>TEST_IMPORT_MASSE_GAP</nomInterface>
+	<descriptionInterface>TEST_IMPORT_MASSE_GAP</descriptionInterface>
+	<traitements>
+		<traitement>
+			<descriptionTraitement>Appel de l'interface IMPORT_MASSE_GAP_ALIM</descriptionTraitement>
+			<typeTraitement>IMPORT_MASSE_GAP_ALIM</typeTraitement>
+		</traitement>
+		<traitement>
+			<descriptionTraitement>Appel a l'interface</descriptionTraitement>
+			<typeTraitement>GAP_MASSE_TRT</typeTraitement>
+		</traitement>
+	</traitements>
+</interface>

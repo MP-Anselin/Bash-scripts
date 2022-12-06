@@ -1,0 +1,53 @@
+##
+TAG_CHARSET=@€éèç
+##
+SYS_DEF_LIBELLE_TOOLS_ML
+=SQL IFNOTEXIST=SYS_DEF_LIBELLE_TOOLS_ML=
+CREATE TABLE "SYS_DEF_LIBELLE_TOOLS_ML" (TYPE VARCHAR2(100) NOT NULL ENABLE ,LIBELLE CLOB, CODE_LIBELLE VARCHAR2(100) NOT NULL ENABLE, CODE_LANGUE VARCHAR2(5) NOT NULL ENABLE, PRIMARY KEY (TYPE, CODE_LANGUE, CODE_LIBELLE))
+##
+SYS_DEF_LIBELLE_TOOLS_ML
+==
+DELETE FROM SYS_DEF_LIBELLE_TOOLS_ML WHERE TYPE = 'GENERIC_LABELS' AND CODE_LIBELLE in ('GENERIC_LABELS_OUI_NON', 'GENERIC_LABELS_NON_OUI') AND CODE_LANGUE = 'fr_fr'
+'GENERIC_LABELS', 'Oui,Non', 'GENERIC_LABELS_OUI_NON', 'fr_fr'
+'GENERIC_LABELS', 'Non,Oui', 'GENERIC_LABELS_NON_OUI', 'fr_fr'
+##
+SYS_DEF_LIBELLE_TOOLS_ML
+==
+DELETE FROM SYS_DEF_LIBELLE_TOOLS_ML WHERE TYPE = 'GENERIC_LABELS' AND CODE_LIBELLE in ('btnValue_INI','btnValue_LIGERR','btnValue_INT','btnValue_AFF','btnValue_VAL','btnValue_CRE','btnValue_SUI','btnValue_PRE','btnValue_SUP','btnValue_BoutonSupprimerOccurrence','btnValue_FOR','btnValue_DUP','btnValue_MOD','btnValue_EDI','btnValue_LIS','btnValue_EXE','btnValue_NOU','btnValue_AJO','btnValue_FER','btnValue_RECH','btnValue_NEWSAL','btnValue_RET_MOD_EMB','btnValue_UNDEFINED','btnValue_EDIM','btnValue_SAVS','btnValue_SSUI','btnValue_SPRE','btnValue_GEN','btnValue_EXP','btnValue_ADDM','btnValue_ADDP','btnValue_ADDL') AND CODE_LANGUE = 'fr_fr'
+'GENERIC_LABELS','Initialiser','btnValue_INI','fr_fr'
+'GENERIC_LABELS','Lignes en Erreur','btnValue_LIGERR','fr_fr'
+'GENERIC_LABELS','Afficher','btnValue_INT','fr_fr'
+'GENERIC_LABELS','Afficher','btnValue_AFF','fr_fr'
+'GENERIC_LABELS','Valider','btnValue_VAL','fr_fr'
+'GENERIC_LABELS','Créer','btnValue_CRE','fr_fr'
+'GENERIC_LABELS','Suivant','btnValue_SUI','fr_fr'
+'GENERIC_LABELS','Précédent','btnValue_PRE','fr_fr'
+'GENERIC_LABELS','Supprimer','btnValue_SUP','fr_fr'
+'GENERIC_LABELS','Supprimer la situation du {GEN_DATE_EFF}','btnValue_BoutonSupprimerOccurrence','fr_fr'
+'GENERIC_LABELS','Forcer','btnValue_FOR','fr_fr'
+'GENERIC_LABELS','Dupliquer','btnValue_DUP','fr_fr'
+'GENERIC_LABELS','Modifier','btnValue_MOD','fr_fr'
+'GENERIC_LABELS','Editer','btnValue_EDI','fr_fr'
+'GENERIC_LABELS','Lister','btnValue_LIS','fr_fr'
+'GENERIC_LABELS','Exécuter','btnValue_EXE','fr_fr'
+'GENERIC_LABELS','Mise à blanc','btnValue_NOU','fr_fr'
+'GENERIC_LABELS','Ajouter','btnValue_AJO','fr_fr'
+'GENERIC_LABELS','Fermer','btnValue_FER','fr_fr'
+'GENERIC_LABELS','Rechercher','btnValue_RECH','fr_fr'
+'GENERIC_LABELS','Embaucher un nouveau salarié','btnValue_NEWSAL','fr_fr'
+'GENERIC_LABELS','Retour','btnValue_RET_MOD_EMB','fr_fr'
+'GENERIC_LABELS','Undefined_Btn_Value','btnValue_UNDEFINED','fr_fr'
+'GENERIC_LABELS','Editer','btnValue_EDIM','fr_fr'
+'GENERIC_LABELS','Mettre en pause','btnValue_SAVS','fr_fr'
+'GENERIC_LABELS','Suivant','btnValue_SSUI','fr_fr'
+'GENERIC_LABELS','Précédent','btnValue_SPRE','fr_fr'
+'GENERIC_LABELS','Import','btnValue_GEN','fr_fr'
+'GENERIC_LABELS','Export','btnValue_EXP','fr_fr'
+'GENERIC_LABELS','Ajout multiple','btnValue_ADDM','fr_fr'
+'GENERIC_LABELS','Ajout population','btnValue_ADDP','fr_fr'
+'GENERIC_LABELS','Ajout libre','btnValue_ADDL','fr_fr'
+##
+SYS_DEF_LIBELLE_TOOLS_ML
+==
+DELETE FROM SYS_DEF_LIBELLE_TOOLS_ML WHERE TYPE = 'GENERIC_LABELS' AND CODE_LIBELLE in ('btnValue_ACT') AND CODE_LANGUE = 'fr_fr'
+'GENERIC_LABELS','Actualiser','btnValue_ACT','fr_fr'

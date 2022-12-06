@@ -1,0 +1,6 @@
+##
+TAG_CHARSET=@€ιθη
+##
+TGE_CTRL40_prop_absence
+=SQL IF_TYPE_NOTEXIST=TGE_CTRL40_prop_absence=
+create or replace TYPE TGE_CTRL40_prop_absence AS OBJECT (  isDemiJourneeSurUnSeulJour  NUMBER (1),  isDemiJourneeSurPlusieursJour  NUMBER (1),  isJourneeCompleteSurUnSeulJour  NUMBER (1),  isEnDureeSurUnSeulJour  NUMBER (1),  isJourneCompletSurPlusieurJour  NUMBER (1),  isEnDureeSurPlusieursJour  NUMBER (1),  isMatinSurUnSeulJour NUMBER (1),  isMatinSurPlusieursJour  NUMBER (1),  isApresMidiSurUnSeulJour  NUMBER (1),  isApresMidiSurPlusieursJour NUMBER (1),  isStatApremdAndFinitToutJourne NUMBER (1),  isStartApremidiAndFinitMatin  NUMBER (1),  isStartToutJourneAndFinitMatin  NUMBER (1),  estDemiJournee NUMBER (1),  erreur NUMBER (1));

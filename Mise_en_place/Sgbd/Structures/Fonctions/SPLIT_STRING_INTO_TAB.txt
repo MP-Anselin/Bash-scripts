@@ -1,0 +1,14 @@
+##
+SPLIT_STRING_INTO_TAB
+=SQL=
+CREATE OR REPLACE FUNCTION SPLIT_STRING_INTO_TAB (pStr IN VARCHAR2 ,pDelimiter IN VARCHAR2) RETURN TAB_VARCHAR
+IS
+malist TAB_VARCHAR;
+BEGIN 
+	malist := TAB_VARCHAR();
+	for x in (select regexp_substr(pStr,'[^' || pDelimiter || ']+', 1, level) RES from dual connect by regexp_substr(pStr,'[^' || pDelimiter || ']+', 1, level) is not null) loop
+		malist.extend;
+		malist(malist.last) := x.RES;
+	end loop;
+RETURN malist;
+END SPLIT_STRING_INTO_TAB;

@@ -1,0 +1,75 @@
+##
+TAG_CHARSET=@€ιθη
+##
+SYS_SCH_PROFIL_P
+==
+DELETE FROM SYS_SCH_PROFIL_P WHERE NOM_PAGE in ('Ext.adp.ZPaie.RETRO.INSCRIRETRO','Ext.adp.ZPaie.RETRO.MatricInscritRetro','Ext.adp.ZPaie.MatricModifInscritRecyclage','Moteur/Trace/TracesInterpreter.jsp') and CODE_PROFIL in ('-2','-3')
+'-2','Ext.adp.ZPaie.MatricModifInscritRecyclage','E'
+'-2','Ext.adp.ZPaie.RETRO.INSCRIRETRO','E'
+'-2','Ext.adp.ZPaie.RETRO.MatricInscritRetro','E'
+'-2','Moteur/Trace/TracesInterpreter.jsp','E'
+'-3','Ext.adp.ZPaie.MatricModifInscritRecyclage','E'
+'-3','Ext.adp.ZPaie.RETRO.INSCRIRETRO','E'
+'-3','Ext.adp.ZPaie.RETRO.MatricInscritRetro','E'
+'-3','Moteur/Trace/TracesInterpreter.jsp','E'
+##
+SYS_SCH_PROFIL_P
+==
+DELETE FROM SYS_SCH_PROFIL_P WHERE NOM_PAGE in ('Ext.adp.Modules.TraceApi.TraceAppelsAPI') and CODE_PROFIL in ('-2')
+'-2','Ext.adp.Modules.TraceApi.TraceAppelsAPI','E'
+##
+SYS_SCH_PROFIL_P
+==
+DELETE FROM SYS_SCH_PROFIL_P WHERE NOM_PAGE in ('Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.AppelsTableAdmin','Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageGroupesDonneesExtjs','Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageDictionnairesExtjs','Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.HistoriquesDesProjetsMVVM','Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.AppelsTableTools','Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageEcransExtjs','Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageDonneesExtjs','Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.GestionDesLivrablesMVVM','Ext.adp.Moteur.ParamEcranDyn.GestionDesProjetsMVVM') and CODE_PROFIL in ('-2')
+'-2','Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.AppelsTableAdmin','E'
+'-2','Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageGroupesDonneesExtjs','E'
+'-2','Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageDictionnairesExtjs','E'
+'-2','Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.HistoriquesDesProjetsMVVM','E'
+'-2','Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.AppelsTableTools','E'
+'-2','Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageEcransExtjs','E'
+'-2','Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageDonneesExtjs','E'
+'-2','Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.GestionDesLivrablesMVVM','E'
+'-2','Ext.adp.Moteur.ParamEcranDyn.GestionDesProjetsMVVM','E'
+##
+SYS_SCH_PROFIL_P
+==
+DELETE FROM SYS_SCH_PROFIL_P WHERE NOM_PAGE in ('Ext.adp.Modules.Signature.SuiviDocumentsEtSignatures','Ext.adp.Modules.Signature.SuiviDocumentsEtSignaturesAdmin','Ext.adp.Modules.Signature.OptionSignatureExtjs','Ext.adp.Modules.Signature.GroupeSignataires','Ext.adp.Modules.Signature.SignataireMVVM') and CODE_PROFIL in ('-2')
+'-2','Ext.adp.Modules.Signature.SuiviDocumentsEtSignaturesAdmin','E'
+'-2','Ext.adp.Modules.Signature.OptionSignatureExtjs','E'
+'-2','Ext.adp.Modules.Signature.GroupeSignataires','E'
+'-2','Ext.adp.Modules.Signature.SignataireMVVM','E'
+##
+SYS_SCH_PROFIL_P
+=SQL IFNOTEXIST=SYS_SCH_PROFIL_P=BRIDGING=
+INSERT INTO SYS_SCH_PROFIL_P SELECT DISTINCT(CODE_PROFIL),'Ext.adp.MainDesk.view.eastregion.news.News','L' from SYS_SCH_PROFIL WHERE NOT EXISTS (SELECT 1 FROM SYS_SCH_PROFIL_P WHERE NOM_PAGE='Ext.adp.MainDesk.view.eastregion.news.News')
+##
+SYS_SCH_PROFIL_P
+=SQL IFEXIST=SYS_SCH_PROFIL_P=BRIDGING=
+INSERT INTO SYS_SCH_PROFIL_P SELECT DISTINCT(CODE_PROFIL),'Ext.adp.MainDesk.view.eastregion.news.News','L','N' from SYS_SCH_PROFIL WHERE NOT EXISTS (SELECT 1 FROM SYS_SCH_PROFIL_P WHERE NOM_PAGE='Ext.adp.MainDesk.view.eastregion.news.News')
+##
+SYS_SCH_PROFIL_P
+=SQL IFNOTEXIST=SYS_SCH_PROFIL_P=BRIDGING=
+ALTER TABLE SYS_SCH_PROFIL_P ADD BRIDGING VARCHAR2(1) DEFAULT 'N'
+##
+SYS_SCH_PROFIL_P
+=SQL IFEXIST=SYS_SCH_PROFIL_P=BRIDGING=
+UPDATE SYS_SCH_PROFIL_P S SET BRIDGING = 'N' WHERE BRIDGING IS NULL
+##
+SYS_SCH_PROFIL_P
+=SQL IFEXIST=UX_BRIDGING=
+UPDATE SYS_SCH_PROFIL_P S SET BRIDGING = 'I' WHERE EXISTS(SELECT 1 FROM UX_BRIDGING U WHERE S.NOM_PAGE = U.NOM_PAGE ) AND BRIDGING <> 'A'
+##
+SYS_SCH_PROFIL_P
+==
+DELETE FROM SYS_SCH_PROFIL_P WHERE NOM_PAGE in ('Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.WkfOperationEcransMVVM') and CODE_PROFIL in ('-2')
+'-2','Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.WkfOperationEcransMVVM','E','N'
+##
+SYS_SCH_PROFIL_P
+==
+DELETE FROM SYS_SCH_PROFIL_P WHERE NOM_PAGE in ('Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageReglesGestionExtjs') and CODE_PROFIL in ('-2')
+'-2','Ext.adp.Moteur.ADP_ONLY.ParamEcranDyn.ParametrageReglesGestionExtjs','E','N'
+##
+SYS_SCH_PROFIL_P
+==
+DELETE FROM SYS_SCH_PROFIL_P WHERE NOM_PAGE in ('Ext.adp.ZPaie.ExportDonneesEcran') and CODE_PROFIL in ('-2')
+'-2','Ext.adp.ZPaie.ExportDonneesEcran','E','N'

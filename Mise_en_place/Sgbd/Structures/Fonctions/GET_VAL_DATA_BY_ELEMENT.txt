@@ -1,0 +1,84 @@
+##
+GET_VAL_DATA_BY_ELEMENT
+=SQL=
+CREATE OR REPLACE FUNCTION GET_VAL_DATA_BY_ELEMENT(p_MATRIC VARCHAR2, p_NUMPAC VARCHAR2, p_PACMAT VARCHAR2, p_NUMCNT VARCHAR2, p_PAIEZAD VARCHAR2, p_DATE_EFF VARCHAR2, p_ELEMENT VARCHAR2, p_cleSupp1 VARCHAR2, p_valCleSupp1 VARCHAR2, p_cleSupp2 VARCHAR2, p_valCleSupp2 VARCHAR2) RETURN VARCHAR2 AS 
+  donneeGxp VARCHAR2(30);
+  tableGxp VARCHAR2(30);
+  tablePhy VARCHAR2(30);
+  valTmp VARCHAR2(4000);
+  clWhere VARCHAR2(4000);
+  req VARCHAR2(4000);
+  retour VARCHAR2(4000);
+BEGIN
+  -- NUMPAC et ELEMENT obligatoires
+  IF p_NUMPAC IS NULL OR p_ELEMENT IS NULL THEN
+    RETURN NULL;
+  END IF;
+  -- On recherche la donnée et la table dans lesquelles l'élément est stocké
+  BEGIN
+    SELECT DONNEEGXP, TABLEGXP INTO donneeGxp, tableGxp FROM TGE_REF_MAPDO WHERE NUMPAC=p_NUMPAC AND ELEMENT=p_ELEMENT;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      -- Pas trouvé pour le NUMPAC passé en paramètre, on recherche pour NUMPAC='*'
+      BEGIN
+        SELECT DONNEEGXP, TABLEGXP INTO donneeGxp, tableGxp FROM TGE_REF_MAPDO WHERE NUMPAC='*' AND ELEMENT=p_ELEMENT;
+      EXCEPTION
+        WHEN OTHERS THEN
+          RETURN NULL;
+      END;
+    WHEN OTHERS THEN
+      RETURN NULL;
+  END;
+  -- On recherche la table dans lesquelles l'élément est stocké
+  BEGIN
+    SELECT TABLEPHY INTO tablePhy FROM TGE_REF_MAPTA WHERE NUMPAC=p_NUMPAC AND TABLEPARAM=tableGxp;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      -- Pas trouvé pour le NUMPAC passé en paramètre, on recherche pour NUMPAC='*'
+      BEGIN
+        SELECT TABLEPHY INTO tablePhy FROM TGE_REF_MAPTA WHERE NUMPAC='*' AND TABLEPARAM=tableGxp;
+      EXCEPTION
+        WHEN OTHERS THEN
+          RETURN NULL;
+      END;
+    WHEN OTHERS THEN
+      RETURN NULL;
+  END;
+  clWhere := '1=1';
+  FOR une_cle_primaire IN (SELECT CC.COLUMN_NAME, (SELECT DATA_TYPE FROM USER_TAB_COLUMNS TC WHERE TC.COLUMN_NAME=CC.COLUMN_NAME AND TC.TABLE_NAME=CC.TABLE_NAME) AS DATA_TYPE FROM USER_CONSTRAINTS C, USER_CONS_COLUMNS CC WHERE C.CONSTRAINT_TYPE='P' AND C.CONSTRAINT_NAME=CC.CONSTRAINT_NAME AND CC.TABLE_NAME=tablePhy ORDER BY CC.POSITION)
+  LOOP
+  --  VARCHAR2,  VARCHAR2,  VARCHAR2,  VARCHAR2,  VARCHAR2, p_ELEMENT VARCHAR2) RETURN VARCHAR2 AS
+    valTmp := NULL;
+    IF une_cle_primaire.COLUMN_NAME='MATRIC' THEN
+      valTmp := p_MATRIC;
+    ELSIF une_cle_primaire.COLUMN_NAME='NUMPAC' THEN
+      valTmp := p_NUMPAC;
+    ELSIF une_cle_primaire.COLUMN_NAME='PACMAT' THEN
+      valTmp := p_PACMAT;
+    ELSIF une_cle_primaire.COLUMN_NAME='NUMCNT' THEN
+      valTmp := p_NUMCNT;
+    ELSIF une_cle_primaire.COLUMN_NAME='PAIEZAD' THEN
+      valTmp := p_PAIEZAD;
+    ELSIF une_cle_primaire.COLUMN_NAME='DATE_EFF' THEN
+      valTmp := p_DATE_EFF;
+    ELSIF p_cleSupp1 IS NOT NULL AND une_cle_primaire.COLUMN_NAME=p_cleSupp1 THEN
+      valTmp := p_valCleSupp1;
+    ELSIF p_cleSupp2 IS NOT NULL AND une_cle_primaire.COLUMN_NAME=p_cleSupp2 THEN
+      valTmp := p_valCleSupp2;
+    END IF;
+    IF valTmp IS NULL THEN
+      RETURN NULL;
+    END IF;
+    IF une_cle_primaire.DATA_TYPE='NUMBER' THEN
+      valTmp := valTmp;
+    ELSIF une_cle_primaire.DATA_TYPE='DATE' THEN
+      valTmp := 'TO_DATE('''||valTmp||''', ''yyyymmdd'')';
+    ELSE
+      valTmp := ''''||valTmp||'''';
+    END IF;
+    clWhere := clWhere||' AND '||une_cle_primaire.COLUMN_NAME||'='||valTmp;
+  END LOOP;
+  req := 'SELECT '||donneeGxp||' FROM '||tablePhy||' WHERE '||clWhere||' AND ROWNUM=1';
+  EXECUTE IMMEDIATE req INTO retour;
+  RETURN retour;
+END GET_VAL_DATA_BY_ELEMENT;

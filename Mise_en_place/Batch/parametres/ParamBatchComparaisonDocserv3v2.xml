@@ -1,0 +1,19 @@
+<interface idInterface="COMPARAISONDOCSERV3V2">
+	<nomInterface>InterfaceComparaisonDocserv3v2</nomInterface>
+	<descriptionInterface>
+		mettre à dispostion dans le DSF  une liste de documents PDF et DOC  en docserv v2 et en docserv v3 pour pouvoir comparer entre les 2 versions d'un même document produit avec docserv v2 et docserv v3.
+	</descriptionInterface>
+	<traitements>	
+		<traitement>
+			<descriptionTraitement>créer 2 versions d'un même document produit avec docserv v2 et docserv v3</descriptionTraitement>
+			<typeTraitement>InterfaceComparaisonDocserv3v2</typeTraitement>
+			<modeDebug>false</modeDebug>
+			<versionTraitement>V1</versionTraitement>
+			<fichierUsers></fichierUsers>
+			<activerMail>OUI</activerMail>
+			<multiThreadTraitement>NON</multiThreadTraitement>
+			<cheminRepDocservComparaison>D:\\DevSpace\\Common\\docserv3\\genereComparaisonDocserv2v3</cheminRepDocservComparaison>
+			<continueSiErreur>OUI</continueSiErreur>
+		</traitement>
+	</traitements>
+</interface>

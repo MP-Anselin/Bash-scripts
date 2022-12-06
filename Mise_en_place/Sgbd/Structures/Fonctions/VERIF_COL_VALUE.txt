@@ -1,0 +1,26 @@
+##
+VERIF_COL_VALUE
+=SQL=
+create or replace FUNCTION VERIF_COL_VALUE (P_TRT IN NUMBER , P_TABLEGXP IN VARCHAR2 )RETURN TYP_TAB_VERIF AS 
+
+p_retour TYP_TAB_VERIF := TYP_TAB_VERIF();
+n INTEGER := 0; 
+ BEGIN
+ FOR une_ligne IN 
+ (SELECT NUMPAC,TABLEGXP,DONNEEGXP,PACMAT,PAIEZAD,VALEUR 
+  FROM   TGE_IMPORT_FSED_30 T 
+  WHERE  ID_TRT =P_TRT 
+  AND    TABLEGXP=P_TABLEGXP 
+  AND    IS_NUMBER(VALEUR) >= (SELECT POWER(10,(DATA_PRECISION-DATA_SCALE )) 
+                               FROM   USER_TAB_COLS  
+                               WHERE  TABLE_NAME=P_TABLEGXP 
+                               AND    DATA_TYPE='NUMBER' 
+                               AND    COLUMN_NAME=T.DONNEEGXP )
+  )
+ LOOP
+ p_retour.extend;
+ n := n + 1;
+ p_retour(p_retour.count) := TYP_VERIF(une_ligne.numpac,  une_ligne.TABLEGXP,une_ligne.DONNEEGXP, une_ligne.pacmat, une_ligne.paiezad, une_ligne.valeur);
+ END LOOP;
+ RETURN p_retour;
+ END VERIF_COL_VALUE;

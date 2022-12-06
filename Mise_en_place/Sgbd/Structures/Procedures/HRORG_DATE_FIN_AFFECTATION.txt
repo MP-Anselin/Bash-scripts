@@ -1,0 +1,46 @@
+##
+HRORG_DATE_FIN_AFFECTATION
+=SQL=
+CREATE or REPLACE PROCEDURE "HRORG_DATE_FIN_AFFECTATION" 
+AS
+  	CURSOR tabAffPb
+IS
+   	/* Récupération des matricules/codTs qui ont plusieurs dates de fin à 2099 */
+   	SELECT codts, matric FROM std_struc_affectation WHERE date_fin = '20991231'
+   	GROUP BY matric, codts
+   	HAVING COUNT(*)>1;
+	
+   	lignesRequetes tabAffPb%ROWTYPE;
+		
+BEGIN
+	OPEN tabAffPb;
+	LOOP
+    	FETCH tabAffPb INTO lignesRequetes;
+		EXIT
+    WHEN tabAffPb % NOTFOUND;
+		UPDATE std_struc_affectation a
+       	SET date_fin = 
+       		/* On met à jour la date de fin avec la date d'effet suivante - 1 jour */
+        	NVL(
+            	TO_CHAR(
+					TO_DATE(
+						(SELECT MIN(a2.date_eff) 
+						FROM std_struc_affectation a2
+						WHERE
+                            a2.codts = lignesRequetes.codts 
+                            AND a2.matric = lignesRequetes.matric 
+                            AND a2.date_eff > a.date_eff
+                        )
+						, 'YYYYMMDD'
+					) -1
+				, 'YYYYMMDD'
+				)
+			,'20991231'
+            )
+        WHERE 
+        	a.codts = lignesRequetes.codts 
+        	AND a.matric = lignesRequetes.matric;
+        COMMIT;
+    END LOOP;
+    CLOSE tabAffPb;
+END HRORG_DATE_FIN_AFFECTATION;

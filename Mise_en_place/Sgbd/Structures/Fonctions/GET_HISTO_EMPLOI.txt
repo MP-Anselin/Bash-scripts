@@ -1,0 +1,98 @@
+##
+TAG_CHARSET=@€éèç
+##
+GET_HISTO_EMPLOI
+=SQL=
+CREATE OR REPLACE FUNCTION GET_HISTO_EMPLOI(
+          p_numpac  VARCHAR2,
+          p_paiezad VARCHAR2)
+     RETURN HISTO_EMPLOI_TAB
+AS
+     p_req CLOB;
+     p_selectLibEmploi CLOB;
+     p_cursHisto SYS_REFCURSOR;
+     p_dateEff       DATE;
+     p_dateFin       DATE;
+     p_libelleEmploi VARCHAR2(4000);
+     p_tabTmp HISTO_EMPLOI_TAB := HISTO_EMPLOI_TAB();
+     p_retour HISTO_EMPLOI_TAB := HISTO_EMPLOI_TAB();
+     p_tableGxp  VARCHAR2(24);
+     p_donneeGxp VARCHAR2(50);
+     p_trt       VARCHAR2(4000);
+BEGIN
+     p_req := 'SELECT DATE_EFF, (CASE WHEN DATE_FIN=TO_DATE(''20991231'',''yyyymmdd'') THEN NULL ELSE DATE_FIN END)        AS DATE_FIN, ';
+     -- Par défaut, on récupère QUALPE, ou le libellé de l’emploi
+     p_selectLibEmploi := 'NVL(QUALPE,(SELECT F.LIBELLE FROM GA_FILIERE F WHERE F.NUMPAC=C.NUMPAC AND F.FILIERE=C.FILIR AND F.REGROUPEMENT_METIER=C.SSFIL AND F.METIER=C.METIER AND F.QUALIFICATION=C.EMPLOI))';
+     -- ICI ON VA RECUPERER LE TRAITEMENT PARTICULIER POTENTIEL pour l’élément A670
+     BEGIN
+          SELECT TABLEGXP,
+               DONNEEGXP,
+               TRTPARTICULIER
+          INTO p_tableGxp,
+               p_donneeGxp,
+               p_trt
+          FROM TGE_REF_MAPDO
+          WHERE NUMPAC = p_numpac
+           AND ELEMENT = 'A670';
+     EXCEPTION
+     WHEN NO_DATA_FOUND THEN
+          -- Pas trouvé pour le NUMPAC passé en paramètre, on recherche pour NUMPAC='*'
+          BEGIN
+               SELECT TABLEGXP,
+                    DONNEEGXP,
+                    TRTPARTICULIER
+               INTO p_tableGxp,
+                    p_donneeGxp,
+                    p_trt
+               FROM TGE_REF_MAPDO
+               WHERE NUMPAC = '*'
+                AND ELEMENT = 'A670';
+          EXCEPTION
+          WHEN NO_DATA_FOUND THEN NULL;
+          END;
+     END;
+IF p_tableGxp               IS NOT NULL AND p_tableGxp='DIC_ADM_CONTRAT_HISTO' THEN
+     IF p_trt               IS NOT NULL THEN
+          p_selectLibEmploi := p_trt;
+          p_selectLibEmploi := REPLACE(p_selectLibEmploi,'$TABLE','C');
+          p_selectLibEmploi := REPLACE(p_selectLibEmploi,'$MATRIC','C.MATRIC');
+          p_selectLibEmploi := REPLACE(p_selectLibEmploi,'$NUMPAC','C.NUMPAC');
+          p_selectLibEmploi := REPLACE(p_selectLibEmploi,'$DONNEEGXP','C.'||p_donneeGxp);
+     ELSE
+          IF p_donneeGxp         != 'QUALPE' THEN
+               p_selectLibEmploi := REPLACE(p_selectLibEmploi, 'QUALPE', p_donneeGxp);
+          END IF;
+     END IF;
+END IF;
+p_req := p_req || p_selectLibEmploi;
+p_req := p_req || ' AS LIBELLE_EMPLOI FROM DIC_ADM_CONTRAT_HISTO C WHERE NUMPAC='''||p_numpac||''' AND PAIEZAD ='''||p_paiezad||''' ORDER BY DATE_EFF';
+OPEN p_cursHisto FOR p_req;
+LOOP
+     FETCH p_cursHisto INTO p_dateEff, p_dateFin, p_libelleEmploi;
+     EXIT
+WHEN p_cursHisto%NOTFOUND;
+     IF p_tabTmp.count = 0 THEN
+          p_tabTmp.extend;
+          p_tabTmp(p_tabTmp.count) := HISTO_EMPLOI(NULL, p_dateEff, p_dateFin, p_libelleEmploi);
+     ELSE
+          IF p_libelleEmploi = p_tabTmp(p_tabTmp.count).LIBELLE_EMPLOI AND p_dateEff = p_tabTmp(p_tabTmp.count).DATE_FIN+1 THEN
+               -- Même emploi sur une période continue : on modifie la date de fin du dernier histo stocké
+               p_tabTmp(p_tabTmp.count).DATE_FIN := p_dateFin;
+          ELSE
+               -- Emploi différent, ou même emploi avec rupture (départ / réembauche avec période d'inactivité) : on stocke un nouvel histo
+               p_tabTmp.extend;
+               p_tabTmp(p_tabTmp.count) := HISTO_EMPLOI(NULL, p_dateEff, p_dateFin, p_libelleEmploi);
+          END IF;
+     END IF;
+END LOOP;
+CLOSE p_cursHisto;
+FOR i IN REVERSE 1..p_tabTmp.count
+LOOP
+     EXIT
+WHEN p_retour.count=30;
+     p_retour.extend;
+     p_retour(p_retour.count)            := p_tabTmp(i);
+     p_retour(p_retour.count).NUM_EMPLOI := LPAD(p_retour.count,2,'0');
+END LOOP;
+RETURN p_retour;
+END GET_HISTO_EMPLOI;

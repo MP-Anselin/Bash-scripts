@@ -1,0 +1,6 @@
+##
+TAG_CHARSET=@€ιθη
+##
+SYS_SEC_USR_EZ
+==
+delete from SYS_SEC_USR_EZ where LOGIN in (select upper(ASSOCIATE_OID) from MP_CONSUMERAPPOID)

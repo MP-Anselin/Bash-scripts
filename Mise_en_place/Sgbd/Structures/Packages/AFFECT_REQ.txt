@@ -1,0 +1,191 @@
+##
+TAG_CHARSET=@€éèç
+##
+AFFECT_REQ
+=SQL=
+create or replace PACKAGE AFFECT_REQ
+AS
+  PROCEDURE maj_requetesimple(
+      p_id             NUMBER,
+      p_application    VARCHAR2,
+      p_nomrequete     VARCHAR2,
+      p_requeteecr_gsi VARCHAR2 );
+  PROCEDURE principal(
+      p_application VARCHAR2) ;
+TYPE requeteSimple
+IS
+  RECORD
+  (
+    nomrequete     VARCHAR2(50 BYTE),
+    requeteEcr_Gsi VARCHAR2(4000 BYTE));
+TYPE STD_REQUETESAISIE
+IS
+  RECORD
+  (
+    bloc      VARCHAR2(999),
+    etou      VARCHAR2(100),
+    operateur VARCHAR2(20),
+    parapres  VARCHAR2(5),
+    paravant  VARCHAR2(5),
+    selection VARCHAR2(100),
+    valeur    VARCHAR2(100));
+TYPE type_List_arr IS VARRAY(999) OF STD_REQUETESAISIE;
+TYPE type_listNomRequete IS VARRAY(999)OF REQUETESIMPLE;
+p_requetesimple REQUETESIMPLE;
+END AFFECT_REQ;   
+##
+AFFECT_REQ
+=SQL=
+CREATE OR REPLACE PACKAGE BODY AFFECT_REQ
+AS
+  PROCEDURE maj_requetesimple(
+      p_id             NUMBER,
+      p_application    VARCHAR2,
+      p_nomrequete     VARCHAR2,
+      p_requeteecr_gsi VARCHAR2 )
+  IS
+    cpt      NUMBER;
+    p_prefix NUMBER;
+    p_txtreq VARCHAR2(4000);
+    p_retour type_List_arr;
+    p_retourReqSplit TAB_VARCHAR;
+    parOuvrante   NUMBER;
+    indexNomTable NUMBER;
+    listParam type_List_arr;
+    p_requeteSaisie STD_REQUETESAISIE;
+    withClausePac NUMBER;
+    noUpdate      NUMBER;
+    valeurPac     VARCHAR2(20);
+  BEGIN
+    SELECT AVECNOMTABLE
+    INTO p_prefix
+    FROM REQUETEURAPP
+    WHERE application =p_application ;
+    /* découpage de la requete*/
+    p_txtreq                    := p_requeteecr_gsi;
+    p_txtreq                    := REPLACE(p_txtreq,'@@', '{{OR{{');
+    p_txtreq                    :=REPLACE(p_txtreq, '##', '{{AND{{');
+    p_txtreq                    := REPLACE(p_txtreq,'{{', '¿');
+    IF ( p_txtreq               IS NOT NULL ) THEN
+      p_retourReqSplit          := split_string_into_tab(p_txtreq, '¿');
+      IF (p_retourReqSplit.COUNT >1) THEN
+        listParam               := type_List_arr();
+        FOR i IN 1..p_retourReqSplit.COUNT
+        LOOP
+          parOuvrante:=0;
+          IF i mod 4  =1 THEN
+            listParam.extend;
+            p_requeteSaisie       := STD_REQUETESAISIE(NULL,NULL, NULL,NULL,NULL,NULL,NULL);
+            IF (i                  > 0) THEN
+              p_requeteSaisie.ETOU:= p_retourReqSplit(i);
+            END IF ;
+            p_requeteSaisie.SELECTION                       := trim (p_retourReqSplit(i+1));
+            IF ( LENGTH ( trim ( p_requeteSaisie.SELECTION)) > 0 AND '('= SUBSTR ( trim ( p_requeteSaisie.SELECTION),0,1) )THEN
+              p_requeteSaisie.SELECTION                     := trim (SUBSTR ( p_requeteSaisie.SELECTION ,1));
+              p_requeteSaisie.PARAVANT                      := '(';
+              parOuvrante                                   :=1;
+            END IF;
+            IF ( p_prefix                  = 1) THEN
+              indexNomTable               := INSTR( p_requeteSaisie.SELECTION , '.') ;
+              IF ( indexNomTable           > 0) THEN
+                p_requeteSaisie.SELECTION := SUBSTR ( p_requeteSaisie.SELECTION ,indexNomTable);
+              END IF ;
+            END IF;
+            p_requeteSaisie.OPERATEUR  := p_retourReqSplit(i                                                                                                                       + 2);
+            p_requeteSaisie.VALEUR     :=trim (p_retourReqSplit(i                                                                                                                  + 3));
+            IF ( parOuvrante            =1 AND LENGTH ( trim (p_requeteSaisie.VALEUR) )>0 AND ')'=SUBSTR ( TRIM (p_requeteSaisie.VALEUR ), LENGTH( trim ( p_requeteSaisie.VALEUR) )-1 , LENGTH( trim ( p_requeteSaisie.VALEUR) ))) THEN
+              p_requeteSaisie.VALEUR   :=SUBSTR (trim ( p_requeteSaisie.VALEUR) , 0 , LENGTH( trim ( p_requeteSaisie.VALEUR))                                                      -1) ;
+              p_requeteSaisie.PARAPRES := ')';
+              parOuvrante              :=0;
+            END IF;
+            IF (i          =1) THEN
+              listParam(1):= p_requeteSaisie;
+            ELSE
+              listParam(listParam.count):=p_requeteSaisie;
+            END IF;
+          ELSE
+            CONTINUE;
+          END IF;
+        END LOOP;
+        /*Si la requête contient une seule clause de sécurité de type Numpac = 'xxx' ou Numpac in ('xxx') et qu'elle n'est pas précédée par l'opérateur 'OR'
+        on l'affecte au numpac xxx
+        */
+        noUpdate:=0;
+        FOR k IN 1..listParam.COUNT
+        LOOP         
+          IF listParam(k).ETOU != 'AND' THEN
+   			 noUpdate           :=1;
+    		 EXIT;
+ 		  END IF ;
+          IF trim(listParam(k).SELECTION) ='PAC' THEN
+            IF (withClausePac      IS NULL )THEN
+              withClausePac        := 1;
+            ELSE
+              withClausePac :=withClausePac+1;
+            END IF;
+            IF listParam(k).OPERATEUR NOT IN ( 'EQUAL','Egal à', 'IN','Dans la liste') THEN
+              noUpdate :=1;
+              EXIT;
+            END IF;
+            IF ( INSTR( listParam(k).VALEUR ,',')>0) THEN
+              noUpdate                          :=1;
+              EXIT;
+            END IF ;
+            valeurPac := listParam(k).VALEUR;
+          END IF;
+        END LOOP;
+        IF ( withClausePac = 1 AND valeurPac IS NOT NULL AND noUpdate =0 ) THEN
+          UPDATE REQUETESIMPLE
+          SET NUMPAC       = valeurPac
+          WHERE application=p_application
+          AND NOMREQUETE   =p_nomrequete ;
+          FSED.FSED_AVANCEMENT_PLSQL(p_id,'AFFECT_REC ','MAJ de la requete '||p_nomrequete);
+        END IF;
+      END IF;
+    END IF;
+  END;
+  PROCEDURE principal(
+      p_application VARCHAR2)
+  IS
+    p_id NUMBER;
+    cpt  NUMBER;
+    cur_1 SYS_REFCURSOR;
+    sql_1 VARCHAR2(200);
+    listRequete type_listNomRequete;
+    p_userManagementByPac VARCHAR2(10);
+  BEGIN
+    SELECT GAP_TRT_SEQ_ID.nextval INTO p_id FROM DUAL;
+    SELECT UPPER(valvar)
+    INTO p_userManagementByPac
+    FROM sys_varsys
+    WHERE codvar ='USER_MANAGEMENT_BY_PAC'
+    AND module   ='STD' ;
+    FSED.FSED_AVANCEMENT_PLSQL(p_id,'AFFECT_REC (Begin)','Début d''affectation des requetes de sécurités aux pacs adéquats pour application: '|| p_application);
+    IF (p_application IN ('SEC_LOC', 'GAP_NAT_TRT_PAIE_SEC_EXP') AND p_userManagementByPac='TRUE' ) THEN
+      listRequete                                                                        := type_listNomRequete();
+      sql_1                                                                              :='SELECT nomrequete, requeteecr_gsi  from requetesimple where  application = '''||p_application ||'''';
+      cpt                                                                                :=0;
+      OPEN cur_1 FOR sql_1;
+      LOOP
+        FETCH cur_1 INTO p_requetesimple;
+        EXIT
+      WHEN cur_1%NOTFOUND;
+        cpt :=cpt+1;
+        listRequete.extend;
+        listRequete(cpt) :=p_requetesimple;
+        begin
+			maj_requetesimple(p_id, p_application, listRequete(cpt).nomRequete, listRequete(cpt).requeteEcr_GSI);
+			exception
+			when others then
+			FSED.FSED_AVANCEMENT_PLSQL(p_id, 'AFFECT_REQ (Erreur)', listRequete(cpt).nomRequete || ' :' || SQLCODE || '-' || SQLERRM);
+		end;
+      END LOOP;
+      FSED.FSED_AVANCEMENT_PLSQL(p_id,'AFFECT_REC (End)','Fin d''affectation des requetes de sécurités aux pacs adéquats pour application: '|| p_application);
+    ELSE
+      FSED.FSED_AVANCEMENT_PLSQL(p_id,'AFFECT_REC (End)','USER_MANAGEMENT_BY_PAC est non activée ou application n''est pas dans la liste (population, nature de traitement de paie ) ');
+    END IF;
+  EXCEPTION
+  WHEN OTHERS THEN
+    FSED.FSED_AVANCEMENT_PLSQL(p_id ,'AFFECT_REQ (Erreur)', SQLCODE||'-'||SQLERRM );
+  END;
+END AFFECT_REQ;

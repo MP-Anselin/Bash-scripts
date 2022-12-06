@@ -1,0 +1,862 @@
+##
+CALC_HP
+=SQL=
+create or replace PACKAGE CALC_HP IS
+
+p_date_deb DATE;
+p_date_fin DATE;
+horaireRemu VARCHAR(255);--horaire remu.	
+horairePres VARCHAR(255); -- tmp horaire pres. 
+dateDebTranchSitu DATE;   --tmp loop cycle dans situation
+dateFinTranchSitu DATE;   --tmp loop cycle dans situation
+dateEnCours DATE;         --date en cours pour calcul LOOP decomposerArrCycleDcySituationEnTrancheAndCreateHP
+numJourCanevas NUMBER(5,0);--tmp for LOOP decomposerArrCycleDcySituationEnTrancheAndCreateHP
+nbreHeures NUMBER(5,2);    --tmp for LOOP decomposerArrCycleDcySituationEnTrancheAndCreateHP
+jourSemaine VARCHAR2(15);
+ isRetro NUMBER;
+
+TYPE map_horaire_par_jour IS TABLE OF NUMBER INDEX BY VARCHAR2(50);
+arrHoraireParJour map_horaire_par_jour;
+
+/*****************/
+TYPE TgeRefHprType IS RECORD (
+    NUMPAC	VARCHAR2(6 BYTE),
+    CODE_HOR_PRES	NUMBER(3,0),
+    DATE_DEBUT	DATE,
+    DATE_FIN	DATE,
+    HRS_LUNDI	NUMBER(4,2),
+    HRS_MARDI	NUMBER(4,2),
+    HRS_MERCREDI	NUMBER(4,2),
+    HRS_JEUDI	NUMBER(4,2),
+    HRS_VENDREDI	NUMBER(4,2),
+    HRS_SAMEDI	NUMBER(4,2),
+    HRS_DIMANCHE	NUMBER(4,2)
+);
+--TYPE map_hpr IS TABLE OF TgeRefHprType INDEX BY VARCHAR2(30);
+cur_TgeRefhpr TgeRefHprType;
+--l_map_hpr map_hpr;
+TYPE type_List_arr_2 IS VARRAY(999) OF TgeRefHprType;
+lst_2 type_List_arr_2;
+arrCycleHprSituation type_List_arr_2;
+
+
+TYPE TgeRefDcyCy1Cy2Type IS RECORD (
+	NUMPAC						VARCHAR2(6 BYTE),
+	CODE_CLASSE_HORAIRE_OTT 	NUMBER(3,0),
+	DATE_DEBUT 					DATE,
+	DATE_FIN 					DATE,
+	CODE_CYCLE_OTT 				NUMBER(3,0),
+	CODE_CANEVAS_CYCLE_OTT 		NUMBER(3,0),
+	NOMBRE_JOURS_CYCLE			NUMBER(3,0),
+	NUM_JOUR_ENTREE_CANEVAS		NUMBER(3,0),
+	NOMBRE_HEURE_1 				NUMBER(5,2),
+	NOMBRE_HEURE_2				NUMBER(5,2),
+	NOMBRE_HEURE_3				NUMBER(5,2),
+	NOMBRE_HEURE_4				NUMBER(5,2),
+	NOMBRE_HEURE_5				NUMBER(5,2),
+	NOMBRE_HEURE_6				NUMBER(5,2),
+	NOMBRE_HEURE_7				NUMBER(5,2),
+	NOMBRE_HEURE_8				NUMBER(5,2),
+	NOMBRE_HEURE_9				NUMBER(5,2),
+	NOMBRE_HEURE_10				NUMBER(5,2),
+	NOMBRE_HEURE_11				NUMBER(5,2),
+	NOMBRE_HEURE_12				NUMBER(5,2),
+	NOMBRE_HEURE_13				NUMBER(5,2),
+	NOMBRE_HEURE_14				NUMBER(5,2),
+	NOMBRE_HEURE_15				NUMBER(5,2),
+	NOMBRE_HEURE_16				NUMBER(5,2), 
+	NOMBRE_HEURE_17				NUMBER(5,2),
+	NOMBRE_HEURE_18				NUMBER(5,2),
+	NOMBRE_HEURE_19				NUMBER(5,2),
+	NOMBRE_HEURE_20				NUMBER(5,2),
+	NOMBRE_HEURE_21				NUMBER(5,2)
+	) ;
+  /* FOR HASHMAP AND RECORD */
+--TYPE map_varchar IS TABLE OF TgeRefDcyCy1Cy2Type INDEX BY VARCHAR2(30);
+cur_TgeRefDcy TgeRefDcyCy1Cy2Type;
+--l_map map_varchar;
+TYPE type_List_arr IS VARRAY(999) OF TgeRefDcyCy1Cy2Type;
+lst_1 type_List_arr;
+arrCycleSituation type_List_arr;
+  /***************/
+  
+  TYPE TGE_REF_MAPDOType IS RECORD (
+    NUMPAC	VARCHAR2(6),
+    ELEMENT	VARCHAR2(4),
+    OCCURENCE	VARCHAR2(2),
+    DONNEEGXP	VARCHAR2(50),
+    TABLEGXP	VARCHAR2(24),
+    DONNFILTRE	VARCHAR2(50),
+    OPERFILTRE	VARCHAR2(2),
+    VALFILTRE	VARCHAR2(15),
+    TRTPARTICULIER	VARCHAR2(4000),
+    ENVOI_SYSTEMATIQUE	VARCHAR2(1),
+    FORCABLE_ECRAN_GENERE	VARCHAR2(1)
+	) ;
+cur_TgeRefmapdo TGE_REF_MAPDOType;
+TYPE type_List_arr_3 IS VARRAY(999) OF TGE_REF_MAPDOType;
+lst_3 type_List_arr_3;
+
+
+--TYPE dachtype IS RECORD();
+ TYPE DACH_Type IS RECORD (PAIEZAD VARCHAR2(8),
+    MATRIC VARCHAR2(32),
+    NUMPAC VARCHAR2(6),
+    PACMAT VARCHAR2(8),
+    NUMCNT  NUMBER(9,0),
+    DATE_EFF  DATE,
+    DATE_FIN  DATE,
+    ZA819  NUMBER(3,0),
+    ZA820  NUMBER(3,0),
+    ZA996  VARCHAR2(1),
+    DEBUT_PER_GENERATION_HP DATE,
+    FIN_PER_GENERATION_HP  DATE);
+ cur_dachtype DACH_Type;
+cur_periodetype VARCHAR2(10);
+ 
+ TYPE type_List_arr_4 IS VARRAY(999) OF DACH_Type;
+ lst_4 type_List_arr_4;
+ 
+
+  
+ sql_1 CLOB;
+ sql_2 CLOB;
+ sql_3 CLOB;
+ sql_4 CLOB;
+
+ sql_periode_hp CLOB ;
+ 
+ 
+ 
+ cpt number:=1;
+ 
+ TYPE SituationType IS RECORD (
+    numpac	VARCHAR2(30),
+    pacmat	VARCHAR2(30),
+    paieZad	VARCHAR2(30),
+    numcnt	NUMBER(13,0),
+    code_classe_horaire_ott	NUMBER(13,0),
+    code_cycle_ott	NUMBER(13,0),
+    dateDeb	DATE,
+    dateFin	DATE,
+    isGtaT1	boolean,
+    HRS_SAMEDI	NUMBER(4,2),
+    HRS_DIMANCHE	NUMBER(4,2)
+);
+--l_map_hpr map_hpr;
+TYPE SituationType_arr_2 IS VARRAY(99) OF SituationType;
+lst_Situation SituationType_arr_2;
+ 
+ /**
+  * récupérer valeur de l'objet TgeRefDcyCy1Cy2 selon chaine de caractére (nom colonne)
+  */
+  FUNCTION calculateNomJourCanevas( ligneTgeRefHprType IN TgeRefHprType, dateEnCour IN DATE  ) RETURN VARCHAR;
+  
+  /**
+  * retourne le numero de jour canevas 
+  */
+ FUNCTION calculateNumJourCanevas( ligneDcyCy1Cy2 IN TgeRefDcyCy1Cy2Type, local_dateEnCours IN DATE  ) RETURN NUMBER;
+    
+  /**
+  * récupérer valeur de l'objet TgeRefDcyCy1Cy2 selon chaine de caractére (nom colonne)
+  */
+  FUNCTION getValOfCycle( val IN VARCHAR2, obj IN TgeRefDcyCy1Cy2Type) RETURN NUMBER;
+  
+   FUNCTION getHprHoursNbre( val IN NUMBER, obj IN TgeRefHprType  )  RETURN NUMBER;
+  
+  
+  /*
+  * get value from DACH object selon clé
+  */
+ FUNCTION getValOfDACH( val IN VARCHAR2, obj IN DACH_Type  )  RETURN VARCHAR2;
+  
+  /*
+  *   insertion d'un incident paie hors absence (a la fin de du traitement)
+  */
+PROCEDURE insertIncidentPaieHorsAbs( nbrHeur IN NUMBER,dateActu IN DATE, p_unIncident IN SituationType,  p_login IN VARCHAR2, v_periode_limiteRetro IN VARCHAR2);
+  
+PROCEDURE principal( p_numpac IN VARCHAR2
+ , p_pacmat IN VARCHAR2
+ , p_paiezad IN VARCHAR2
+ , p_numcnt IN NUMBER
+ , p_date_eff IN VARCHAR2 
+ , p_date_sortie_sit_bo IN VARCHAR2
+ , p_login IN VARCHAR2
+ , p_isDeleting IN NUMBER
+  ); 
+ 
+ 
+END CALC_HP;
+
+##
+CALC_HP
+=SQL=
+create or replace PACKAGE BODY CALC_HP AS
+
+ /**
+  * récupérer valeur de l'objet TgeRefDcyCy1Cy2 selon chaine de caractére (nom colonne)
+  */
+  FUNCTION calculateNomJourCanevas( ligneTgeRefHprType IN TgeRefHprType, dateEnCour IN DATE  )
+  RETURN VARCHAR
+  IS
+  numJr NUMBER := 0;
+  BEGIN
+  select to_char(dateEnCour,'D') INTO numJr from dual;
+  CASE numJr
+    WHEN 1 THEN  RETURN 'Lundi';
+    WHEN 2 THEN  RETURN 'Mardi';
+    WHEN 3 THEN  RETURN 'Mercredi';
+    WHEN 4 THEN  RETURN 'Jeudi';
+    WHEN 5 THEN  RETURN 'Vendredi';
+    WHEN 6 THEN  RETURN 'Samedi';
+    WHEN 7 THEN  RETURN 'Dimanche';
+    ELSE RETURN 'Erreur numéro jour';
+  END CASE;
+  
+  
+  END calculateNomJourCanevas;
+  
+  /**
+  * retourne le numero de jour canevas 
+  */
+ FUNCTION calculateNumJourCanevas( ligneDcyCy1Cy2 IN TgeRefDcyCy1Cy2Type, local_dateEnCours IN DATE  )
+  RETURN NUMBER
+  IS
+  local_numJourCanevas NUMBER;
+  res1 NUMBER;
+  res2 NUMBER;
+  
+  tmp NUMBER;
+  tmp2 NUMBER;
+  BEGIN
+    IF((ligneDcyCy1Cy2.Date_debut-local_dateEnCours+ligneDcyCy1Cy2.Num_jour_entree_canevas)< ligneDcyCy1Cy2.Nombre_jours_cycle) THEN
+      res1:=(ligneDcyCy1Cy2.date_debut - local_dateEnCours) / ligneDcyCy1Cy2.Nombre_jours_cycle;
+      res2:=ABS((ligneDcyCy1Cy2.date_debut - local_dateEnCours)) + 1 - (TRUNC(ABS(res1)) * ligneDcyCy1Cy2.Nombre_jours_cycle); 
+      
+      tmp2:=TRUNC(ABS(res1));
+      
+     tmp:= ABS((ligneDcyCy1Cy2.date_debut - local_dateEnCours));
+      
+      
+      IF( (res2-1) > ligneDcyCy1Cy2.Nombre_jours_cycle - ligneDcyCy1Cy2.Num_jour_entree_canevas ) THEN
+        local_numJourCanevas := res2- (ligneDcyCy1Cy2.Nombre_jours_cycle - ligneDcyCy1Cy2.Num_jour_entree_canevas);
+       ELSE
+        local_numJourCanevas := res2 + ligneDcyCy1Cy2.Num_jour_entree_canevas-1;
+      END IF;
+    ELSE
+        local_numJourCanevas :=ligneDcyCy1Cy2.Num_jour_entree_canevas + ABS(ligneDcyCy1Cy2.date_debut - local_dateEnCours); --
+    END IF;
+    
+    RETURN local_numJourCanevas;
+  END calculateNumJourCanevas;
+    
+  /**
+  * récupérer valeur de l'objet TgeRefDcyCy1Cy2 selon chaine de caractére (nom colonne)
+  */
+  FUNCTION getValOfCycle( val IN VARCHAR2, obj IN TgeRefDcyCy1Cy2Type  )
+  RETURN NUMBER
+  IS
+  BEGIN
+      IF val='NOMBRE_HEURE_1' THEN RETURN TO_NUMBER(obj.NOMBRE_HEURE_1); END IF;
+      IF val='NOMBRE_HEURE_2' THEN RETURN TO_NUMBER(obj.NOMBRE_HEURE_2); END IF;
+      IF val='NOMBRE_HEURE_3' THEN RETURN TO_NUMBER(obj.NOMBRE_HEURE_3); END IF;
+      IF val='NOMBRE_HEURE_4' THEN RETURN TO_NUMBER(obj.NOMBRE_HEURE_4); END IF;
+      IF val='NOMBRE_HEURE_5' THEN RETURN TO_NUMBER(obj.NOMBRE_HEURE_5); END IF;
+      IF val='NOMBRE_HEURE_6' THEN RETURN TO_NUMBER(obj.NOMBRE_HEURE_6); END IF;
+      IF val='NOMBRE_HEURE_7' THEN RETURN TO_NUMBER(obj.NOMBRE_HEURE_7); END IF;
+      IF val='NOMBRE_HEURE_8' THEN RETURN TO_NUMBER(obj.NOMBRE_HEURE_8); END IF;
+      IF val='NOMBRE_HEURE_9' THEN RETURN TO_NUMBER(obj.NOMBRE_HEURE_9); END IF;
+      IF val='NOMBRE_HEURE_10' THEN RETURN TO_NUMBER(obj.NOMBRE_HEURE_10); END IF;
+      IF val='NOMBRE_HEURE_11' THEN RETURN TO_NUMBER(obj.NOMBRE_HEURE_11); END IF;
+      IF val='NOMBRE_HEURE_12' THEN RETURN TO_NUMBER(obj.NOMBRE_HEURE_12); END IF;
+      IF val='NOMBRE_HEURE_13' THEN RETURN TO_NUMBER(obj.NOMBRE_HEURE_13); END IF;
+      IF val='NOMBRE_HEURE_14' THEN RETURN TO_NUMBER(obj.NOMBRE_HEURE_14); END IF;
+      IF val='NOMBRE_HEURE_15' THEN RETURN TO_NUMBER(obj.NOMBRE_HEURE_15); END IF;
+      IF val='NOMBRE_HEURE_16' THEN RETURN TO_NUMBER(obj.NOMBRE_HEURE_16); END IF;
+      IF val='NOMBRE_HEURE_17' THEN RETURN TO_NUMBER(obj.NOMBRE_HEURE_17); END IF;
+      IF val='NOMBRE_HEURE_18' THEN RETURN TO_NUMBER(obj.NOMBRE_HEURE_18); END IF;
+      IF val='NOMBRE_HEURE_19' THEN RETURN TO_NUMBER(obj.NOMBRE_HEURE_19); END IF;
+      IF val='NOMBRE_HEURE_20' THEN RETURN TO_NUMBER(obj.NOMBRE_HEURE_20); END IF;
+      IF val='NOMBRE_HEURE_21' THEN RETURN TO_NUMBER(obj.NOMBRE_HEURE_21); END IF;
+      RETURN NULL;
+  END getValOfCycle;
+  
+   FUNCTION getHprHoursNbre( val IN NUMBER, obj IN TgeRefHprType  )
+  RETURN NUMBER
+  IS
+  BEGIN
+      IF val='Lundi' THEN RETURN TO_NUMBER(obj.HRS_LUNDI); END IF;
+      IF val='Mardi' THEN RETURN TO_NUMBER(obj.HRS_MARDI); END IF;
+      IF val='Mercredi' THEN RETURN TO_NUMBER(obj.HRS_MERCREDI); END IF;
+      IF val='Jeudi' THEN RETURN TO_NUMBER(obj.HRS_JEUDI); END IF;
+      IF val='Vendredi' THEN RETURN TO_NUMBER(obj.HRS_VENDREDI); END IF;
+      IF val='Samedi' THEN RETURN TO_NUMBER(obj.HRS_SAMEDI); END IF;
+      IF val='Dimanche' THEN RETURN TO_NUMBER(obj.HRS_DIMANCHE); END IF;
+      RETURN NULL;
+  END getHprHoursNbre;
+  
+  
+  /*
+  * get value from DACH object selon clé
+  */
+ FUNCTION getValOfDACH( val IN VARCHAR2, obj IN DACH_Type  )
+  RETURN VARCHAR2
+  IS
+  BEGIN
+    IF val='ZA996' THEN RETURN TO_CHAR(obj.ZA996); END IF;
+    IF val='ZA819' THEN RETURN TO_CHAR(obj.ZA819); END IF;
+    IF val='ZA820' THEN RETURN TO_CHAR(obj.ZA820); END IF;
+    return '';
+  END getValOfDACH;
+  
+  /*
+  *   insertion d'un incident paie hors absence (a la fin de du traitement)
+  */
+PROCEDURE insertIncidentPaieHorsAbs( nbrHeur IN NUMBER,dateActu IN DATE, p_unIncident IN SituationType, p_login IN VARCHAR2,v_periode_limiteRetro VARCHAR2 )
+  IS
+  seq NUMBER:='';
+ cur_5 SYS_REFCURSOR;
+ v_periode_retro VARCHAR2(10) ;
+  
+ BEGIN
+ --	En rétro, CALC_HP calcule les HP à partir du mois de la date d'effet en entrée et sur tous les mois suivants jusqu’à la période en cours.
+ IF isRetro='1'  THEN
+
+ sql_periode_hp := ' SELECT MOIS_PAIE 
+ FROM TGE_PERIODE_RECUEIL_PAIEZAD
+ WHERE numpac = ''' || p_unIncident.numPac || '''
+ AND paiezad  = '''|| p_unIncident.paieZad ||'''
+AND '''|| dateActu ||''' BETWEEN DEBUT_PER_GENERATION_HP AND FIN_PER_GENERATION_HP
+AND MOIS_PAIE>=' || v_periode_limiteRetro ;
+ 
+ cpt:=1;
+ OPEN cur_5 FOR sql_periode_hp;
+ LOOP
+ FETCH cur_5 INTO cur_periodetype;
+ EXIT WHEN cur_5%NOTFOUND;
+ 
+ v_periode_retro := cur_periodetype;
+  select SEQ_TGE_INCIDENTS_PAIE.NEXTVAL into seq from dual;
+  
+  INSERT INTO TGE_INCIDENTS_PAIE
+	 (ID, NUMPAC, PAIEZAD, PERIODE, TYPE_TRAITEMENT, DATE_EFFET, TYPE_IP, CODE_IP
+			, CODE_IMPUTATION, HEURES, ORIGINE, LOGIN_CREATE, DATE_CREATE, ROLE_CREATE, ORIGINE_CREATE
+			, LOGIN_MAJ, DATE_MAJ, ROLE_MAJ, ORIGINE_MAJ, CLE_IMPORT, CLE_ABSENCE, IDPACMAT, ENVOYE, JOUR_OUVRABLE
+			,JOUR_OUVRE , JOUR_OEUVRE, JOUR_CALENDAIRE, JOUR_HEURES )
+			 values (
+			  seq --ID
+			  , p_unIncident.numPac --NUMPAC
+			  , p_unIncident.paieZad --PAIEZAD
+			  , TO_DATE(v_periode_retro || 01, 'yyyyMMdd') --PERIODE
+			  , (select CODETYPTRT  from (select CODETYPTRT from TGE_REF_TYPETRT where (NUMPAC=p_unIncident.numPac OR NUMPAC='*') and CODETYPTRT='TT' order by NUMPAC desc) where rownum = 1 ) --TYPE_TRAITEMENT
+			  ,  dateActu --DATE_EFFET
+			  , 'T' --TYPE_IP
+			  , 'HP' --CODE_IP
+			  , '' -- p_unIncident.code_imputation;
+			  , nbrHeur --HEURES
+
+			  , 'T' --ORIGINE
+			  , p_login --LOGIN_CREATE
+			  , sysdate --DATE_CREATE
+			  , 'ADM' -- info non trouver :'( !!ROLE_CREATE DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER -------
+			  , 'TRG_DIC_ADM_CONTRAT_HISTO' --ORIGINE_CREATE DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER -------
+			  , p_login --LOGIN_MAJ
+			  , sysdate --Date MAJ
+			  , 'ADM' -- ROLE_MAJ
+			  , 'TRG_DIC_ADM_CONTRAT_HISTO' --ORIGINE_MAJ DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER -------
+			  , null --CLE_IMPORT
+
+				,  null --CLE_ABSENCE
+			  ,  p_unIncident.numpac||p_unIncident.pacmat --IDPACMAT
+			  ,  '' --ENVOYE
+			
+			  ,  null -- p_unIncident.jour_ouvrable
+			  ,  null -- p_unIncident.jour_ouvre
+			  ,  null --p_unIncident.jour_oeuvre
+			  ,  null --p_unIncident.jour_calendaire
+			  ,  null --p_unIncident.jour_heures
+			  );
+	cpt:=cpt+1;
+ END LOOP;
+ ELSE 
+ select SEQ_TGE_INCIDENTS_PAIE.NEXTVAL into seq from dual;
+ 
+ INSERT INTO TGE_INCIDENTS_PAIE
+ (ID, NUMPAC, PAIEZAD, PERIODE, TYPE_TRAITEMENT, DATE_EFFET, TYPE_IP, CODE_IP
+ , CODE_IMPUTATION, HEURES, ORIGINE, LOGIN_CREATE, DATE_CREATE, ROLE_CREATE, ORIGINE_CREATE
+ , LOGIN_MAJ, DATE_MAJ, ROLE_MAJ, ORIGINE_MAJ, CLE_IMPORT, CLE_ABSENCE, IDPACMAT, ENVOYE, JOUR_OUVRABLE
+ ,JOUR_OUVRE , JOUR_OEUVRE, JOUR_CALENDAIRE, JOUR_HEURES )
+ values (
+ seq --ID
+ , p_unIncident.numPac --NUMPAC
+ , p_unIncident.paieZad --PAIEZAD 
+ , TO_DATE((select periodeEnCours from TGE_REF_PAC where numpac=p_unIncident.numPac) , 'YYYYMM') --PERIODE
+ , (select CODETYPTRT  from (select CODETYPTRT from TGE_REF_TYPETRT where (NUMPAC=p_unIncident.numPac OR NUMPAC='*') and CODETYPTRT='TT' order by NUMPAC desc) where rownum = 1 ) --TYPE_TRAITEMENT
+ ,  dateActu --DATE_EFFET
+ , 'T' --TYPE_IP
+ , 'HP' --CODE_IP
+ , '' -- p_unIncident.code_imputation;
+ , nbrHeur --HEURES
+ , 'T' --ORIGINE
+ , p_login --LOGIN_CREATE
+ , sysdate --DATE_CREATE
+ , 'ADM' -- info non trouver :'( !!ROLE_CREATE DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER -------
+ , 'TRG_DIC_ADM_CONTRAT_HISTO' --ORIGINE_CREATE DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER -------
+ , p_login --LOGIN_MAJ
+ , sysdate --Date MAJ
+ , 'ADM' -- ROLE_MAJ
+ , 'TRG_DIC_ADM_CONTRAT_HISTO' --ORIGINE_MAJ DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER -------
+ , null --CLE_IMPORT
+ 
+ ,  null --CLE_ABSENCE
+ ,  p_unIncident.numpac||p_unIncident.pacmat --IDPACMAT
+ ,  '' --ENVOYE
+ 
+ ,  null -- p_unIncident.jour_ouvrable
+ ,  null -- p_unIncident.jour_ouvre
+ ,  null --p_unIncident.jour_oeuvre
+ ,  null --p_unIncident.jour_calendaire
+ ,  null --p_unIncident.jour_heures
+ );
+ END IF ;
+  END;
+  
+  
+  
+   PROCEDURE principal( p_numpac IN VARCHAR2
+ , p_pacmat IN VARCHAR2
+ , p_paiezad IN VARCHAR2
+ , p_numcnt IN NUMBER
+ , p_date_eff IN VARCHAR2 
+ , p_date_sortie_sit_bo IN VARCHAR2
+ , p_login IN VARCHAR2
+ , p_isDeleting IN NUMBER
+)
+  IS
+    cur_1 SYS_REFCURSOR; 
+    cur_2 SYS_REFCURSOR; 
+    cur_3 SYS_REFCURSOR; 
+    cur_4 SYS_REFCURSOR; 
+    debut_calcul_hp_DB DATE;
+    v_period_en_cour varchar2(10);
+    v_deb_retro varchar2(10);
+    v_fin_per_gen_hp varchar2(10);
+    m_embauche varchar2(6);
+ 	d_limiteMaj DATE;
+ 	d_dsdcn DATE;
+ 	v_count number;
+    err_msg  VARCHAR(1000);
+ 	err_code VARCHAR(200);
+    p_id NUMBER; 
+    numJourCanevas NUMBER;
+    dateEnCours DATE;
+    dateFinTranchSitu DATE;
+    dateDebTranchSitu DATE;
+    v_periode_limiteRetro VARCHAR(6);
+  BEGIN
+ 
+ SELECT GAP_TRT_SEQ_ID.nextval INTO p_id FROM DUAL;
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'CALC_HP (Begin)','Début de recalcul des HP pour la situation ( numpac:  '||p_numpac ||', pacmat: '|| p_pacmat ||', numcnt: '||p_numcnt|| ', paiezad: '|| p_paiezad ||', date_eff : '||p_date_eff||')');
+	  isRetro:= 0 ;
+      p_date_deb := TO_DATE(p_date_eff,'DD/MM/YYYY');
+ 	  p_date_fin := TO_DATE(p_date_sortie_sit_bo,'DD/MM/YYYY');
+	  select count(*) into v_count from tge_periode_recueil_paiezad where NUMPAC=p_numpac and PAIEZAD=p_paiezad ;
+  	  if  v_count<1 THEN 
+ 			FSED.FSED_AVANCEMENT_PLSQL(p_id,'CALC_HP (End)','Fin de CALC HP. La table TGE_PERIODE_RECUEIL_PAIEZAD n''est pas alimenté pour le paiezad '||p_paiezad);
+ 	    RETURN;
+ 	  END IF ; 
+
+    /**** IS RETRO ? IS FUTUR *****/
+FSED.FSED_AVANCEMENT_PLSQL(p_id,'CALC_HP (Recup Periode)','Récupération de la période en cours, début retro et fin génération HP à partir de TGE_REF_PAC pour le numpac : '||p_numpac);
+	 select pac.PERIODEENCOURS,pac.DEB_RETRO,tprp.fin_per_generation_hp INTO v_period_en_cour,v_deb_retro,v_fin_per_gen_hp
+	 from tge_ref_pac pac
+	 LEFT join tge_periode_recueil_paiezad tprp
+	 ON (pac.PERIODEENCOURS=tprp.MOIS_PAIE and pac.NUMPAC = tprp.NUMPAC  and tprp.PAIEZAD=p_paiezad )
+	 where pac.NUMPAC=p_numpac  ;
+	 IF  ((v_fin_per_gen_hp is null )   and  (p_date_sortie_sit_bo= '31/12/2099'  )) THEN
+	 	FSED.FSED_AVANCEMENT_PLSQL(p_id,'CALC_HP (End)','Fin de CALC HP. La date de fin de recalcul est 20991231'); 
+	 RETURN;
+	 END IF;
+
+--IF DACH FUTUR ALORS pas calcul HP
+    IF ( v_fin_per_gen_hp is not null and p_date_deb>v_fin_per_gen_hp)THEN
+		FSED.FSED_AVANCEMENT_PLSQL(p_id,'CALC_HP (End)','Fin de CALC HP. La date d''effet de la situation modifiée '||p_date_eff||' est dans le future, donc pas de recalcul des HP pour le paiezad '|| p_paiezad); RETURN;
+      RETURN; 
+    END IF;
+
+/**** IS retro ***/
+IF v_deb_retro IS NOT NULL AND v_period_en_cour > v_deb_retro THEN
+
+BEGIN
+	isRetro:=1 ;
+ 	FSED.FSED_AVANCEMENT_PLSQL(p_id,'CALC_HP (Recup mois d''embauche)','Récupération du mois d''embauche pour le numpac : '||p_numpac ||'  paiezad '||p_paiezad );
+	SELECT MIN(MOIS_PAIE) INTO m_embauche FROM TGE_PERIODE_RECUEIL_PAIEZAD WHERE NUMPAC =p_numpac AND paiezad  =p_paiezad  ;
+	
+	SELECT Greatest (m_embauche ,pac.deb_histo_retro,TO_CHAR(ADD_MONTHS(TO_DATE(pac.periodeencours,'YYYYMM'), - pac.nb_mois_retro),'YYYYMM'),NVL( S.PREMIERE_PAIE, '190101'))
+	INTO v_periode_limiteRetro FROM TGE_REF_PAC pac INNER JOIN SECUPACMAT S ON S.NUMPAC=pac.NUMPAC AND S.PACMAT = p_pacmat AND S.NUMPAC = p_numpac ;
+	
+	FSED.FSED_AVANCEMENT_PLSQL(p_id,'CALC_HP (Recup date d''embauche)','' );
+	BEGIN
+	 	SELECT DSDCN INTO d_dsdcn  FROM DIC_ADM_CONTRAT WHERE NUMPAC  =p_numpac and PACMAT = p_pacmat and NUMCNT = p_numcnt; 
+	 EXCEPTION
+	 WHEN OTHERS THEN
+	 d_dsdcn:=  to_date ('31122099', 'ddmmyyyy');
+	END; 
+	FSED.FSED_AVANCEMENT_PLSQL(p_id,'CALC_HP (Recup date limite retro)','Récupération de la date limite retro le numpac : '||p_numpac ||'  paiezad '||p_paiezad );
+	 BEGIN 
+	
+	 	SELECT DEBUT_PERIODE_RECUEIL INTO d_limiteMaj FROM TGE_PERIODE_RECUEIL_PAIEZAD WHERE MOIS_PAIE=
+		 (SELECT Greatest (m_embauche ,pac.deb_histo_retro,TO_CHAR(ADD_MONTHS(TO_DATE(pac.periodeencours,'YYYYMM'), - pac.nb_mois_retro),'YYYYMM'),NVL( S.PREMIERE_PAIE, '190101'))
+		 FROM TGE_REF_PAC pac
+ 		INNER JOIN SECUPACMAT S ON S.NUMPAC=pac.NUMPAC AND S.PACMAT = p_pacmat AND S.NUMPAC = p_numpac 
+		 )
+		 AND NUMPAC  =p_numpac
+		 AND PAIEZAD =p_paiezad;
+	 EXCEPTION
+	 WHEN others THEN
+	  	d_limiteMaj := nvl (d_dsdcn,  to_date ('31122099', 'ddmmyyyy')); 
+	 END;
+	 IF (d_limiteMaj IS NULL)  THEN  
+	 	d_limiteMaj := nvl (d_dsdcn,  to_date ('31122099', 'ddmmyyyy')); 
+	 END IF;  
+	 FSED.FSED_AVANCEMENT_PLSQL(p_id,'CALC_HP (Recup date deb genHP)','Récupération de la date de début de génération des HP en mode retro pour le numpac : '||p_numpac ||'  paiezad '||p_paiezad );
+	 SELECT
+	 	debut_per_generation_hp  INTO debut_calcul_hp_DB
+	 	FROM
+	 tge_periode_recueil_paiezad tprp, tge_ref_pac p
+	 WHERE
+		 tprp.numpac = p_numpac
+	 AND tprp.paiezad = p_paiezad
+	 AND P.numpac = p_numpac
+	 AND tprp.mois_paie = nvl (--mois_paie_hp
+	 ( SELECT  MIN(tprp.mois_paie) FROM
+	 tge_periode_recueil_paiezad tprp, tge_ref_pac pac
+	 WHERE
+	 tprp.numpac = p_numpac -- NEW.numpac
+	 AND  tprp.numpac = pac.numpac
+	 AND tprp.paiezad = p_paiezad -- NEW.paiezad
+	 AND tprp.fin_periode_paie >=p_date_deb-- NEW.date_sortie_sit_bo
+	 AND tprp.mois_paie >= greatest(pac.deb_histo_retro,TO_CHAR(ADD_MONTHS(TO_DATE(pac.periodeencours,'YYYYMM'), - pac.nb_mois_retro),'YYYYMM'))
+	
+	 ), p.periodeencours);
+  EXCEPTION
+ WHEN others THEN
+ 	debut_calcul_hp_DB:=null;
+ END;
+
+/**** fin retro ****/
+ELSE
+/*** NOT RETRO ***/
+BEGIN
+        select debut_per_generation_hp  INTO debut_calcul_hp_DB 
+            from tge_periode_recueil_paiezad 
+            where numpac=p_numpac
+              and PAIEZAD=p_paiezad
+              and MOIS_PAIE=(select PERIODEENCOURS from tge_ref_pac where NUMPAC=p_numpac );
+EXCEPTION
+ WHEN others THEN
+ 	debut_calcul_hp_DB:=null;
+ END;
+END IF; -- END test is RETRO    
+
+
+ p_date_deb:=GREATEST(NVL(debut_calcul_hp_DB,p_date_deb),NVL(d_limiteMaj,debut_calcul_hp_DB) );
+
+p_date_fin:=NVL(v_fin_per_gen_hp,p_date_fin);
+
+    
+   sql_1:='SELECT * 
+            FROM
+              ( SELECT dcy.numpac            AS numpac, dcy.code_classe_horaire_ott AS code_classe_horaire_ott, dcy.date_debut              AS date_debut,
+                dcy.date_fin                AS date_fin, dcy.code_cycle_ott          AS code_cycle_ott,
+                cy1.code_canevas_cycle_ott  AS code_canevas_cycle_ott, cy1.nombre_jours_cycle      AS nombre_jours_cycle,
+                cy1.num_jour_entree_canevas AS num_jour_entree_canevas,    cy2.num_jour_dans_cycle     AS num_jour_dans_cycle, cy2.nombre_heure_1          AS nombre_heure
+                
+              FROM tge_ref_dcy dcy,  tge_ref_cy1 cy1,  tge_ref_cy2 cy2
+              WHERE  dcy.numpac              IN ('''|| p_numpac /*SUBSTR(:NEW.IDPACMAT,0,6)*/ ||''')
+              AND  cy1.numpac                 = dcy.numpac  AND cy2.numpac                 = cy1.numpac
+              AND dcy.code_cycle_ott         = cy1.code_cycle_ott  AND cy1.code_canevas_cycle_ott = cy2.code_canevas_cycle_ott
+              ORDER BY dcy.code_cycle_ott, dcy.code_classe_horaire_ott, cy1.code_canevas_cycle_ott, cy1.num_jour_entree_canevas
+              ) pivot 	( MAX(nombre_heure) FOR num_jour_dans_cycle IN ( 	''1'' AS "NOMBRE_HEURE_1", ''2'' AS "NOMBRE_HEURE_2", ''3'' AS "NOMBRE_HEURE_3",
+                                            ''4'' AS "NOMBRE_HEURE_4", ''5'' AS "NOMBRE_HEURE_5", ''6'' AS "NOMBRE_HEURE_6", ''7'' AS "NOMBRE_HEURE_7",
+                                            ''8'' AS "NOMBRE_HEURE_8", ''9'' AS "NOMBRE_HEURE_9", ''10'' AS "NOMBRE_HEURE_10", ''11'' AS "NOMBRE_HEURE_11",
+                                            ''12'' AS "NOMBRE_HEURE_12", ''13'' AS "NOMBRE_HEURE_13", ''14'' AS "NOMBRE_HEURE_14", ''15'' AS "NOMBRE_HEURE_15",
+                                            ''16'' AS "NOMBRE_HEURE_16", ''17'' AS "NOMBRE_HEURE_17", ''18'' AS "NOMBRE_HEURE_18", ''19'' AS "NOMBRE_HEURE_19",
+                                            ''20'' AS "NOMBRE_HEURE_20", ''21'' AS "NOMBRE_HEURE_21")
+                    ) ORDER BY numpac, code_classe_horaire_ott, date_debut';
+        
+        
+sql_2:='select numpac, code_hor_pres, date_debut, date_fin, hrs_lundi, hrs_mardi, hrs_mercredi, hrs_jeudi, hrs_vendredi, hrs_samedi, hrs_dimanche 
+		  	 FROM   tge_ref_hpr 
+		  	 WHERE  numpac               		IN ('''|| p_numpac ||''')
+          ORDER BY numpac, code_hor_pres, date_debut';
+
+
+/* A819,A820,A996 valeur alimenter manuellement dans Java*/
+sql_3:='select M.NUMPAC,M.ELEMENT,M.OCCURENCE,M.DONNEEGXP,M.TABLEGXP,M.DONNFILTRE,M.OPERFILTRE,M.VALFILTRE,M.TRTPARTICULIER,M.ENVOI_SYSTEMATIQUE,M.FORCABLE_ECRAN_GENERE 
+          from TGE_REF_MAPDO M  
+          where ( ELEMENT IN (''A819'',''A820'',''A996'') ) 
+          and  (((SELECT COUNT(1) FROM TGE_REF_MAPDO WHERE NUMPAC= '''||p_numpac||''' AND  ELEMENT = M.ELEMENT ) > 0 AND  M.NUMPAC='''||p_numpac||''')
+              OR ((SELECT COUNT(1) FROM TGE_REF_MAPDO WHERE NUMPAC='''||p_numpac||''' AND ELEMENT = M.ELEMENT) = 0 AND M.NUMPAC=''*'' ))';
+
+/* les colonne FIN_PER_GENERATION_HP et DEBUT_PER_GENERATION_HP sont null pour les alimenter manuellement lors d'itération*/
+ IF ( p_isDeleting=1) THEN 
+ 	sql_4:='select PAIEZAD,MATRIC,NUMPAC,PACMAT,NUMCNT,TO_DATE('''||p_date_eff ||''',''DD/MM/YYYY''),DATE_FIN,ZA819,ZA820,ZA996,
+              null as DEBUT_PER_GENERATION_HP, 
+              null as FIN_PER_GENERATION_HP
+            from DIC_ADM_CONTRAT_HISTO where 
+                NUMPAC = '''|| p_numpac || ''''
+             || ' AND PACMAT ='''|| p_pacmat || ''''
+             || ' AND numcnt ='''|| p_numcnt||'''' 
+             || ' AND paiezad ='''|| p_paiezad||''''             
+ 			 || ' AND    TO_DATE('''||p_date_eff ||''',''DD/MM/YYYY'')-1 BETWEEN DATE_EFF AND DATE_FIN
+               
+                ORDER BY matric asc, date_eff asc' ;
+ ELSE 
+	sql_4:='select PAIEZAD,MATRIC,NUMPAC,PACMAT,NUMCNT,DATE_EFF,DATE_FIN,ZA819,ZA820,ZA996,
+              null as DEBUT_PER_GENERATION_HP, 
+              null as FIN_PER_GENERATION_HP
+            from DIC_ADM_CONTRAT_HISTO where 
+                NUMPAC = '''|| p_numpac || ''''
+             || ' AND PACMAT ='''|| p_pacmat || ''''
+             || ' AND numcnt ='''|| p_numcnt||'''' 
+             || ' AND paiezad ='''|| p_paiezad||''''             
+             || ' AND date_eff =   TO_DATE('''||p_date_eff ||''',''DD/MM/YYYY'')
+               
+                ORDER BY matric asc, date_eff asc' ;
+ END IF; 
+FSED.FSED_AVANCEMENT_PLSQL(p_id,'CALC_HP (Chargement des cycles)','' );
+
+/*****************************************************************************/
+/******************** loadCyclesGroupByPacAndClasseHorOtt ********************/
+/*****************************************************************************/
+cpt:=1; lst_1:=type_List_arr();
+  OPEN cur_1 FOR sql_1;
+  LOOP
+     FETCH cur_1 INTO cur_TgeRefDcy; EXIT WHEN cur_1%NOTFOUND;
+      lst_1.extend;
+      lst_1(cpt) :=cur_TgeRefDcy;
+      cpt:=cpt+1;
+  END LOOP;
+
+FSED.FSED_AVANCEMENT_PLSQL(p_id,'CALC_HP (Chargement des horaires)','' );
+
+/*****************************************************************/
+/******************** loadCyclesHprGroupByPac ********************/
+/*****************************************************************/
+cpt:=1; lst_2:=type_List_arr_2();
+  OPEN cur_2 FOR sql_2;
+  LOOP
+     FETCH cur_2 INTO cur_TgeRefhpr; EXIT WHEN cur_2%NOTFOUND;
+    lst_2.extend;
+    lst_2(cpt) :=cur_TgeRefhpr;
+    cpt:=cpt+1;
+  END LOOP;
+
+
+/*****************************************************************/
+/******************** getPopulationHistoContrat ********************/
+/******************** chargerInfoElementMapDo ********************/
+/*****************************************************************/
+cpt:=1; lst_3:=type_List_arr_3();
+  OPEN cur_3 FOR sql_3;
+  LOOP
+     FETCH cur_3 INTO cur_TgeRefmapdo; EXIT WHEN cur_3%NOTFOUND;
+    lst_3.extend;
+    lst_3(cpt) :=cur_TgeRefmapdo;
+    cpt:=cpt+1;
+  END LOOP;
+FSED.FSED_AVANCEMENT_PLSQL(p_id,'CALC_HP (Chargement info contractuelle)','Chargement de toute la situation y compris horaire de présence, horaire de rémunération et type GTA ' );
+/******************** chargerHistoContrat ********************/
+
+cpt:=1; lst_4:=type_List_arr_4();
+  OPEN cur_4 FOR sql_4;
+  LOOP
+     FETCH cur_4 INTO cur_dachtype; 
+     EXIT WHEN cur_4%NOTFOUND;
+    lst_4.extend;
+    lst_4(cpt) :=cur_dachtype;
+    lst_4(cpt).FIN_PER_GENERATION_HP := p_date_fin; 
+    lst_4(cpt).DEBUT_PER_GENERATION_HP := p_date_deb; 
+    cpt:=cpt+1;
+  END LOOP;
+  
+
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'CALC_HP (Suppression  HP )','Suppression des anciens HP entre  '||p_date_deb ||' et '||p_date_fin );
+  IF lst_4.COUNT >0 THEN
+    delete from TGE_INCIDENTS_PAIE 
+                  WHERE 
+                  NUMPAC = p_numpac
+                  AND PAIEZAD = p_PAIEZAD
+                  AND TYPE_IP = 'T'
+                  AND CODE_IP = 'HP'
+                  AND DATE_EFFET  between p_date_deb AND p_date_fin;  -- sortie du boucle pour executer une seul fois
+  END IF;
+  
+  lst_Situation:=SituationType_arr_2();
+  arrCycleSituation:=type_List_arr();
+  arrCycleSituation.extend;
+    
+    
+  FOR k IN 1..lst_4.COUNT LOOP --K LOOP DACH
+          lst_Situation.extend;
+          
+          /****** ajusterPeriodeSituation ******/
+              lst_4(k).DATE_EFF:=p_date_deb; --lst_4(cpt).DEBUT_PER_GENERATION_HP;
+   
+          /***** build Situation *****/
+          lst_Situation(k).numpac:=lst_4(k).NUMPAC;
+          lst_Situation(k).Pacmat:=lst_4(k).Pacmat;
+          lst_Situation(k).PaieZad:=lst_4(k).PaieZad;
+          lst_Situation(k).DateDeb:=lst_4(k).DATE_EFF;
+          lst_Situation(k).DateFin:=lst_4(k).FIN_PER_GENERATION_HP;
+          
+          --GET Donner specifier selon parametrage MAPDO
+          --LOOP MAPDO
+          FOR J IN 1..lst_3.COUNT LOOP --J LOOP
+          
+            --A996 / TYPE_GTA
+            IF(lst_3(J).ELEMENT='A996' AND lst_3(J).NUMPAC=lst_4(k).NUMPAC) THEN
+              lst_Situation(k).isGtaT1:=CASE WHEN getValOfDACH(lst_3(J).DONNEEGXP,lst_4(k))='Z' THEN TRUE ELSE FALSE END;
+            END IF; 
+        
+            -- Horaire Remu Presence
+            --ZA819 / HORAIRE_REMUNERATION
+            IF(lst_3(J).ELEMENT='A819') THEN
+                    HoraireRemu := getValOfDACH(lst_3(J).DONNEEGXP,lst_4(k));
+                    
+                    
+            END IF;
+            --ZA820 / HORAIRE_PRESENCE
+            IF(lst_3(J).ELEMENT='A820') THEN
+                    HorairePres := getValOfDACH(lst_3(J).DONNEEGXP,lst_4(k));
+                    
+		           
+            END IF;
+             --horairePres/horaireRemu =>Code_classe_horaire_ott
+            IF(lst_3.count=J) THEN 
+              IF(horairePres IS NOT NULL) THEN
+                lst_Situation(k).Code_classe_horaire_ott:=TO_NUMBER(horairePres);
+              ELSE
+              IF(horaireRemu IS NOT NULL) THEN
+                lst_Situation(k).Code_classe_horaire_ott:=TO_NUMBER(horaireRemu);
+              END IF;
+              END IF;
+            END IF;          
+            
+          END LOOP; --FIN J MAPDO LOOP 
+          
+    cpt:=1;     
+    
+     FOR M IN 1..lst_1.COUNT LOOP
+       IF( lst_1(M).CODE_CLASSE_HORAIRE_OTT=lst_Situation(k).Code_classe_horaire_ott)THEN
+          arrCycleSituation(cpt):=lst_1(M);
+          cpt:=cpt+1;
+       END IF;     
+     END LOOP;
+     
+      cpt:=1; 
+     arrCycleHprSituation:=type_List_arr_2();
+     arrCycleHprSituation.extend;
+     FOR M IN 1..lst_2.COUNT LOOP
+       IF( lst_2(M).Code_hor_pres=lst_Situation(k).Code_classe_horaire_ott)THEN
+          arrCycleHprSituation(cpt):=lst_2(M);
+          cpt:=cpt+1;
+       END IF;     
+     END LOOP;
+
+
+
+     END LOOP; --END K LOOP DACH
+     
+     
+  --decomposerArrCycle_DCY_SituationEnTrancheAndCreateHP
+  FOR k IN 1..lst_Situation.COUNT LOOP   
+     
+     IF(arrCycleSituation.COUNT>0) THEN
+     FOR W IN 1..arrCycleSituation.COUNT LOOP
+     /* La date de début du premier cycle d'une situation doit être égale à la date de début de la situation La date de
+         fin du dernier cycle d'une situation doit être égale à la  date de fin de la situation*/
+        IF(lst_Situation(k).datedeb <= arrCycleSituation(W).Date_fin AND lst_Situation(k).datefin >= arrCycleSituation(W).Date_debut) THEN
+          dateDebTranchSitu:=null; dateFinTranchSitu:=null;
+          
+          --La date d'effet du cycle est antérieure à la date de début de la situation, On se met sur la date début de la situation
+            dateDebTranchSitu:=lst_Situation(k).datedeb;
+          
+          --La date de fin d'effet du cycle est postérieur à la date de fin de la situation, On se met sur la date de fin de la situation
+            dateFinTranchSitu:=lst_Situation(k).datefin;
+          
+          dateEnCours:=dateDebTranchSitu;
+		  FSED.FSED_AVANCEMENT_PLSQL(p_id,'CALC_HP (Début insertion HP)',' ' );
+		  
+		  --LOOP INSERT TGE_INCIDENTS_PAIE
+          WHILE (dateEnCours <= dateFinTranchSitu) LOOP
+             numJourCanevas:=calculateNumJourCanevas( arrCycleSituation(W), dateEnCours );
+             nbreHeures:=getValOfCycle('NOMBRE_HEURE_'||numJourCanevas,arrCycleSituation(W));
+             arrHoraireParJour(TO_CHAR(dateEnCours,'dd/mm/yyyy')):=nbreHeures;
+             -- Insertion des HP
+             insertIncidentPaieHorsAbs( nbreHeures ,dateEnCours, lst_Situation(k),p_login ,v_periode_limiteRetro );
+             dateEnCours:=dateEnCours+1;
+          END LOOP; --LOOP WHILE   
+          
+          FSED.FSED_AVANCEMENT_PLSQL(p_id,'CALC_HP (Fin insertion HP)',' ' );
+          
+        END IF; --FIN decomposerArrCycleDcySituationEnTrancheAndCreateHP
+         
+  /*******************************************************/
+  
+    --decomposerArrCycle_Hpr_SituationEnTrancheAndCreateHP
+ 
+   IF(arrCycleSituation.count=0) THEN
+    FOR W IN 1..arrCycleHprSituation.COUNT LOOP  
+      /* La date de début du premier cycle d'une situation doit être égale à la date de début de la situation La date de
+         fin du dernier cycle d'une situation doit être égale à la  date de fin de la situation*/
+        IF(lst_Situation(k).datedeb <= arrCycleHprSituation(W).Date_fin AND lst_Situation(k).datefin >= arrCycleHprSituation(W).Date_debut) THEN
+          dateDebTranchSitu:=null; dateFinTranchSitu:=null;
+          
+          --La date d'effet du cycle est antérieure à la date de début de la situation, On se met sur la date début de la situation
+          IF(arrCycleHprSituation(W).Date_debut <= lst_Situation(k).datedeb) THEN
+            dateDebTranchSitu:=lst_Situation(k).datedeb;
+           ELSE
+            dateDebTranchSitu:=arrCycleHprSituation(W).Date_debut;
+          END IF;
+          
+          --La date de fin d'effet du cycle est postérieur à la date de fin de la situation, On se met sur la date de fin de la situation
+          IF(arrCycleHprSituation(W).Date_fin >= lst_Situation(k).datefin) THEN
+            dateFinTranchSitu:=lst_Situation(k).datefin;
+           ELSE
+            dateFinTranchSitu:=arrCycleHprSituation(W).Date_fin;
+          END IF;
+          
+          dateEnCours:=dateDebTranchSitu;
+          
+          --LOOP INSERT TGE_INCIDENTS_PAIE 
+          WHILE (dateEnCours <= dateFinTranchSitu) LOOP
+             jourSemaine:=calculateNomJourCanevas( arrCycleHprSituation(W), dateEnCours );
+             nbreHeures:=getHprHoursNbre(numJourCanevas,arrCycleHprSituation(W));
+             arrHoraireParJour(TO_CHAR(dateEnCours,'dd/mm/yyyy')):=nbreHeures;
+             -- Insertion des HP
+             insertIncidentPaieHorsAbs( nbreHeures ,dateEnCours, lst_Situation(k), p_login ,v_periode_limiteRetro );
+             dateEnCours:=dateEnCours+1;
+          END LOOP; --LOOP WHILE TGE_INCIDENTS_PAIE
+ 
+        END IF; -- END IF INTO THE LOOP
+    END LOOP; --FIN decomposerArrCycleHprSituationEnTrancheAndCreateHP
+  END IF; --END IF arrCycleSituation vide
+  END LOOP; --END LOOP parcour situation
+  END IF;
+  END LOOP;  --END LOOP Situation génerer
+    
+
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'CALC_HP (End)','Fin de recalcul des HP pour la situation ( numpac:  '||p_numpac ||', pacmat: '|| p_pacmat ||', numcnt: '||p_numcnt|| ', paiezad: '|| p_paiezad ||',date_eff : '||p_date_eff||')');
+ 
+	EXCEPTION
+ 	WHEN others THEN
+  	err_code := SQLCODE;
+ 	err_msg  := SQLERRM;
+ 	FSED.FSED_ERREUR( p_id , 'Calc_HP (Erreur) ' , 'Erreur est survenue lors du recalcul des HP pour la situation  ( numpac:  '||p_numpac ||', pacmat: '|| p_pacmat ||', numcnt: '||p_numcnt|| ', paiezad: '|| p_paiezad ||',date_eff : '||p_date_eff||') ' , err_code||'-'||err_msg );
+
+
+ END;
+
+END CALC_HP;

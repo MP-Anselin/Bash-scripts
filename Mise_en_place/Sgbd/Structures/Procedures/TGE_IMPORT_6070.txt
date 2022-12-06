@@ -1,0 +1,302 @@
+##
+TAG_CHARSET=@€éèç
+##
+TGE_IMPORT_6070
+=SQL=
+create or replace PROCEDURE TGE_IMPORT_6070 
+(
+  P_LOGIN IN VARCHAR2 
+, P_DATE_IMPORT IN VARCHAR2 
+, P_ROLE IN VARCHAR2 -- pour les traces
+  -- Origine écran
+, P_ORIGINE IN VARCHAR2  -- pour les traces
+, P_VALIDATION IN VARCHAR2 
+, P_WITH60 IN VARCHAR2 
+, P_WITH70 IN VARCHAR2 
+, P_CODLANG IN VARCHAR2 
+-- Valeurs attendues : EC -> écran création, EM -> écran modification, I --> pour le préchargement des imports Web, VI -> pour la validation des imports Web ou Batch
+, P_TYPE_ACTION IN VARCHAR2
+) AS 
+
+  w_err   VARCHAR2(2000);
+  v_start NUMBER;
+  v_stop  NUMBER;
+  dateMaj SYS_TRC_MODIF.datemaj%type;
+  functionnalityTrace VARCHAR2(250);
+BEGIN
+  v_start := DBMS_UTILITY.GET_TIME;
+  SELECT CURRENT_TIMESTAMP INTO dateMaj FROM dual;
+ IF  ( P_WITH60 =1  OR P_WITH70 = 1) THEN
+    BEGIN
+      TGE_CONTROLE_DONNEE_PAIE (p_login,p_date_import,NULL, p_codlang, P_TYPE_ACTION);
+    EXCEPTION
+    WHEN OTHERS THEN
+      w_err := w_err||'  '||sqlerrm;
+      TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'imp:TGE_CONTROLE_DONNEE_PAIE - Erreur : ' || w_err);
+      IF (P_LOGIN != 'BATCH') THEN
+      	-- On remonte l'erreur à l'application
+  	    raise;
+  	  END IF;
+    END ;
+ END IF;
+ IF p_validation = 1 THEN
+   BEGIN
+   	 INSERT INTO TGE_DONNEES_PAIE (NUMPAC                 ,
+                                 PAIEZAD                    ,
+                                 PERIODE                    ,
+                                 TYPE_TRAITEMENT            ,
+                                 TYPE_DONNEE                ,
+                                 CODE_RUBRIQUE              ,
+                                 CODE_CAISSE                ,
+                                 NO_SEQUENCE                ,
+                                 SENS                       ,
+                                 CODE_IMPUTATION            ,
+                                 ORIGINE                    ,
+                                 NOMBRE                     ,
+                                 TAUX                       ,
+                                 MONTANT                    ,
+                                 POURCENTAGE                ,
+                                 DOMAINE_PRCTE              ,
+                                 DERNIER_CODE_OPE           ,
+                                 LOGIN_MAJ                  ,
+                                 DATE_MAJ                   ,
+                                 CLE_IMPORT                 ,
+                                 IDPACMAT                   ,
+                                 PERIODE_RATTACH_DEB        ,
+                                 PERIODE_RATTACH_FIN        ,
+                                 DATE_DEB_ARRET             ,
+                                 PERIODE_AFFECTATION        ,
+                                 TYPE_WRITER                ,
+                                 CODE_REMPLACEMENT			,
+                                 DATE_EFFET           		,
+                                 ACTION_RETRO				,
+                                 ACTION_RETRO_DATE
+                                 )
+                                 
+              SELECT                   DONNEES.NUMPAC,
+                                       DONNEES.PAIEZAD,
+                                       DONNEES.PERIODE,
+                                       DONNEES.TYPE_TRAITEMENT,
+                                       DONNEES.TYPE_DONNEE,
+                                       DONNEES.CODE_RUBRIQUE,
+                                       DONNEES.CODE_CAISSE,
+                                       is_number(DONNEES.NO_SEQUENCE+DONNEES.CMPT),
+                                       DONNEES.SENS,
+                                       DONNEES.CODE_IMPUTATION,
+                                       DONNEES.ORIGINE,
+                                       is_number(DONNEES.NOMBRE),
+                                       is_number(DONNEES.TAUX),
+                                       is_number(DONNEES.MONTANT),
+                                       is_number(DONNEES.POURCENTAGE),
+                                       DONNEES.DOMAINE_PRCTE,
+                                       DONNEES.DERNIER_CODE_OPE,
+                                       DONNEES.LOGIN_MAJ,
+                                       DONNEES.DATE_MAJ,
+                                       DONNEES.CLE_IMPORT,
+                                       DONNEES.IDPACMAT,
+                                       DONNEES.PERIODE_RATTACH_DEB,
+                                       DONNEES.PERIODE_RATTACH_FIN,
+                                       DONNEES.DATE_DEB_ARRET,
+                                       DONNEES.PERIODE_AFFECTATION,
+                                       DONNEES.TYPE_WRITER,
+                                       DONNEES.CODE_REMPLACEMENT,
+                                       DONNEES.DATE_EFFET,
+                                       DONNEES.ACTION_RETRO,
+                                       DONNEES.ACTION_RETRO_DATE
+              FROM    
+              (SELECT            dense_rank() over (partition by tg.NUMPAC,tg.PAIEZAD,tg.PERIODE,tg.TYPE_TRAITEMENT,tg.TYPE_DONNEE,tg.CODE_RUBRIQUE,tg.CODE_CAISSE order by tg.NUMLIGNE desc)  as CMPT,     
+                                 TG.NUMPAC,
+                                 TG.PAIEZAD,
+                                 TG.PERIODE,
+                                 TG.TYPE_TRAITEMENT,
+                                 TG.TYPE_DONNEE ,
+                                 TG.CODE_RUBRIQUE,
+                                 NVL(TG.CODE_CAISSE,'*') AS CODE_CAISSE,
+                            (select NVL(max(tp.no_sequence),0 )
+                             from TGE_DONNEES_PAIE tp
+                             where tp.NUMPAC=tg.NUMPAC
+                             AND tp.PAIEZAD=tg.PAIEZAD
+                             AND tp.PERIODE =tg.PERIODE
+                             AND tp.TYPE_TRAITEMENT =tg.TYPE_TRAITEMENT
+                             AND tp.TYPE_DONNEE = tg.TYPE_DONNEE
+                             AND tp.CODE_RUBRIQUE =tg.code_rubrique
+                             AND tp.CODE_CAISSE=NVL(tg.code_caisse,'*')) AS no_sequence,
+                             TG.SENS,
+                             TG.CODE_IMPUTATION,
+                             TG.ORIGINE,
+                             TG.NOMBRE                     ,
+                             TG.TAUX                       ,
+                             TG.MONTANT                    ,
+                             TG.POURCENTAGE                ,
+                             TG.DOMAINE_PRCTE              ,
+                             'C'  AS   DERNIER_CODE_OPE ,
+                             P_LOGIN AS LOGIN_MAJ,
+                             TO_CHAR (sysdate, 'YYYYMMDDHH24MI') AS DATE_MAJ,
+                             -- Pour les DV/DR, on va stocker une clé d'import même lorsque l'on vient de l'écran
+                             -- afin de pouvoir retrouver la ligne créée et le no_sequence (pour les traces)
+                             P_LOGIN||'#'||P_DATE_IMPORT||'#'||NUMLIGNE AS CLE_IMPORT,
+                             CASE
+                               WHEN TG.NUMPAC IS NOT NULL
+                               AND TG.PACMAT  IS NOT NULL
+                               THEN RPAD(TG.NUMPAC,6)|| TG.PACMAT
+                               ELSE ' '
+                             END AS IDPACMAT,
+                             to_date(TG.PERIODE_RATTACH_DEB, 'YYYYMMDD') as PERIODE_RATTACH_DEB,
+                             to_date(TG.PERIODE_RATTACH_FIN, 'YYYYMMDD') as PERIODE_RATTACH_FIN,
+                             to_date(TG.DATE_DEB_ARRET, 'YYYYMMDD') as DATE_DEB_ARRET,
+                             to_date(TG.PERIODE_AFFECTATION, 'YYYYMMDD') as PERIODE_AFFECTATION,
+                             case 
+                               when (select O.MODE_T2||'#'||O.ENVOI_MODE_R from TGE_REF_ORIGINE_GTA O where O.NUMPAC = TG.NUMPAC and O.CODE_ORIGINE = TG.ORIGINE) = 'R#N'
+      						   then 'N'
+      						   else NULL
+                             end as TYPE_WRITER,
+                             TG.CODE_REMPLACEMENT,
+                             to_date(TG.DATE_EFFET,'YYYYMMDD') as DATE_EFFET,
+                             -- Gestion Action Retro : pour ne pas bousiller les perfs, on va positionner une valeur '*' dans actionRetro et null dans actionRetroDate
+                             -- et ensuite avec une requête d'update mettre à jour la valeur de actionRetro et actionRetroDate.
+                             -- On évite ainsi de faire 2 sous-select sur TGE_REF_PAC ou une jointure globale pour récupérer TGE_REF_PAC.PERIODEENCOURS
+                             case
+                             	when  TG.PERIODE < (select PAC.PERIODEENCOURS from TGE_REF_PAC PAC where PAC.NUMPAC = TG.NUMPAC)
+                             	then '*'
+                             	else NULL
+                             end as ACTION_RETRO,
+                             NULL as ACTION_RETRO_DATE
+                             
+          FROM               TGE_IMPORT_DONNEES  TG
+          WHERE              TG.LOGIN            = P_LOGIN 
+          AND                TG.DATE_IMPORT      = P_DATE_IMPORT
+          AND ((TG.ERREURS   IS NULL
+          AND TG.STATUT  = 'TRAIT')
+          OR (TG.ERREURS  IS NULL
+          AND TG.STATUT   = 'TRANS')))DONNEES;
+          
+          -- Gestion Action Retro : si création d'une ligne rétro, on sauvegarde qu'il s'agit d'une création comme première action et la date à laquelle elle a eu lieu
+          update TGE_DONNEES_PAIE set 
+          	ACTION_RETRO = 'C',
+          	ACTION_RETRO_DATE = DATE_MAJ
+          where ACTION_RETRO = '*';
+   END ;
+   
+   	--- Gestion de la trace pour les imports ou la MarketPlace : on enregistre une trace pour chaque ligne de l'import qui n'est pas en erreur
+	IF P_TYPE_ACTION = 'VI' or P_TYPE_ACTION = 'MP' THEN
+		functionnalityTrace := 'IMPORT_DONNEE_ELT_PAIE';
+    	IF P_TYPE_ACTION = 'MP' THEN
+			functionnalityTrace := 'IMPORT_DONNEE_ELT_PAIE_MP';
+    	END IF;
+    	
+      	TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'Début SYS_TRC_MODIF pour insertion DV/DR');
+      	
+		insert into SYS_TRC_MODIF (LOGIN, DATEMAJ, ROLE, FUNCTIONNALITY, KEYS_VALUES, SHORT_NAME, ACTION, 
+	  		NAMES_VALUES_HAVE_CHANGED, AFTER_CHANGE, NUMPAC, PACMAT, PAIEZAD, MATRIC, DATE_EFFET)
+			select DI.LOGIN, SYSDATE, '3', functionnalityTrace, 
+			-- KEY_VALUES
+			'numPac='||D.NUMPAC||'&paieZad='||D.PAIEZAD||'&periode='||D.PERIODE||'&type_traitement='||D.TYPE_TRAITEMENT||'&type_donnee='||D.TYPE_DONNEE||'&code_rubrique='||D.CODE_RUBRIQUE||'&code_caisse='||D.CODE_CAISSE||'&no_sequence='||D.NO_SEQUENCE,
+			-- SHORT_NAME : on gère le type de donnée DV/DR /DR Cotis et si c'est du remplacement ou non
+			'Ajout d''une ' || decode(D.TYPE_DONNEE, '1', 'DV', '2', 'DR', 'DR cotis.') || decode(nvl(D.CODE_REMPLACEMENT, '*'), '*', '', ' rempl.'),
+			-- ACTION
+			'C',
+			-- NAMES_VALUES_HAVE_CHANGED 
+			'numPac^paieZad^periode^type_traitement^type_donnee^code_rubrique^code_caisse^no_sequence^sens^code_imputation^nombre^taux^montant^pourcentage^domaine_prcte^periode_rattach_deb^periode_rattach_fin^date_deb_arret^periode_affectation^origine^dernier_code_ope^login_maj^date_maj^code_remplacement^date_effet^idPacMat^cle_import',
+			-- AFTER_CHANGE
+			D.NUMPAC||'^'||D.PAIEZAD||'^'||D.PERIODE||'^'||D.TYPE_TRAITEMENT||'^'||D.TYPE_DONNEE||'^'||D.CODE_RUBRIQUE||'^'||D.CODE_CAISSE
+			||'^'||D.NO_SEQUENCE||'^'||D.SENS||'^'||D.CODE_IMPUTATION||'^'||D.NOMBRE||'^'||D.TAUX||'^'||D.MONTANT||'^'||D.POURCENTAGE
+			||'^'||D.DOMAINE_PRCTE||'^'||D.PERIODE_RATTACH_DEB||'^'||D.PERIODE_RATTACH_FIN||'^'||D.DATE_DEB_ARRET||'^'||D.PERIODE_AFFECTATION
+			||'^'||D.ORIGINE||'^'||D.DERNIER_CODE_OPE||'^'||D.LOGIN_MAJ||'^'||D.DATE_MAJ
+			||'^'||D.CODE_REMPLACEMENT||'^'||D.DATE_EFFET||'^'||D.IDPACMAT||'^'||D.CLE_IMPORT,
+			-- NUMPAC / PACMAT / PAIEZAD / MATRIC / DATE_EFFET
+			D.NUMPAC, DI.PACMAT, D.PAIEZAD, DI.MATRICULE, D.DATE_EFFET
+			from TGE_DONNEES_PAIE D inner join TGE_IMPORT_DONNEES DI on D.CLE_IMPORT = DI.LOGIN||'#'||DI.DATE_IMPORT||'#'||DI.NUMLIGNE
+			where DI.LOGIN = P_LOGIN and DI.DATE_IMPORT = P_DATE_IMPORT;
+	END IF;
+   
+   TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'début update TGE_IMPORT_DONNEES');
+   -- Mise à jour des lignes d'import qui sont encore en erreur après validation, statut prend TRANS
+   UPDATE TGE_IMPORT_DONNEES
+   SET STATUT = 'TRANS'
+   WHERE LOGIN = P_LOGIN
+   AND DATE_IMPORT = p_date_import
+   AND (ERREURS IS NOT NULL
+   AND STATUT = 'TRAIT');
+	 
+   -- Mise à jour des lignes d'import qui ne sont plus en erreur après validation, statut prend FIN
+   UPDATE TGE_IMPORT_DONNEES
+   SET STATUT ='FIN'
+   WHERE LOGIN = P_LOGIN
+   AND DATE_IMPORT = p_date_import
+   AND ERREURS IS NULL;
+   
+	TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'début UPDATE TGE_IMPORT_LISTE');
+	-- DV
+	UPDATE TGE_IMPORT_LISTE
+	SET NBLIGNES_ERR =
+	  (SELECT COUNT(*)
+	  FROM TGE_IMPORT_DONNEES
+	  WHERE LOGIN     = P_LOGIN
+	  AND DATE_IMPORT = p_date_import
+	  AND ERREURS    IS NOT NULL
+	  AND TYPE_IMPORT = '1'
+	  ),
+	  NBLIGNES_IMP =
+	  (SELECT COUNT(*)
+	  FROM TGE_IMPORT_DONNEES
+	  WHERE LOGIN     = P_LOGIN
+	  AND DATE_IMPORT = p_date_import
+	  AND TYPE_IMPORT = '1'
+	  ),
+	  STATUT        ='TRANS'
+	WHERE LOGIN     = P_LOGIN
+	AND DATE_IMPORT = p_date_import
+	AND TYPE = '1';
+	-- DR
+	UPDATE TGE_IMPORT_LISTE
+	SET NBLIGNES_ERR =
+	  (SELECT COUNT(*)
+	  FROM TGE_IMPORT_DONNEES
+	  WHERE LOGIN     = P_LOGIN
+	  AND DATE_IMPORT = p_date_import
+	  AND ERREURS    IS NOT NULL
+	  AND TYPE_IMPORT = '3'
+	  ),
+	  NBLIGNES_IMP =
+	  (SELECT COUNT(*)
+	  FROM TGE_IMPORT_DONNEES
+	  WHERE LOGIN     = P_LOGIN
+	  AND DATE_IMPORT = p_date_import
+	  AND TYPE_IMPORT = '3'
+	  ),
+	  STATUT        ='TRANS'
+	WHERE LOGIN     = P_LOGIN
+	AND DATE_IMPORT = p_date_import
+	AND TYPE = '3';
+	-- DR Cotis
+	UPDATE TGE_IMPORT_LISTE
+	SET NBLIGNES_ERR =
+	  (SELECT COUNT(*)
+	  FROM TGE_IMPORT_DONNEES
+	  WHERE LOGIN     = P_LOGIN
+	  AND DATE_IMPORT = p_date_import
+	  AND ERREURS    IS NOT NULL
+	  AND TYPE_IMPORT = '4'
+	  ),
+	  NBLIGNES_IMP =
+	  (SELECT COUNT(*)
+	  FROM TGE_IMPORT_DONNEES
+	  WHERE LOGIN     = P_LOGIN
+	  AND DATE_IMPORT = p_date_import
+	  AND TYPE_IMPORT = '4'
+	  ),
+	  STATUT        ='TRANS'
+	WHERE LOGIN     = P_LOGIN
+	AND DATE_IMPORT = p_date_import
+	AND TYPE = '4';
+   
+ END IF ;
+EXCEPTION
+  WHEN OTHERS THEN
+  w_err := ' '||w_err|| sqlerrm;
+  TGE_IMPORT_AVANCEMENT_proc(P_DATE_IMPORT,'ValidDonneePaie - Erreur : ' || w_err);
+  IF (P_LOGIN != 'BATCH' or SQLCODE='-20001') THEN
+  	-- On remonte l'erreur à l'application
+    raise;
+  END IF;
+END TGE_IMPORT_6070;

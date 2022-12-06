@@ -1,0 +1,32 @@
+##
+TAG_CHARSET=@€éèç
+##
+TRG_PERSO_HISTO_BEFORE_ROW
+=SQL=
+CREATE OR REPLACE FUNCTION TRG_PERSO_HISTO_BEFORE_ROW RETURN CLOB AS 
+BEGIN
+  RETURN '
+  -- On vérifie qu''on ne modifie ni le RHID, ni la date d''effet
+  IF UPDATING AND (NOT v_ligOld.MATRIC=v_ligNew.MATRIC OR NOT v_ligOld.DATE_EFF=v_ligNew.DATE_EFF) THEN
+    -- Message d''erreur --> On interdit la mise à jour du RHID et de la date d''effet : il faut faire un delete puis un insert
+    RAISE_APPLICATION_ERROR(-20000,''La mise à jour des colonnes MATRIC et DATE_EFF n''''est pas autorisée : vous devez supprimer puis recréer l''''occurrence'');
+  END IF;
+  IF INSERTING OR UPDATING THEN
+    IF v_ligNew.DATE_FIN IS NULL THEN
+      :NEW.DATE_FIN := TO_DATE(''20991231'',''yyyymmdd'');
+      v_ligNew.DATE_FIN := :NEW.DATE_FIN;
+    END IF;
+  END IF;
+  IF v_type_writer<>''N'' AND v_type_writer<>''M'' AND (v_listMatricToUpdate IS NULL OR INSTR(v_listMatricToUpdate,NVL(v_ligNew.MATRIC,v_ligOld.MATRIC))<=0) THEN
+    -- On stocke la liste des MATRIC modifiés
+    IF v_nbMatricToUpdate=1000 THEN
+      v_nbMatricToUpdate := 0;
+      v_listMatricToUpdate := v_listMatricToUpdate||'') OR MATRIC IN ('';
+    ELSIF v_nbMatricToUpdate>0 THEN
+      v_listMatricToUpdate := v_listMatricToUpdate||'','';
+    END IF;
+    v_listMatricToUpdate := v_listMatricToUpdate||''''''''||NVL(v_ligNew.MATRIC,v_ligOld.MATRIC)||'''''''';
+    v_nbMatricToUpdate := v_nbMatricToUpdate+1;
+  END IF;
+';
+END TRG_PERSO_HISTO_BEFORE_ROW;

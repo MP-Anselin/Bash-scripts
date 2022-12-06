@@ -1,0 +1,65 @@
+##
+TRG_SIMU_TGE_STRUC
+=SQL=
+CREATE OR REPLACE TRIGGER TRG_SIMU_TGE_STRUC
+AFTER ALTER ON SCHEMA
+DECLARE
+  V_TABLE_NAME VARCHAR2 (30);
+  V_TABLE_SIMU_NAME VARCHAR2 (30);
+  V_SQL_TEXT ORA_NAME_LIST_T;
+  V_STMT   VARCHAR2 (4000);
+  NO_SUCH_TABLE EXCEPTION;
+  PRAGMA EXCEPTION_INIT (NO_SUCH_TABLE, -942);
+  DONT_TOUCH_SIMU EXCEPTION;
+  PRAGMA EXCEPTION_INIT (DONT_TOUCH_SIMU, -20001);
+BEGIN
+  IF UPPER(ORA_DICT_OBJ_NAME)='TGE_ELEMENTS_PAIE'
+      OR UPPER(ORA_DICT_OBJ_NAME)='TGE_DONNEES_PAIE'
+      OR UPPER(ORA_DICT_OBJ_NAME)='TGE_ABSENCES'
+      OR UPPER(ORA_DICT_OBJ_NAME)='TGE_INCIDENTS_PAIE'
+      OR UPPER(ORA_DICT_OBJ_NAME)='TGE_PERIODE_RECUEIL_PAIEZAD' THEN
+    V_TABLE_NAME := ORA_DICT_OBJ_NAME;
+    IF UPPER(V_TABLE_NAME)='TGE_PERIODE_RECUEIL_PAIEZAD' THEN
+      -- Petite rustine pour la table TGE_PERIODE_RECUEIL_PAIEZAD dont le nom est un peu long ...
+      V_TABLE_SIMU_NAME := 'SIMU_TGE_PERIODE_RECUEIL_PZAD';
+    ELSE
+      V_TABLE_SIMU_NAME := 'SIMU_'||V_TABLE_NAME;
+    END IF;
+    -- Modification de la structure d'une des tables ayant été dupliquées pour la simulation de paie --> On exécute le même ALTER sur la table de simu
+    FOR i IN 1 .. ORA_SQL_TXT (V_SQL_TEXT)
+    LOOP
+      V_STMT := V_STMT || UPPER(V_SQL_TEXT (i));
+    END LOOP;
+    IF (INSTR(UPPER(V_STMT),'CONSTRAINT')<=0 AND INSTR(UPPER(V_STMT),'PRIMARY KEY')<=0) THEN
+      V_STMT :=  REPLACE(V_STMT,V_TABLE_NAME,'/*FROM TRG*/'||V_TABLE_SIMU_NAME);
+      EXECUTE_IMMEDIATE_STRING(V_STMT,0); 
+    END IF;
+  ELSIF UPPER(ORA_DICT_OBJ_NAME)='SIMU_TGE_ELEMENTS_PAIE'
+      OR UPPER(ORA_DICT_OBJ_NAME)='SIMU_TGE_DONNEES_PAIE'
+      OR UPPER(ORA_DICT_OBJ_NAME)='SIMU_TGE_ABSENCES'
+      OR UPPER(ORA_DICT_OBJ_NAME)='SIMU_TGE_INCIDENTS_PAIE'
+      OR UPPER(ORA_DICT_OBJ_NAME)='SIMU_TGE_PERIODE_RECUEIL_PZAD' THEN
+    V_TABLE_SIMU_NAME := ORA_DICT_OBJ_NAME;
+    IF UPPER(V_TABLE_SIMU_NAME)='SIMU_TGE_PERIODE_RECUEIL_PZAD' THEN
+      -- Petite rustine pour la table TGE_PERIODE_RECUEIL_PAIEZAD dont le nom est un peu long ...
+      V_TABLE_NAME := 'TGE_PERIODE_RECUEIL_PAIEZAD';
+    ELSE
+      V_TABLE_NAME := SUBSTR(V_TABLE_SIMU_NAME,6);
+    END IF;
+    -- Modification de la structure d'une des tables de la simulation de paie --> Interdit (c'est fait automatiquement), à moins qu'on vienne du trigger
+    FOR i IN 1 .. ORA_SQL_TXT (V_SQL_TEXT)
+    LOOP
+      V_STMT := V_STMT || UPPER(V_SQL_TEXT (i));
+    END LOOP;
+    IF INSTR(UPPER(V_STMT),'/*FROM TRG*/')<=0 THEN
+      RAISE_APPLICATION_ERROR(-20001,'La table '||V_TABLE_SIMU_NAME||' ne doit pas être modifiée directement : la modification de cette table est faite automatiquement lors de la modification de la table '||V_TABLE_NAME||'. Si les structures des 2 tables sont déphasées, vous devez désactiver le trigger TRG_SIMU_TGE_STRUC pour les réaligner. Merci de penser à le réactiver après !');
+    END IF;
+  END IF;
+EXCEPTION
+  WHEN NO_SUCH_TABLE THEN
+    RAISE_APPLICATION_ERROR(-20002,'La table '||V_TABLE_SIMU_NAME||' n''existe pas, merci de la créer avec la même structure que '||V_TABLE_NAME||' avec une colonne DOS_NUM en tout début, et dans la clé primaire, avant toute modification');
+  WHEN DONT_TOUCH_SIMU THEN
+    RAISE;
+  WHEN OTHERS THEN
+    RAISE_APPLICATION_ERROR(-20003,'Une erreur est survenue lors de la mise à jour de la structure de la table '||V_TABLE_SIMU_NAME||' (conjointement à '||V_TABLE_NAME||') : vous devez désactiver le trigger TRG_SIMU_TGE_STRUC pour faire la modification de '||V_TABLE_NAME||' et de '||V_TABLE_SIMU_NAME||'. Merci de penser à le réactiver après ! '||SQLERRM(SQLCODE));
+END TRG_SIMU_TGE_STRUC;

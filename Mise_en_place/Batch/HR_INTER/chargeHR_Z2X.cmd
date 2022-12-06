@@ -1,0 +1,1 @@
+CALL D:\DevSpace\RD_GXP\Batch\Lib\BatchInterface.cmd paramBatch.xml HR_INTER Z2XCHARGEMENT D

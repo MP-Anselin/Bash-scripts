@@ -1,0 +1,20 @@
+##
+HRGP_SALAIRE_MENSUEL_AN
+=SQL=
+CREATE OR REPLACE
+  FUNCTION HRGP_SALAIRE_MENSUEL_AN(
+      p_matric IN DONPAIE.MATRIC%Type ,
+      p_annee  IN DONPAIE.AN%Type)
+    RETURN NUMBER
+  IS
+    le_salaire NUMBER;
+  BEGIN
+    SELECT ROUND(MBRUT/12,2)
+    INTO le_salaire
+    FROM DONPAIE
+    WHERE MATRIC = p_matric
+    AND AN       =p_annee
+    AND mois     ='A' ;
+    RETURN le_salaire;
+  END hrgp_salaire_mensuel_an ; 
+  

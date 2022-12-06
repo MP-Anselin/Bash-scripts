@@ -1,0 +1,123 @@
+##
+CREATE_PROC_IDX_PERSO_HISTO
+=SQL=
+CREATE OR REPLACE PROCEDURE CREATE_PROC_IDX_PERSO_HISTO AUTHID CURRENT_USER
+AS
+  TYPE TYP_COL_NAME IS TABLE OF USER_TAB_COLUMNS.COLUMN_NAME%type ;
+  Tabcol TYP_COL_NAME ; 
+  v_reqCreate CLOB;
+BEGIN
+  SELECT COLUMN_NAME BULK COLLECT
+  INTO Tabcol
+  FROM USER_TAB_COLUMNS
+  WHERE TABLE_NAME='DIC_ADM_PERSO_HISTO'
+  AND COLUMN_NAME NOT IN ('MATRIC','DATE_EFF','DATE_FIN','DATE_CREATION','DATE_DERNIERE_MODIF','TYPE_WRITER')
+  ORDER BY COLUMN_ID;
+  EXECUTE_IMMEDIATE_STRING('CREATE OR REPLACE VIEW DIC_ADM_PERSO_HISTO_FOR_IDX AS SELECT DIC_ADM_PERSO_HISTO.*, (SELECT COUNT(*) FROM DIC_ADM_PERSO_HISTO H, DIC_ADM_PERSO P WHERE H.MATRIC=P.MATRIC AND H.DATE_EFF<=NVL(P.DSNAI,H.DATE_EFF) AND H.MATRIC=DIC_ADM_PERSO_HISTO.MATRIC) AS EXIST_DSNAI_IN_HISTO FROM DIC_ADM_PERSO_HISTO',0);
+  v_reqCreate := 'CREATE OR REPLACE PROCEDURE ALIM_IDX_PERSO_HISTO (p_onlyFlaggedMatric NUMBER) ';
+  v_reqCreate := v_reqCreate||'AS ';
+  v_reqCreate := v_reqCreate||'TYPE TYP_TAB_PERSO IS TABLE OF DIC_ADM_PERSO%Rowtype ; ';
+  v_reqCreate := v_reqCreate||'Tabperso TYP_TAB_PERSO ; ';
+  v_reqCreate := v_reqCreate||'TYPE TYP_TAB_HISTO IS TABLE OF DIC_ADM_PERSO_HISTO_FOR_IDX%Rowtype ; ';
+  v_reqCreate := v_reqCreate||'Tabhisto TYP_TAB_HISTO ; ';
+  v_reqCreate := v_reqCreate||'TYPE TYP_TAB_IDX IS TABLE OF DIC_IDX_PERSO_HISTO%Rowtype ; ';
+  v_reqCreate := v_reqCreate||'Tabidx TYP_TAB_IDX ; ';
+  v_reqCreate := v_reqCreate||'Ligidx DIC_IDX_PERSO_HISTO%rowtype ; ';
+  v_reqCreate := v_reqCreate||'TYPE TAB_INDICE_IDX_BY_DONNEE IS TABLE OF NUMBER INDEX BY VARCHAR2(20) ; ';
+  v_reqCreate := v_reqCreate||'tabIndice TAB_INDICE_IDX_BY_DONNEE ; ';
+  v_reqCreate := v_reqCreate||'BEGIN ';
+  v_reqCreate := v_reqCreate||'IF p_onlyFlaggedMatric=1 THEN ';
+  v_reqCreate := v_reqCreate||'DELETE FROM DIC_IDX_PERSO_HISTO WHERE MATRIC IN (SELECT MATRIC FROM SECUPACMAT_TMP_PERSO); ';
+  v_reqCreate := v_reqCreate||'Select * BULK COLLECT Into Tabhisto From DIC_ADM_PERSO_HISTO_FOR_IDX Where MATRIC In (SELECT MATRIC FROM SECUPACMAT_TMP_PERSO) Order By Matric, date_eff; ';
+  v_reqCreate := v_reqCreate||'ELSE ';
+  v_reqCreate := v_reqCreate||'DELETE FROM DIC_IDX_PERSO_HISTO; ';
+  v_reqCreate := v_reqCreate||'Select * BULK COLLECT Into Tabhisto From DIC_ADM_PERSO_HISTO_FOR_IDX Order By Matric, date_eff; ';
+  v_reqCreate := v_reqCreate||'END IF; ';
+  v_reqCreate := v_reqCreate||'Tabidx := TYP_TAB_IDX(); ';
+  v_reqCreate := v_reqCreate||'IF Tabhisto.count>0 THEN ';
+  v_reqCreate := v_reqCreate||'FOR i IN Tabhisto.first..Tabhisto.last LOOP ';
+  v_reqCreate := v_reqCreate||'IF i=1 OR NOT Tabhisto(i-1).MATRIC=Tabhisto(i).MATRIC THEN ';
+  v_reqCreate := v_reqCreate||'tabIndice.delete(); ';
+  v_reqCreate := v_reqCreate||'BEGIN ';
+  v_reqCreate := v_reqCreate||'FORALL i IN 1..Tabidx.COUNT SAVE EXCEPTIONS ';
+  v_reqCreate := v_reqCreate||'INSERT INTO DIC_IDX_PERSO_HISTO VALUES (Tabidx(i).MATRIC, Tabidx(i).DATE_EFF, Tabidx(i).NOM_DONNEE, Tabidx(i).DATE_FIN); ';
+  v_reqCreate := v_reqCreate||'EXCEPTION WHEN OTHERS THEN NULL; END; ';
+  v_reqCreate := v_reqCreate||'Tabidx.delete(); ';
+  v_reqCreate := v_reqCreate||'IF Tabhisto(i).EXIST_DSNAI_IN_HISTO>0 THEN ';
+  v_reqCreate := v_reqCreate||'Ligidx.MATRIC := Tabhisto(i).MATRIC; ';
+  v_reqCreate := v_reqCreate||'Ligidx.DATE_EFF := Tabhisto(i).DATE_EFF; ';
+  v_reqCreate := v_reqCreate||'Ligidx.DATE_FIN := NULL; ';
+  v_reqCreate := v_reqCreate||'Ligidx.NOM_DONNEE := ''*''; ';
+  v_reqCreate := v_reqCreate||'Tabidx.extend; ';
+  v_reqCreate := v_reqCreate||'Tabidx(Tabidx.last) := Ligidx; ';
+  v_reqCreate := v_reqCreate||'ELSE ';
+  IF Tabcol.count>0 THEN
+    FOR i IN Tabcol.first..Tabcol.last LOOP
+      v_reqCreate := v_reqCreate||'Ligidx.MATRIC := Tabhisto(i).MATRIC; ';
+      v_reqCreate := v_reqCreate||'Ligidx.DATE_EFF := Tabhisto(i).DATE_EFF; ';
+      v_reqCreate := v_reqCreate||'Ligidx.DATE_FIN := Tabhisto(i).DATE_FIN; ';
+      v_reqCreate := v_reqCreate||'Ligidx.NOM_DONNEE := '''||Tabcol(i)||'''; ';
+      v_reqCreate := v_reqCreate||'Tabidx.extend; ';
+      v_reqCreate := v_reqCreate||'Tabidx(Tabidx.last) := Ligidx; ';
+      v_reqCreate := v_reqCreate||'tabIndice('''||Tabcol(i)||''') := Tabidx.last; ';
+    END LOOP;
+    v_reqCreate := v_reqCreate||'END IF; ';
+    v_reqCreate := v_reqCreate||'ELSE ';
+    FOR i IN Tabcol.first..Tabcol.last LOOP
+      v_reqCreate := v_reqCreate||'
+IF NOT NVL(TO_CHAR(Tabhisto(i-1).'||Tabcol(i)||'),''_EMPTY_'')=NVL(TO_CHAR(Tabhisto(i).'||Tabcol(i)||'),''_EMPTY_'') THEN ';
+      v_reqCreate := v_reqCreate||'Ligidx.MATRIC := Tabhisto(i).MATRIC; ';
+      v_reqCreate := v_reqCreate||'Ligidx.DATE_EFF := Tabhisto(i).DATE_EFF; ';
+      v_reqCreate := v_reqCreate||'Ligidx.DATE_FIN := Tabhisto(i).DATE_FIN; ';
+      v_reqCreate := v_reqCreate||'Ligidx.NOM_DONNEE := '''||Tabcol(i)||'''; ';
+      v_reqCreate := v_reqCreate||'Tabidx.extend; ';
+      v_reqCreate := v_reqCreate||'Tabidx(Tabidx.last) := Ligidx; ';
+      v_reqCreate := v_reqCreate||'tabIndice('''||Tabcol(i)||''') := Tabidx.last; ';
+      v_reqCreate := v_reqCreate||'ELSIF tabIndice.exists('''||Tabcol(i)||''') THEN ';
+      v_reqCreate := v_reqCreate||'Tabidx(tabIndice('''||Tabcol(i)||''')).DATE_FIN := Tabhisto(i).DATE_FIN; ';
+      v_reqCreate := v_reqCreate||'END IF; ';
+    END LOOP;
+  ELSE
+  	v_reqCreate := v_reqCreate||'NULL; ';
+    v_reqCreate := v_reqCreate||'END IF; ';
+    v_reqCreate := v_reqCreate||'ELSE ';
+  	v_reqCreate := v_reqCreate||'NULL; ';
+  END IF;
+  v_reqCreate := v_reqCreate||'END IF; ';
+  v_reqCreate := v_reqCreate||'END LOOP; ';
+  v_reqCreate := v_reqCreate||'END IF; ';
+  v_reqCreate := v_reqCreate||'BEGIN ';
+  v_reqCreate := v_reqCreate||'FORALL i IN 1..Tabidx.COUNT SAVE EXCEPTIONS ';
+  v_reqCreate := v_reqCreate||'INSERT INTO DIC_IDX_PERSO_HISTO VALUES (Tabidx(i).MATRIC, Tabidx(i).DATE_EFF, Tabidx(i).NOM_DONNEE, Tabidx(i).DATE_FIN); ';
+  v_reqCreate := v_reqCreate||'EXCEPTION WHEN OTHERS THEN NULL; END; ';
+  v_reqCreate := v_reqCreate||'Tabidx.delete(); ';
+  v_reqCreate := v_reqCreate||'IF p_onlyFlaggedMatric=1 THEN ';
+  v_reqCreate := v_reqCreate||'Select * BULK COLLECT Into Tabperso From DIC_ADM_PERSO Where DSNAI IS NOT NULL AND MATRIC NOT IN (SELECT MATRIC FROM DIC_IDX_PERSO_HISTO WHERE NOM_DONNEE=''*'') AND MATRIC In (SELECT MATRIC FROM SECUPACMAT_TMP_PERSO) Order By Matric; ';
+  v_reqCreate := v_reqCreate||'ELSE ';
+  v_reqCreate := v_reqCreate||'Select * BULK COLLECT Into Tabperso From DIC_ADM_PERSO Where DSNAI IS NOT NULL AND MATRIC NOT IN (SELECT MATRIC FROM DIC_IDX_PERSO_HISTO WHERE NOM_DONNEE=''*'') Order By Matric; ';
+  v_reqCreate := v_reqCreate||'END IF; ';
+  v_reqCreate := v_reqCreate||'IF Tabperso.count>0 THEN ';
+  v_reqCreate := v_reqCreate||'FOR i IN Tabperso.first..Tabperso.last LOOP ';
+  v_reqCreate := v_reqCreate||'Ligidx.MATRIC := Tabperso(i).MATRIC; ';
+  v_reqCreate := v_reqCreate||'Ligidx.DATE_EFF := Tabperso(i).DSNAI; ';
+  v_reqCreate := v_reqCreate||'Ligidx.DATE_FIN := NULL; ';
+  v_reqCreate := v_reqCreate||'Ligidx.NOM_DONNEE := ''*''; ';
+  v_reqCreate := v_reqCreate||'Tabidx.extend; ';
+  v_reqCreate := v_reqCreate||'Tabidx(Tabidx.last) := Ligidx; ';
+  v_reqCreate := v_reqCreate||'END LOOP; ';
+  v_reqCreate := v_reqCreate||'END IF; ';
+  v_reqCreate := v_reqCreate||'BEGIN ';
+  v_reqCreate := v_reqCreate||'FORALL i IN 1..Tabidx.COUNT SAVE EXCEPTIONS ';
+  v_reqCreate := v_reqCreate||'INSERT INTO DIC_IDX_PERSO_HISTO VALUES (Tabidx(i).MATRIC, Tabidx(i).DATE_EFF, Tabidx(i).NOM_DONNEE, Tabidx(i).DATE_FIN); ';
+  v_reqCreate := v_reqCreate||'EXCEPTION WHEN OTHERS THEN NULL; END; ';
+  v_reqCreate := v_reqCreate||'END ALIM_IDX_PERSO_HISTO;';
+  EXECUTE_IMMEDIATE_STRING( v_reqCreate,0);
+END CREATE_PROC_IDX_PERSO_HISTO;
+##
+CREATE_PROC_IDX_PERSO_HISTO
+==
+CALL CREATE_PROC_IDX_PERSO_HISTO()
+##
+ALIM_IDX_PERSO_HISTO
+==
+CALL ALIM_IDX_PERSO_HISTO(0)

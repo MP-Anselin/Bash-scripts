@@ -1,0 +1,44 @@
+##
+TAG_CHARSET=@€ιθη
+##
+ADM_SUPPRIME_NOM_PAGE
+=SQL=
+CREATE OR REPLACE
+PROCEDURE ADM_SUPPRIME_NOM_PAGE(
+    p_nom_page VARCHAR2)
+IS
+BEGIN
+  DELETE
+  FROM sys_schemas
+  WHERE (niveau,code_elt) IN
+    (SELECT niveau, code_element FROM sys_sch_element WHERE nom_page = p_nom_page
+    );
+  DELETE FROM sys_sch_element WHERE nom_page = p_nom_page;
+  DELETE FROM sys_sch_PROFIL_MI WHERE page_mo_interdite = p_nom_page;
+  DELETE FROM sys_sch_PROFIL_OP_PAGE WHERE nom_page = p_nom_page;
+  DELETE FROM sys_sch_PROFIL_P WHERE nom_page = p_nom_page;
+  DELETE FROM UX_BRIDGING WHERE nom_page = p_nom_page;
+  DELETE FROM sys_sch_json WHERE nom_page = p_nom_page;
+  DELETE FROM DEL_FONCTIONMETIER WHERE ID_ECRANPROCESSUS = p_nom_page;
+  DELETE FROM REQ_INDEX_PAGES WHERE nom_page = p_nom_page;
+  DELETE FROM GA_CC_ONGLETS WHERE PAGE_ONGLET = p_nom_page;
+  DELETE FROM GAP_EPP_LIENS WHERE nompage = p_nom_page;
+  UPDATE STD_LHW_DONNEE SET nom_page=NULL WHERE nom_page = p_nom_page;
+  DELETE FROM SYS_ACC_REG_LIEN WHERE lien = p_nom_page;
+  UPDATE SYS_ALERTES SET nom_page=NULL WHERE nom_page = p_nom_page;
+  UPDATE SYS_ALERTES SET nom_page1=NULL WHERE nom_page1 = p_nom_page;
+  UPDATE SYS_ALERTES SET nom_page2=NULL WHERE nom_page2 = p_nom_page;
+  DELETE FROM SYS_LOCK_MODULE WHERE nom_page = p_nom_page;
+  DELETE FROM SYS_PAGES_MODAL WHERE nom_page = p_nom_page;
+  DELETE FROM SYS_PAGES_MODAL_ML WHERE nom_page = p_nom_page;
+  DELETE FROM SYS_PAGES_MODAL_RESTRICTION WHERE NOM_PAGE_BUR_LIEE = p_nom_page;
+  DELETE FROM SYS_PAGES_MODAL_RESTRICTION WHERE NOM_PAGE_MODALE = p_nom_page;
+  DELETE FROM SYS_SCH_DASHBOARD WHERE nom_page = p_nom_page;
+  DELETE FROM SYS_SCH_ECRANLOGIQUE WHERE nompage = p_nom_page;
+  DELETE FROM SYS_SCH_ECRANLOGIQUE WHERE NOMPAGESUIV = p_nom_page;
+  DELETE FROM SYS_USR_FAVORIS WHERE nom_page = p_nom_page;
+  DELETE FROM SYS_AIDE_DYN_2 WHERE UPPER(sujet) = UPPER(p_nom_page);
+  DELETE FROM AIDE_DYNAMIQUE_2 WHERE UPPER(sujet) = UPPER(p_nom_page);
+  DELETE FROM STD_LHW_THEME_PAGE WHERE NOM_PAGE = p_nom_page;
+  COMMIT ;
+END ADM_SUPPRIME_NOM_PAGE;

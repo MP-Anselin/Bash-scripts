@@ -1,0 +1,110 @@
+##
+TAG_CHARSET=@€ιθη
+##
+WKF_BRANCH_GEN
+=SQL IFEXIST=UX_EVENTS=
+UPDATE WKF_BRANCH_GEN BG1 SET CODE_RETOUR='Valider', GBR_OBLIG='false', GBR_CRREPRIS='true' WHERE OP_EMET_NUM IN (SELECT OP_NUM FROM UX_EVENTS) AND CODE_RETOUR='Default' AND NOT EXISTS (SELECT 1 FROM WKF_BRANCH_GEN BG2 WHERE BG2.OP_EMET_NUM=BG1.OP_EMET_NUM AND CODE_RETOUR='Valider')
+##
+WKF_BRANCH_GEN
+==
+UPDATE WKF_BRANCH_GEN SET FCT_NUM='20' WHERE OP_EMET_NUM='802' AND CODE_RETOUR ='EnvoiHost' AND OP_DEST_NUM='807' AND TR_NUM='8243'
+##
+WKF_BRANCH_GEN
+==
+delete from WKF_BRANCH_GEN WHERE OP_EMET_NUM in (55000,55001)
+55000,'Valider',55001,55003,1,'true','false','true','false','false','20191015162538','false',null
+55001,'Supprimer',55002,55004,1,'true','false','true','false','false','20191014135421','false',null
+55001,'Valider',55002,55001,1,'true','false','true','false','false','20191015110522','false',null
+##
+WKF_BRANCH_GEN
+==
+delete from WKF_BRANCH_GEN WHERE OP_EMET_NUM = 55100
+'55100','Annuler','55102','55101','1','false','true','true','false','false','20191106111454','false',null
+'55100','Supprimer','55102','55102','1','false','true','true','false','false','20191106111528','false',null
+'55100','Valider','55102','55103','1','false','true','true','false','false','20191106111554','false',null
+##
+WKF_BRANCH_GEN
+==
+Delete from WKF_BRANCH_GEN where OP_EMET_NUM IN( select OP_NUM from WKF_OPERATIONS where PROC_NUM in ('5052'))
+'55200','Annuler','55201','55201','1','false','true','true','false','false','20200131174458','false',null
+'55200','Supprimer','55201','55203','1','false','true','true','false','false','20200131174526','false',null
+'55200','Supprimer','55202','55201','1','false','true','true','false','false','20200124111259','false',null
+'55200','Valider','55201','55202','1','false','true','true','false','false','20200124111343','false',null
+'55200','Annuler','55202','55203','1','false','true','true','false','false','20200124111409','false',null
+'55201','Annuler','55202','55211','1','false','true','true','false','false','20200124111538','false',null
+'55201','Supprimer','55202','55212','1','false','true','true','false','false','20200124111554','false',null
+'55201','Valider','55202','55213','1','false','true','true','false','false','20200124111619','false',null
+##
+WKF_BRANCH_GEN
+==
+delete from WKF_BRANCH_GEN where OP_EMET_NUM='55201' OR OP_DEST_NUM='55202'
+##
+WKF_BRANCH_GEN
+==
+delete from WKF_BRANCH_GEN WHERE OP_EMET_NUM IN (55300,55301)
+'55300','Valider','55301','55301','1','false','false','true','false','false','20200402082500','false',null
+'55301','Supprimer','55302','55302','1','false','true','true','false','false','20200402082500','false',null
+'55301','Valider','55302','55303','1','false','true','true','false','false','20200402082500','false',null
+##
+WKF_BRANCH_GEN
+==
+delete from WKF_BRANCH_GEN WHERE OP_EMET_NUM IN (50317,53203,53204)
+'50317','Valider','50315','50320','1','false','true','true','false','false','20200515153516','false',null
+'53203','Valider','53204','53205','1','true','false','true','false','false','20200617092842','false',null
+'53203','Valider','53205','53205','1','true','false','true','false','false','20200616094142','false',null
+'53204','Supprimer','53202','53207','1','false','true','true','false','false','20200617092929','false',null
+'53204','Valider','53202','53206','1','false','true','true','false','false','20200515145638','false',null
+##
+WKF_BRANCH_GEN
+==
+delete from WKF_BRANCH_GEN WHERE OP_EMET_NUM in (40200,40201,40203)
+'40200','Default','40201','40220','1','false','true','true','false','false','20190417145341','false',null
+'40201','Default','40202','40221','1','false','true','true','false','false','20190419174150','false',null
+'40203','Valider','40201','4203','1','false','false','true','false','false','20200630101236','false',null
+##
+WKF_BRANCH_GEN
+==
+delete from WKF_BRANCH_GEN WHERE OP_EMET_NUM in (51501,51500)
+51501,'Supprimer','51502','51503','1','false','true','true','false','false','20200819155408','false',null
+51500,'Valider','51501','51501','1','true','false','true','false','false','20200819153805','false',null
+51501,'Valider','51502','51502','1','false','true','true','false','false','20200819155418','false',null
+##
+WKF_BRANCH_GEN
+==
+delete from WKF_BRANCH_GEN WHERE OP_EMET_NUM = 50705 AND CODE_RETOUR='ValiderAuto'
+'50705','ValiderAuto','50704','50708','1','false','false','true','false','false','20200902142828','false',null
+##
+WKF_BRANCH_GEN
+==
+delete from WKF_BRANCH_GEN WHERE OP_EMET_NUM in ('63010','63015')
+'63010','Valider','63015','63011','1','false','false','true','false','false','20201016111106','false',null
+'63015','Supprimer','63004','63017','1','false','true','true','false','false','20201016111237','false',null
+'63015','Valider','63004','63018','1','false','true','true','false','false','20201016111321','false',null
+##
+WKF_BRANCH_GEN
+==
+delete from WKF_BRANCH_GEN WHERE OP_EMET_NUM = 53803 AND CODE_RETOUR='Valider' AND OP_DEST_NUM = 53800
+'53803','Valider','53800','53804','19','false','true','true','false','false','20210728112500','false',null
+##
+WKF_BRANCH_GEN
+==
+UPDATE WKF_BRANCH_GEN SET FCT_NUM=19 WHERE FCT_NUM=1 AND OP_EMET_NUM IN (SELECT OP_NUM FROM MP_REF_EVENTS WHERE OP_NUM IS NOT NULL) AND OP_DEST_NUM IN (SELECT OP_NUM FROM WKF_OPERATIONS WHERE OP_STATUTPROC IN ('N','I'))
+##
+WKF_BRANCH_GEN
+==
+delete from WKF_BRANCH_GEN WHERE OP_EMET_NUM = 53705 AND CODE_RETOUR='Valider' AND OP_DEST_NUM = 53700
+'53705','Valider','53700','53706','19','false','true','true','false','false','20211129195227','false',null
+##
+WKF_BRANCH_GEN
+==
+delete from WKF_BRANCH_GEN WHERE TR_NUM IN ('55100','55110','55120','55200','55210')
+'5510','Valider','5520','55100','1','false','true','true','false','false','20211012120621','false',null	
+'5510','Annuler','5530','55110','1','false','true','true','false','false','20211012120653','false',null	
+'5520','Renvoi','5510','55210','1','false','false','true','false','false','20211012120928','false',null	
+'5510','Supprimer','5530','55120','1','false','true','true','false','false','20211012120741','false',null	
+'5520','Default','5530','55200','1','false','true','true','false','false','20211012120853','false',null	
+##
+WKF_BRANCH_GEN
+==
+delete from WKF_BRANCH_GEN WHERE OP_EMET_NUM = 50203 AND CODE_RETOUR='Valider' AND OP_DEST_NUM = 50200
+'50203','Valider','50200','50205','19','false','true','true','false','false','20220121160317','false',null

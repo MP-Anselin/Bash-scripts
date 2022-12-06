@@ -1,0 +1,72 @@
+##
+EXISTE_DONNEE_WKF
+=SQL=
+create or replace FUNCTION EXISTE_DONNEE_WKF(    P_NOM_DIC      IN VARCHAR2 ,
+    P_NOM_DONNEE   IN VARCHAR2 ,
+    P_VALUE        IN VARCHAR2 ,
+    P_CLAUSE_WHERE IN VARCHAR2 )  RETURN INTEGER IS
+	
+	cur_wkf_select   CLOB;
+	cur_node_select  CLOB;
+  	cur_table_select CLOB;
+ 	w_err            CLOB;
+  	xml_content      XMLTYPE;
+  	dos_num_cpt      NUMBER(10);
+	cur_wkf          tab_varchar;
+	cur_node         tab_varchar;
+	cur_table        SYS_REFCURSOR;  
+	BEGIN
+  	--controle de saisie
+    IF length(trim(P_NOM_DIC)) IS NULL  OR P_NOM_DIC IS NULL THEN
+       --dbms_output.put_line('Veuillez saisir le nom du dictionnaire');
+       --FIXME utiliser la procédure trace_dbms_output()
+       RETURN -1;
+    ELSIF length(trim(P_NOM_DONNEE))  IS NULL OR P_NOM_DONNEE IS NULL THEN
+      --dbms_output.put_line('Veuillez saisir le nom de donnee');
+      --FIXME utiliser la procédure trace_dbms_output()
+      RETURN -1;
+    END IF;
+    
+    --creation des curseurs selon l'existance de la partie where
+    cur_table_select := 'SELECT dos_num,xml_datas FROM WKF_METIER_GENERIQUE';
+		cur_wkf_select   := 'SELECT extractvalue(:1,''/DATA_DOS/''||:2 ||''/''||:3) As nodeValue	FROM dual';
+		cur_node_select  := 'SELECT node_name  FROM XMLTable(''/DATA_DOS/*'' passing  (SELECT xml_datas FROM WKF_METIER_GENERIQUE WHERE dos_num = :1 ) columns node_name VARCHAR2(30) path ''name(.)'' , node_value VARCHAR2(30) path ''.'') WHERE node_name LIKE (:2 ||''_%'')';
+		
+		IF P_CLAUSE_WHERE IS NOT NULL THEN
+        cur_table_select := cur_table_select||' WHERE ' || P_CLAUSE_WHERE;
+    END IF;
+    
+		--ouvrir le curseur principale qui va parcourir la table
+    OPEN cur_table FOR cur_table_select;
+    LOOP
+			  FETCH cur_table INTO dos_num_cpt,xml_content;
+			  EXIT WHEN cur_table%NOTFOUND;
+        EXECUTE immediate cur_node_select bulk collect INTO cur_node USING dos_num_cpt,P_NOM_DIC;
+        IF cur_node.exists(1) THEN
+          FOR j IN cur_node.first..cur_node.last
+          LOOP
+            --chercher les dictionnaires qui ont le nom passer en paramétre suivi par _XX
+            IF  substr(cur_node(j),1, INSTR(cur_node(j),'_', -1, 1)-1) = P_NOM_DIC THEN
+               EXECUTE immediate cur_wkf_select bulk collect INTO cur_wkf USING xml_content,cur_node(j),P_NOM_DONNEE;
+               IF cur_wkf.exists(1) THEN
+               FOR k IN cur_wkf.first..cur_wkf.last
+                LOOP
+                IF cur_wkf(k) = P_VALUE OR (P_VALUE IS NULL AND cur_wkf(k) IS NULL) THEN
+                  --dbms_output.put_line('donnee existe');
+                  --FIXME utiliser la procédure trace_dbms_output()
+                  RETURN 1;
+                END IF; 
+              END LOOP;
+              END IF;
+            END IF;
+          END LOOP;
+        END IF;
+    END LOOP;
+    --dbms_output.put_line('donnee n''existe pas');
+    --FIXME utiliser la procédure trace_dbms_output()
+	RETURN 0;
+Exception 
+ when others then 
+   w_err := 'ERROR EXISTE_DONNEE_WKF '||sqlerrm ;
+   RETURN -1;
+END EXISTE_DONNEE_WKF;

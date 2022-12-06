@@ -1,0 +1,123 @@
+##
+TAG_CHARSET=@€éèç
+##
+WKF_OPERATIONS
+=SQL IFEXIST=WKF_OPERATIONS=
+UPDATE WKF_OPERATIONS SET COMP_CLASS = 'fr.adp.com.gxp.std.modules.lib.objects.gap.administratif.workflow.GA_WKF_ESS_ATTESTATION' WHERE OP_NUM = '50704'  
+##
+WKF_OPERATIONS
+=SQL IFEXIST=WKF_OPERATIONS=
+UPDATE WKF_OPERATIONS SET COMP_WEB = 'Ext.adp.Gap.Administratif.workflow.Attestation.WkfAttestationsExpert' WHERE OP_NUM = '50702'  
+##
+WKF_OPERATIONS
+=SQL IFEXIST=WKF_OPERATIONS=
+UPDATE WKF_OPERATIONS SET COMP_WEB = 'Ext.adp.Gap.Administratif.workflow.Attestation.WkfAttestationsCollab' WHERE OP_NUM = '50700'  
+##
+WKF_OPERATIONS
+=SQL IFEXIST=WKF_OPERATIONS=
+UPDATE WKF_OPERATIONS SET COMP_WEB = 'Ext.adp.Gap.Administratif.workflow.Attestation.WkfAttestationsManager' WHERE OP_NUM = '50701'  
+##
+WKF_OPERATIONS
+==
+delete from WKF_OPERATIONS WHERE PROC_NUM = 5050
+55000,5050,'init refus demat','Initialisation','0','0','I','true','true','false',null,'_PARAM_DYN_','false','false','false','20191007112736','false','0','false',null,null,null,null,null,'false','ASC','0','false')
+55001,5050,'valide refus demat','Validation de la demande','0','0','N','true','true','false',null,'_PARAM_DYN_','false','false','false','20191014134419','false','0','false',null,null,null,null,null,'false','ASC','0','false')
+55002,5050,'fin demat','Fin wkf dématérialisation','0','0','F','true','true','true','fr.adp.com.gxp.std.mot_met.lib.objects.workflow.WkfMetierGeneriqueObj',null,'false','false','false','20191007113005','false','0','false',null,null,null,null,null,'false',null,'0','false')
+##
+WKF_OPERATIONS
+==
+delete from WKF_OPERATIONS WHERE PROC_NUM = 5051
+'55100','5051','EMBSTANP','Embauche stagiaire non payé','0','0','I','true','true','false',null,'_PARAM_DYN_','false','false','false','20191106105903','false','0','false',null,null,null,null,null,'false',null,'0','false'
+'55102','5051','FINEMBSTANP','Fin processus embauche stagiaire non payé','0','0','F','true','true','true','fr.adp.com.gxp.std.mot_met.lib.objects.workflow.WkfMetierGeneriqueObj',null,'false','false','false','20191106110631','false','0','false',null,null,null,null,null,'false',null,'0','false'
+##
+WKF_OPERATIONS
+==
+Delete from WKF_OPERATIONS where PROC_NUM in ('5052')
+'55200','5052','INIT INSET PE','Initialisation insertion de période d''emploi','5','0','I','true','false','false',null,'_PARAM_DYN_','false','false','false','24/01/20','false','0','false',null,null,null,null,null,'false','ASC','0','true'
+'55201','5052','FIN PROCESS INSER PE','Fin du processus insertion période d''emploi','5','0','TF','true','false','false','fr.adp.com.gxp.std.mot_met.lib.objects.workflow.WkfMetierGeneriqueObj',null,'false','false','false','24/01/20','false','0','false',null,null,null,null,null,'false','ASC','0','true'
+##
+WKF_OPERATIONS
+==
+Delete from WKF_OPERATIONS where PROC_NUM in ('5052') AND OP_NUM = '55201'
+'55201','5052','FIN PROCESS INSER PE','Fin du processus insertion période d''emploi','5','0','TF','true','false','true','fr.adp.com.gxp.std.mot_met.lib.objects.workflow.WkfMetierGeneriqueObj',null,'false','false','false','24/01/20','false','0','false',null,null,null,null,null,'false','ASC','0','true'
+##
+WKF_OPERATIONS
+==
+delete from WKF_OPERATIONS WHERE PROC_NUM = 5053
+'55300','5053','DEM. MUT.','Demande de modification','0','0','I','true','true','false',null,'_PARAM_DYN_','false','false','false','20200402082500','false','0','false',null,null,null,null,null,'false',null,'0','false'
+'55301','5053','VAL. MUT.','Validation de la demande','0','0','N','true','true','false',null,'_PARAM_DYN_','false','false','false','20200402082500','false','0','false',null,null,null,null,null,'false',null,'0','false'
+'55302','5053','FIN DEM. MUT.','Fin processus modification mutuelle','0','0','F','true','true','true','fr.adp.com.gxp.std.mot_met.lib.objects.workflow.WkfMetierGeneriqueObj',null,'false','false','false','20200402082500','false','0','false',null,null,null,null,null,'false',null,'0','false'
+##
+WKF_OPERATIONS
+==
+delete from WKF_OPERATIONS WHERE OP_NUM in ('50317','53203','53204')
+'50317','5003','UX modif N° bureau','UX modification numéro de bureau','2','0','I','true','false','false',null,'_PARAM_DYN_','false','false','false','12/05/20','false','0','false',null,null,null,null,null,'false','ASC','0','true'
+'53203','5032','UX Modif mutuelle','UX modification de la mutuelle','2','0','I','true','false','false',null,'_PARAM_DYN_','false','false','false','07/05/20','false','0','false',null,null,null,null,null,'false','ASC','0','true'
+'53204','5032','UX valid mutuelle','UX validation mutuelle','2','0','N','true','false','false',null,'_PARAM_DYN_','false','false','false','16/06/20','false','0','false',null,null,null,null,null,'false','ASC','0','true'
+##
+WKF_OPERATIONS
+==
+UPDATE WKF_OPERATIONS SET OP_LIBELLE = 'UX Validation de modification des coordonnées' WHERE OP_NUM = '50315'  
+##
+WKF_OPERATIONS
+==
+delete from WKF_OPERATIONS WHERE PROC_NUM = 4009
+'40200','4009','modification_carte','Intialiser modification carte','0','0','I','true','false','false',null,'_PARAM_DYN_','false','false','false','20190416114648','false','0','false',null,null,null,null,null,'false',null,'0','false'
+'40201','4009','valider_modif_carte','valider la modification de la carte','0','0','N','true','false','false',null,'_PARAM_DYN_','false','false','false','20190416115410','false','0','false',null,null,null,null,null,'false',null,'0','false'
+'40202','4009','init-fin-carte','validation carte sejour','0','0','F','true','false','true','fr.adp.com.gxp.std.mot_met.lib.objects.workflow.WkfMetierGeneriqueObj',null,'false','false','false','20190417150400','false','0','false',null,null,null,null,null,'false','ASC','0','false'
+'40203','4009','modif docImm salarié','modification Carte salarié étranger Market Place','0','0','I','true','false','false',null,'_PARAM_DYN_','false','false','false','20190416114648','false','0','false',null,null,null,null,null,'false',null,'0','false'
+##
+WKF_OPERATIONS
+==
+delete from WKF_OPERATIONS WHERE PROC_NUM = 5015
+51501,5015,'valid envoi fic','Validation du document','0','0','N','true','true','false',null,'_PARAM_DYN_','false','false','false','20200819155408','false','0','false',null,null,null,null,null,'false','ASC','0','true'
+51500,5015,'init envoi fichier','Envoi du document','0','0','I','true','true','false',null,'_PARAM_DYN_','false','false','false','20200819155408','false','0','false',null,null,null,null,null,'false','ASC','0','true'
+51502,5015,'fin envoi fic','Fin de processus','0','0','F','true','true','true','fr.adp.com.gxp.std.mot_met.lib.objects.workflow.WkfMetierGeneriqueObj',null,'false','false','false','20200819155408','false','0','false',null,null,null,null,null,'false',null,'0','false'
+##
+WKF_OPERATIONS
+==
+delete from WKF_OPERATIONS where PROC_NUM = '6300'
+'63001','6300','Valider RRH','Valider la demande de modification transport','0','0','N','true','false','false',null,'_PARAM_DYN_','false','false','false','20170728162933','false','0','false',null,null,null,null,null,'false','ASC','0','true'
+'63002','6300','Corriger la demande','Corriger la demande de modification transport','0','0','N','true','false','false',null,'_PARAM_DYN_','false','false','false','20170728163007','false','0','false',null,null,null,null,null,'false','ASC','0','true'
+'63004','6300','Fin processus','Fin du processus','0','0','F','true','false','true','fr.adp.com.gxp.std.mot_met.lib.objects.workflow.WkfMetierGeneriqueObj',null,'false','false','false','20170728163133','false','0','false',null,null,null,null,null,'false','ASC','0','true'
+'63000','6300','Modification trans','Modification de mes données transport','0','0','I','true','true','false',null,'_PARAM_DYN_','false','false','false','20170728162848','false','0','false',null,null,null,null,null,'false','ASC','0','true'
+'63010','6300','UX dem remb. TRP','UX demande de remboursement transport','2','0','I','true','false','false',null,'_PARAM_DYN_','false','false','false','16/10/20','false','0','false',null,null,null,null,null,'false','ASC','0','true'
+'63015','6300','UX valid remb TRP','UX validation demande remb transport','2','0','N','true','false','false',null,'_PARAM_DYN_','false','false','false','16/10/20','false','0','false',null,null,null,null,null,'false','ASC','0','true'
+##
+WKF_OPERATIONS
+==
+delete from WKF_OPERATIONS WHERE OP_NUM = 53803
+'53803','5038','INITDEPAPI','Initialiser le départ depuis l''API','0','0','I','true','false','false',null,'_PARAM_DYN_','false','false','false','20210728112500','false','0','false',null,null,null,null,null,'false',null,'0','true'
+##
+WKF_OPERATIONS
+==
+UPDATE WKF_OPERATIONS SET OP_ABREV='UX init refus demat', OP_LIBELLE='UX Initialisation refus démat' WHERE OP_NUM=55000
+##
+WKF_OPERATIONS
+==
+UPDATE WKF_OPERATIONS SET OP_ABREV='UX val refus demat', OP_LIBELLE='UX validation de la demande démat' WHERE OP_NUM=55001
+##
+WKF_OPERATIONS
+==
+UPDATE WKF_OPERATIONS SET OP_ABREV='UX fin demat', OP_LIBELLE='UX fin wkf dématérialisation' WHERE OP_NUM=55002
+##
+WKF_OPERATIONS
+==
+delete from WKF_OPERATIONS WHERE OP_NUM = 53705
+'53705','5037','INITEMBAPI','Initialiser l''embauche depuis l''API','0','0','I','true','true','false',null,'_PARAM_DYN_','false','false','false','20211129195018','false','0','false',null,null,null,null,null,'false',null,'0','false'
+##
+WKF_OPERATIONS
+==
+delete from WKF_OPERATIONS WHERE PROC_NUM = '5500'
+'5510','5500','Evts contract','Evènements contractuels','5','5','I'	'true','false','false',null,'_PARAM_DYN_','false','false','false','20211012010101','false','0','false',null,null,null,null,null,'false','ASC','0','true'
+'5520','5500','Accepte modif','Accepter les modifications','5','0','N','false','false','false',null,'_PARAM_DYN_','false','false','false','20211012010101','false','0','false',null,null,null,null,null,'false',null,'0','true'
+'5530','5500','Fin évts contract.','Fin processus évènements contractuels','0','0','F','true','false','true','fr.adp.com.gxp.std.mot_met.lib.objects.workflow.WkfMetierGeneriqueObj',null,'false','false','false','20211012010101','false','0','false',null,null,null,null,null,'false',null,'0','false'
+##
+WKF_OPERATIONS
+==
+delete from WKF_OPERATIONS WHERE OP_NUM = 50203
+'50203','5002','INITMODCNTAPI','Initialiser la modification contractuelle depuis l''API','0','0','I','true','true','false',null,'_PARAM_DYN_','false','false','false','20220121155837','false','0','false',null,null,null,null,null,'false',null,'0','true'
+##
+WKF_OPERATIONS
+==
+update WKF_OPERATIONS O1 set OP_DATECREA = (select TO_CHAR(TO_DATE(OP_DATECREA, 'DD/MM/YY'), 'YYYYMMDDHH24MISS') from WKF_OPERATIONS O2 where O2.OP_NUM = O1.OP_NUM) where IS_DATE(OP_DATECREA, 'DD/MM/YY')=1

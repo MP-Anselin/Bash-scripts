@@ -1,0 +1,21 @@
+##
+TAG_CHARSET=@€ιθη
+##
+GET_EMAIL_MATRIC
+=SQL=
+create or replace FUNCTION GET_EMAIL_MATRIC(pMatric VARCHAR2) RETURN VARCHAR2
+ IS
+ varsys VARCHAR2(50);
+ reqSelect VARCHAR2(4000);
+ nomTable VARCHAR2(30);
+ retour VARCHAR2(100);
+ BEGIN
+ SELECT VALVAR INTO varsys FROM SYS_VARSYS WHERE MODULE='STD' AND CODVAR = 'EMAIL_FIELD';
+ nomTable := SUBSTR(varsys,0, INSTR(varsys,'.', -1, 1)-1);
+ reqSelect := 'SELECT '||varsys||' FROM '||nomTable||' WHERE matric= :1';
+ EXECUTE IMMEDIATE reqSelect INTO retour using pMatric;
+ RETURN retour;
+ EXCEPTION
+ WHEN OTHERS THEN RETURN NULL;
+ END GET_EMAIL_MATRIC;
+ 

@@ -1,0 +1,10 @@
+##
+TAG_CHARSET=@€éèç
+##
+GA_ZWNATURCNT_DSN
+==
+DELETE FROM GA_ZWNATURCNT_DSN WHERE CODE_DSN_NAT IN ('82')
+##
+GA_ZWNATURCNT_DSN
+==
+INSERT INTO GA_ZWNATURCNT_DSN (CODE_DSN_NAT	,LIBELLE_DSN_NAT) VALUES ('82',	'Contrat de travail à durée indéterminée de chantier ou d''opération')

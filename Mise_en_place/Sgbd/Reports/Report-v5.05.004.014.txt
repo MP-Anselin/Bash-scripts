@@ -1,0 +1,451 @@
+##
+TAG_CHARSET=@€éèç
+TAG_IMPORT=5.05.004.R014
+##
+TGE_CLOTURE
+=SQL=
+create or replace PROCEDURE TGE_CLOTURE ( p_id in number, P_NUMPAC IN VARCHAR2 ) AS /********************************************************************************
+ Version     : V5.05.000
+ *********************************************************************************/
+ P_PERIODEENCOURS TGE_REF_PAC.PERIODEENCOURS%type;
+ p_dtdebMois varchar2(8);
+ p_finMois varchar2(8);
+ p_histoIP varchar2(1);
+ 
+ P_DEB_RETRO TGE_REF_PAC.DEB_RETRO%type;
+ P_DEB_HISTO_RETRO TGE_REF_PAC.DEB_HISTO_RETRO%type;
+ P_NB_MOIS_RETRO TGE_REF_PAC.NB_MOIS_RETRO%type;
+ P_PERIDOE_HISTO_LIMITE TGE_REF_PAC.PERIODEENCOURS%type;
+ w_per   VARCHAR2(6);
+ w_req   CLOB;
+ isRetro number :=0;
+ BEGIN
+ 
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'TGE_CLOTURE (Begin)','Début de la clôture du numpac  '||P_NUMPAC);
+ 
+ 
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'TGE_CLOTURE (Recup Periode + infos Rétro)','Récupération de la période en cours,date début Rétro, date début historisation Rétro et nombre de mois Rétro à partir de TGE_REF_PAC pour le numpac : '||P_NUMPAC);
+ select PERIODEENCOURS ,DEB_RETRO,DEB_HISTO_RETRO,NB_MOIS_RETRO ,to_char( add_months(to_date(PERIODEENCOURS,'yyyymm'),(-1*nvl(NB_MOIS_RETRO,1))+1),'YYYYMM') PERIDOE_HISTO_LIMITE
+ into P_PERIODEENCOURS,P_DEB_RETRO,P_DEB_HISTO_RETRO,P_NB_MOIS_RETRO ,P_PERIDOE_HISTO_LIMITE
+ from TGE_REF_PAC where numpac=p_numpac;
+ 
+ IF P_DEB_RETRO is not null  AND to_date(P_PERIODEENCOURS,'YYYYMM')>=to_date(P_DEB_HISTO_RETRO,'YYYYMM') THEN
+ w_per := P_PERIDOE_HISTO_LIMITE;
+ isRetro :=1;
+ ELSE
+ w_per := P_PERIODEENCOURS;
+ isRetro:=0;
+ END IF;
+ 
+ 
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'TGE_CLOTURE (avant lecture REF PER)','Récupération de la date de début et de fin du mois pour le numpac '||P_NUMPAC || '  et la periode '|| p_PERIODEENCOURS );
+ select DATE_DEBUT_MOIS,DATE_FIN_MOIS into p_dtdebMois,p_finMois from TGE_REF_PER where numpac=p_numpac and periodeencours=p_PERIODEENCOURS;
+ --Purge et Historisation de dif_FSED
+ 
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'TGE_CLOTURE (Deb PURGE_HISTO_DIF_FSED)','Début PURGE_HISTO_DIF_FSED pour le numpac  '||P_NUMPAC );
+ PURGE_HISTO_DIF_FSED ( p_id, P_NUMPAC,P_PERIODEENCOURS,P_DEB_RETRO,P_DEB_HISTO_RETRO,P_NB_MOIS_RETRO,P_PERIDOE_HISTO_LIMITE);
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'TGE_CLOTURE (Fin PURGE_HISTO_DIF_FSED)','Fin PURGE_HISTO_DIF_FSED pour le numpac  '||P_NUMPAC );
+ 
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'TGE_CLOTURE (SAV DIF_FSED) ',' début sauvegarde DIF_FSED'  );
+ BEGIN
+ w_req :='Create TABLE DIF_FSED_'||P_PERIODEENCOURS||' as select * from DIF_FSED '  ;
+ execute_immediate_string (w_req,0);
+ EXCEPTION 
+   WHEN OTHERS THEN
+  FSED.FSED_AVANCEMENT_PLSQL(p_id,'TGE_CLOTURE (SAV DIF_FSED) ','la table DIF_FSED_'||P_PERIODEENCOURS||' existe déja ' );
+ END ;
+
+
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'TGE_CLOTURE (DEBUT Supp DIF_FSED)','DEBUT Purge de la table DIF_FSED ');
+ FOR C IN
+ (SELECT DISTINCT to_char(id_trt) as trt FROM DIF_FSED WHERE NUMPAC =p_numpac
+ )
+ LOOP
+ w_req :='ALTER TABLE DIF_FSED DROP PARTITION ID_'||C.trt ;
+ BEGIN
+ execute_immediate_string (w_req,0);
+ EXCEPTION 
+ when others then 
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'TGE_CLOTURE ( Supp partition DIF_FSED)','ERREUR lors de la suppresstion partition ID_'||C.trt||' de DIF_FSED '||SQLCODE||'-'||SQLERRM);
+ end ;
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'TGE_CLOTURE ( Supp partition DIF_FSED)','suppression partition ID_'||C.trt||' de DIF_FSED ');
+ END LOOP;
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'TGE_CLOTURE (FIN Supp DIF_FSED)','FIN Purge de la table DIF_FSED');
+ 
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'TGE_CLOTURE (avant insert GAP TRT)','Préparation du traitement GAP_TRT pour le  '||P_NUMPAC);
+ --Ajout  dans GAP_TRT
+ insert into GAP_TRT (ID_TRT,NUMPAC,PERIODE_PAIE,NUMERO_ECHANGE,MODELE,NATURE,DATE_DEBUT_PAIE,DATE_FIN_PAIE,WORKFLOW_ID,DATE_PREVUE_TRT,DATE_PLANIF_TRT,DATE_DEBUT_TRT,INFO)
+ values
+ (p_id,P_NUMPAC,p_PERIODEENCOURS,'0000','ALP','CLOTURE',p_dtdebMois,p_finMois,'TGEPAY'||P_NUMPAC||'PACGXP'||p_PERIODEENCOURS||'0000',sysdate,sysdate,sysdate,'CLOTURE');
+ 
+ --GAP_TRT_SUIVI
+ FSED.insert_gap_trt_suivi(p_id,'PREPA_CLOTURE',null,'BATCH','CL');
+ --BEGIN DIT 37805
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'TGE_CLOTURE (Begin Supp RELIQ)',' Début de la purge des tables  TGE_RELIQ_INCIDENTS_PAIE, TGE_RELIQ_DONNEES_PAIE, TGE_RELIQ_ELEMENTS_PAIE, TGE_RELIQ_IMPUTATIONS,TGE_RELIQ_PACMAT_TORESEND pour le numpac  '||P_NUMPAC);
+ -- les tables TGE_RELIQ_* sont vidées pour le pac en question
+ DELETE FROM TGE_RELIQ_INCIDENTS_PAIE  WHERE NUMPAC = P_NUMPAC;
+ DELETE FROM TGE_RELIQ_DONNEES_PAIE    WHERE NUMPAC = P_NUMPAC;
+ DELETE FROM TGE_RELIQ_ELEMENTS_PAIE   WHERE NUMPAC = P_NUMPAC;
+ DELETE FROM TGE_RELIQ_IMPUTATIONS     WHERE NUMPAC = P_NUMPAC;
+ DELETE FROM TGE_RELIQ_PACMAT_TORESEND WHERE NUMPAC = P_NUMPAC;
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'TGE_CLOTURE (End Supp RELIQ)','Fin de de la purge des tables RELIQ pour le  numpac : '||P_NUMPAC);
+ --FIN  DIT 37805
+ 
+ -- Mise à jour secupacmat
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'TGE_CLOTURE (Update SECUPACMAT)','Deuxième période de recyclage : Mise à jour de la table SECUPACMAT pour le numpac : '||p_numpac);
+ update SECUPACMAT set PERIODE_RECYCLAGE=2 where numpac=p_numpac;
+ FSED.insert_gap_trt_suivi(p_id,'PERIODE_RECYCLAGE_2',null,'BATCH','CL');
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'TGE_CLOTURE (avant insert LISTE MAT)','Préparation de la liste des matricules');
+ -- RSI  Le 20/02/2015 DIT 41197:EVOL: Ajout du type de paie 'GAPSELMA'
+ insert into GAP_TRT_LISTE_MAT select distinct  p_id,b.numpac,b.pacmat,null from (
+ select distinct c.id_trt
+ from TGE_SCHEMA_PRODUCTION a,GAP_TRT b,GAP_TRT_SUIVI c  where a.numpac=p_numpac and a.TYPE_PAIE in ('PRECONTR','CONTROLE','RECYCLAG','PARTICUL','REGLE','REGLEALL','GAPSELMA')
+ and a.numpac=b.numpac and a.modele=b.modele and a.nature=b.nature and b.id_trt=c.id_trt and c.statut in ('PA','EX','DEMSEA') AND NVL(c.code_retour_zpp,'00')='00' and b.PERIODE_PAIE = p_PERIODEENCOURS  and b.numero_echange<>'0000') a, GAP_TRT_LISTE_MAT b where a.id_trt=b.id_trt
+ and not exists (select c.numpac,c.pacmat from GAP_RECYCL_MATRIC c where c.numpac=b.numpac and c.pacmat=b.pacmat ) ;
+ -- Le 25/04/2015 ajout des mal recyclés (colonne "TRAITE"='R')
+ insert into GAP_TRT_LISTE_MAT select distinct  p_id,b.numpac,b.pacmat,'R' from (
+ select distinct c.id_trt
+ from TGE_SCHEMA_PRODUCTION a,GAP_TRT b,GAP_TRT_SUIVI c  where a.numpac=p_numpac and a.TYPE_PAIE in ('PRECONTR','CONTROLE','RECYCLAG','PARTICUL','REGLE','REGLEALL','GAPSELMA')
+ and a.numpac=b.numpac and a.modele=b.modele and a.nature=b.nature and b.id_trt=c.id_trt and c.statut in ('PA','EX','DEMSEA') AND NVL(c.code_retour_zpp,'00')='00' and b.PERIODE_PAIE = p_PERIODEENCOURS  and b.numero_echange<>'0000') a, GAP_TRT_LISTE_MAT b where a.id_trt=b.id_trt
+ and exists (select c.numpac,c.pacmat from GAP_RECYCL_MATRIC c where c.numpac=b.numpac and c.pacmat=b.pacmat ) ;
+ -- photos
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'TGE_CLOTURE (avant génération photo)','Début de la génération de la photo pour le numpac '||P_NUMPAC||'  à la date '||p_dtdebMois);
+ tge_generation_photo(p_id,p_numpac,p_dtdebMois);
+ FSED.insert_gap_trt_suivi(p_id,'PHOTO',null,'BATCH','CL');
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'TGE_CLOTURE (après génération photo)','Fin de la génération de la photo pour le numpac '||P_NUMPAC||'  à la date '||p_dtdebMois);
+ 
+ 
+ insert into bypass_trg_recycl_on_session(date_event, message) values (sysdate, 'Cloture en cours pour le NUMPAC : ' || p_numpac);
+ 
+ -- lecture de la valeur de HISTO_IP dans TGE_REF_PAC
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'TGE_CLOTURE (avant lecture REF PER)','Récupération de la valeur de HISTO_IP dans TGE_REF_PAC pour le numpac '||P_NUMPAC );
+ select nvl(HISTO_IP,'N') into p_histoIP from TGE_REF_PAC where NUMPAC = p_numpac;
+ 
+ -- purge saisies quai
+ FSED.insert_gap_trt_suivi(p_id,'PURGE_QUAIS',null,'BATCH','CL');
+ delete from TGE_IMPUTATIONS where numpac=p_numpac and to_date(PERIODE,'YYYYMM')<=to_date(p_PERIODEENCOURS,'YYYYMM') and (numpac,paiezad) in (select distinct b.numpac,d.paiezad from GAP_TRT_LISTE_MAT b,DIC_ADM_CONTRAT_SITU d where b.id_trt=p_id
+ and d.numpac=b.numpac and d.pacmat=b.pacmat and b.traite is null );
+ 
+ IF p_histoIP = 'N' THEN
+ 
+ w_req :='DELETE FROM TGE_INCIDENTS_PAIE z WHERE z.numpac='''||p_numpac||''' AND  ';
+ if isRetro=1 then
+ w_req := w_req || ' ( z.PERIODE <greatest(to_date('''||P_PERIDOE_HISTO_LIMITE||''',''YYYYMM''),to_date(nvl('''||P_DEB_HISTO_RETRO||''',''209912''),''YYYYMM''))'||' OR DERNIER_CODE_OPE=''S''';
+ else
+ w_req := w_req || ' ( z.PERIODE           <=to_date('''||w_per||''',''yyyymm'')';
+ end if;
+ w_req := w_req||')'||' AND (z.numpac,z.paiezad) IN (SELECT DISTINCT b.numpac,
+ d.paiezad FROM GAP_TRT_LISTE_MAT b,DIC_ADM_CONTRAT_SITU d,TGE_PERIODE_RECUEIL_PAIEZAD t
+ WHERE b.id_trt ='||p_id||' AND d.numpac =b.numpac AND d.pacmat =b.pacmat AND d.numpac  =t.numpac AND d.pacmat  =t.pacmat
+ AND d.paiezad   =t.paiezad AND ';
+ if isRetro=1 then
+ w_req := w_req || ' to_date(t.MOIS_PAIE,''YYYYMM'') <= greatest(to_date('''||P_PERIDOE_HISTO_LIMITE||''',''YYYYMM''),to_date(nvl('''||P_DEB_HISTO_RETRO||''',''209912''),''YYYYMM''))'||' OR DERNIER_CODE_OPE=''S''';
+ else
+  w_req := w_req ||' to_date(t.MOIS_PAIE,''YYYYMM'') = to_date('''||p_PERIODEENCOURS||''',''YYYYMM'')';
+ end if;
+ w_req := w_req ||' AND (z.date_effet <= t.FIN_PERIODE_RECUEIL OR z.TYPE_IP       = ''T'')AND b.traite      IS NULL)';
+  FSED.FSED_AVANCEMENT_PLSQL(p_id,'TGE_CLOTURE (Purge incidents )',w_req);
+ execute_immediate_string (w_req,0);
+ if isRetro=1 then
+ update TGE_INCIDENTS_PAIE z
+ set    ACTION_RETRO='H',ACTION_RETRO_DATE=null
+ WHERE  z.numpac           =p_numpac
+ AND z.PERIODE >to_date(P_PERIDOE_HISTO_LIMITE,'yyyymm')
+ AND z.PERIODE<=to_date(p_PERIODEENCOURS,'yyyymm')
+ AND (z.numpac,z.paiezad) IN
+ (SELECT DISTINCT b.numpac,
+ d.paiezad
+ FROM GAP_TRT_LISTE_MAT b,
+ DIC_ADM_CONTRAT_SITU d,
+ TGE_PERIODE_RECUEIL_PAIEZAD t
+ WHERE b.id_trt     =p_id
+ AND d.numpac       =b.numpac
+ AND d.pacmat       =b.pacmat
+ AND d.numpac       =t.numpac
+ AND d.pacmat       =t.pacmat
+ AND d.paiezad      =t.paiezad
+ AND to_date(t.MOIS_PAIE,'yyyymm') = to_date(p_PERIODEENCOURS,'yyyymm')
+ AND (z.date_effet <= t.FIN_PERIODE_RECUEIL
+ OR z.TYPE_IP       = 'T')
+ AND b.traite      IS NULL
+ );
+ end if;
+ END IF;
+ 
+ w_req :='delete from TGE_DONNEES_PAIE where numpac='''||p_numpac||''' and ' ;
+ if isRetro=1 then
+ w_req := w_req || '( to_date(PERIODE,''YYYYMM'') < greatest(to_date('''||P_PERIDOE_HISTO_LIMITE||''',''YYYYMM''),to_date(nvl('''||P_DEB_HISTO_RETRO||''',''209912''),''YYYYMM''))'||' OR DERNIER_CODE_OPE=''S''';
+ else
+ w_req := w_req ||' (  to_date(PERIODE,''YYYYMM'') <= to_date('''||p_PERIODEENCOURS||''',''YYYYMM'')';
+ end if;
+ w_req := w_req ||') and (numpac,paiezad) in (select distinct b.numpac,d.paiezad from GAP_TRT_LISTE_MAT b,DIC_ADM_CONTRAT_SITU d where b.id_trt='||p_id||
+ ' and d.numpac=b.numpac and d.pacmat=b.pacmat and b.traite is null)';
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'TGE_CLOTURE (Purge donnes )',w_req);
+ execute_immediate_string (w_req,0);
+ if isRetro=1 then
+ update TGE_DONNEES_PAIE
+ set    ACTION_RETRO ='H',
+ ACTION_RETRO_DATE =null
+ where numpac=p_numpac 
+ and to_date(PERIODE,'YYYYMM')>to_date(P_PERIDOE_HISTO_LIMITE,'yyyymm') 
+ AND to_date(PERIODE,'YYYYMM')<=to_date(p_PERIODEENCOURS,'yyyymm')
+ and (numpac,paiezad) in (select distinct b.numpac,d.paiezad from GAP_TRT_LISTE_MAT b,DIC_ADM_CONTRAT_SITU d where b.id_trt=p_id
+ and d.numpac=b.numpac and d.pacmat=b.pacmat and b.traite is null);
+ end if;
+ w_req :='delete from TGE_ELEMENTS_PAIE where numpac='''||p_numpac||''' and  ' ;
+ if isRetro=1 then
+ w_req := w_req || '( to_date(PERIODE,''YYYYMM'') < greatest(to_date('''||P_PERIDOE_HISTO_LIMITE||''',''YYYYMM''),to_date(nvl('''||P_DEB_HISTO_RETRO||''',''209912''),''YYYYMM''))'||' OR DERNIER_CODE_OPE=''S''';
+ else
+ w_req := w_req ||' (  to_date(PERIODE,''YYYYMM'') <= to_date('''||p_PERIODEENCOURS||''',''YYYYMM'')';
+ end if;
+ w_req := w_req ||')  and (numpac,paiezad) in (select distinct b.numpac,d.paiezad from GAP_TRT_LISTE_MAT b,DIC_ADM_CONTRAT_SITU d where b.id_trt='||p_id||
+ ' and d.numpac=b.numpac and d.pacmat=b.pacmat and b.traite is null )';
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'TGE_CLOTURE (Purge elements )',w_req);
+ execute_immediate_string (w_req,0);
+ if isRetro=1 then
+ update TGE_ELEMENTS_PAIE
+ set    ACTION_RETRO ='H',
+ ACTION_RETRO_DATE =null
+ where numpac=p_numpac 
+ and to_date(PERIODE,'YYYYMM')>to_date(P_PERIDOE_HISTO_LIMITE,'yyyymm') 
+ AND to_date(PERIODE,'YYYYMM')<=to_date(p_PERIODEENCOURS,'yyyymm')
+ and (numpac,paiezad) in (select distinct b.numpac,d.paiezad from GAP_TRT_LISTE_MAT b,DIC_ADM_CONTRAT_SITU d where b.id_trt=p_id
+ and d.numpac=b.numpac and d.pacmat=b.pacmat and b.traite is null);
+ END IF;
+ delete from DELETED_PAIEZAD where numpac=p_numpac and DATE_SUPPRESSION<=add_months(to_date(p_PERIODEENCOURS,'yyyymm'),-1)  and (numpac,paiezad) not in (select distinct b.numpac,d.paiezad from GAP_TRT_LISTE_MAT b,DIC_ADM_CONTRAT_SITU d where b.id_trt=p_id
+ and d.numpac=b.numpac and d.pacmat=b.pacmat and b.traite is null);
+ 
+ -- purge saisies quai des matricules mal recyclés
+ FSED.insert_gap_trt_suivi(p_id,'PURGE_QUAIS_RECY',null,'BATCH','CL');
+ delete from TGE_IMPUTATIONS z where numpac=p_numpac AND to_date(date_maj,'yyyymmddHH24MI')<
+ 
+ ( SELECT max (b.DATE_DEBUT_TRT)
+ FROM TGE_SCHEMA_PRODUCTION a,
+ GAP_TRT b,
+ GAP_TRT_SUIVI c, GAP_TRT_LISTE_MAT e, DIC_ADM_CONTRAT_SITU d
+ WHERE a.numpac       =p_numpac
+ AND a.TYPE_PAIE     IN ('PRECONTR','CONTROLE','RECYCLAG','PARTICUL','REGLE','REGLEALL','GAPSELMA')
+ AND a.numpac         =b.numpac
+ AND a.modele         =b.modele
+ AND a.nature         =b.nature
+ AND b.id_trt         =c.id_trt
+ AND c.statut        IN ('PA','EX','DEMSEA')
+ AND NVL(c.code_retour_zpp,'00')='00'
+ AND b.PERIODE_PAIE   = p_PERIODEENCOURS
+ AND b.numero_echange<>'0000'
+ and e.id_trt=b.id_trt
+ AND EXISTS
+ (SELECT f.numpac,
+ f.pacmat
+ FROM GAP_RECYCL_MATRIC f
+ WHERE f.numpac=e.numpac
+ AND f.pacmat  =e.pacmat
+ )  AND d.numpac       =e.numpac
+ AND d.pacmat       =e.pacmat
+ AND z.numpac       =e.numpac
+ AND z.PAIEZAD      =d.paiezad
+ )  and PERIODE<=p_PERIODEENCOURS ;
+ 
+ IF p_histoIP='N' THEN
+ DELETE
+ FROM TGE_INCIDENTS_PAIE z
+ WHERE z.numpac            =p_numpac
+ AND (z.numpac,z.paiezad) IN
+ (SELECT DISTINCT t.numpac,
+ t.paiezad
+ FROM TGE_PERIODE_RECUEIL_PAIEZAD t
+ WHERE z.numpac     =t.numpac
+ AND z.paiezad      =t.paiezad
+ AND t.MOIS_PAIE = p_PERIODEENCOURS
+ AND (z.date_effet <= t.FIN_PERIODE_RECUEIL
+ OR z.TYPE_IP       = 'T')
+ )
+ AND z.date_maj<
+ (SELECT MAX (b.DATE_DEBUT_TRT)
+ FROM TGE_SCHEMA_PRODUCTION a,
+ GAP_TRT b,
+ GAP_TRT_SUIVI c,
+ GAP_TRT_LISTE_MAT e,
+ DIC_ADM_CONTRAT_SITU d
+ WHERE a.numpac                 =p_numpac
+ AND a.TYPE_PAIE               IN ('PRECONTR','CONTROLE','RECYCLAG','PARTICUL','REGLE','REGLEALL','GAPSELMA')
+ AND a.numpac                   =b.numpac
+ AND a.modele                   =b.modele
+ AND a.nature                   =b.nature
+ AND b.id_trt                   =c.id_trt
+ AND c.statut                  IN ('PA','EX','DEMSEA')
+ AND NVL(c.code_retour_zpp,'00')='00'
+ AND b.PERIODE_PAIE             = p_PERIODEENCOURS
+ AND b.numero_echange          <>'0000'
+ AND e.id_trt                   =b.id_trt
+ AND EXISTS
+ (SELECT f.numpac,
+ f.pacmat
+ FROM GAP_RECYCL_MATRIC f
+ WHERE f.numpac=e.numpac
+ AND f.pacmat  =e.pacmat
+ )
+ AND d.numpac  =e.numpac
+ AND d.pacmat  =e.pacmat
+ AND z.numpac  =e.numpac
+ AND z.PAIEZAD =d.paiezad
+ )
+ AND to_date(z.PERIODE)<=to_date(p_PERIODEENCOURS,'YYYYMM');
+ END IF;
+ 
+ delete from TGE_DONNEES_PAIE z where numpac=p_numpac AND to_date(date_maj,'yyyymmddHH24MI')<
+ 
+ ( SELECT max (b.DATE_DEBUT_TRT)
+ FROM TGE_SCHEMA_PRODUCTION a,
+ GAP_TRT b,
+ GAP_TRT_SUIVI c, GAP_TRT_LISTE_MAT e, DIC_ADM_CONTRAT_SITU d
+ WHERE a.numpac       =p_numpac
+ AND a.TYPE_PAIE     IN ('PRECONTR','CONTROLE','RECYCLAG','PARTICUL','REGLE','REGLEALL','GAPSELMA')
+ AND a.numpac         =b.numpac
+ AND a.modele         =b.modele
+ AND a.nature         =b.nature
+ AND b.id_trt         =c.id_trt
+ AND c.statut        IN ('PA','EX','DEMSEA')
+ AND NVL(c.code_retour_zpp,'00')='00'
+ AND b.PERIODE_PAIE   = p_PERIODEENCOURS
+ AND b.numero_echange<>'0000'
+ and e.id_trt=b.id_trt
+ AND EXISTS
+ (SELECT f.numpac,
+ f.pacmat
+ FROM GAP_RECYCL_MATRIC f
+ WHERE f.numpac=e.numpac
+ AND f.pacmat  =e.pacmat
+ )  AND d.numpac       =e.numpac
+ AND d.pacmat       =e.pacmat
+ AND z.numpac       =e.numpac
+ AND z.PAIEZAD      =d.paiezad
+ ) and PERIODE<=p_PERIODEENCOURS ;
+ 
+ delete from TGE_ELEMENTS_PAIE z where numpac=p_numpac AND to_date(date_maj,'yyyymmddHH24MI')<
+ 
+ ( SELECT max (b.DATE_DEBUT_TRT)
+ FROM TGE_SCHEMA_PRODUCTION a,
+ GAP_TRT b,
+ GAP_TRT_SUIVI c, GAP_TRT_LISTE_MAT e, DIC_ADM_CONTRAT_SITU d
+ WHERE a.numpac       =p_numpac
+ AND a.TYPE_PAIE     IN ('PRECONTR','CONTROLE','RECYCLAG','PARTICUL','REGLE','REGLEALL','GAPSELMA')
+ AND a.numpac         =b.numpac
+ AND a.modele         =b.modele
+ AND a.nature         =b.nature
+ AND b.id_trt         =c.id_trt
+ AND c.statut        IN ('PA','EX','DEMSEA')
+ AND NVL(c.code_retour_zpp,'00')='00'
+ AND b.PERIODE_PAIE   = p_PERIODEENCOURS
+ AND b.numero_echange<>'0000'
+ and e.id_trt=b.id_trt
+ AND EXISTS
+ (SELECT f.numpac,
+ f.pacmat
+ FROM GAP_RECYCL_MATRIC f
+ WHERE f.numpac=e.numpac
+ AND f.pacmat  =e.pacmat
+ )  AND d.numpac       =e.numpac
+ AND d.pacmat       =e.pacmat
+ AND z.numpac       =e.numpac
+ AND z.PAIEZAD      =d.paiezad
+ )  and PERIODE<=p_PERIODEENCOURS ;
+ 
+ delete from DELETED_PAIEZAD z where numpac=p_numpac AND DATE_SUPPRESSION<
+ 
+ ( SELECT max (b.DATE_DEBUT_TRT)
+ FROM TGE_SCHEMA_PRODUCTION a,
+ GAP_TRT b,
+ GAP_TRT_SUIVI c, GAP_TRT_LISTE_MAT e, DIC_ADM_CONTRAT_SITU d
+ WHERE a.numpac       =p_numpac
+ AND a.TYPE_PAIE     IN ('PRECONTR','CONTROLE','RECYCLAG','PARTICUL','REGLE','REGLEALL','GAPSELMA')
+ AND a.numpac         =b.numpac
+ AND a.modele         =b.modele
+ AND a.nature         =b.nature
+ AND b.id_trt         =c.id_trt
+ AND c.statut        IN ('PA','EX','DEMSEA')
+ AND NVL(c.code_retour_zpp,'00')='00'
+ AND b.PERIODE_PAIE   = p_PERIODEENCOURS
+ AND b.numero_echange<>'0000'
+ and e.id_trt=b.id_trt
+ AND EXISTS
+ (SELECT f.numpac,
+ f.pacmat
+ FROM GAP_RECYCL_MATRIC f
+ WHERE f.numpac=e.numpac
+ AND f.pacmat  =e.pacmat
+ )  AND d.numpac       =e.numpac
+ AND d.pacmat       =e.pacmat
+ AND z.pacmat       =d.pacmat
+ AND z.numpac       =e.numpac
+ AND z.PAIEZAD      =d.paiezad
+ ) ;
+ 
+ -- M+1 sur TGE_REF_PAC
+ update TGE_REF_PAC set periodeencours=to_char(add_months(to_date(periodeencours,'yyyymm'), 1),'yyyymm') where numpac=p_numpac;
+ 
+ merge into TGE_REF_PER a using (select p_numpac as numpac,to_char(add_months(to_date(p_PERIODEENCOURS,'yyyymm'), 1),'yyyymm') as periodeencours from dual) b on (a.numpac=b.numpac and a.periodeencours=b.periodeencours)
+ when matched then
+ update set a.DATE_DEBUT_MOIS=b.periodeencours||'01',a.DATE_FIN_MOIS= to_char(last_day(to_date(b.periodeencours,'yyyymm')),'yyyymmdd'),a.DERNIER_NUM_ECHANGE=nvl(a.DERNIER_NUM_ECHANGE,'0000')
+ when not matched then
+ insert (a.numpac,a.periodeencours,a.DATE_DEBUT_MOIS,a.DATE_FIN_MOIS,a.DERNIER_NUM_ECHANGE) values (b.numpac,b.periodeencours,b.periodeencours||'01', to_char(last_day(to_date(b.periodeencours,'yyyymm')),'yyyymmdd') ,'0000'      )
+ ;
+ -- purge histo technique
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'TGE_CLOTURE (avant purge histo)','Début de la purge pour le numpac : '||P_NUMPAC);
+ tge_purge_histo(p_numpac,to_char(add_months(to_date(p_PERIODEENCOURS,'yyyymm'), 1),'yyyymm'));
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'TGE_CLOTURE (après purge histo)','Fin de la purge pour le numpac : '||P_NUMPAC);
+ 
+ --BEGIN DIT 37805
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'TGE_CLOTURE (Begin Insert RELIQ)','Début d insertion dans les tables RELIQ_  pour le numpac : '||P_NUMPAC);
+ 
+ -- les tables TGE_RELIQ_* sont vidées pour le pac en question
+ tge_insert_reliq (p_id,p_numpac,p_PERIODEENCOURS);
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'TGE_CLOTURE (End Insert RELIQ)','Fin d insertion dans les tables RELIQ_  pour le numpac : '||P_NUMPAC);
+ 
+ -- Mise à jour secupacmat
+ update SECUPACMAT set PERIODE_RECYCLAGE=0 where numpac=p_numpac;
+ FSED.insert_gap_trt_suivi(p_id,'PERIODE_RECYCLAGE_0',null,'BATCH','CL');
+ -- purger table matricules en recyclage
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'TGE_CLOTURE (Purge RECYCL)','Purger table matricules en recyclage  pour le numpac : '||P_NUMPAC);
+ DELETE from GAP_RECYCL_MATRIC where numpac=p_numpac ;
+ DELETE from TGE_MODIF_PACMAT_TORESEND where numpac=p_numpac ;
+ DELETE from GAP_SELECTION_PACMAT where nomtraitement='RECYCLAG' and numpac=p_numpac;
+ 
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'TGE_CLOTURE (Purge RETRO)','Purger table matricules Rétro  pour le numpac : '||P_NUMPAC);
+ -- purger table matricules  RETRO
+ if P_DEB_RETRO is not null AND to_date(P_PERIODEENCOURS,'YYYYMM')>=to_date(P_DEB_RETRO,'YYYYMM') then
+ DELETE from GAP_RETRO_MATRIC where numpac=p_numpac ;
+ DELETE from GAP_RETRO_MATRIC_TRAITE where numpac=p_numpac ;
+ DELETE from TGE_MODIF_PACMAT_RETRO where numpac=p_numpac ;
+ DELETE from GAP_SELECTION_RETRO where  numpac=p_numpac;
+ END IF;
+ -- RSI Le 20/02/2015 DIT 41197 : Supprimer pour le pac en cours des matricules
+ -- sélectionnés dans GAP_SELECTION_PACMAT pour les natures de traitements associés à GAPSELMA dans TGE_SCHEMA_PRODUCTION
+ DELETE from GAP_SELECTION_PACMAT
+ where numpac= p_numpac
+ and nomtraitement in (select distinct NATURE from TGE_SCHEMA_PRODUCTION where type_paie =  'GAPSELMA' and date_fin is null and numpac=p_numpac);
+  
+ --On réactive les triggers pour que la colonne période de paie des incidents soit recalculée
+ delete bypass_trg_recycl_on_session;
+ 
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'TGE_CLOTURE (avant alimentation période recueil)','Début de la procédure d''alimentation des périodes de recueil pour le numpac '||P_NUMPAC);
+ TGE_ALIM_PERIODE_INDIV(p_id, p_numpac, TO_CHAR(ADD_MONTHS(TO_DATE(p_periodeencours,'yyyymm'), 1),'YYYYMM'), NULL);
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'TGE_CLOTURE (après alimentation période recueil)','Fin de la procédure d''alimentation des périodes de recueil pour le numpac '||P_NUMPAC);
+ 
+ --On désactive à nouveau les triggers
+ insert into bypass_trg_recycl_on_session(date_event, message) values (sysdate, 'Cloture en cours pour le NUMPAC : ' || p_numpac);
+ 
+ FSED.FSED_AVANCEMENT_PLSQL(p_id,'TGE_CLOTURE (end)','Fin de la clôture pour le numpac '||P_NUMPAC);
+ FSED.insert_gap_trt_suivi(p_id,'CLOTURE_OK',null,'BATCH','CL');
+ 
+ exception
+ when others then
+ FSED.FSED_ERREUR(p_id,'TGE_CLOTURE (raise)',P_NUMPAC,SQLCODE||'-'||SQLERRM);
+ update SECUPACMAT set PERIODE_RECYCLAGE=1 where numpac=p_numpac;
+ raise;
+ END TGE_CLOTURE;
+##
+TGE_REF_MAPDO
+==
+DELETE FROM TGE_REF_MAPDO WHERE NUMPAC='*' AND TABLEGXP='DIC_ADM_CONTRAT_HISTO' AND ELEMENT = 'P105'
+'*','P105','**','KMVELO','DIC_ADM_CONTRAT_HISTO',null,null,null,null,null,'N'

@@ -1,0 +1,204 @@
+##
+PURGE_HISTO_DIF_FSED
+=SQL=
+create or replace PROCEDURE PURGE_HISTO_DIF_FSED(
+    p_id     IN NUMBER,
+    P_NUMPAC IN VARCHAR2,
+    P_PERIODEENCOURS IN TGE_REF_PAC.PERIODEENCOURS%type,
+    P_DEB_RETRO IN  TGE_REF_PAC.DEB_RETRO%type,
+    P_DEB_HISTO_RETRO IN TGE_REF_PAC.DEB_HISTO_RETRO%type,
+    P_NB_MOIS_RETRO IN TGE_REF_PAC.NB_MOIS_RETRO%type,
+    P_PERIDOE_HISTO_LIMITE IN TGE_REF_PAC.PERIODEENCOURS%type)
+AS
+  P_REQ     VARCHAR2(2000);
+  w_isRetro NUMBER ;
+  w_periode_partition TGE_REF_PAC.PERIODEENCOURS%type;
+  w_subpartition_0 VARCHAR2(20);
+  w_subpartition VARCHAR2(20);
+  w_subpartition_del VARCHAR2(20);
+BEGIN
+
+  IF  to_date(P_PERIODEENCOURS,'YYYYMM')>=to_date(P_DEB_HISTO_RETRO,'YYYYMM') THEN
+      select to_char(ADD_MONTHS(TO_DATE(P_PERIODEENCOURS,'yyyymm'),1),'yyyymm') into w_periode_partition from dual;
+     FSED.FSED_AVANCEMENT_PLSQL(p_id,'Partitions des HISTO (DEB CREAT PARTITION DIF_FSED_HISTO)','Début Création des partitions  de la table DIF_FSED_HISTO avant purge');
+     
+  IF is_number(P_NUMPAC)IS NOT NULL THEN 
+     w_subpartition_0 := '"'||P_NUMPAC||'_000000"';
+     w_subpartition :='"'||P_NUMPAC||'_'||P_PERIODEENCOURS||'"';
+  ELSE
+     w_subpartition_0 :=P_NUMPAC;
+     w_subpartition :=P_NUMPAC||'_'||P_PERIODEENCOURS;
+  END IF; 
+    
+    BEGIN     
+      p_req := 'Alter TABLE DIF_FSED_HISTO add partition NUMPAC_'||P_NUMPAC||' VALUES('''||P_NUMPAC||''')(SUBPARTITION '||w_subpartition_0||'  VALUES LESS THAN(''000000'')) UPDATE INDEXES ';
+      FSED.FSED_AVANCEMENT_PLSQL(p_id,'CREATION PARTITION DIF_FSED_HISTO','Création partition NUMPAC_'||P_NUMPAC||'sur la table DIF_FSED_HISTO p_req '||p_req);
+      EXECUTE_IMMEDIATE_STRING( p_req,0);
+      FSED.FSED_AVANCEMENT_PLSQL(p_id,'CREATION PARTITION DIF_FSED_HISTO','Fin création partition NUMPAC_'||P_NUMPAC||'sur la table DIF_FSED_HISTO ');
+    EXCEPTION
+    WHEN OTHERS THEN
+      FSED.FSED_AVANCEMENT_PLSQL(p_id,'CREATION PARTITION DIF_FSED_HIST_RETRO','Partition NUMPAC_'||P_NUMPAC||'de la table DIF_FSED_HISTO existe');
+    END ;
+    BEGIN
+      p_req := 'ALTER TABLE DIF_FSED_HISTO  MODIFY PARTITION NUMPAC_'||P_NUMPAC||' ADD SUBPARTITION '||w_subpartition||' VALUES LESS THAN ('''||w_periode_partition||''') UPDATE INDEXES';
+      FSED.FSED_AVANCEMENT_PLSQL(p_id,'CREATION SOUS PARTITION DIF_FSED_HISTO','Création SOUS partition PERIODE_'||P_PERIODEENCOURS||' de NUMPAC_'||P_NUMPAC||'sur la table DIF_FSED_HISTO p_req '||p_req);
+      EXECUTE_IMMEDIATE_STRING( p_req,0);
+      FSED.FSED_AVANCEMENT_PLSQL(p_id,'CREATION SOUS PARTITION DIF_FSED_HISTO','Fin création SOUS partition PERIODE_'||P_PERIODEENCOURS||' de NUMPAC_'||P_NUMPAC||'sur la table DIF_FSED_HISTO ');
+    EXCEPTION
+    WHEN OTHERS THEN
+      FSED.FSED_AVANCEMENT_PLSQL(p_id,'CREATION PARTITION DIF_FSED_HISTO','SOUS partition PERIODE_'||P_PERIODEENCOURS||' de NUMPAC_'||P_NUMPAC||'sur la table DIF_FSED_HISTO existe ');
+    END ;
+    FSED.FSED_AVANCEMENT_PLSQL(p_id,'Partitions des HISTO (Fin CREAT PARTITION DIF_FSED_HISTO)','Fin Créatin des partitions  de la table DIF_FSED_HISTO avant purge');
+  
+    --purge de DIF_FSED_HISTO 
+    FSED.FSED_AVANCEMENT_PLSQL(p_id,'PURGE_HISTO_DIF_FSED (DEBUT Supp DIF_FSED_HISTO)','DEBUT Purge de la table DIF_FSED_HISTO  pour les periodes inférieurs à '||P_PERIDOE_HISTO_LIMITE);
+    FOR K IN
+    (SELECT DISTINCT periode
+    FROM DIF_FSED_HISTO
+    WHERE to_date(periode,'YYYYMM') <add_months(to_date(P_PERIODEENCOURS,'yyyymm'),-1*P_NB_MOIS_RETRO)
+    AND NUMPAC                      =P_NUMPAC
+    )
+    LOOP
+      IF is_number(P_NUMPAC)IS NOT NULL THEN 
+        w_subpartition_del :='"'||P_NUMPAC||'_'||K.PERIODE||'"';
+      ELSE
+        w_subpartition_del :=P_NUMPAC||'_'||K.PERIODE;
+      END IF;
+      p_req := 'ALTER TABLE DIF_FSED_HISTO TRUNCATE SUBPARTITION '||w_subpartition_del||' DROP STORAGE';
+      FSED.FSED_AVANCEMENT_PLSQL(p_id,'PURGE_HISTO_DIF_FSED ( Supp Sous partition DIF_FSED_HISTO)','suppression sous partition '||P_NUMPAC||'_'||K.PERIODE||' de DIF_FSED_HISTO p_req '||p_req);
+      EXECUTE_IMMEDIATE_STRING( p_req,0);
+      FSED.FSED_AVANCEMENT_PLSQL(p_id,'PURGE_HISTO_DIF_FSED ( Fin Supp Sous partition DIF_FSED_HISTO)','Fin suppression sous partition '||P_NUMPAC||'_'||K.PERIODE||' de DIF_FSED_HISTO ');
+    END LOOP;
+    FSED.FSED_AVANCEMENT_PLSQL(p_id,'PURGE_HISTO_DIF_FSED (FIN Supp DIF_FSED_HISTO)','FIN Purge de la table DIF_FSED_HISTO  pour les periodes inférieurs à '||P_PERIDOE_HISTO_LIMITE);
+    --historisation
+    FSED.FSED_AVANCEMENT_PLSQL(p_id,'PURGE_HISTO_DIF_FSED (Debut INSERT de DIF_FSED IN DIF_FSED_HISTO)','Remplissage  de la table DIF_FSED_HISTO à partir de DIF_FSED');
+    --Merge 1
+    MERGE INTO DIF_FSED_HISTO T USING
+    (SELECT p_PERIODEENCOURS AS PERIODE,
+      NUMPAC ,
+      CLE ,
+      PACMAT ,
+      PAIEZAD ,
+      ELEM ,
+      OCC ,
+      VALEUR ,
+      CODEOP ,
+      TYPE_DONNEE ,
+      DTEFFET
+    FROM DIF_FSED z
+    WHERE NUMPAC = p_numpac
+    AND ID_TRT   =
+      ( SELECT max(ID_TRT)  from GAP_TRT_DERNIER_ENVOI  e
+      WHERE z.pacmat =e.pacmat
+      AND z.numpac   =e.numpac
+      AND z.PAIEZAD  =e.paiezad
+      )
+    )i ON (i.PERIODE= T.PERIODE AND i.NUMPAC=T.NUMPAC AND i.CLE=T.CLE AND i.PACMAT=T.PACMAT AND i.PAIEZAD=T.PAIEZAD AND i.ELEM=T.ELEM AND i.OCC=T.OCC)
+  WHEN NOT MATCHED THEN
+    INSERT
+      (
+        PERIODE,
+        NUMPAC,
+        CLE,
+        PACMAT,
+        PAIEZAD,
+        ELEM,
+        OCC,
+        VALEUR,
+        CODEOP,
+        TYPE_DONNEE,
+        DTEFFET
+      )
+      VALUES
+      (
+        i.PERIODE,
+        i.NUMPAC,
+        i.CLE,
+        i.PACMAT,
+        i.PAIEZAD,
+        i.ELEM,
+        i.OCC,
+        i.VALEUR,
+        i.CODEOP,
+        i.TYPE_DONNEE,
+        i.DTEFFET
+      );
+    FSED.FSED_AVANCEMENT_PLSQL(p_id,'PURGE_HISTO_DIF_FSED (Fin INSERT de DIF_FSED IN DIF_FSED_HISTO)','Fin remplissage  de la table DIF_FSED_HISTO à partir de DIF_FSED ');
+    --DELETE 1
+    FSED.FSED_AVANCEMENT_PLSQL(p_id,'PURGE_HISTO_DIF_FSED (DEBUT DELETE de DIF_FSED_HISTO)','Supression de DIF_FSED_HISTO dont la référence numpac/pacmat/periode est dans DIF_FSED_PARTIERETRO par périodes ');   
+    DELETE
+    FROM DIF_FSED_HISTO retro
+    WHERE retro.numpac=p_numpac
+    AND EXISTS
+        (SELECT 1
+        FROM DIF_FSED_PARTIERETRO z
+        WHERE z.paiezad                =retro.paiezad
+        AND z.pacmat                   =retro.pacmat
+        AND z.numpac                   =retro.numpac
+        AND z.periode                  =retro.periode
+        AND z.ID_TRT                   =
+          (SELECT max(ID_TRT)  from GAP_TRT_DERNIER_ENVOI  e         
+          WHERE z.pacmat  =e.pacmat
+          AND z.numpac    =e.numpac
+          AND z.PAIEZAD   =e.paiezad
+          )
+        );
+       FSED.FSED_AVANCEMENT_PLSQL(p_id,'PURGE_HISTO_DIF_FSED (FIN DELETE de DIF_FSED_HISTO)','Fin Supression de DIF_FSED_HISTO');   
+       --MERGE 2 
+       FSED.FSED_AVANCEMENT_PLSQL(p_id,'PURGE_HISTO_DIF_FSED (DEBUT INSERT de DIF_FSED_PARTIERETRO IN DIF_FSED_HISTO)','Remplissage de la table DIF_FSED_HISTO à partir de DIF_FSED_PARTIERETRO ');
+        MERGE INTO DIF_FSED_HISTO T USING
+         (SELECT r.PERIODE AS PERIODE,
+                 r.NUMPAC ,
+                 r.CLE ,
+                 r.PACMAT ,
+                 r.PAIEZAD ,
+                 r.ELEM ,
+                 r.OCC ,
+                 r.VALEUR ,
+                 r.CODEOP ,
+                 r.TYPE_DONNEE ,
+                 r.DTEFFET
+       FROM DIF_FSED_PARTIERETRO r
+       WHERE r.NUMPAC   = p_numpac
+       AND   r.ID_TRT  =
+          (SELECT max(ID_TRT)  from GAP_TRT_DERNIER_ENVOI  e          
+          WHERE r.pacmat =e.pacmat
+          AND r.numpac   =e.numpac
+          AND r.PAIEZAD  =e.paiezad
+          )
+     )i ON (i.PERIODE= T.PERIODE AND i.NUMPAC=T.NUMPAC AND i.PACMAT=T.PACMAT AND i.PAIEZAD=T.PAIEZAD AND i.ELEM=T.ELEM AND i.OCC=T.OCC)
+    WHEN NOT MATCHED THEN
+     INSERT
+      (PERIODE,
+       NUMPAC,
+       CLE,
+       PACMAT,
+       PAIEZAD,
+       ELEM,
+       OCC,
+       VALEUR,
+       CODEOP,
+       TYPE_DONNEE,
+       DTEFFET)
+     VALUES
+      (i.PERIODE,
+       i.NUMPAC,
+       i.CLE,
+       i.PACMAT,
+       i.PAIEZAD,
+       i.ELEM,
+       i.OCC,
+       i.VALEUR,
+       i.CODEOP,
+       i.TYPE_DONNEE,
+       i.DTEFFET);
+       FSED.FSED_AVANCEMENT_PLSQL(p_id,'PURGE_HISTO_DIF_FSED (FIN INSERT de DIF_FSED_PARTIERETRO IN DIF_FSED_HISTO)','Fin remplissage de la table DIF_FSED_HISTO à partir de DIF_FSED_PARTIERETRO ');
+
+  END IF;
+  
+EXCEPTION
+WHEN OTHERS THEN
+  FSED.FSED_AVANCEMENT_PLSQL(p_id,'PURGE_HISTO_DIF_FSED  ', 'Une erreur est survenue lors de l historisation Rétro de DIF_FSED . Veuillez consulter la table TGE_FSED_ERREUR.');
+  FSED.FSED_ERREUR(p_id,'PURGE_HISTO_DIF_FSED',P_NUMPAC,SQLCODE||'-'||SQLERRM);
+  raise;
+END PURGE_HISTO_DIF_FSED;

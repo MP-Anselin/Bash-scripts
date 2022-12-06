@@ -1,0 +1,151 @@
+##
+ADD_TUILES_ACCUEIL
+=SQL=
+CREATE OR REPLACE PROCEDURE ADD_TUILES_ACCUEIL
+AS
+  CURSOR CUR_ELEMENT
+  IS
+    SELECT DISTINCT S.code_element,
+      S.LIBELLE,
+      SCH.ORDRE
+    FROM SYS_SCH_ELEMENT S,
+      SYS_SCH_LISTE L,
+      SYS_SCHEMAS SCH
+    WHERE SCH.code_schema = L.code_schema
+    AND L.NOM_SCHEMA      = upper('COUGAR')
+    AND sch.niveau        = 2
+    AND s.niveau          =sch.niveau
+    AND s.code_element    =sch.CODE_ELT
+    AND S.CODE_ROLE = 3
+    ORDER BY SCH.ORDRE;
+  v_exist NUMBER :=0;
+  v_CODE_REGROUP SYS_ACCUEIL.CODE_REGROUP%TYPE;
+  v_ACTIF SYS_ACCUEIL.ACTIF%TYPE;
+BEGIN
+  FOR C IN CUR_ELEMENT
+  LOOP
+    BEGIN
+      SELECT 1,
+        CODE_REGROUP,
+        ACTIF
+      INTO v_exist,
+        v_CODE_REGROUP,
+        v_ACTIF
+      FROM SYS_ACCUEIL
+      WHERE TYPE_CADRE = -6
+      AND CODE_REGROUP =C.CODE_ELEMENT;
+    EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      v_exist :=0;
+    END ;
+    IF (v_exist=1 AND v_ACTIF='O') THEN
+      INSERT
+      INTO SYS_ACCUEIL
+        (
+          LOGIN,
+          CODE_REGROUP,
+          CODE_CADRE,
+          ACTIF,
+          LIBELLE,
+          TYPE_CADRE,
+          ETENDU
+        )
+      SELECT '*',
+        C.CODE_ELEMENT,
+        (SELECT
+          (SELECT NVL(MAX(CODE_CADRE),0)
+          FROM SYS_ACCUEIL
+          WHERE CODE_REGROUP = C.CODE_ELEMENT
+          ) + 1
+        FROM dual
+        ),
+        AVEC_WKF,
+        'Tâches en attente',
+        -21,
+        'N'
+      FROM SYS_ACCUEIL_ACTIONS
+      WHERE CODE_REGROUP = C.CODE_ELEMENT;
+      INSERT
+      INTO SYS_ACCUEIL
+        (
+          LOGIN,
+          CODE_REGROUP,
+          CODE_CADRE,
+          ACTIF,
+          LIBELLE,
+          TYPE_CADRE,
+          ETENDU
+        )
+      SELECT '*',
+        C.CODE_ELEMENT,
+        (SELECT
+          (SELECT NVL(MAX(CODE_CADRE),0)
+          FROM SYS_ACCUEIL
+          WHERE CODE_REGROUP = C.CODE_ELEMENT
+          ) + 1
+        FROM dual
+        ),
+        AVEC_SUIVI,
+        'Demandes en cours',
+        -22,
+        'N'
+      FROM SYS_ACCUEIL_ACTIONS
+      WHERE CODE_REGROUP = C.CODE_ELEMENT;
+    ELSE
+      INSERT
+      INTO SYS_ACCUEIL
+        (
+          LOGIN,
+          CODE_REGROUP,
+          CODE_CADRE,
+          ACTIF,
+          LIBELLE,
+          TYPE_CADRE,
+          ETENDU
+        )
+        VALUES
+        (
+          '*',
+          C.CODE_ELEMENT,
+          (SELECT
+            (SELECT NVL(MAX(CODE_CADRE),0)
+            FROM SYS_ACCUEIL
+            WHERE CODE_REGROUP = C.CODE_ELEMENT
+            ) + 1
+          FROM dual
+          ),
+          'N',
+          'Tâches en attente',
+          -21,
+          'N'
+        );
+      INSERT
+      INTO SYS_ACCUEIL
+        (
+          LOGIN,
+          CODE_REGROUP,
+          CODE_CADRE,
+          ACTIF,
+          LIBELLE,
+          TYPE_CADRE,
+          ETENDU
+        )
+        VALUES
+        (
+          '*',
+          C.CODE_ELEMENT,
+          (SELECT
+            (SELECT NVL(MAX(CODE_CADRE),0)
+            FROM SYS_ACCUEIL
+            WHERE CODE_REGROUP = C.CODE_ELEMENT
+            ) + 1
+          FROM dual
+          ),
+          'N',
+          'Demandes en cours',
+          -22,
+          'N'
+        );
+    END IF;
+  END LOOP;
+END ADD_TUILES_ACCUEIL;

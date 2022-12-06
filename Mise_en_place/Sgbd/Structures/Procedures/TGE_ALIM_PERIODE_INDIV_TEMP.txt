@@ -1,0 +1,381 @@
+##
+TAG_CHARSET=@€éèç
+##
+TGE_ALIM_PERIODE_INDIV_TEMP
+=SQL=
+create or replace PROCEDURE TGE_ALIM_PERIODE_INDIV_TEMP( p_id           IN NUMBER, p_numpac       IN VARCHAR2, p_pacmat       IN VARCHAR2,
+ p_periode_paie IN VARCHAR2,
+ out_req OUT CLOB,
+ recueil_photo IN BOOLEAN DEFAULT TRUE)
+ AS
+ w_Y326                 VARCHAR2(4000 BYTE);
+ w_Y327                 VARCHAR2(4000 BYTE);
+ w_A302                 VARCHAR2(4000 BYTE);
+ w_A301                 VARCHAR2(4000 BYTE);
+ w_A520                 VARCHAR2(4000 BYTE);
+ w_A521                 VARCHAR2(4000 BYTE);
+ w_A523                 VARCHAR2(4000 BYTE);
+ w_AB43                 VARCHAR2(4000 BYTE);
+ w_AB44                 VARCHAR2(4000 BYTE);
+ periode_paie_en_cours  VARCHAR2(6);
+ periode_deb_retro      VARCHAR2(6);
+ optionEcp      VARCHAR2(1);
+ v_multiClient NUMBER;
+ 
+ A01_NOM_ELT    VARCHAR2(20);
+ A02_NOM_ELT    VARCHAR2(20);
+ A03_NOM_ELT    VARCHAR2(20);
+ requeteMappingPivot  VARCHAR2(3000);
+ 
+ BEGIN
+ /**
+  * Dans le cadre du multiclient, la table MULTICLIENT_REF_PAC permet d'associer un NUMPAC avec un COMPANY_ID (CID).
+  * si cette table existe, cela signifie que l'on est en mode multiclient
+ */
+ select count(*) into v_multiClient from USER_TABLES where TABLE_NAME = 'MULTICLIENT_REF_PAC';
+ TGE_IMPORT_AVANCEMENT_proc('TGE_ALIM_PER','TGE_ALIM_PERIODE_INDIV_TEMP début (' || p_id || ',' || p_numpac || ',' || p_pacmat || ',' || p_periode_paie || ')');
+ BEGIN
+ --Alimentation des informations sur le pac
+ SELECT PERIODEENCOURS, DEB_RETRO, OPTION_ECP
+ INTO periode_paie_en_cours, periode_deb_retro, optionEcp
+ FROM TGE_REF_PAC
+ WHERE NUMPAC = p_numpac;
+ --- Calcul des noms d'elements depuis tge_map_arg_elt
+ select A01_NOM_ELT, A02_NOM_ELT, A03_NOM_ELT
+ into   A01_NOM_ELT, A02_NOM_ELT, A03_NOM_ELT
+ from (
+ SELECT NOM_ARG,NOM_ELT FROM TABLE(GET_TGE_MAP_ARG_ELT_BY_NUMPAC(p_numpac))
+ )
+ pivot (MAX(NOM_ELT) AS NOM_ELT FOR (NOM_ARG) in ('A01' AS A01,'A02' AS A02,'A03' AS A03));
+ 
+ 
+ --Alimentation des informations sur le mapping des données
+ requeteMappingPivot :='SELECT
+ Y326_DONNEE ,
+ Y327_DONNEE ,
+ A302_DONNEE ,
+ A301_DONNEE ,
+ A520_DONNEE ,
+ A521_DONNEE ,
+ A523_DONNEE ,
+ AB43_DONNEE ,
+ AB44_DONNEE
+ FROM (
+ SELECT DISTINCT c.element,
+ NVL(REPLACE(REPLACE(c.trtparticulier, ''$DONNEEGXP'', ''$TABLE.'' || c.donneegxp), ''$TABLE'', c.tablegxp), c.tablegxp || ''.'' || c.donneegxp) AS DONNEEGXP
+ FROM tge_ref_mapdo c
+ WHERE C.numpac = '''|| p_numpac ||'''
+ AND c.element IN (''Y326'',''Y327'',''A302'',''A301'','''||A01_NOM_ELT||''','''||A02_NOM_ELT||''','''|| A03_NOM_ELT||''',''BA50'',''BA51'')
+ UNION ALL
+ SELECT DISTINCT c.element,
+ NVL(REPLACE(REPLACE(c.trtparticulier, ''$DONNEEGXP'', ''$TABLE.'' || c.donneegxp), ''$TABLE'', c.tablegxp), c.tablegxp || ''.'' || c.donneegxp) AS DONNEEGXP
+ FROM tge_ref_mapdo c
+ WHERE C.numpac = ''*''
+ AND c.element IN (''Y326'',''Y327'',''A302'',''A301'','''||A01_NOM_ELT||''','''||A02_NOM_ELT||''','''|| A03_NOM_ELT||''',''BA50'',''BA51'')
+ AND (c.ELEMENT) NOT IN
+ (
+ SELECT a.element
+ FROM tge_ref_mapdo a
+ WHERE a.numpac = '''|| p_numpac ||'''
+ AND A.ELEMENT IN (''Y326'',''Y327'',''A302'',''A301'','''||A01_NOM_ELT||''','''||A02_NOM_ELT||''','''|| A03_NOM_ELT||''',''BA50'',''BA51'')
+ )
+ ) pivot ( MAX(DONNEEGXP) AS DONNEE FOR (element)
+ IN(''Y326'' AS Y326 ,''Y327'' AS Y327 ,''A302'' AS A302,''A301'' AS A301 ,'''||A01_NOM_ELT||''' AS A520 ,'''||A02_NOM_ELT||''' AS A521,'''||A03_NOM_ELT||''' AS A523,''BA50'' AS AB43,''BA51'' AS AB44))
+ ';
+ EXECUTE IMMEDIATE
+ requeteMappingPivot
+ INTO w_Y326,
+ w_Y327,
+ w_A302,
+ w_A301,
+ w_A520,
+ w_A521,
+ w_A523,
+ w_AB43,
+ w_AB44;
+ EXCEPTION
+ WHEN NO_DATA_FOUND THEN
+ TGE_IMPORT_AVANCEMENT_proc('TGE_ALIM_PER','TGE_ALIM_PERIODE_INDIV_TEMP ERR : Erreurs de configuration de TGE_REF_MAPDO : NUMPAC = ''' || p_numpac || ''' AND ELEMENT in (''Y326'',''Y327'',''A302'',''A301'',''A520'',''A521'',''A523'')');
+ raise;
+ END;
+ 
+ out_req := 'SELECT l.numpac, l.pacmat, l.PAIEZAD, l.debut_forcee, l.fin_forcee, l.entree, l.sortie, l.retour_susp, l.depart_susp, l.debut_situ, l.fin_situ, l.DT_RECUEIL_DEB, l.DT_RECUEIL_FIN, l.retro_gc, l.MOIS_PAIE, l.DATE_DEB_PERIODE, l.DATE_FIN_PERIODE, l.DSFCN, l.DSDCN from (
+ SELECT
+ dach_tmp_sus.numpac,
+ dach_tmp_sus.pacmat,
+ dach_tmp_sus.PAIEZAD,
+ dach_tmp_sus.debut_forcee,
+ dach_tmp_sus.fin_forcee,
+ dach_tmp_sus.debut_situ as entree,
+ dach_tmp_sus.fin_situ as sortie ,'
+ || w_A302 || '+1 as retour_susp,  ' --pseudo date de retour de suspension / réembaucher
+ || w_A301 || '-1 as depart_susp,  ' --pseudo date de départ en suspension
+ || '
+ dach_tmp_sus.debut_situ,
+ dach_tmp_sus.fin_situ,
+ dach_tmp_sus.DT_RECUEIL_DEB,
+ dach_tmp_sus.DT_RECUEIL_FIN,
+ dach_tmp_sus.retro_gc,
+ dach_tmp_sus.NUMCNT,
+ dach_tmp_sus.DATE_EFF,
+ dach_tmp_sus.DSFCN,
+ dach_tmp_sus.DSDCN,
+ ' || w_A301 || ' AS sous_DSA301,
+ ' || w_A302 || ' AS sous_DSA302,
+ MOIS_PAIE,DATE_DEB_PERIODE,DATE_FIN_PERIODE
+ FROM (
+ select VR.numpac,VR.pacmat,VR.PAIEZAD,VR.NUMCNT,VR.DATE_EFF,VR.DSFCN,VR.DSDCN,VR.debut_forcee,VR.fin_forcee,VR.debut_situ,VR.fin_situ,VR.MOIS_PAIE,VR.DATE_DEB_PERIODE,VR.DATE_FIN_PERIODE,
+ CASE
+ WHEN TO_CHAR(VR.debut_forcee,''YYYYMMDD'') IS NOT NULL
+ THEN VR.debut_forcee
+ ELSE ';
+ IF v_multiClient > 0 THEN
+ out_req := out_req || ' DEBUT_PERIODE ';
+ ELSE
+ out_req := out_req || ' to_date(SUBSTR(TGE_REF_VRVAL.ENREGISTREMENT, 29, 8), ''DDMMYYYY'') ';
+ END IF;
+ out_req := out_req || 'END AS DT_RECUEIL_DEB,
+ CASE
+ WHEN TO_CHAR(VR.fin_forcee,''YYYYMMDD'') IS NOT NULL
+ THEN VR.fin_forcee
+ ELSE ';
+ IF v_multiClient > 0 THEN
+ out_req := out_req || ' FIN_PERIODE ';
+ ELSE
+ out_req := out_req || ' to_date(SUBSTR(TGE_REF_VRVAL.ENREGISTREMENT, 37, 8), ''DDMMYYYY'') ';
+ END IF;
+ out_req := out_req || 'END AS DT_RECUEIL_FIN,  ';
+ IF periode_deb_retro IS NULL OR periode_deb_retro > periode_paie_en_cours THEN
+ out_req := out_req || ' TGE_PERIODE_RECUEIL_PAIEZAD_R.retro_gc,  ';
+ ELSE
+ out_req := out_req || ' null as retro_gc, ';
+ END IF;
+ out_req := out_req || '(
+ select max(dach_tmp.date_eff) from ';
+ IF recueil_photo THEN
+ 	IF v_multiClient > 0 THEN
+	 	out_req := out_req || ' PHOTO_DIC_ADM_CONTRAT_HISTO1 DIC_ADM_CONTRAT_HISTO1 ';
+	 ELSE 
+	 	out_req := out_req || ' PHOTO_DIC_ADM_CONTRAT_HISTO DIC_ADM_CONTRAT_HISTO ';
+	 END IF;
+ ELSE
+ IF v_multiClient > 0 THEN
+ 	out_req := out_req || ' dic_adm_contrat_histo1 ';
+ ELSE 
+ 	out_req := out_req || ' dic_adm_contrat_histo ';
+ END IF;
+ END IF;
+ out_req := out_req || ' dach_tmp ';
+ IF v_multiClient > 0 THEN
+ 	out_req := out_req || ' where dach_tmp.CTR_CNCSUS is not null
+ 	and dach_tmp.CTR_CNDSUS-1 <= last_day(to_date(''' || p_periode_paie || '''||''01'',''YYYYMMDD''))
+ 	and dach_tmp.CTR_CNFSUS+1 >=  DEBUT_PERIODE ';
+ ELSE 
+ 	out_req := out_req || 'where dach_tmp.ZA962 is not null
+ 	and dach_tmp.DSA301-1 <= last_day(to_date(''' || p_periode_paie || '''||''01'',''YYYYMMDD''))
+ 	and nvl(dach_tmp.DSA302, dach_tmp.dsfsus)+1 >= to_date(SUBSTR(TGE_REF_VRVAL.ENREGISTREMENT, 29, 8), ''DDMMYYYY'') ';
+ END IF;
+ out_req := out_req || ' and dach_tmp.date_eff <= last_day(to_date(''' || p_periode_paie || '''||''01'',''YYYYMMDD'')) + 1
+ and dach_tmp.numpac = VR.NUMPAC
+ and dach_tmp.pacmat = VR.PACMAT
+ and dach_tmp.paiezad = VR.PAIEZAD
+ ) as date_eff_sus
+ 
+ from ( ';
+ IF v_multiClient > 0 THEN
+	out_req := out_req || ' select COM.numpac,pacmat,PAIEZAD,NUMCNT,DATE_EFF,DSFCN,DSDCN,debut_forcee,fin_forcee,debut_situ,fin_situ,MOIS_PAIE,DATE_DEB_PERIODE,DATE_FIN_PERIODE ';
+ ELSE
+ 	out_req := out_req || ' select numpac,pacmat,PAIEZAD,NUMCNT,DATE_EFF,DSFCN,DSDCN,debut_forcee,fin_forcee,debut_situ,fin_situ,NUMERO_DE_PAC,CODE_TABLE,MOIS_PAIE,DATE_DEB_PERIODE,DATE_FIN_PERIODE,MIN(NUMERO_DE_LIGNE) as min_NUMERO_DE_LIGNE  ';
+ END IF;
+ out_req := out_req || ' from (SELECT CO.* FROM (select
+ DIC_ADM_CONTRAT_SITU.numpac as numpac,
+ DIC_ADM_CONTRAT_SITU.pacmat as pacmat,
+ DIC_ADM_CONTRAT_SITU.PAIEZAD as paiezad,
+ DIC_ADM_CONTRAT.DSDCN                 AS DSDCN,
+ DIC_ADM_CONTRAT.DSFCN                 AS DSFCN,
+ DIC_ADM_CONTRAT_HISTO.NUMCNT          AS NUMCNT,
+ DIC_ADM_CONTRAT_HISTO.DATE_EFF        AS DATE_EFF, ';
+ IF v_multiClient > 0 THEN
+ 	out_req := out_req || 'null as debut_forcee,
+ 	null as fin_forcee,
+ 	DIC_ADM_CONTRAT_SITU.DSDSC as debut_situ,
+ 	NVL( DIC_ADM_CONTRAT_SITU.DSFSC, TO_DATE(''20991231'',''YYYYMMDD'')) as fin_situ,';
+ ELSE 
+	 out_req := out_req || w_Y326 || ' as debut_forcee,
+	 ' || w_Y327 || ' as fin_forcee,
+	 ' || w_AB43 || ' as debut_situ,
+	 NVL(' || w_AB44 || ', TO_DATE(''20991231'',''YYYYMMDD'')) as fin_situ,
+	 ' || w_A520 || ' as activite,
+	 ' || w_A521 || ' as etablissement,
+	 ' || w_A523 || ' as categorie,';
+ END IF;
+ out_req := out_req || ' DIC_ADM_CONTRAT_HISTO.MOIS_PAIE,
+ DIC_ADM_CONTRAT_HISTO.DATE_DEB_PERIODE,
+ DIC_ADM_CONTRAT_HISTO.DATE_FIN_PERIODE
+ FROM  ';
+ IF recueil_photo THEN
+ out_req := out_req || ' (SELECT NUMPAC, PACMAT, NUMCNT, CURRENT_PAIEZAD as PAIEZAD, DSDCN as DSDSC, NVL(DSFCN,TO_DATE(''20991231'',''yyyymmdd'')) as DSFSC
+ FROM PHOTO_DIC_ADM_CONTRAT WHERE paiezad IS NOT NULL) DIC_ADM_CONTRAT_SITU ';
+ ELSE
+ out_req := out_req || ' DIC_ADM_CONTRAT_SITU ';
+ END IF;
+ IF v_multiClient = 0 THEN
+	 out_req := out_req || '
+	 left join DIC_PERIODES_RECUEIL_HIS
+	 on DIC_PERIODES_RECUEIL_HIS.numpac = DIC_ADM_CONTRAT_SITU.numpac
+	 AND DIC_PERIODES_RECUEIL_HIS.paiezad = DIC_ADM_CONTRAT_SITU.paiezad
+	 AND DIC_PERIODES_RECUEIL_HIS.PRH_MOIS_PAIE = ''' || p_periode_paie || ''' ';
+ END IF;
+ out_req := out_req || ' inner join  ';
+ IF recueil_photo THEN
+ out_req := out_req || ' PHOTO_DIC_ADM_CONTRAT DIC_ADM_CONTRAT ';
+ ELSE
+ out_req := out_req || ' DIC_ADM_CONTRAT ';
+ END IF;
+ out_req := out_req || '
+ on DIC_ADM_CONTRAT.NUMPAC=DIC_ADM_CONTRAT_SITU.NUMPAC
+ AND DIC_ADM_CONTRAT.PACMAT=DIC_ADM_CONTRAT_SITU.PACMAT
+ AND DIC_ADM_CONTRAT.NUMCNT=DIC_ADM_CONTRAT_SITU.NUMCNT
+ left join ( SELECT  DIC_ADM_CONTRAT_HISTO.*,C.MOIS_PAIE, C.DATE_DEB_PERIODE_PREC, C.DATE_DEB_PERIODE, C.DATE_FIN_PERIODE
+ FROM (
+ SELECT distinct DACH_MAX_DATE_EFF.NUMPAC,
+ DACH_MAX_DATE_EFF.PAIEZAD,
+ DACH_MAX_DATE_EFF.PACMAT,
+ ''' || p_periode_paie || ''' MOIS_PAIE,
+ TO_DATE(TO_CHAR(ADD_MONTHS(TO_DATE(''' || p_periode_paie || ''',''yyyymm''),-1),''YYYYMM'')||''01'',''yyyymmdd'') DATE_DEB_PERIODE_PREC,
+ TO_DATE(''' || p_periode_paie || '''||''01'',''yyyymmdd'') DATE_DEB_PERIODE,
+ last_day(to_date(''' || p_periode_paie || '''||''01'',''yyyymmdd'')) DATE_FIN_PERIODE,
+ MAX(DACH_MAX_DATE_EFF.DATE_EFF)  over (partition BY DACH_MAX_DATE_EFF.NUMPAC, DACH_MAX_DATE_EFF.PAIEZAD, DACH_MAX_DATE_EFF.PACMAT) AS max_date_eff
+ FROM ';
+ IF recueil_photo THEN
+ out_req := out_req || ' PHOTO_DIC_ADM_CONTRAT_HISTO ';
+ ELSE
+ out_req := out_req || ' DIC_ADM_CONTRAT_HISTO ';
+ END IF;
+ out_req := out_req || ' DACH_MAX_DATE_EFF
+ WHERE DACH_MAX_DATE_EFF.NUMPAC = ''' || p_numpac || ''' ';
+ IF p_pacmat IS NOT NULL THEN
+ out_req := out_req || ' AND PACMAT = ''' || p_pacmat || ''' ';
+ END IF;
+ out_req := out_req || '  AND DACH_MAX_DATE_EFF.DATE_EFF <= last_day(TO_DATE( ''' || p_periode_paie || '''||''01'',''yyyymmdd''))
+ ) C
+ inner join ';
+ IF recueil_photo THEN
+ out_req := out_req || ' PHOTO_DIC_ADM_CONTRAT_HISTO DIC_ADM_CONTRAT_HISTO ';
+ ELSE
+ out_req := out_req || ' DIC_ADM_CONTRAT_HISTO ';
+ END IF;
+ out_req := out_req || ' on
+ DIC_ADM_CONTRAT_HISTO.NUMPAC = C.NUMPAC
+ AND DIC_ADM_CONTRAT_HISTO.paiezad = C.paiezad
+ AND DIC_ADM_CONTRAT_HISTO.PACMAT = C.PACMAT
+ AND DIC_ADM_CONTRAT_HISTO.DATE_EFF = C.max_date_eff
+ ) DIC_ADM_CONTRAT_HISTO
+ on DIC_ADM_CONTRAT_HISTO.NUMCNT=DIC_ADM_CONTRAT_SITU.NUMCNT
+ AND DIC_ADM_CONTRAT_HISTO.NUMPAC=DIC_ADM_CONTRAT_SITU.NUMPAC
+ AND DIC_ADM_CONTRAT_HISTO.paiezad = DIC_ADM_CONTRAT_SITU.paiezad ';
+ IF v_multiClient > 0 THEN
+ 	out_req := out_req || '  WHERE (DIC_ADM_CONTRAT.ADZ_ADZCODE05 IS NULL OR DIC_ADM_CONTRAT_HISTO.DRPAI2 != ''B'')
+ 	AND (DIC_ADM_CONTRAT.NATCOL IS NULL OR DIC_ADM_CONTRAT.NATCOL in (''SAL'',''STA''))
+ 	AND NVL(DIC_ADM_CONTRAT_SITU.DSFSC, TO_DATE(''20991231'',''YYYYMMDD'')) >= DIC_ADM_CONTRAT_HISTO.DATE_DEB_PERIODE_PREC
+ 	AND NVL(DIC_ADM_CONTRAT_HISTO.DATE_EFF, DIC_ADM_CONTRAT_SITU.DSDSC) <= DIC_ADM_CONTRAT_HISTO.DATE_FIN_PERIODE
+ 	) CO ) COM
+ 	) VR inner join TGE_REF_LTP on TGE_REF_LTP.NUMPAC = VR.NUMPAC  AND TGE_REF_LTP.MOIS_PAIE = ''' || p_periode_paie || ''' ';
+ ELSE 
+	 out_req := out_req || '  AND DIC_ADM_CONTRAT_HISTO.PACMAT=DIC_ADM_CONTRAT_SITU.PACMAT
+	 WHERE (DIC_ADM_CONTRAT_HISTO.ZA750 IS NULL OR DIC_ADM_CONTRAT_HISTO.DRPAI2 != ''B'')
+	 AND (DIC_ADM_CONTRAT.NATCOL IS NULL OR DIC_ADM_CONTRAT.NATCOL in (''SAL'',''STA''))
+	 AND NVL(' || w_AB44 || ', TO_DATE(''20991231'',''YYYYMMDD'')) >= DIC_ADM_CONTRAT_HISTO.DATE_DEB_PERIODE_PREC
+	 AND NVL(DIC_ADM_CONTRAT_HISTO.DATE_EFF, ' || w_AB43 || ') <= DIC_ADM_CONTRAT_HISTO.DATE_FIN_PERIODE
+	 ) CO
+	 ) COM,TGE_REF_VRVAL
+	 WHERE TGE_REF_VRVAL.CODE_TABLE = ''LTP''
+	 AND TGE_REF_VRVAL.NUMERO_DE_PAC = COM.NUMPAC
+	 AND SUBSTR(TGE_REF_VRVAL.ENREGISTREMENT, 19 , 6 ) = SUBSTR(COM.MOIS_PAIE,5, 2)||SUBSTR(COM.MOIS_PAIE,1, 4) ';
+	 
+	 IF optionEcp IS NOT NULL AND optionEcp = 'P' THEN
+	 out_req := out_req || '
+	 AND TRIM(LPAD(COM.activite,2)) BETWEEN LPAD(SUBSTR(TGE_REF_VRVAL.ENREGISTREMENT,1 ,2),2) AND LPAD(SUBSTR(TGE_REF_VRVAL.ENREGISTREMENT,3,2),2)
+	 AND TRIM(LPAD(COM.etablissement,5)) BETWEEN LPAD(SUBSTR(TGE_REF_VRVAL.ENREGISTREMENT,5 ,5),5) AND LPAD(SUBSTR(TGE_REF_VRVAL.ENREGISTREMENT,10,5),5)
+	 AND TRIM(LPAD(COM.categorie,2)) BETWEEN LPAD(SUBSTR(TGE_REF_VRVAL.ENREGISTREMENT,15,2),2) AND LPAD(SUBSTR(TGE_REF_VRVAL.ENREGISTREMENT,17,2),2)
+	 ';
+	 ELSE
+	 out_req := out_req || '
+	 AND IS_BETWEEN_NLS_FRENCH(TRIM(LPAD(COM.activite,2)),LPAD(SUBSTR(TGE_REF_VRVAL.ENREGISTREMENT,1 ,2),2), LPAD(SUBSTR(TGE_REF_VRVAL.ENREGISTREMENT,3,2),2) )  = ''TRUE''
+	 AND IS_BETWEEN_NLS_FRENCH(TRIM(LPAD(COM.etablissement,5)),LPAD(SUBSTR(TGE_REF_VRVAL.ENREGISTREMENT,5 ,5),5), LPAD(SUBSTR(TGE_REF_VRVAL.ENREGISTREMENT,10,5),5))  = ''TRUE''
+	 AND IS_BETWEEN_NLS_FRENCH(TRIM(LPAD(COM.categorie,2)),LPAD(SUBSTR(TGE_REF_VRVAL.ENREGISTREMENT,15,2),2), LPAD(SUBSTR(TGE_REF_VRVAL.ENREGISTREMENT,17,2),2) )  = ''TRUE''
+	 ';
+	 END IF;
+	 
+	 out_req := out_req || '
+	 GROUP BY numpac,pacmat,PAIEZAD,NUMCNT,DATE_EFF,DSFCN,DSDCN,debut_forcee,fin_forcee,debut_situ,fin_situ,NUMERO_DE_PAC,CODE_TABLE,COM.MOIS_PAIE,COM.DATE_DEB_PERIODE,COM.DATE_FIN_PERIODE
+	 ) VR inner join TGE_REF_VRVAL on TGE_REF_VRVAL.NUMERO_DE_PAC = VR.NUMERO_DE_PAC AND TGE_REF_VRVAL.CODE_TABLE = VR.CODE_TABLE AND TGE_REF_VRVAL.NUMERO_DE_LIGNE = VR.min_NUMERO_DE_LIGNE ';
+ END IF;
+ out_req := out_req || 'LEFT JOIN TGE_PERIODE_RECUEIL_PAIEZAD_R
+ ON TGE_PERIODE_RECUEIL_PAIEZAD_R.NUMPAC      = VR.NUMPAC
+ AND TGE_PERIODE_RECUEIL_PAIEZAD_R.PACMAT     = VR.PACMAT
+ AND TGE_PERIODE_RECUEIL_PAIEZAD_R.PAIEZAD    = VR.PAIEZAD
+ AND TGE_PERIODE_RECUEIL_PAIEZAD_R.MOIS_PAIE  = VR.MOIS_PAIE
+ AND TGE_PERIODE_RECUEIL_PAIEZAD_R.ID_TRT     = ''' || p_id || '''
+ ) dach_tmp_sus
+ LEFT JOIN  ';
+ IF recueil_photo THEN
+ 	IF v_multiClient > 0 THEN
+	 	out_req := out_req || ' PHOTO_DIC_ADM_CONTRAT_HISTO1 DIC_ADM_CONTRAT_HISTO1 ';
+	 ELSE 
+	 	out_req := out_req || ' PHOTO_DIC_ADM_CONTRAT_HISTO DIC_ADM_CONTRAT_HISTO ';
+	 END IF;
+ ELSE
+	 IF v_multiClient > 0 THEN
+	 	out_req := out_req || ' DIC_ADM_CONTRAT_HISTO1  ';
+	 ELSE 
+	 	out_req := out_req || ' DIC_ADM_CONTRAT_HISTO ';
+	 END IF;
+ END IF;
+ IF v_multiClient > 0 THEN
+ 	out_req := out_req || ' ON
+ 	DIC_ADM_CONTRAT_HISTO1.numpac = dach_tmp_sus.NUMPAC
+ 	AND DIC_ADM_CONTRAT_HISTO1.pacmat = dach_tmp_sus.PACMAT
+ 	AND DIC_ADM_CONTRAT_HISTO1.paiezad = dach_tmp_sus.PAIEZAD
+ 	AND DIC_ADM_CONTRAT_HISTO1.date_eff = dach_tmp_sus.date_eff_sus';
+ ELSE 
+ 	out_req := out_req || ' ON
+ 	DIC_ADM_CONTRAT_HISTO.numpac = dach_tmp_sus.NUMPAC
+ 	AND DIC_ADM_CONTRAT_HISTO.pacmat = dach_tmp_sus.PACMAT
+ 	AND DIC_ADM_CONTRAT_HISTO.paiezad = dach_tmp_sus.PAIEZAD
+ 	AND DIC_ADM_CONTRAT_HISTO.date_eff = dach_tmp_sus.date_eff_sus';
+ END IF;
+ out_req := out_req || ' ) l ';
+ IF not recueil_photo THEN
+ out_req := out_req || ' LEFT JOIN PHOTO_DIC_ADM_CONTRAT P
+ ON l.NUMPAC = P.NUMPAC
+ AND l.PACMAT = P.PACMAT
+ AND l.NUMCNT = P.NUMCNT
+ LEFT JOIN PHOTO_DIC_ADM_CONTRAT_HISTO PH
+ ON l.NUMPAC = PH.NUMPAC
+ AND l.PACMAT = PH.PACMAT
+ AND l.NUMCNT = PH.NUMCNT
+ AND l.DATE_EFF = PH.DATE_EFF
+ AND l.PAIEZAD = PH.PAIEZAD
+ WHERE P.PACMAT IS NULL
+ OR l.DSFCN IS NULL
+ OR l.DSFCN >  l.DATE_FIN_PERIODE
+ OR NVL(P.DSDCN, TO_DATE(''01.01.1900'', ''dd.MM.yyyy'')) != NVL(l.DSDCN, TO_DATE(''01.01.1900'', ''dd.MM.yyyy''))
+ OR NVL(P.DSFCN, TO_DATE(''01.01.1900'', ''dd.MM.yyyy'')) != NVL(l.DSFCN, TO_DATE(''01.01.1900'', ''dd.MM.yyyy''))';
+ IF v_multiClient = 0 THEN
+ 	out_req := out_req || ' OR PH.PACMAT IS NULL
+ 	OR l.sous_DSA301 IS NULL
+ 	OR l.sous_DSA301 > l.DATE_FIN_PERIODE
+ 	OR NVL(PH.DSA302, TO_DATE(''01.01.1900'', ''dd.MM.yyyy'')) != NVL(l.sous_DSA302, TO_DATE(''01.01.1900'', ''dd.MM.yyyy''))
+ 	OR NVL(PH.DSA301, TO_DATE(''01.01.1900'', ''dd.MM.yyyy'')) != NVL(l.sous_DSA301, TO_DATE(''01.01.1900'', ''dd.MM.yyyy''))';
+ END IF;
+ out_req := out_req || ' OR l.DATE_DEB_PERIODE BETWEEN l.ENTREE AND l.SORTIE
+ OR l.ENTREE BETWEEN l.DATE_DEB_PERIODE AND  l.DATE_FIN_PERIODE ';
+ END IF;
+ 
+ TGE_IMPORT_AVANCEMENT_proc('TGE_ALIM_PER','fin TGE_ALIM_PERIODE_INDIV_TEMP OK');
+ EXCEPTION
+ WHEN OTHERS THEN
+ TGE_IMPORT_AVANCEMENT_proc('TGE_ALIM_PER','fin TGE_ALIM_PERIODE_INDIV_TEMP KO : TGE_ALIM_PERIODE_INDIV_TEMP '||SQLCODE||' '||SQLERRM);
+ raise;
+ END TGE_ALIM_PERIODE_INDIV_TEMP;

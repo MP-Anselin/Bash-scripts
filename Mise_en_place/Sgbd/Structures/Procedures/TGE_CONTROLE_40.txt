@@ -1,0 +1,290 @@
+##
+TAG_CHARSET=@€éèç
+##
+TGE_CONTROLE_40
+=SQL=
+create or replace PROCEDURE TGE_CONTROLE_40 ( P_LOGIN IN VARCHAR2
+ , P_DATE_IMPORT IN VARCHAR2
+ , P_NUMLIGNE IN VARCHAR2
+ , P_CODLANG in VARCHAR2
+ , P_ISFSED in NUMBER
+ ) AS
+/********************************************************************************
+Version     : V5.05.000
+*********************************************************************************/
+ cNumeric_Characters varchar2(40);
+ cNLS_NUMERIC_CHARACTERS varchar2(40);
+ clWhere varchar2(1000);
+ req varchar2(2000);
+ w_exist_incident VARCHAR2(2000);
+ w_err VARCHAR2(2000);
+ 
+ /* Objets utilisés pour le contrôle sur la somme des heures réalisées */
+ -- Objet contenant un tableau des lignes par collaborateur par jour avec les sommes des heures réalisées déjà créées (TGE_INCIDENTS_PAIE) et des heures réalisées ajoutées par l'import
+ TYPE T_REC IS RECORD (
+ numpac varchar2(6),
+ paiezad varchar2(8),
+ date_effet date,
+ somme_heures number,
+ somme_heures_trav_import number);
+ TYPE typ_tab IS table of T_REC;
+ tab typ_tab ;
+ -- Plus petite et plus grande date de l'import
+ v_dateMinImport varchar2(8);
+ v_dateMaxImport varchar2(8);
+ varsys varchar2(100);
+ 
+ BEGIN
+ 
+ SELECT substr(TRIM(VALUE),length(TRIM(VALUE)))  INTO cNLS_NUMERIC_CHARACTERS FROM nls_session_parameters where PARAMETER = 'NLS_NUMERIC_CHARACTERS';
+ 
+ clwhere:='login='''||p_login||''' and date_import='''||p_date_import||'''';
+ if p_numligne is not null then
+ clwhere:=clwhere||' AND NUMLIGNE='||p_numligne;
+ end if;
+ -- On ne traite que les lignes qui sont en statut TRAIT et TRANS (les autres FIN, ANNULER, ... ne doivent plus être controler
+ clwhere:=clwhere || ' AND (STATUT = ''TRAIT''';
+ clwhere:=clwhere || ' OR STATUT = ''TRANS'')';
+ 
+ -- Mise à blanc de tous les messages d'erreur des lignes qui vont être contrôlées
+ IF p_login='BATCH' THEN
+ req:='update TGE_IMPORT_INCIDENTS I SET ERREURS = '''' WHERE '||clwhere;
+EXECUTE_IMMEDIATE_STRING (req,0);
+ END IF;
+ 
+ -- Numpac non vide
+ req:='update TGE_IMPORT_INCIDENTS SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00077',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''') where '||clwhere||' AND NUMPAC is null  ';
+  EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- PAIEZAD non vide
+ req:='update TGE_IMPORT_INCIDENTS SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00078',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''') where '||clwhere||' AND PAIEZAD is null  ';
+  EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- PERIODE non vide
+ req:='update TGE_IMPORT_INCIDENTS SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00010',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''') where '||clwhere||' AND PERIODE is null ';
+  EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- TYPE_TRAITEMENT non vide
+ req:='update TGE_IMPORT_INCIDENTS SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00079',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''') where '||clwhere||' AND TYPE_TRAITEMENT is null  ';
+  EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- DATE_DEBUT non vide
+ req:='update TGE_IMPORT_INCIDENTS SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00108',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''') where '||clwhere||' AND DATE_DEBUT is null  ';
+  EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- DATE_FIN non vide
+ req:='update TGE_IMPORT_INCIDENTS SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00109',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''') where '||clwhere||' AND DATE_FIN is null  ';
+  EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ 
+ -- NUMPAC controle format
+ req:='update TGE_IMPORT_INCIDENTS SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00072',p_codlang),'''','''''')||''',NUMPAC,'''||p_codlang||''') where '||clwhere||' AND  NVL(LENGTH(NUMPAC),0)>6 ';
+  EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ ---controleLigneImportIncidentVide(TGE_IMPORT_INCIDENTS_sgbd p_importIncident, ArrayList<GxpErreurWithParams> p_arrErreurs)INCI0025
+ req:='update TGE_IMPORT_INCIDENTS ii SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','INCI0025',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''') where '||clwhere||' AND CODE_IP is null AND HEURES_IP IS NULL AND HEURES_TRAV IS NULL ';
+  EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+  ---controleLigneImportIncidentWhenHeuresIncNonVide(TGE_IMPORT_INCIDENTS_sgbd p_importIncident, ArrayList<GxpErreurWithParams> p_arrErreurs)INCI0035
+ req:='update TGE_IMPORT_INCIDENTS ii SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','INCI0035',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''') where '||clwhere||' AND CODE_IP is null AND HEURES_IP IS not NULL ';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- PAIEZAD >8 cara
+ req:='update TGE_IMPORT_INCIDENTS SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00073',p_codlang),'''','''''')||''',PAIEZAD,'''||p_codlang||''') where '||clwhere||' AND NVL(LENGTH(PAIEZAD),0)>8  ';
+  EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- PERIODE format date OK
+ req:='update TGE_IMPORT_INCIDENTS SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00083',p_codlang),'''','''''')||''',PERIODE||''|yyyyMM'','''||p_codlang||''') WHERE '||clwhere||' AND (IS_DATE(PERIODE ,''yyyyMM'') =0)' ;
+  EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- DATE_DEBUT format date OK
+ req:='update TGE_IMPORT_INCIDENTS SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00110',p_codlang),'''','''''')||''',DATE_DEBUT||''|yyyyMMdd'','''||p_codlang||''') WHERE '||clwhere||' AND (IS_DATE(DATE_DEBUT ,''yyyyMMdd'') =0) ';
+  EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- DATE_FIN format date OK
+ req:='update TGE_IMPORT_INCIDENTS SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00111',p_codlang),'''','''''')||''',DATE_FIN||''|yyyyMMdd'','''||p_codlang||''') WHERE '||clwhere||' AND IS_DATE(DATE_FIN ,''yyyyMMdd'') =0 ';
+  EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- HEURES_TRAV controle 1 numerique
+ req:='update TGE_IMPORT_INCIDENTS SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00112',p_codlang),'''','''''')||''',HEURES_TRAV,'''||p_codlang||''') WHERE '||clwhere||' AND TGE_CONTROLE_HEURE_TRAV ( HEURES_TRAV, 3, 2,'''||cNLS_NUMERIC_CHARACTERS||''')=0 ';
+  EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- HEURES_IP controle 1 numerique
+ req:='update TGE_IMPORT_INCIDENTS SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00113',p_codlang),'''','''''')||''',HEURES_IP,'''||p_codlang||''') WHERE '||clwhere||' AND TGE_CONTROLE_HEURE_TRAV ( HEURES_IP, 3, 2,'''||cNLS_NUMERIC_CHARACTERS||''')=0 ';
+  EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ --ORIGINE
+ req:='update TGE_IMPORT_INCIDENTS INC SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00331',p_codlang),'''','''''')||''',INC.ORIGINE||''|''||INC.NUMPAC ,'''||p_codlang||''') WHERE '||clwhere;
+ req:= req || ' and INC.ORIGINE is not null';
+ req:= req || ' and not exists (select 1 from TGE_REF_ORIGINE_GTA G where G.CODE_ORIGINE = INC.ORIGINE and G.NUMPAC = INC.NUMPAC)';
+ EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ --ORIGINE (lig 1968)
+ req:='update TGE_IMPORT_INCIDENTS SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00100',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''') WHERE '||clwhere||' AND (ORIGINE IS NOT NULL AND LENGTH(ORIGINE) >1) ';
+  EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ --ORIGINE
+  IF P_LOGIN ='BATCH' THEN 
+  req:='update TGE_IMPORT_INCIDENTS SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00225',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''') WHERE '||clwhere||' AND ((ORIGINE IS NOT NULL AND ORIGINE = ''T'') OR (ORIGINE is null)) ';
+  EXECUTE_IMMEDIATE_STRING( req,0);
+  else if P_ISFSED=1 then
+  req:='update TGE_IMPORT_INCIDENTS SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00225',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''') WHERE '||clwhere||' AND ((ORIGINE IS NOT NULL AND ORIGINE = ''T'') OR (ORIGINE is null)) ';
+  EXECUTE_IMMEDIATE_STRING( req,0);
+  END IF;
+  END IF;
+ 
+ -- CONTROLES EXISTENCES
+ -- TYPE_TRAITEMENT (Lig 1971)
+ req:='update TGE_IMPORT_INCIDENTS ii SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00101',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''')';
+ req:= req || ' WHERE '||clwhere||' AND ii.TYPE_TRAITEMENT IS NOT NULL AND NOT ';
+ req:= req || '(';
+ req:= req ||   '( exists  (SELECT RT.CODETYPTRT FROM TGE_REF_TYPETRT RT WHERE rt.numpac=ii.numpac and ii.type_traitement =RT.CODETYPTRT) )';
+ req:= req || ' OR ';
+ req:= req ||   '( exists (SELECT RT.CODETYPTRT FROM TGE_REF_TYPETRT RT WHERE rt.numpac=''*'' AND RT.codetyptrt= ii.type_traitement and ii.type_traitement =RT.CODETYPTRT AND NOT EXISTS (SELECT 1 FROM TGE_REF_TYPETRT RT2 WHERE RT2.NUMPAC=ii.numpac)))';
+ req:= req || ')  ' ;
+  EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- CODE_IMPUTATION (Lig 1972)
+ 
+ select valvar into varsys from sys_varsys where module='TGE' and CODVAR='CTRL_CODE_IMPUTATION_EXISTE';
+ if upper(varsys)<>'FALSE' then
+ req:='update TGE_IMPORT_INCIDENTS ii SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00012',p_codlang),'''','''''')||''',ii.code_imputation||''|''||ii.numPac,'''||p_codlang||''') ';
+ req:= req || ' WHERE '||clwhere||' and ii.code_imputation<>''*'' AND  ii.code_imputation IS NOT NULL AND NOT ';
+ req:= req || '(';
+ req:= req ||   '( exists (SELECT ri.codeimp FROM TGE_REF_IMPUTATION ri WHERE ri.numpac = ii.numpac and ri.codeimp=ii.code_imputation))';
+ req:= req || ' OR ';
+ req:= req ||   '(exists  (SELECT ri.codeimp FROM TGE_REF_IMPUTATION ri WHERE ri.numpac=''*'' AND  ri.codeimp=ii.code_imputation and ri.codeimp= ii.code_imputation AND NOT EXISTS (SELECT 1 FROM TGE_REF_IMPUTATION rt2 WHERE rt2.numpac=ii.numpac and rt2.codeimp= ii.code_imputation)))';
+ req:= req || ')  ' ;
+  EXECUTE_IMMEDIATE_STRING( req,0);
+ end if;
+ 
+ -- CODE_IP (Lig 1973)INCI0012
+ req:='update TGE_IMPORT_INCIDENTS ii SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','INCI0012',p_codlang),'''','''''')||''',code_ip,'''||p_codlang||''') ';
+ req:= req || ' WHERE '||clwhere||' AND ii.code_ip IS NOT NULL AND NOT ';
+ req:= req || '(';
+ req:= req ||   ' ( exists (SELECT * FROM TGE_REF_PRE rp WHERE ii.code_ip=rp.code_incident and rp.numpac = ii.numpac ) )';
+ req:= req || ' OR ';
+ req:= req ||   '(exists (SELECT * FROM TGE_REF_PRE rp WHERE ii.code_ip=rp.code_incident and rp.numpac=''*'' AND rp.code_incident=ii.code_ip AND NOT EXISTS (SELECT 1 FROM TGE_REF_PRE rp2 WHERE rp2.numpac=ii.numpac and ii.code_ip=rp2.code_incident)))';
+ req:= req || ') ' ;
+  EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- Contrôles spécifiques
+ -- Date_Debut Date_Fin (lig 1977)
+ req:='update TGE_IMPORT_INCIDENTS SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00118',p_codlang),'''','''''')||''',to_char(to_date(date_debut, ''yyyymmdd''), ''dd.mm.yyyy'')||''|''||to_char(to_date(date_fin, ''yyyymmdd''), ''dd.mm.yyyy''),'''||p_codlang||''') WHERE '||clwhere||' AND  date_debut > date_fin ';
+  EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ 
+ -- HEURES_TRAV TYPE_HEURE (lig 1978)
+ req:='update TGE_IMPORT_INCIDENTS SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00114',p_codlang),'''','''''')||''',type_heure,'''||p_codlang||''') WHERE '||clwhere||' AND heures_trav IS NOT NULL AND type_heure NOT IN (''T'',''R'') ';
+  EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ req:='update TGE_IMPORT_INCIDENTS SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00115',p_codlang),'''','''''')||''',type_heure,'''||p_codlang||''') WHERE '||clwhere||' AND heures_trav IS NULL AND type_heure IS NOT NULL ';
+  EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- CODE_IP HEURE_IP (lig 1979)
+ /*req:='update TGE_IMPORT_INCIDENTS SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00138',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''') WHERE '||clwhere||' AND code_ip IS NOT NULL AND heures_ip IS NULL ';
+  EXECUTE_IMMEDIATE_STRING( req,0);*/
+ 
+ -- DOMAINE_IMP ligne 1980
+ req:='update TGE_IMPORT_INCIDENTS SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00119',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''') WHERE '||clwhere||' AND (DOMAINE_IMP IS NOT NULL AND CODE_IMPUTATION IS NULL) ';
+  EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ req:='update TGE_IMPORT_INCIDENTS SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00120',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''') WHERE '||clwhere||' AND code_imputation IS NOT NULL AND heures_trav IS NOT NULL AND heures_ip IS NOT NULL AND domaine_imp != ''H'' AND domaine_imp !=''1'' ';
+  EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ req:='update TGE_IMPORT_INCIDENTS SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00121',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''') WHERE '||clwhere||' AND code_imputation IS NOT NULL AND heures_trav IS NOT NULL AND heures_ip IS NULL AND domaine_imp != ''H'' ';
+  EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ req:='update TGE_IMPORT_INCIDENTS SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00122',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''') WHERE '||clwhere||' AND code_imputation IS NOT NULL AND heures_ip IS NOT NULL AND heures_trav IS NULL AND domaine_imp != ''1'' ';
+  EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ req:='update TGE_IMPORT_INCIDENTS SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00136',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''') WHERE '||clwhere||' AND code_imputation IS NOT NULL AND heures_trav IS NULL AND heures_ip IS NULL AND domaine_imp != ''1'' ';
+  EXECUTE_IMMEDIATE_STRING( req,0);
+  
+ -- controle date début incident avec les dates de bébut et fin contrat 
+req:='update TGE_IMPORT_INCIDENTS ii  SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00358',p_codlang),'''','''''')||''',date_debut,'''||p_codlang||''')';
+req:= req || ' where '||clwhere||'' ; 
+req:= req || ' and (not exists(SELECT 1 FROM DIC_ADM_CONTRAT_SITU DACS WHERE DACS.NUMPAC=ii.NUMPAC and DACS.PAIEZAD=ii.PAIEZAD';
+req:= req || ' and TO_DATE(ii.DATE_DEBUT, ''YYYYMMDD'') between DACS.DSDSC and DACS.DSFSC))';
+EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ --ctrl if heure contenuHeures(String p_heures, String p_type_ip, ArrayList<GxpErreurWithParams> p_arrErreurs) INCI0024
+ req:='update TGE_IMPORT_INCIDENTS ii SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||REPLACE(get_message_erreur('TGE','INCI0024',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''') ';
+ req:= req || ' WHERE '||clwhere||' AND (((Ii.heures_ip IS NOT NULL OR Ii.code_ip is not null ) AND Ii.code_ip = ''HP'' AND II.heures_ip is null)
+     OR (ii.HEURES_TRAV is null  AND ii.type_heure  in (''T'',''R''))
+     ) ';
+  EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ --ToolsTge_controles.controleAutorisationPaieZad(p_loginUserOrDelegator, p_unIncident.numPac, p_unIncident.paieZad, arrErreurs);STD00049
+ req:='update TGE_IMPORT_INCIDENTS ii SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('STD','STD00049',p_codlang),'''','''''')||''',paiezad||''|''||numpac,'''||p_codlang||''') ';
+ req:= req || ' WHERE '||clwhere||' AND ii.paiezad IS NOT NULL AND ii.numpac is not null AND NOT ';
+ req:= req || '(';
+ req:= req ||   ' ( exists (SELECT * from DIC_ADM_CONTRAT C WHERE C.NUMPAC =ii.numpac and C.CURRENT_PAIEZAD =ii.paiezad and c.numpac in (select numpac from TGE_REF_PAC where numpac = c.numpac and not nvl(mpe,''N'')=''N'')) )';
+ req:= req || ' OR ';
+ req:= req ||   '(exists (SELECT * from DIC_ADM_CONTRAT C ,SECUPACMAT S  WHERE C.NUMPAC = S.NUMPAC and C.PACMAT = S.PACMAT and C.NUMCNT = S.CURRENT_NUMCNT AND C.NUMPAC =ii.numpac and C.CURRENT_PAIEZAD =ii.paiezad and c.numpac in (select numpac from TGE_REF_PAC where numpac = c.numpac and nvl(mpe,''N'')=''N'')) )';
+ req:= req || ') ' ;
+  EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ --controleHoraireTheorique(p_unIncident, arrErreurs, p_transac); INCI0020 DIT 37186
+ req:='update TGE_IMPORT_INCIDENTS ii SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||REPLACE(get_message_erreur('TGE','INCI0020',p_codlang),'''','''''')||''',type_heure,'''||p_codlang||''') ';
+ req:= req || ' WHERE '||clwhere||' AND  ii.code_IP =''HP'' AND ii.code_imputation IS NOT NULL ';
+  EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ --controleDateDebutFin(p_code_ip,p_date_debut,p_date_fin,p_arrErreurs); TGE00226 DIT 37186
+ req:='update TGE_IMPORT_INCIDENTS ii SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||REPLACE(get_message_erreur('TGE','TGE00226',p_codlang),'''','''''')||''',to_char(to_date(date_debut, ''yyyymmdd''), ''dd.mm.yyyy'')||''|''||to_char(to_date(date_fin, ''yyyymmdd''), ''dd.mm.yyyy''),'''||p_codlang||''') ';
+ req:= req || ' WHERE '||clwhere||' AND  ii.code_IP =''HP'' AND ii.DATE_FIN !=  ii.DATE_DEBUT ';
+  EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ --controleCode_ip; INCI0027 DIT 37186
+ req:='update TGE_IMPORT_INCIDENTS ii SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||REPLACE(get_message_erreur('TGE','INCI0027',p_codlang),'''','''''')||''',code_ip,'''||p_codlang||''') ';
+ req:= req || ' WHERE '||clwhere||' AND  ii.type_heure != ''T'' AND  ii.type_heure != ''R''  AND (ii.CODE_IP =''HP'' OR ii.CODE_IP =''HT'') ';
+  EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+  -- controle saisie en demi journée DIT 42237
+ req:='update TGE_IMPORT_INCIDENTS ii SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00264',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''') ';
+ req:= req || ' where '||clwhere||' AND ii.CODE_IP  IS NOT NULL AND ii.CODE_IP != ''HP'' AND ii.DATE_DEBUT is not null and ii.DATE_FIN is not null  and ii.DATE_DEBUT!=ii.DATE_FIN ';
+ req := req || 'AND ( exists (SELECT * FROM TGE_REF_PRE rp WHERE ii.code_ip=rp.code_incident and rp.numpac = ii.numpac AND rp.OPTION_CONSERV_HISTO =''A'' AND rp.UNITE=''J'') ) AND is_number(ii.HEURES_IP)=0.5 ';
+ 
+  EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+  -- controle saisie du volume different de 0 ou 1 DIT 42237
+ req:='update TGE_IMPORT_INCIDENTS ii  SET ERREURS=TGE_GET_MESSAGE_ERREUR(ERREURS,'''||replace(get_message_erreur('TGE','TGE00265',p_codlang),'''','''''')||''',NULL,'''||p_codlang||''')'; 
+ req:= req || ' where '||clwhere||' AND ii.CODE_IP  IS NOT NULL AND ii.CODE_IP != ''HP'' ';
+ req := req || 'AND ( exists (SELECT * FROM TGE_REF_PRE rp WHERE ii.code_ip=rp.code_incident and rp.numpac = ii.numpac AND rp.OPTION_CONSERV_HISTO =''A'' AND rp.UNITE=''J'') ) AND is_number(ii.HEURES_IP)!=0 AND is_number(ii.HEURES_IP)!=1  AND is_number(ii.HEURES_IP)!=0.5 ';
+  EXECUTE_IMMEDIATE_STRING( req,0);
+ 
+ -- Bloquer les imports carte 40 sur des périodes antérieures à la date de limite de rétro
+ req:='MERGE INTO TGE_IMPORT_INCIDENTS II USING ';
+ req:= req ||' (SELECT P1.NUMPAC, P1.PERIODEENCOURS, P1.DEB_RETRO,GREATEST(P1.DEB_HISTO_RETRO,NVL( S.PREMIERE_PAIE, ''190101''))  AS DEB_HISTO_RETRO , P1.NB_MOIS_RETRO,  S.PACMAT,';
+ req:= req ||'  GREATEST(NVL( S.PREMIERE_PAIE, ''190101''),NVL(P1.DEB_HISTO_RETRO, ''190001''), (TO_CHAR(ADD_MONTHS(TO_DATE(P1.PERIODEENCOURS, ''YYYYMM''), -P1.NB_MOIS_RETRO), ''YYYYMM''))) AS LIMITE_RETRO ';
+ req:= req ||' FROM TGE_REF_PAC P1 LEFT JOIN SECUPACMAT S ON P1.NUMPAC = S.NUMPAC ) P';
+ req:= req ||' ON (';
+ req:= req || clwhere;
+ req:= req ||' AND II.NUMPAC = P.NUMPAC';
+ req:= req ||' AND  ( II.PACMAT is  null or II.PACMAT = P.PACMAT )'; 
+ req:= req ||' AND II.PERIODE < P.PERIODEENCOURS';
+ req:= req ||' AND ( P.DEB_RETRO IS NOT NULL AND P.DEB_RETRO <= P.PERIODEENCOURS';
+ req:= req ||' ) ) WHEN MATCHED THEN UPDATE SET II.ERREURS = CASE';
+ req:= req ||' WHEN II.PERIODE < P.DEB_HISTO_RETRO THEN TGE_GET_MESSAGE_ERREUR(II.ERREURS,'''||replace(get_message_erreur('TGE','TGE00336',p_codlang),'''','''''')||''',TO_CHAR(TO_DATE(P.DEB_HISTO_RETRO, ''YYYYMM''), ''MM.YYYY''),'''||p_codlang||''')';
+ req:= req ||' WHEN II.PERIODE < P.LIMITE_RETRO THEN TGE_GET_MESSAGE_ERREUR(II.ERREURS,'''||replace(get_message_erreur('TGE','TGE00337',p_codlang),'''','''''')||''',TO_CHAR(TO_DATE(P.LIMITE_RETRO, ''YYYYMM''), ''MM.YYYY''),'''||p_codlang||''')';
+ req:= req ||' END WHERE II.ERREURS IS NULL';
+ EXECUTE_IMMEDIATE_STRING(req, 0);
+ 
+ -- Bloquer en mode non rétro les imports carte 40 sur des périodes antérieures à la période en cours
+ req := 'MERGE INTO TGE_IMPORT_INCIDENTS II USING TGE_REF_PAC P ON( '|| clwhere;
+ req := req || ' AND II.NUMPAC = P.NUMPAC';
+ req := req || ' AND P.PERIODEENCOURS IS NOT NULL ';
+ req := req || ' AND (P.DEB_RETRO > P.PERIODEENCOURS OR P.DEB_RETRO IS NULL) ';
+ req := req || ' AND II.PERIODE < P.PERIODEENCOURS) ';
+ req := req || ' WHEN MATCHED THEN UPDATE ';
+ req := req || ' SET II.ERREURS = TGE_GET_MESSAGE_ERREUR(II.ERREURS, ''' || replace(get_message_erreur('TGE', 'TGE00351', p_codlang), '''', '''''') || ''', NULL, ''' || p_codlang || ''')';
+ req := req || ' WHERE II.ERREURS IS NULL';
+ EXECUTE_IMMEDIATE_STRING(req, 0);
+ 
+ EXCEPTION
+ WHEN OTHERS THEN
+ 	IF (P_LOGIN != 'BATCH') THEN
+ 		-- On remonte l'erreur à l'application
+  		raise;
+  	END IF;
+ END TGE_CONTROLE_40;

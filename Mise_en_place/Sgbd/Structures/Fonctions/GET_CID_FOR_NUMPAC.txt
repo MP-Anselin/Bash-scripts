@@ -1,0 +1,24 @@
+##
+TAG_CHARSET=@€éèç
+##
+GET_CID_FOR_NUMPAC
+=SQL=
+CREATE OR REPLACE FUNCTION GET_CID_FOR_NUMPAC(p_numpac IN VARCHAR2) 
+	RETURN VARCHAR2 
+AS 
+	v_retour VARCHAR2(32);
+BEGIN
+	/**
+	 * Dans le cadre du multiclient, la table MULTICLIENT_REF_PAC permet d'associer un NUMPAC avec un COMPANY_ID (CID).
+	 * Le problème, c'est que cette table n'existe pas dans ADP Link car on est monoclient.
+	 * Cette fonction va permettre de récupérer le CID associé à un login sans avoir à s'interroger sur l'existence ou non de la table.
+	 * Si la table existe, on utilise les données de MULTICLIENT_REF_PAC, 
+	 * sinon on va utiliser la table TGE_REF_PAC et la valeur du CID contenue dans la varsys "NS_CLIENT_ID"
+	*/
+	select COMPANY_ID into v_retour from GET_MULTICLIENT_REF_PAC() where NUMPAC = p_numpac;
+	return v_retour;
+EXCEPTION
+	WHEN NO_DATA_FOUND THEN
+    -- Le login n'a pas été trouvé  	
+    return NULL;
+END GET_CID_FOR_NUMPAC;

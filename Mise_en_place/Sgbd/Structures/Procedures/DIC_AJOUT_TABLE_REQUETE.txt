@@ -1,0 +1,305 @@
+##
+TAG_CHARSET=@€éèç
+##
+DIC_AJOUT_TABLE_REQUETE
+=SQL=
+create or replace PROCEDURE DIC_AJOUT_TABLE_REQUETE(p_nomTable IN user_tables.table_name%TYPE,p_nomRequete EDI_REQ_SQL.NOMREQ%type) AS
+	TYPE typeTrancoClefs IS TABLE OF VARCHAR2(200) INDEX BY VARCHAR2(1);
+	TYPE TypeTrancoTypeChamp IS TABLE OF VARCHAR2(1) INDEX BY VARCHAR2(1);
+	retourChampSplit TAB_VARCHAR;
+	tableTranscoCleSal typeTrancoClefs;
+	tableTranscotypeChamp TypeTrancoTypeChamp;
+	dictionnaire REF_DONNEE_GENERALE.NOM_DICTIONNAIRE%type;
+	nomRequete EDI_REQ_SQL.NOMREQ%type;
+	champSelect EDI_REQ_SQL_CF.VALEURSELECT%type;
+	typeChampQuery EDI_REQ_SQL_CF.TYPEDATA%type;
+	cleSalarieDictinnaire META_DICTIONNAIRE_IHM.TYPE_CLE_SALARIE%type;
+	cleDictionnaire META_DICTIONNAIRE_IHM.CHAMPS_CLE%type;
+	cleHistoriseDictionnaire META_DICTIONNAIRE_IHM.HISTORISE%type;
+	cleClauseWhere varchar2(1000);	
+	compId META_DICTIONNAIRE_IHM.COMPANY_ID%type := '*';
+	compteur integer;
+	typeDon REF_DONNEE_GENERALE.TYPE_DONNEE%type;
+	masqueDon REF_DONNEE_GENERALE.LONGUEUR_MASQUE_NB_ENTIERS%type;
+	decimaux REF_DONNEE_GENERALE.NB_DECIMAUX%type;
+	gestionNumCnt integer;
+begin
+	tableTranscoCleSal('R') := 'MATRIC';
+	tableTranscoCleSal('M') := 'NUMPAC,PACMAT';
+	tableTranscoCleSal('P') := 'NUMPAC,PAIEZAD';
+	tableTranscoCleSal('O') := 'DATE_EFF';
+	
+	tableTranscotypeChamp('X') := 'T';
+	tableTranscotypeChamp('9') := 'N';
+	tableTranscotypeChamp('D') := 'T';
+	tableTranscotypeChamp('N') := 'T';
+	
+	dictionnaire := p_nomTable;
+	nomRequete := p_nomRequete;
+
+	--recherche si la table à traiter possede la clé NUMCNT --
+	begin
+	    gestionNumCnt := 0;
+  
+		select 1 into gestionNumCnt from USER_TAB_COLS where table_name = dictionnaire  AND COLUMN_NAME = 'NUMCNT';
+    
+		EXCEPTION
+		WHEN others THEN
+		gestionNumCnt := 0;
+	end;
+	
+	
+	-- cherche les clefs salarié et les autres clé fonctionnelles du dictionnaire --
+	begin
+		select TYPE_CLE_SALARIE,CHAMPS_CLE,HISTORISE into cleSalarieDictinnaire, cleDictionnaire , cleHistoriseDictionnaire from META_DICTIONNAIRE_IHM where NOM_DICTIONNAIRE = dictionnaire and COMPANY_ID = compId;
+		
+		EXCEPTION
+		WHEN others THEN
+		cleSalarieDictinnaire := null;
+		cleDictionnaire := null;
+		cleHistoriseDictionnaire := null;
+	end;
+	-- mémorise les clefs fonctionnelles du dictionnaire
+	cleClauseWhere := cleDictionnaire;
+	
+	-- ajout la clef salarié -------------------------------------------------------------------
+	begin
+		if cleClauseWhere is not null then
+			cleClauseWhere := cleClauseWhere || ',' || tableTranscoCleSal(cleSalarieDictinnaire);
+			else
+			cleClauseWhere := tableTranscoCleSal(cleSalarieDictinnaire);
+		end if;
+		
+		EXCEPTION
+		WHEN others THEN
+		null;
+	end;
+	-- fin ajout la clef salarié ---------------------------------------------------------------------------------
+	
+	-- ajout la clef effdt si table historisé-------------------------------------------------------------------
+	
+	-- si cleHistoriseDictionnaire != 'O' cleClauseWhere ne change pas car on par en exception
+	begin
+		if cleClauseWhere is not null then
+			cleClauseWhere := cleClauseWhere || ',' || tableTranscoCleSal(cleHistoriseDictionnaire);
+			else
+			cleClauseWhere := tableTranscoCleSal(cleHistoriseDictionnaire);
+			end if;
+			
+		EXCEPTION
+		WHEN others THEN
+		null;
+	end;
+	
+
+  	-- ajout de NUMCNT dans la clauseWhere pour les tables contenant la clé NUMCNT
+	begin
+        if gestionNumCnt=1 then
+          if cleClauseWhere IS NOT NULL THEN
+            cleClauseWhere  := cleClauseWhere || ',NUMCNT ';
+          else
+            cleClauseWhere := 'NUMCNT';
+          end if;
+        end if;
+
+		EXCEPTION
+		WHEN others THEN
+		null;
+	end;
+	
+	-- fin ajout la clef effdt ---------------------------------------------------------------------------------
+	
+	retourChampSplit := split_string_into_tab(cleClauseWhere,',');
+	
+	-- on reutilise la variable pour non plus stocker les colonnes clefs, mais la clause where du select
+	cleClauseWhere := '';
+	
+	-- construit la clause where avec champs fusions, les champs dynamiques et attache un calendrider pour les dates -------------------------------------------------------------------
+	compteur := 1; -- indexe des champs  pour la table EDI_REQ_SQL_FCT
+	for elem in 1 .. retourChampSplit.last loop
+		if retourChampSplit(elem) is not null then
+			if retourChampSplit(elem) = 'DATE_EFF' then
+				cleClauseWhere := cleClauseWhere || retourChampSplit(elem) || ' = to_date(''_@' || retourChampSplit(elem) || '@_'',''dd.mm.yyyy'')' || ' AND ';
+				begin
+					Insert into EDI_REQ_SQL_FCT (NOMREQ,CODE,CODEFCT,PARAM1,PARAM2,PARAM3,ORDRE) values (nomRequete,compteur,'1','...',retourChampSplit(elem),'dd.mm.yyyy',0);
+				EXCEPTION
+					WHEN others THEN
+						null;
+				end;
+				compteur := compteur + 1;
+			elsif retourChampSplit(elem) = 'MATRIC' or retourChampSplit(elem) = 'PACMAT' or retourChampSplit(elem) = 'PAIEZAD' or retourChampSplit(elem) = 'NUMPAC' OR retourChampSplit(elem) = 'NUMCNT' then
+				cleClauseWhere := cleClauseWhere || retourChampSplit(elem) || ' = ''_@' || retourChampSplit(elem) || '@_''' || ' AND ';
+			else
+				begin
+					select DG.TYPE_DONNEE,DG.LONGUEUR_MASQUE_NB_ENTIERS, DG.NB_DECIMAUX into typeDon, masqueDon,decimaux from REF_DONNEE_GENERALE DG where DG.NOM_DICTIONNAIRE = dictionnaire and NOM_DONNEE = retourChampSplit(elem) and DG.COMPANY_ID = compId;
+					EXCEPTION
+					WHEN others THEN
+					typeDon := 'X';
+					masqueDon := null;
+					decimaux := null;
+				end;
+				if typeDon = 'D' then
+					cleClauseWhere := cleClauseWhere || retourChampSplit(elem) || ' = to_date(''_@' || retourChampSplit(elem) || '@_'',''' || masqueDon || ''')' || ' AND ';
+					begin
+						Insert into EDI_REQ_SQL_FCT (NOMREQ,CODE,CODEFCT,PARAM1,PARAM2,PARAM3,ORDRE) values (nomRequete,compteur,'1','...',retourChampSplit(elem),'dd.mm.yyyy',0);
+					EXCEPTION
+					WHEN others THEN
+						null;
+					end;
+					compteur := compteur + 1;
+				elsif typeDon = '9' then
+					cleClauseWhere := cleClauseWhere || retourChampSplit(elem) || ' = _@' || retourChampSplit(elem) || '@_' || ' AND ';
+				else 
+					cleClauseWhere := cleClauseWhere || retourChampSplit(elem) || ' = ''_@' || retourChampSplit(elem) || '@_''' || ' AND ';
+				end if;
+
+				end if;
+			-- insertion parametre dynamique
+			begin
+				insert into EDI_REQ_PARAM (NOMREQ,NOMPARAM,FACULTATIF) values (nomRequete,retourChampSplit(elem),'false');
+			EXCEPTION
+				WHEN others THEN
+					null;
+			end;
+		end if;
+	end loop;
+	
+	--ajout du where si la clause existe
+	if cleClauseWhere is not null then
+		cleClauseWhere := ' where ' || cleClauseWhere;
+	end if;
+	
+	-- supprime le dernier and inutile
+	cleClauseWhere := REGEXP_REPLACE(cleClauseWhere , '\.*AND \.*$', '') ;
+	
+	-- insertion requète, clause
+	begin
+		Insert into EDI_REQ_SQL (NOMREQ,FINREQ,DELIMITEUR_TEXT,SEPAR_CHAMP,SEPAR_CHAMP_SR,AFFICHE_SR_VIDE,SANSDOUBLONS,PROPRIETAIRE) values (nomRequete ,'from ' || dictionnaire || cleClauseWhere ,'~',';','-','N','0',null);
+	EXCEPTION
+		WHEN others THEN
+			null;
+	end;	
+	-- fin construit la clause where avec champs fusions, les champs dynamiques et attache un calendrider pour les dates -------------------------------------------------------------------
+	
+	
+	-- ajout des champs du dictionnaire dans la requète ---------------------------------------------------------------------------------------------
+	compteur := 1;
+	for dic in (select UTC.COLUMN_ID,NOM_DONNEE,LIBELLE_DONNEE,NOM_DICTIONNAIRE,DG.TYPE_DONNEE,DG.LONGUEUR_MASQUE_NB_ENTIERS, DG.NB_DECIMAUX from REF_DONNEE_GENERALE DG, user_tab_columns UTC where DG.NOM_DICTIONNAIRE = dictionnaire and UTC.TABLE_NAME = dictionnaire and UTC.COLUMN_NAME = DG.NOM_DONNEE and DG.COMPANY_ID = compId order by UTC.COLUMN_ID)  loop
+		champSelect := dictionnaire || '.' || dic.NOM_DONNEE;
+		
+		begin
+			typeChampQuery := tableTranscotypeChamp(dic.TYPE_DONNEE);
+			EXCEPTION
+			WHEN others THEN
+			typeChampQuery := 'T';
+		end;
+		if dic.TYPE_DONNEE = 'D' then
+			champSelect := 'TO_CHAR(' || champSelect || ',''' || dic.LONGUEUR_MASQUE_NB_ENTIERS || ''')';
+		end if;
+		
+		-- insertion des champs de la requète
+		begin
+			Insert into EDI_REQ_SQL_CF (NOMREQ,NOMCHAMPFUSION,VALEURSELECT,SEPAR_CHAMP,ORDRE,TYPEDATA,LIBCHAMPFUSION,TAILLE)
+			values (nomRequete,dic.NOM_DONNEE,champSelect,null,compteur,typeChampQuery,substr(dic.LIBELLE_DONNEE,1,50),0);
+			compteur:= compteur + 1;
+		EXCEPTION
+			WHEN others THEN
+				null;
+		end;
+			end loop;
+	--ajout des clef dans les champs fusions
+	if cleSalarieDictinnaire = 'R' then
+		begin
+			Insert into EDI_REQ_SQL_CF (NOMREQ,NOMCHAMPFUSION,VALEURSELECT,SEPAR_CHAMP,ORDRE,TYPEDATA,LIBCHAMPFUSION,TAILLE) 
+			values (nomRequete,'MATRIC', dictionnaire || '.' || 'MATRIC',null,compteur,'T','Identifiant RH',0);
+			compteur:= compteur + 1;
+			EXCEPTION
+			WHEN others THEN
+				null;
+		end;
+	end if;
+	if cleSalarieDictinnaire = 'M' then
+		begin
+			Insert into EDI_REQ_SQL_CF (NOMREQ,NOMCHAMPFUSION,VALEURSELECT,SEPAR_CHAMP,ORDRE,TYPEDATA,LIBCHAMPFUSION,TAILLE) 
+			values (nomRequete,'NUMPAC', dictionnaire || '.' || 'NUMPAC',null,compteur,'T','Pac',0);
+			compteur:= compteur + 1;
+		EXCEPTION
+			WHEN others THEN
+				null;
+		end;
+		begin
+			Insert into EDI_REQ_SQL_CF (NOMREQ,NOMCHAMPFUSION,VALEURSELECT,SEPAR_CHAMP,ORDRE,TYPEDATA,LIBCHAMPFUSION,TAILLE) 
+			values (nomRequete,'PACMAT', dictionnaire || '.' || 'PACMAT',null,compteur,'T','Matricule Paie',0);
+			compteur:= compteur + 1;
+		EXCEPTION
+			WHEN others THEN
+				null;
+		end;
+		begin
+			Insert into EDI_REQ_SQL_CF (NOMREQ,NOMCHAMPFUSION,VALEURSELECT,SEPAR_CHAMP,ORDRE,TYPEDATA,LIBCHAMPFUSION,TAILLE) 
+			values (nomRequete,'MATRIC', dictionnaire || '.' || 'MATRIC',null,compteur,'T','Identifiant RH',0);
+			compteur:= compteur + 1;
+		EXCEPTION
+			WHEN others THEN
+				null;
+		end;			
+	end if;
+	if cleSalarieDictinnaire = 'P' then
+		begin
+			Insert into EDI_REQ_SQL_CF (NOMREQ,NOMCHAMPFUSION,VALEURSELECT,SEPAR_CHAMP,ORDRE,TYPEDATA,LIBCHAMPFUSION,TAILLE) 
+			values (nomRequete,'MATRIC', dictionnaire || '.' || 'MATRIC',null,compteur,'T','Identifiant RH',0);
+			compteur:= compteur + 1;
+		EXCEPTION
+			WHEN others THEN
+				null;
+		end;			
+		begin
+			Insert into EDI_REQ_SQL_CF (NOMREQ,NOMCHAMPFUSION,VALEURSELECT,SEPAR_CHAMP,ORDRE,TYPEDATA,LIBCHAMPFUSION,TAILLE) 
+			values (nomRequete,'PAIEZAD', dictionnaire || '.' || 'PAIEZAD',null,compteur,'T','Periode d''emploi',0);
+			compteur:= compteur + 1;
+		EXCEPTION
+			WHEN others THEN
+				null;
+		end;
+		begin
+			Insert into EDI_REQ_SQL_CF (NOMREQ,NOMCHAMPFUSION,VALEURSELECT,SEPAR_CHAMP,ORDRE,TYPEDATA,LIBCHAMPFUSION,TAILLE) 
+			values (nomRequete,'NUMPAC', dictionnaire || '.' || 'NUMPAC',null,compteur,'T','Pac',0);
+			compteur:= compteur + 1;
+		EXCEPTION
+			WHEN others THEN
+				null;
+		end;
+		begin
+			Insert into EDI_REQ_SQL_CF (NOMREQ,NOMCHAMPFUSION,VALEURSELECT,SEPAR_CHAMP,ORDRE,TYPEDATA,LIBCHAMPFUSION,TAILLE) 
+			values (nomRequete,'PACMAT', dictionnaire || '.' || 'PACMAT',null,compteur,'T','Matricule Paie',0);
+			compteur:= compteur + 1;
+		EXCEPTION
+			WHEN others THEN
+				null;
+		end;			
+	end if;
+	
+	if cleHistoriseDictionnaire = 'O' then
+		begin
+			Insert into EDI_REQ_SQL_CF (NOMREQ,NOMCHAMPFUSION,VALEURSELECT,SEPAR_CHAMP,ORDRE,TYPEDATA,LIBCHAMPFUSION,TAILLE) 
+			values (nomRequete,'DATE_EFF', 'to_char(' || dictionnaire || '.' || 'DATE_EFF' || ',''dd.mm.yyyy'')',null,compteur,'T','Date d''effet',0);
+			compteur:= compteur + 1;
+		EXCEPTION
+			WHEN others THEN
+				null;
+		end;
+	end if;
+	
+	if  gestionNumCnt = 1  THEN
+    	begin 
+      		Insert into EDI_REQ_SQL_CF (NOMREQ,NOMCHAMPFUSION,VALEURSELECT,SEPAR_CHAMP,ORDRE,TYPEDATA,LIBCHAMPFUSION,TAILLE)
+      		Values (nomRequete,'NUMCNT', dictionnaire || '.' || 'NUMCNT', NULL, compteur,'T', 'Numero de contrat', 0);
+        
+      		compteur:= compteur + 1;
+    
+    	EXCEPTION
+    		WHEN OTHERS THEN NULL;
+    	end;
+  	end if;
+	
+end;

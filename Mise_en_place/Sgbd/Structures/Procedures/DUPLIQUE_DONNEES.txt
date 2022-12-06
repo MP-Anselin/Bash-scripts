@@ -1,0 +1,79 @@
+##
+TAG_CHARSET=@€éèç
+##
+DUPLIQUE_DONNEES
+=SQL=
+create or replace
+PROCEDURE DUPLIQUE_DONNEES (p_table VARCHAR2, p_whereOldValues VARCHAR2, p_colonne1 VARCHAR2 DEFAULT NULL, p_newVal1 VARCHAR2 DEFAULT NULL, p_colonne2 VARCHAR2 DEFAULT NULL, p_newVal2 VARCHAR2 DEFAULT NULL, p_colonne3 VARCHAR2 DEFAULT NULL, p_newVal3 VARCHAR2 DEFAULT NULL, p_colonne4 VARCHAR2 DEFAULT NULL, p_newVal4 VARCHAR2 DEFAULT NULL, p_colonne5 VARCHAR2 DEFAULT NULL, p_newVal5 VARCHAR2 DEFAULT NULL, p_colonne6 VARCHAR2 DEFAULT NULL, p_newVal6 VARCHAR2 DEFAULT NULL, p_colonne7 VARCHAR2 DEFAULT NULL, p_newVal7 VARCHAR2 DEFAULT NULL, p_colonne8 VARCHAR2 DEFAULT NULL, p_newVal8 VARCHAR2 DEFAULT NULL, p_colonne9 VARCHAR2 DEFAULT NULL, p_newVal9 VARCHAR2 DEFAULT NULL) 
+AS
+  TYPE TYP_COL_NAME IS TABLE OF USER_TAB_COLUMNS.COLUMN_NAME%type ;
+  Tabcol  TYP_COL_NAME ;
+  v_reqInsert CLOB;
+  v_listCols CLOB;
+  v_listVals CLOB;
+  v_flagCol NUMBER;
+  v_tableSource VARCHAR2(100);
+  v_tableCible VARCHAR2(30);
+BEGIN
+  IF INSTR(p_table,'-->')>0 THEN
+    -- p_table est au format TABLE1-->TABLE2 : on duplique de TABLE1 dans TABLE2
+    v_tableSource := SUBSTR(p_table,1,INSTR(p_table,'-->')-1);
+    v_tableCible := SUBSTR(p_table,INSTR(p_table,'-->')+3);
+  ELSE
+    -- p_table est au format TABLE : on duplique de TABLE dans elle-même
+    v_tableSource := p_table;
+    v_tableCible := p_table;
+  END IF;
+  SELECT COLUMN_NAME BULK COLLECT Into Tabcol FROM USER_TAB_COLS WHERE UPPER(TABLE_NAME)=UPPER(v_tableCible) AND VIRTUAL_COLUMN='NO' AND HIDDEN_COLUMN='NO' AND COLUMN_ID IS NOT NULL ORDER BY COLUMN_ID;
+  IF Tabcol.count>0 THEN
+    FOR i IN Tabcol.first..Tabcol.last LOOP
+      v_flagCol := 0;
+      v_listCols := v_listCols||UPPER(Tabcol(i));
+      IF UPPER(Tabcol(i))=UPPER(p_colonne1) THEN
+        v_listVals := v_listVals||p_newVal1;
+        v_flagCol := 1;
+      END IF;
+      IF UPPER(Tabcol(i))=UPPER(p_colonne2) THEN
+        v_listVals := v_listVals||p_newVal2;
+        v_flagCol := 1;
+      END IF;
+      IF UPPER(Tabcol(i))=UPPER(p_colonne3) THEN
+        v_listVals := v_listVals||p_newVal3;
+        v_flagCol := 1;
+      END IF;
+      IF UPPER(Tabcol(i))=UPPER(p_colonne4) THEN
+        v_listVals := v_listVals||p_newVal4;
+        v_flagCol := 1;
+      END IF;
+      IF UPPER(Tabcol(i))=UPPER(p_colonne5) THEN
+        v_listVals := v_listVals||p_newVal5;
+        v_flagCol := 1;
+      END IF;
+      IF UPPER(Tabcol(i))=UPPER(p_colonne6) THEN
+        v_listVals := v_listVals||p_newVal6;
+        v_flagCol := 1;
+      END IF;
+      IF UPPER(Tabcol(i))=UPPER(p_colonne7) THEN
+        v_listVals := v_listVals||p_newVal7;
+        v_flagCol := 1;
+      END IF;
+      IF UPPER(Tabcol(i))=UPPER(p_colonne8) THEN
+        v_listVals := v_listVals||p_newVal8;
+        v_flagCol := 1;
+      END IF;
+      IF UPPER(Tabcol(i))=UPPER(p_colonne9) THEN
+        v_listVals := v_listVals||p_newVal9;
+        v_flagCol := 1;
+      END IF;
+      IF v_flagCol=0 THEN
+        v_listVals := v_listVals||Tabcol(i);
+      END IF;
+      IF i<Tabcol.last THEN
+        v_listCols := v_listCols||',';
+        v_listVals := v_listVals||',';
+      END IF;
+    END LOOP;
+    v_reqInsert := 'INSERT INTO '||v_tableCible||' ('||v_listCols||') SELECT '||v_listVals||' FROM '||v_tableSource||' WHERE '||p_whereOldValues;
+    EXECUTE_IMMEDIATE_STRING (v_reqInsert,0);
+  END IF;
+END DUPLIQUE_DONNEES;

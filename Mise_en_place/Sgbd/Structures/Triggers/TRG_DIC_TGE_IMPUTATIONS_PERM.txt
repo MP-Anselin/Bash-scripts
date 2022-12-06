@@ -1,0 +1,206 @@
+##
+TRG_DIC_TGE_IMPUTATIONS_PERM
+=SQL=
+CREATE OR REPLACE TRIGGER trg_dic_tge_imputations_perm BEFORE
+  INSERT OR
+  UPDATE OR
+  DELETE ON dic_tge_imputations_perm 
+  REFERENCING NEW AS n 
+  FOR EACH ROW 
+  DECLARE 
+  	nouvelleImputation imputations_perm_tmp%ROWTYPE;
+  BEGIN
+    nouvelleImputation.NUMPAC              := :n.numpac;
+    nouvelleImputation.PAIEZAD             := :n.numpac;
+    nouvelleImputation.CODE_IMPUTATION_01  := :n.CODE_IMPUTATION_01;
+    nouvelleImputation.CODE_IMPUTATION_02  := :n.CODE_IMPUTATION_02;
+    nouvelleImputation.CODE_IMPUTATION_03  := :n.CODE_IMPUTATION_03;
+    nouvelleImputation.CODE_IMPUTATION_04  := :n.CODE_IMPUTATION_04;
+    nouvelleImputation.CODE_IMPUTATION_05  := :n.CODE_IMPUTATION_05;
+    nouvelleImputation.CODE_IMPUTATION_06  := :n.CODE_IMPUTATION_06;
+    nouvelleImputation.CODE_IMPUTATION_07  := :n.CODE_IMPUTATION_07;
+    nouvelleImputation.CODE_IMPUTATION_08  := :n.CODE_IMPUTATION_08;
+    nouvelleImputation.CODE_IMPUTATION_09  := :n.CODE_IMPUTATION_09;
+    nouvelleImputation.CODE_IMPUTATION_10  := :n.CODE_IMPUTATION_10;
+    nouvelleImputation.CODE_IMPUTATION_11  := :n.CODE_IMPUTATION_11;
+    nouvelleImputation.CODE_IMPUTATION_12  := :n.CODE_IMPUTATION_12;
+    nouvelleImputation.CODE_IMPUTATION_13  := :n.CODE_IMPUTATION_13;
+    nouvelleImputation.CODE_IMPUTATION_14  := :n.CODE_IMPUTATION_14;
+    nouvelleImputation.CODE_IMPUTATION_15  := :n.CODE_IMPUTATION_15;
+    nouvelleImputation.CODE_IMPUTATION_16  := :n.CODE_IMPUTATION_16;
+    nouvelleImputation.CODE_IMPUTATION_17  := :n.CODE_IMPUTATION_17;
+    nouvelleImputation.CODE_IMPUTATION_18  := :n.CODE_IMPUTATION_18;
+    nouvelleImputation.CODE_IMPUTATION_19  := :n.CODE_IMPUTATION_19;
+    nouvelleImputation.CODE_IMPUTATION_20  := :n.CODE_IMPUTATION_20;
+    nouvelleImputation.CODE_IMPUTATION_21  := :n.CODE_IMPUTATION_21;
+    nouvelleImputation.CODE_IMPUTATION_22  := :n.CODE_IMPUTATION_22;
+    nouvelleImputation.CODE_IMPUTATION_23  := :n.CODE_IMPUTATION_23;
+    nouvelleImputation.CODE_IMPUTATION_24  := :n.CODE_IMPUTATION_24;
+    nouvelleImputation.CODE_IMPUTATION_25  := :n.CODE_IMPUTATION_25;
+    nouvelleImputation.CODE_IMPUTATION_26  := :n.CODE_IMPUTATION_26;
+    nouvelleImputation.CODE_IMPUTATION_27  := :n.CODE_IMPUTATION_27;
+    nouvelleImputation.CODE_IMPUTATION_28  := :n.CODE_IMPUTATION_28;
+    nouvelleImputation.CODE_IMPUTATION_29  := :n.CODE_IMPUTATION_29;
+    nouvelleImputation.CODE_IMPUTATION_30  := :n.CODE_IMPUTATION_30;
+    nouvelleImputation.CODE_IMPUTATION_31  := :n.CODE_IMPUTATION_31;
+    nouvelleImputation.CODE_IMPUTATION_32  := :n.CODE_IMPUTATION_32;
+    nouvelleImputation.CODE_IMPUTATION_33  := :n.CODE_IMPUTATION_33;
+    nouvelleImputation.CODE_IMPUTATION_34  := :n.CODE_IMPUTATION_34;
+    nouvelleImputation.CODE_IMPUTATION_35  := :n.CODE_IMPUTATION_35;
+    nouvelleImputation.CODE_IMPUTATION_36  := :n.CODE_IMPUTATION_36;
+    nouvelleImputation.CODE_IMPUTATION_37  := :n.CODE_IMPUTATION_37;
+    nouvelleImputation.CODE_IMPUTATION_38  := :n.CODE_IMPUTATION_38;
+    nouvelleImputation.CODE_IMPUTATION_39  := :n.CODE_IMPUTATION_39;
+    nouvelleImputation.CODE_IMPUTATION_40  := :n.CODE_IMPUTATION_40;
+    nouvelleImputation.POURCENT_IMPUT_01   := :n.POURCENT_IMPUT_01;
+    nouvelleImputation.POURCENT_IMPUT_02   := :n.POURCENT_IMPUT_02;
+    nouvelleImputation.POURCENT_IMPUT_03   := :n.POURCENT_IMPUT_03;
+    nouvelleImputation.POURCENT_IMPUT_04   := :n.POURCENT_IMPUT_04;
+    nouvelleImputation.POURCENT_IMPUT_05   := :n.POURCENT_IMPUT_05;
+    nouvelleImputation.POURCENT_IMPUT_06   := :n.POURCENT_IMPUT_06;
+    nouvelleImputation.POURCENT_IMPUT_07   := :n.POURCENT_IMPUT_07;
+    nouvelleImputation.POURCENT_IMPUT_08   := :n.POURCENT_IMPUT_08;
+    nouvelleImputation.POURCENT_IMPUT_09   := :n.POURCENT_IMPUT_09;
+    nouvelleImputation.POURCENT_IMPUT_10   := :n.POURCENT_IMPUT_10;
+    nouvelleImputation.POURCENT_IMPUT_11   := :n.POURCENT_IMPUT_11;
+    nouvelleImputation.POURCENT_IMPUT_12   := :n.POURCENT_IMPUT_12;
+    nouvelleImputation.POURCENT_IMPUT_13   := :n.POURCENT_IMPUT_13;
+    nouvelleImputation.POURCENT_IMPUT_14   := :n.POURCENT_IMPUT_14;
+    nouvelleImputation.POURCENT_IMPUT_15   := :n.POURCENT_IMPUT_15;
+    nouvelleImputation.POURCENT_IMPUT_16   := :n.POURCENT_IMPUT_16;
+    nouvelleImputation.POURCENT_IMPUT_17   := :n.POURCENT_IMPUT_17;
+    nouvelleImputation.POURCENT_IMPUT_18   := :n.POURCENT_IMPUT_18;
+    nouvelleImputation.POURCENT_IMPUT_19   := :n.POURCENT_IMPUT_19;
+    nouvelleImputation.POURCENT_IMPUT_20   := :n.POURCENT_IMPUT_20;
+    nouvelleImputation.POURCENT_IMPUT_21   := :n.POURCENT_IMPUT_21;
+    nouvelleImputation.POURCENT_IMPUT_22   := :n.POURCENT_IMPUT_22;
+    nouvelleImputation.POURCENT_IMPUT_23   := :n.POURCENT_IMPUT_23;
+    nouvelleImputation.POURCENT_IMPUT_24   := :n.POURCENT_IMPUT_24;
+    nouvelleImputation.POURCENT_IMPUT_25   := :n.POURCENT_IMPUT_25;
+    nouvelleImputation.POURCENT_IMPUT_26   := :n.POURCENT_IMPUT_26;
+    nouvelleImputation.POURCENT_IMPUT_27   := :n.POURCENT_IMPUT_27;
+    nouvelleImputation.POURCENT_IMPUT_28   := :n.POURCENT_IMPUT_28;
+    nouvelleImputation.POURCENT_IMPUT_29   := :n.POURCENT_IMPUT_29;
+    nouvelleImputation.POURCENT_IMPUT_30   := :n.POURCENT_IMPUT_30;
+    nouvelleImputation.POURCENT_IMPUT_31   := :n.POURCENT_IMPUT_31;
+    nouvelleImputation.POURCENT_IMPUT_32   := :n.POURCENT_IMPUT_32;
+    nouvelleImputation.POURCENT_IMPUT_33   := :n.POURCENT_IMPUT_33;
+    nouvelleImputation.POURCENT_IMPUT_34   := :n.POURCENT_IMPUT_34;
+    nouvelleImputation.POURCENT_IMPUT_35   := :n.POURCENT_IMPUT_35;
+    nouvelleImputation.POURCENT_IMPUT_36   := :n.POURCENT_IMPUT_36;
+    nouvelleImputation.POURCENT_IMPUT_37   := :n.POURCENT_IMPUT_37;
+    nouvelleImputation.POURCENT_IMPUT_38   := :n.POURCENT_IMPUT_38;
+    nouvelleImputation.POURCENT_IMPUT_39   := :n.POURCENT_IMPUT_39;
+    nouvelleImputation.POURCENT_IMPUT_40   := :n.POURCENT_IMPUT_40;
+    nouvelleImputation.DATE_CREATION       := :n.DATE_CREATION;
+    nouvelleImputation.DATE_DERNIERE_MODIF := :n.DATE_DERNIERE_MODIF;
+    nouvelleImputation.PACMAT              := :n.PACMAT;
+    nouvelleImputation.MATRIC              := :n.MATRIC;
+    nouvelleImputation.IDPACMAT            := :n.IDPACMAT;
+    nouvelleImputation.TYPE_WRITER         := :n.TYPE_WRITER;
+    INSERT INTO imputations_perm_tmp VALUES nouvelleImputation;
+    IF inserting THEN
+		insert into imputations_perm
+			select c.numpac, c.paiezad, c.numcnt, imp.imput_number, imp.code_imput, imp.pourcent_imput from 
+			(select numpac as new_numpac, paiezad as new_paiezad, code_imput, pourcent_imput, imput_number 
+			from imputations_perm_tmp 
+			unpivot ((code_imput, pourcent_imput) for imput_number 
+			in ((code_imputation_01, pourcent_imput_01) AS 'IMPUT_01',
+			  (code_imputation_02, pourcent_imput_02) AS 'IMPUT_02',
+			  (code_imputation_03, pourcent_imput_03) AS 'IMPUT_03',
+			  (code_imputation_04, pourcent_imput_04) AS 'IMPUT_04',
+			  (code_imputation_05, pourcent_imput_05) AS 'IMPUT_05',
+			  (code_imputation_06, pourcent_imput_06) AS 'IMPUT_06',
+			  (code_imputation_07, pourcent_imput_07) AS 'IMPUT_07',
+			  (code_imputation_08, pourcent_imput_08) AS 'IMPUT_08',
+			  (code_imputation_09, pourcent_imput_09) AS 'IMPUT_09',
+			  (code_imputation_10, pourcent_imput_10) AS 'IMPUT_10',
+			  (code_imputation_11, pourcent_imput_11) AS 'IMPUT_11',
+			  (code_imputation_12, pourcent_imput_12) AS 'IMPUT_12',
+			  (code_imputation_13, pourcent_imput_13) AS 'IMPUT_13',
+			  (code_imputation_14, pourcent_imput_14) AS 'IMPUT_14',
+			  (code_imputation_15, pourcent_imput_15) AS 'IMPUT_15',
+			  (code_imputation_16, pourcent_imput_16) AS 'IMPUT_16',
+			  (code_imputation_17, pourcent_imput_17) AS 'IMPUT_17',
+			  (code_imputation_18, pourcent_imput_18) AS 'IMPUT_18',
+			  (code_imputation_19, pourcent_imput_19) AS 'IMPUT_19',
+			  (code_imputation_20, pourcent_imput_20) AS 'IMPUT_20',
+			  (code_imputation_21, pourcent_imput_21) AS 'IMPUT_21',
+			  (code_imputation_22, pourcent_imput_22) AS 'IMPUT_22',
+			  (code_imputation_23, pourcent_imput_23) AS 'IMPUT_23',
+			  (code_imputation_24, pourcent_imput_24) AS 'IMPUT_24',
+			  (code_imputation_25, pourcent_imput_25) AS 'IMPUT_25',
+			  (code_imputation_26, pourcent_imput_26) AS 'IMPUT_26',
+			  (code_imputation_27, pourcent_imput_27) AS 'IMPUT_27',
+			  (code_imputation_28, pourcent_imput_28) AS 'IMPUT_28',
+			  (code_imputation_29, pourcent_imput_29) AS 'IMPUT_29',
+			  (code_imputation_30, pourcent_imput_30) AS 'IMPUT_30',
+			  (code_imputation_31, pourcent_imput_31) AS 'IMPUT_31',
+			  (code_imputation_32, pourcent_imput_32) AS 'IMPUT_32',
+			  (code_imputation_33, pourcent_imput_33) AS 'IMPUT_33',
+			  (code_imputation_34, pourcent_imput_34) AS 'IMPUT_34',
+			  (code_imputation_35, pourcent_imput_35) AS 'IMPUT_35',
+			  (code_imputation_36, pourcent_imput_36) AS 'IMPUT_36',
+			  (code_imputation_37, pourcent_imput_37) AS 'IMPUT_37',
+			  (code_imputation_38, pourcent_imput_38) AS 'IMPUT_38',
+			  (code_imputation_39, pourcent_imput_39) AS 'IMPUT_39',
+			  (code_imputation_40, pourcent_imput_40) AS 'IMPUT_40'))) imp 
+			inner join (select numpac, paiezad, max(numcnt) as numcnt 
+			from dic_adm_contrat_situ group by numpac, paiezad) c on (c.numpac = :n.numpac and c.paiezad = :n.paiezad);
+		delete from imputations_perm_tmp;
+	end if;
+		
+	IF updating THEN
+		delete from imputations_perm where numpac = :n.numpac and paiezad = :n.paiezad;
+			insert into imputations_perm
+			select c.numpac, c.paiezad, c.numcnt, imp.imput_number, imp.code_imput, imp.pourcent_imput from 
+			(select numpac as new_numpac, paiezad as new_paiezad, code_imput, pourcent_imput, imput_number 
+			from imputations_perm_tmp 
+			unpivot ((code_imput, pourcent_imput) for imput_number 
+			in ((code_imputation_01, pourcent_imput_01) AS 'IMPUT_01',
+			  (code_imputation_02, pourcent_imput_02) AS 'IMPUT_02',
+			  (code_imputation_03, pourcent_imput_03) AS 'IMPUT_03',
+			  (code_imputation_04, pourcent_imput_04) AS 'IMPUT_04',
+			  (code_imputation_05, pourcent_imput_05) AS 'IMPUT_05',
+			  (code_imputation_06, pourcent_imput_06) AS 'IMPUT_06',
+			  (code_imputation_07, pourcent_imput_07) AS 'IMPUT_07',
+			  (code_imputation_08, pourcent_imput_08) AS 'IMPUT_08',
+			  (code_imputation_09, pourcent_imput_09) AS 'IMPUT_09',
+			  (code_imputation_10, pourcent_imput_10) AS 'IMPUT_10',
+			  (code_imputation_11, pourcent_imput_11) AS 'IMPUT_11',
+			  (code_imputation_12, pourcent_imput_12) AS 'IMPUT_12',
+			  (code_imputation_13, pourcent_imput_13) AS 'IMPUT_13',
+			  (code_imputation_14, pourcent_imput_14) AS 'IMPUT_14',
+			  (code_imputation_15, pourcent_imput_15) AS 'IMPUT_15',
+			  (code_imputation_16, pourcent_imput_16) AS 'IMPUT_16',
+			  (code_imputation_17, pourcent_imput_17) AS 'IMPUT_17',
+			  (code_imputation_18, pourcent_imput_18) AS 'IMPUT_18',
+			  (code_imputation_19, pourcent_imput_19) AS 'IMPUT_19',
+			  (code_imputation_20, pourcent_imput_20) AS 'IMPUT_20',
+			  (code_imputation_21, pourcent_imput_21) AS 'IMPUT_21',
+			  (code_imputation_22, pourcent_imput_22) AS 'IMPUT_22',
+			  (code_imputation_23, pourcent_imput_23) AS 'IMPUT_23',
+			  (code_imputation_24, pourcent_imput_24) AS 'IMPUT_24',
+			  (code_imputation_25, pourcent_imput_25) AS 'IMPUT_25',
+			  (code_imputation_26, pourcent_imput_26) AS 'IMPUT_26',
+			  (code_imputation_27, pourcent_imput_27) AS 'IMPUT_27',
+			  (code_imputation_28, pourcent_imput_28) AS 'IMPUT_28',
+			  (code_imputation_29, pourcent_imput_29) AS 'IMPUT_29',
+			  (code_imputation_30, pourcent_imput_30) AS 'IMPUT_30',
+			  (code_imputation_31, pourcent_imput_31) AS 'IMPUT_31',
+			  (code_imputation_32, pourcent_imput_32) AS 'IMPUT_32',
+			  (code_imputation_33, pourcent_imput_33) AS 'IMPUT_33',
+			  (code_imputation_34, pourcent_imput_34) AS 'IMPUT_34',
+			  (code_imputation_35, pourcent_imput_35) AS 'IMPUT_35',
+			  (code_imputation_36, pourcent_imput_36) AS 'IMPUT_36',
+			  (code_imputation_37, pourcent_imput_37) AS 'IMPUT_37',
+			  (code_imputation_38, pourcent_imput_38) AS 'IMPUT_38',
+			  (code_imputation_39, pourcent_imput_39) AS 'IMPUT_39',
+			  (code_imputation_40, pourcent_imput_40) AS 'IMPUT_40'))) imp 
+			inner join (select numpac, paiezad, max(numcnt) as numcnt 
+			from dic_adm_contrat_situ group by numpac, paiezad) c on (c.numpac = :n.numpac and c.paiezad = :n.paiezad);
+	end if;
+	if deleting then
+		delete from imputations_perm where numpac = :old.numpac and paiezad = :old.paiezad;
+	end if;
+END trg_dic_tge_imputations_perm;

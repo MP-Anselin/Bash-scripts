@@ -1,0 +1,40 @@
+##
+HRO_CODTS
+=SQL=
+CREATE OR REPLACE
+  FUNCTION HRO_CODTS(
+      p_position IN NUMBER )
+    RETURN VARCHAR2
+  IS
+    valvar      VARCHAR2(25);
+    res         VARCHAR2(25);
+    start_index NUMBER;
+    end_index   NUMBER;
+  BEGIN
+    SELECT valvar
+    INTO valvar
+    FROM sys_varsys
+    WHERE codvar  ='HREXTR_CODTS'
+    AND module    ='HRO';
+    IF p_position = 0 THEN
+      RETURN NULL;
+    END IF ;
+    IF p_position = 1 THEN
+      end_index  := instr(valvar,',',1,p_position)-1;
+      res        := SUBSTR (valvar,0,end_index);
+    ELSE
+      start_index := instr(valvar,',',1,p_position-1)+1;
+      end_index   := instr(valvar,',',1,p_position );
+      IF end_index = 0 THEN
+        end_index := LENGTH(valvar);
+        res       := SUBSTR (valvar,start_index,end_index+1-start_index);
+      ELSE
+        res := SUBSTR (valvar,start_index,end_index-start_index);
+      END IF ;
+    END IF;
+    IF instr(res,',',1,1) > 0 THEN
+      RETURN NULL;
+    END IF ;
+    RETURN res;
+  END HRO_CODTS;
+  

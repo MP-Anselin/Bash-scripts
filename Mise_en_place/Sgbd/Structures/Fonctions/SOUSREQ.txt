@@ -1,0 +1,39 @@
+##
+SOUSREQ
+=SQL=
+CREATE OR REPLACE
+  FUNCTION SOUSREQ(
+      Req IN VARCHAR2)
+    RETURN VARCHAR2
+  IS
+  TYPE TCur
+IS
+  REF
+  CURSOR ;
+    cur TCur ;
+    RetourSelect VARCHAR2(80);
+    Retour       VARCHAR2(600);
+    cpt          INTEGER;
+  BEGIN
+    OPEN cur FOR Req ;
+    cpt:=0;
+    LOOP
+      FETCH cur INTO RetourSelect ;
+    EXIT
+  WHEN cur%NOTFOUND ;
+    cpt      :=cpt+1;
+    IF (cpt  <=6) THEN
+      Retour := Retour || RetourSelect || CHR(32);
+    END IF;
+  END LOOP ;
+  CLOSE cur ;
+  IF (cpt<6) THEN
+    LOOP
+      cpt    :=cpt+1;
+      Retour := Retour || CHR(32);
+      EXIT
+    WHEN (cpt>=6) ;
+    END LOOP ;
+  END IF;
+  RETURN Retour;
+END ; 

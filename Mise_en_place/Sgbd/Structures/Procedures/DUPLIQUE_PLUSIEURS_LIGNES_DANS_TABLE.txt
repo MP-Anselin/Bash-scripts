@@ -1,0 +1,21 @@
+##
+TAG_CHARSET=@€éèç
+##
+DUPLIQUE_PLUSIEURS_LIGNES_DANS_TABLE
+=SQL=
+create or replace
+PROCEDURE DUPLIQUE_PLUSIEURS_LIGNES_DANS_TABLE (pTableAModifier VARCHAR2, pTableGxp VARCHAR2, pListeElements TAB_VARCHAR) AS
+p_whereOldValues VARCHAR(1000) := '' ;
+BEGIN
+ FOR i IN pListeElements.first..pListeElements.last LOOP
+     IF pTableGxp IS NOT NULL THEN
+       p_whereOldValues := 'NUMPAC=''*'' AND ELEMENT='''||pListeElements(i)||''' AND NOT TABLEGXP='''||pTableGxp||'''';
+     ELSE
+        p_whereOldValues := 'NUMPAC=''*'' AND ELEMENT='''||pListeElements(i)||'''' ;  
+     END IF ;
+     FOR n IN (SELECT NUMPAC FROM TGE_REF_PAC P WHERE NOT EXISTS (SELECT 1 FROM TGE_REF_MAPDO M WHERE M.NUMPAC=P.NUMPAC AND M.ELEMENT=pListeElements(i))) LOOP
+      -- On duplique la ligne ayant NUMPAC = * , ELEMENT = <Element courant> et TABLEGXP != DIC_PENSION_ALIM (dans le cas où on passe le script une 2nde fois) sur un 'vrai' PAC
+       DUPLIQUE_DONNEES(pTableAModifier,p_whereOldValues,'NUMPAC',''''||n.NUMPAC||'''','','','','','','','','','','','','','','','','');
+     END LOOP;
+  END LOOP;
+END DUPLIQUE_PLUSIEURS_LIGNES_DANS_TABLE;

@@ -1,0 +1,52 @@
+##
+FONCTION_CAST
+=SQL=
+create or replace function CRF_TRANSFERT_CAST_COLUMN(DbLinkSource VARCHAR2, NomTable VARCHAR2, NomColonne VARCHAR2 )return varchar2
+IS
+v_return  varchar2(100);
+
+v_requete CLOB;
+DbLinkCible varchar2(30);
+data_TypeSource varchar2(30);
+data_LengthSource number;
+data_PrecisionSource number;
+
+data_TypeCible varchar2(30);
+data_LengthCible number;
+data_PrecisionCible number;
+
+
+begin
+  v_return := NomColonne;
+  
+  v_requete := 'select sys_context( ''userenv'', ''current_schema'' ) from dual';
+  EXECUTE IMMEDIATE v_requete into DbLinkCible;
+
+  v_requete := 'select data_Type, data_Length, data_Precision from all_tab_columns@' || DbLinkSource || ' where owner = upper(''' || DbLinkSource || ''') and  table_name = upper(''' || NomTable || ''') and column_name =upper(''' || NomColonne || ''')';
+  EXECUTE IMMEDIATE v_requete into data_TypeSource, data_LengthSource, data_PrecisionSource;
+
+  v_requete := 'select data_Type, data_Length, data_Precision from all_tab_columns where owner = upper(''' || DbLinkCible || ''') and table_name = upper(''' || NomTable || ''') and column_name = upper(''' || NomColonne || ''')';
+  EXECUTE IMMEDIATE v_requete into data_TypeCible, data_LengthCible, data_PrecisionCible;
+    
+  -- Si le format de donnee est different d'une base a une autre je cast la donne au format de la base cible
+  if data_TypeSource <> data_TypeCible OR data_LengthSource <> data_LengthCible OR data_PrecisionSource <> data_PrecisionCible then
+    -- si la donne est au format varchar
+    if data_TypeCible = 'VARCHAR2' then
+      -- cast en varchar de la valeur a retourner 
+      v_return := 'cast(' || NomColonne || ' as varchar(' || data_LengthSource || '))';
+    end if;
+    -- Si un nombre
+    if data_TypeCible = 'NUMBER' then
+      -- Si un nombre avec precision
+      if data_PrecisionCible is not null then
+        -- je cast remplace les eventuels points par des virgule
+        v_return := 'cast(to_number(trim(replace(' || NomColonne || ',''.'','',''))) as number(' || data_LengthCible || ',' || data_PrecisionCible ||'))';
+      -- Nombre sans virgule
+      else
+        v_return := 'cast(to_number(trim(replace(' || NomColonne || ',''.'','',''))) as number(' || data_LengthCible || '))';
+      end if;
+    end if;
+  end if;
+      
+ return v_return;
+end CRF_TRANSFERT_CAST_COLUMN;

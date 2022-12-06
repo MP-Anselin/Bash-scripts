@@ -1,0 +1,18 @@
+##
+TAG_CHARSET=@€ιθη
+##
+STD_STRUC_ENTITE_OPEN
+=SQL IFNOTEXIST=STD_STRUC_ENTITE_OPEN=CID=
+alter table STD_STRUC_ENTITE_OPEN add CID varchar2(32)
+##
+STD_STRUC_ENTITE_OPEN
+=SQL=
+update STD_STRUC_ENTITE_OPEN set CID = nvl((select VALVAR from SYS_VARSYS where CODVAR = 'NS_CLIENT_ID'), '*') where CID is null
+##
+STD_STRUC_ENTITE_OPEN
+=SQL=
+alter table STD_STRUC_ENTITE_OPEN drop primary key
+##
+STD_STRUC_ENTITE_OPEN
+=SQL=
+alter table STD_STRUC_ENTITE_OPEN add constraint STD_STRUC_ENTITE_OPEN_PK primary key (CODE_ENTITE, CID)

@@ -1,0 +1,97 @@
+##
+TAG_CHARSET=@€éèç
+##
+WKF_TRANSITIONS
+==
+delete from WKF_TRANSITIONS WHERE PROC_NUM = 5050
+55004,5050,'T55004vers(fin  wf dématérialisation,fin  wf dématérialisation)'
+55003,5050,'T55003vers(validation du refus de démat)'
+55001,5050,'T55001vers(fin  wf dématérialisation)'
+##
+WKF_TRANSITIONS
+==
+delete from WKF_TRANSITIONS WHERE PROC_NUM = 5051
+'55101','5051','T55101 vers (Fin processus embauche stagiaire non payé)'
+'55102','5051','T55102 vers (Fin processus embauche stagiaire non payé)'
+'55103','5051','T55103 vers (Fin processus embauche stagiaire non payé)'
+##
+WKF_TRANSITIONS
+==
+Delete from WKF_TRANSITIONS where PROC_NUM in ('5052')
+'55201','5052','T55201vers(Fin processus insertion de période d''emploi,Fin du processus insertion période d''emploi)'
+'55202','5052','T55202vers(Accepter insertion période d''emploi)'
+'55203','5052','T55203vers(Fin processus insertion de période d''emploi,Fin du processus insertion période d''emploi)'
+'55211','5052','T55211vers(Fin processus insertion de période d''emploi)'
+'55212','5052','T55212vers(Fin processus insertion de période d''emploi)'
+'55213','5052','T55213vers(Fin processus insertion de période d''emploi)'
+##
+WKF_TRANSITIONS
+==
+delete from WKF_TRANSITIONS where TR_NUM in ('55211','55212','55213')
+##
+WKF_TRANSITIONS
+==
+delete from WKF_TRANSITIONS WHERE PROC_NUM = 5053
+'55301','5053','T55301 vers (Validation de la demande)'
+'55302','5053','T55302 vers (Fin processus modification mutuelle)'
+'55303','5053','T55303 vers (Fin processus modification mutuelle)'
+##
+WKF_TRANSITIONS
+==
+delete from WKF_TRANSITIONS WHERE TR_NUM in (53205,53206,53207,50317,50320)
+'53205','5032','T53205 vers (UX validation mutuelle,UX validation mutuelle)'
+'53206','5032','T53206 vers (Fin processus modification mutuelle,Fin processus modification mutuelle)'
+'53207','5032','T53207 vers (Fin processus modification mutuelle,Fin processus modification mutuelle)'
+'50317','5003','T50317 vers (Fin processus modification de l''adresse)'
+'50320','5003','T50320 vers (UX Validation de modification des coordonnées)'
+##
+WKF_TRANSITIONS
+==
+delete from WKF_TRANSITIONS WHERE TR_NUM = 4203
+'4203','4009','T4203vers(valider la modification de la carte)'
+##
+WKF_TRANSITIONS
+==
+delete from WKF_TRANSITIONS WHERE PROC_NUM = 5015
+51501,5015,'T51501vers(valid envoi fic)'
+51502,5015,'T51502vers(fin envoi fic)'
+51503,5015,'T51503vers(fin envoi fic)'
+##
+WKF_TRANSITIONS
+==
+delete from WKF_TRANSITIONS WHERE PROC_NUM = '6300'
+'54448','6300','T54448vers(Fin du processus)'
+'54447','6300','T54447vers(Fin du processus)'
+'54449','6300','T54449vers(Valider la demande de modification transport)'
+'54450','6300','T54450vers(Fin du processus)'
+'54451','6300','T54451vers(Fin du processus)'
+'54452','6300','T54452vers(Corriger la demande de modification transport)'
+'54453','6300','T54453vers(Fin du processus)'
+'54454','6300','T54454vers(Valider la demande de modification transport)'
+'63011','6300','T63011vers(UX validation demande remb transport)'
+'63017','6300','T63017vers(Fin du processus)'
+'63018','6300','T63018vers(Fin du processus)'
+##
+WKF_TRANSITIONS
+==
+delete from WKF_TRANSITIONS WHERE TR_NUM = 53804
+'53804','5038','T53804 vers (Init)'
+##
+WKF_TRANSITIONS
+==
+delete from WKF_TRANSITIONS WHERE TR_NUM = 53706
+'53706','5037','T53706 vers (Init)'
+##
+WKF_TRANSITIONS
+==
+delete from WKF_TRANSITIONS WHERE PROC_NUM = '5500'
+'55100','5500','T55100 vers (Accepter les modifications)'
+'55110','5500','T55110 vers (Fin processus modifications contractuelles)'
+'55120','5500','T55120 vers (Fin processus modifications contractuelles)'
+'55200','5500','T55200 vers (Fin processus modifications contractuelles)'
+'55210','5500','T55210 vers (Modifications contractuelles)'
+##
+WKF_TRANSITIONS
+==
+delete from WKF_TRANSITIONS WHERE TR_NUM = 50205
+'50205','5002','T50205 vers (Init)'

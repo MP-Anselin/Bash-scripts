@@ -1,0 +1,126 @@
+##
+TAG_CHARSET=@€éèç
+##
+BUILD_INDEX_DEFRAG
+=SQL=
+create or replace PROCEDURE "BUILD_INDEX_DEFRAG" (p_retour OUT INTEGER)
+AS
+/**
+ * Procédure de "défragmentation" de la table STD_STRUC_INDEX qui consiste en :
+ * - la recopie des données dans une table temporaire (sans aucun index, ni pk) STD_STRUC_INDEX_DEFRAG
+ * - le truncate de la table STD_STRUC_INDEX
+ * - la recopie des données depuis STD_STRUC_INDEX_DEFRAG vers STD_STRUC_INDEX
+ * - le recalcul des statistiques
+ * La procédure retourne 1 si la défragmentation a pu être lancée, 0 sinon dans le paramètre p_retour
+ * Afin d'éviter la concurrence entre cette procédure et la procédure BUILD_INDEX,
+ * on utilise un codTs bidon -99 dans la table BUILD_INDEX_LOCK
+ * 
+ * A la fin de la défragmentation, on appelle également la procédure HRORG_CONSOLIDE_AFFECTATION qui permet de consolider la table STD_STRUC_AFFECTATION
+ */
+  v_codTs99   INTEGER := NULL;
+  v_codTsLock INTEGER := NULL;
+BEGIN
+  p_retour := 0;
+  
+  -- Récupération si une structure est déjà lockée ou un traitement de défragmentation
+  BEGIN
+    SELECT codTs_lock
+    INTO v_codTsLock
+    FROM build_index_lock
+    WHERE codTs_lock > 0
+    AND ROWNUM = 1;
+  EXCEPTION
+    -- Aucune structure lockée
+  WHEN NO_DATA_FOUND THEN
+    v_codTsLock := NULL;
+  END; 
+  
+  IF v_codTsLock IS NULL THEN
+    -- Récupération si le codTs -99 existe déjà dans la table de lock
+    BEGIN
+      SELECT codTs
+      INTO v_codTs99
+      FROM build_index_lock
+      WHERE codTs = -99;
+    EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      -- Pas de ligne pour le codTs -99
+      v_codTs99 := NULL;
+    END;
+    
+    -- Lock dans la table BUILD_INDEX_LOCK
+    IF v_codTs99 IS NULL THEN
+      INSERT INTO build_index_lock (codTs, codTs_lock)
+      values (-99, 1);
+    ELSE
+      UPDATE build_index_lock
+      SET codTs_lock = 1
+      WHERE codTs = -99;
+    END IF;
+    COMMIT; -- Commite de l'insert/update du lock
+    
+    -- Vidage d'abord de la table de défragmentation
+    EXECUTE_IMMEDIATE_STRING('truncate table STD_STRUC_INDEX_DEFRAG',0);
+      
+    -- Copie dans la table temporaire
+    INSERT INTO std_struc_index_defrag
+    SELECT * FROM std_struc_index;
+    
+    -- Truncate de STD_STRUC_INDEX (pour éliminer la fragmentation de la table) 
+    EXECUTE_IMMEDIATE_STRING('truncate table STD_STRUC_INDEX',0);
+     
+    -- Recopie dans STD_STRUC_INDEX
+    INSERT INTO std_struc_index
+    SELECT * FROM std_struc_index_defrag;
+    
+    COMMIT;
+    
+    -- Recacul des statistiques
+    SYS_RECALCUL_STATS('std_struc_index');
+    
+    -- Truncate de STD_STRUC_INDEX_DEFRAG
+    EXECUTE_IMMEDIATE_STRING('truncate table STD_STRUC_INDEX_DEFRAG',0);
+    
+    -- Déclocke 
+    UPDATE build_index_lock
+    SET codTs_lock = 0
+    WHERE codTs = -99;
+    COMMIT;
+    
+    -- Si des build ont été tentés pendant ce traitement, on les lance à la suite
+    BEGIN
+      FOR tabCodTsLock IN (
+        SELECT codTs, date_eff
+        FROM build_index_lock
+        WHERE codTs_lock > 0)
+      LOOP
+        -- On commence par délocker la structure
+        UPDATE build_index_lock
+        SET codTs_lock = 0
+        WHERE codTs = tabCodTsLock.codTs;
+        COMMIT;
+        -- Puis on lance le traitement de build
+        BUILD_INDEX(tabCodTsLock.codTs, tabCodTsLock.date_eff);
+      END LOOP;
+    END;
+    
+    p_retour := 1;
+    
+    BEGIN
+    	-- Appel à la consolidation des données dans la table STD_STRUC_AFFECTATION
+	    EXECUTE_IMMEDIATE_STRING('call HRORG_CONSOLIDE_AFFECTATION()',0);
+  	EXCEPTION WHEN OTHERS THEN
+  		p_retour := 2;
+  	END;
+  	
+  END IF;
+EXCEPTION
+WHEN OTHERS THEN
+  -- Une exception a été lancé, on déclock la structure
+  UPDATE build_index_lock 
+  SET codTs_lock = 0 
+  WHERE codTs = -99;
+  COMMIT;
+  
+  
+END BUILD_INDEX_DEFRAG;

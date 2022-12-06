@@ -1,0 +1,224 @@
+<clients>
+<client idClient="HR_INTER">
+	<nomClient>HR_INTER</nomClient>
+	<environnements>
+		<env idEnv="D">
+			<nomEnvironnement>Developpement</nomEnvironnement>
+				<SGBD_URL>jdbc:oracle:thin:@XXX.XXX.XXX.XXX:XXXX</SGBD_URL>
+				<SGBD_user>monschemaamoi</SGBD_user>
+				<SGBD_password>**********</SGBD_password>
+		</env>
+	</environnements>
+<interfaces>
+
+
+<interface idInterface="Z2XCHARGEMENT">
+<nomInterface>PreChargement des fichiers</nomInterface>
+<descriptionInterface>
+	Chaîne de chargement du module HRT pour les clients ZADIG 
+	à partir des tables pré-remplies préfixées par Z2X_BATCH_
+	dans le cadre d'un [hr]Training sécable
+</descriptionInterface>
+
+<SupprimerFichier>OUI</SupprimerFichier>
+<lockBase>Oui</lockBase>
+<locknomTable>Z2X_BATCH_LOG</locknomTable>
+<lockId>BATCH HR Z2X</lockId>
+
+<parametreParDefaut>
+	<defauttypeFichier>CSV</defauttypeFichier>
+	<defautmodeChargement>NON</defautmodeChargement>
+	<defautcontinueSiErreur>OUI</defautcontinueSiErreur>
+	<defautpresenceEntete>OUI</defautpresenceEntete>
+	<defautimportanceEntete>NON</defautimportanceEntete>
+	<defautseparateurChamp>;</defautseparateurChamp>
+	<defautencapsuleurChamp>"</defautencapsuleurChamp>
+	<defautseparateurDecimal>.</defautseparateurDecimal>
+	<defautfichierLigneNonTraite>OUI</defautfichierLigneNonTraite>
+</parametreParDefaut>
+<traitements>
+
+<traitement>
+	<descriptionTraitement>Script parametrage de la session oracle </descriptionTraitement>
+	<desactive>NON</desactive>
+	<typeTraitement>SCRIPT</typeTraitement>
+	<nomFichier>sql_z2x_parametrageSession.sql</nomFichier>
+	<typeFichier>SQL</typeFichier>
+	<commitGeneral>OUI</commitGeneral>
+	<continueSiErreur>OUI</continueSiErreur>
+</traitement>
+
+<traitement>
+	<descriptionTraitement>Script parametrage de la session oracle </descriptionTraitement>
+	<desactive>NON</desactive>
+	<typeTraitement>SCRIPT</typeTraitement>
+	<nomFichier>sql_z2x_parametrageSession.sql</nomFichier>
+	<typeFichier>SQL</typeFichier>
+	<commitGeneral>OUI</commitGeneral>
+	<continueSiErreur>OUI</continueSiErreur>
+</traitement>
+
+<traitement>
+	<descriptionTraitement>Traitement des dates de fin de l'historique emploi</descriptionTraitement>
+	<desactive>NON</desactive>
+	<typeTraitement>InterfaceZ2XAlone</typeTraitement>
+	<typeAction>ReparationHistorique</typeAction>
+	<nomTable>Z2X_BATCH_HISEMPLO</nomTable>
+	<nomColonneRupture>MATRIC</nomColonneRupture>
+	<NomColonneDateDeb>DATDEB</NomColonneDateDeb>
+	<NomColonneDateFin>DATFIN</NomColonneDateFin>
+</traitement>
+
+<traitement>
+	<descriptionTraitement>Script chargement des tables de libellé standard</descriptionTraitement>
+	<desactive>NON</desactive>
+	<typeTraitement>SCRIPT</typeTraitement>
+	<nomFichier>sql_z2x_alimentation_tablestd.sql</nomFichier>
+	<typeFichier>SQL</typeFichier>
+	<commitGeneral>OUI</commitGeneral>
+	<continueSiErreur>OUI</continueSiErreur>
+</traitement>
+
+<traitement>
+	<descriptionTraitement>Script chargement des tables de libellé hr training et emplois</descriptionTraitement>
+	<desactive>NON</desactive>
+	<typeTraitement>SCRIPT</typeTraitement>
+	<nomFichier>sql_z2x_alimentation_tablefor.sql</nomFichier>
+	<typeFichier>SQL</typeFichier>
+	<commitGeneral>OUI</commitGeneral>
+	<continueSiErreur>OUI</continueSiErreur>
+</traitement>
+
+<traitement>
+	<descriptionTraitement>Traitement chargement de la table ETAT_CIV</descriptionTraitement>
+	<desactive>NON</desactive>
+	<typeTraitement>interfaceZ2xAlone</typeTraitement>
+	<typeAction>traitementDossier</typeAction>
+</traitement>
+
+<traitement>
+	<descriptionTraitement>Script préchargement des libellés dans les structures </descriptionTraitement>
+	<desactive>NON</desactive>
+	<typeTraitement>SCRIPT</typeTraitement>
+	<nomFichier>sql_z2x_pre_structures.sql</nomFichier>
+	<typeFichier>SQL</typeFichier>
+	<commitGeneral>OUI</commitGeneral>
+	<continueSiErreur>OUI</continueSiErreur>
+</traitement>
+
+<traitement>
+	<descriptionTraitement>Traitement des historiques </descriptionTraitement>
+	<desactive>NON</desactive>
+	<typeTraitement>interfaceZ2xAlone</typeTraitement>
+	<modeDebug>true</modeDebug>
+	<typeAction>traitementHistorique</typeAction>
+	<nomColonneRupture>MATRIC</nomColonneRupture>
+	<NomColonneDateDeb>DTDEBSOCIETE</NomColonneDateDeb>
+	<NomColonneDateFin>DTFINSOCIETE</NomColonneDateFin>
+</traitement>
+
+<traitement>
+        <descriptionTraitement>Script chargement de la table SECUMATRIC</descriptionTraitement>
+        <desactive>NON</desactive>
+        <typeTraitement>SCRIPT</typeTraitement>
+        <nomFichier>sql_z2x_secumatric.sql</nomFichier>
+        <typeFichier>SQL</typeFichier>
+        <commitGeneral>OUI</commitGeneral>
+        <continueSiErreur>OUI</continueSiErreur>
+</traitement>
+
+<traitement>
+	<descriptionTraitement>Script chargement des tables d'historiques</descriptionTraitement>
+	<desactive>NON</desactive>
+	<typeTraitement>SCRIPT</typeTraitement>
+	<nomFichier>sql_z2x_historiques.sql</nomFichier>
+	<typeFichier>SQL</typeFichier>
+	<commitGeneral>OUI</commitGeneral>
+	<continueSiErreur>OUI</continueSiErreur>
+</traitement>
+
+<traitement>
+	<descriptionTraitement>Traitement des structures</descriptionTraitement>
+	<desactive>NON</desactive>
+	<typeTraitement>interfaceZ2xAlone</typeTraitement>
+	<tableZ2X>oui</tableZ2X>
+	<typeAction>traitementStructure</typeAction>
+</traitement>
+
+<traitement>
+	<descriptionTraitement>Script chargement des compteurs</descriptionTraitement>
+	<desactive>NON</desactive>
+	<typeTraitement>SCRIPT</typeTraitement>
+	<nomFichier>sql_z2x_compteurs.sql</nomFichier>
+	<typeFichier>SQL</typeFichier>
+	<commitGeneral>OUI</commitGeneral>
+	<continueSiErreur>OUI</continueSiErreur>
+</traitement>
+
+<traitement>
+	<descriptionTraitement>Script SQL avant Rôle et Organisation</descriptionTraitement>
+	<desactive>NON</desactive>
+	<typeTraitement>SCRIPT</typeTraitement>
+	<nomFichier>sql_z2x_avant_ORG.sql</nomFichier>
+	<typeFichier>SQL</typeFichier>
+	<continueSiErreur>OUI</continueSiErreur>
+</traitement>
+
+<traitement>
+	<descriptionTraitement>interface ORG</descriptionTraitement>
+	<desactive>NON</desactive>
+	<typeTraitement>InterfaceORG</typeTraitement>
+	<synchronisationGXP>OUI</synchronisationGXP>
+	<modeDebug>false</modeDebug>
+	<continueSiErreur>NON</continueSiErreur>
+</traitement>
+
+<traitement>
+	<descriptionTraitement>audit</descriptionTraitement>
+	<desactive>NON</desactive>
+	<typeTraitement>AuditRoleEtOrga</typeTraitement>
+	<fichierOUT></fichierOUT>
+	<continueSiErreur>NON</continueSiErreur>
+</traitement>
+
+<traitement>
+	<descriptionTraitement>Script chargement des codes uid</descriptionTraitement>
+	<desactive>NON</desactive>
+	<typeTraitement>SCRIPT</typeTraitement>
+	<nomFichier>sql_z2x_uid.sql</nomFichier>
+	<typeFichier>SQL</typeFichier>
+	<commitGeneral>OUI</commitGeneral>
+	<continueSiErreur>OUI</continueSiErreur>
+</traitement>
+
+<traitement>
+        <descriptionTraitement>Audit des historiques</descriptionTraitement>
+        <desactive>NON</desactive>
+        <typeTraitement>interfaceZ2xAlone</typeTraitement>
+       <typeAction>audit</typeAction>
+</traitement>
+
+
+</traitements>
+</interface>
+	
+
+</interfaces>
+<mail>
+	<ServeurSMTP>smtp-dc1.ehc.adp.com</ServeurSMTP>
+	<PortSMTP>25</PortSMTP>
+	<MailFrom>batch.gxp@fr.adp.com</MailFrom>
+	<listedestinataire>_a_parametrer_</listedestinataire>
+	<listecopie>_a_parametrer_</listecopie>
+	<typeEnvoie>SiErreur</typeEnvoie>
+</mail>
+<attente>
+	<tempsControleTraitement>1</tempsControleTraitement>
+	<tempsAttenteTraitement>60</tempsAttenteTraitement>
+</attente>
+<purge>
+	<NbFichierConservationLog>4</NbFichierConservationLog>
+	<NbFichierConservationFichier>4</NbFichierConservationFichier>
+</purge>
+</client>
+</clients>

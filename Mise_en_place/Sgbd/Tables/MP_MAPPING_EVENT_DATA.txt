@@ -1,0 +1,33 @@
+##
+TAG_CHARSET=@€ιθη
+##
+MP_MAPPING_EVENT_DATA
+=SQL IFEXIST=DEX_MAPPING_EVENT_DATA=
+RENAME DEX_MAPPING_EVENT_DATA TO MP_MAPPING_EVENT_DATA
+##
+MP_MAPPING_EVENT_DATA
+==
+DELETE FROM MP_MAPPING_EVENT_DATA WHERE NOM_DONNEE_DEX_OU_EVENT='rankEmergency'
+'worker.personalContact.acr','rankEmergency','O','D','N'
+##
+MP_MAPPING_EVENT_DATA
+==
+DELETE FROM MP_MAPPING_EVENT_DATA WHERE EVENT='worker.legalName.change' AND NOM_DONNEE_DEX_OU_EVENT='formattedName'
+'worker.legalName.change','formattedName','O','D','N'
+##
+MP_MAPPING_EVENT_DATA
+==
+DELETE FROM MP_MAPPING_EVENT_DATA WHERE EVENT='worker.workAssignment.modify' AND NOM_DONNEE_DEX_OU_EVENT in ('managerId','originalHireDate')
+'worker.workAssignment.modify','managerId','N','D','N'
+'worker.workAssignment.modify','originalHireDate','N','D','N'
+##
+MP_MAPPING_EVENT_DATA
+==
+delete from  MP_MAPPING_EVENT_DATA WHERE SPECIF = 'N' and EVENT = 'worker.workAssignment.terminate'
+'worker.workAssignment.terminate','worker.terminate','N','E','N'
+##
+MP_MAPPING_EVENT_DATA
+==
+delete from  MP_MAPPING_EVENT_DATA WHERE SPECIF = 'N' and EVENT = 'worker.hire' and NOM_DONNEE_DEX_OU_EVENT in ('legalEntityID','payrollFileNumber')
+'worker.hire','legalEntityID','N','D','N'
+'worker.hire','payrollFileNumber','N','D','N'

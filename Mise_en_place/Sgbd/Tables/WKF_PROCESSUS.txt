@@ -1,0 +1,42 @@
+##
+TAG_CHARSET=@€éèç
+##
+WKF_PROCESSUS
+==
+delete from WKF_PROCESSUS WHERE PROC_NUM = 5050
+5050,'Refus de dématérialisation',0,'','false',0,'fr.adp.com.gxp.std.mot_met.lib.objects.workflow.WkfMetierGeneriqueObj','true','IA','true','',1
+##
+WKF_PROCESSUS
+==
+delete from WKF_PROCESSUS WHERE PROC_NUM = 5051
+'5051','Embauche stagiaire non rémunéré','0',null,'false','0','fr.adp.com.gxp.std.mot_met.lib.objects.workflow.WkfMetierGeneriqueObj','true','IA','true',null,'1'
+##
+WKF_PROCESSUS
+==
+Delete from WKF_PROCESSUS where PROC_NUM in ('5052')
+'5052','Insertion période d''emploi','0','20200124105256','false','0','fr.adp.com.gxp.std.mot_met.lib.objects.workflow.WkfMetierGeneriqueObj','false','DBA','true',null,'45'
+##
+WKF_PROCESSUS
+==
+delete from WKF_PROCESSUS WHERE PROC_NUM = 5053
+'5053','Demande de modification de la mutuelle','0',null,'false','0','fr.adp.com.gxp.std.mot_met.lib.objects.workflow.WkfMetierGeneriqueObj','true','IA','true',null,null
+##
+WKF_PROCESSUS
+==
+delete from WKF_PROCESSUS WHERE PROC_NUM = 4009
+'4009','Modification de la carte de séjour','0',null,'false','0','fr.adp.com.gxp.std.mot_met.lib.objects.workflow.WkfMetierGeneriqueObj','true','DBA','true',null,'1'
+##
+WKF_PROCESSUS
+==
+delete from WKF_PROCESSUS WHERE PROC_NUM = 5015
+5015,'Envoi de document depuis UX',0,null,'false','0','fr.adp.com.gxp.std.mot_met.lib.objects.workflow.WkfMetierGeneriqueObj','false','DBA','false',null,62
+##
+WKF_PROCESSUS
+==
+delete from WKF_PROCESSUS WHERE PROC_NUM = '6300'
+'6300','Remboursement transports','0','20170728162655','false','0','fr.adp.com.gxp.std.mot_met.lib.objects.workflow.WkfMetierGeneriqueObj','true','DBA','false',null,'1'
+##
+WKF_PROCESSUS
+==
+delete from WKF_PROCESSUS WHERE PROC_NUM = '5500'
+'5500','Evènements contractuels','0','20211012115229','false','0','fr.adp.com.gxp.std.mot_met.lib.objects.workflow.WkfMetierGeneriqueObj','false','DBA','true',null,'61'

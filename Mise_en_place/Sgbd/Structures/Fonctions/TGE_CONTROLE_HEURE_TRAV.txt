@@ -1,0 +1,62 @@
+##
+TGE_CONTROLE_HEURE_TRAV
+=SQL=
+create or replace FUNCTION TGE_CONTROLE_HEURE_TRAV(
+    p_valeur         IN VARCHAR2,
+    tailleMaxPartEnt IN NUMBER,
+    tailleMaxPartDec IN NUMBER,
+    p_NLS_SEP        IN VARCHAR2)
+  RETURN NUMBER
+AS
+  retour       NUMBER;
+  cNLS_SEP_BAD VARCHAR2(1);
+  nValeur      NUMBER;
+  cValeur      VARCHAR2(40);
+  cValeurEnt   VARCHAR2(40);
+  cValeurDec   VARCHAR2(40);
+  nPosSep      NUMBER;
+BEGIN
+  cNLS_SEP_BAD   :='.';
+  nValeur        :=0;
+  cValeur        :=' ';
+  cValeurEnt     :=' ';
+  cValeurDec     :=' ';
+  nPosSep        :=0;
+  IF (p_NLS_SEP   = '.') THEN
+    cNLS_SEP_BAD :=',';
+  END IF;
+  -- on met le bon séparateur
+  cValeur := REPLACE(p_valeur ,cNLS_SEP_BAD,p_NLS_SEP);
+  -- on retire les + et -
+  cValeur                  := REPLACE(cValeur ,'+');
+  cValeur                  := REPLACE(cValeur ,'-');
+  retour                   :=1;
+  IF (cValeur              IS NOT NULL ) THEN
+    IF (IS_NUMBER(cValeur) IS NOT NULL) THEN
+      nPosSep              := INSTR(cValeur , p_NLS_SEP);
+      -- partie entiere ne doit pas depasser taille max
+      IF (nPosSep           = 0 ) THEN
+        IF (LENGTH(cValeur) > tailleMaxPartEnt ) THEN
+          retour           :=0;
+        END IF;
+      ELSE -- valeur avec decimal
+        -- partie entiere ne doit pas depasser taille max
+        cValeurEnt            := SUBSTR(cValeur ,0,INSTR(cValeur ,p_NLS_SEP )-1 );
+        IF (LENGTH(cValeurEnt) > tailleMaxPartEnt ) THEN
+          retour              :=0;
+        END IF;
+        -- partie decimaentiere ne doit pas depasser taille max
+        cValeurDec            := SUBSTR(cValeur,INSTR(cValeur ,p_NLS_SEP)+1 );
+        IF (LENGTH(cValeurDec) > tailleMaxPartDec ) THEN
+          retour              :=0;
+        END IF;
+      END IF;
+    ELSE
+      retour:=0;
+    END IF;
+  END IF;
+  RETURN retour;
+EXCEPTION
+WHEN OTHERS THEN
+  RETURN 0;
+END;

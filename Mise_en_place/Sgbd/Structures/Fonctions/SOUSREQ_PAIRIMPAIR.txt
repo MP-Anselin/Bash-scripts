@@ -1,0 +1,35 @@
+##
+SOUSREQ_PAIRIMPAIR
+=SQL=
+CREATE OR REPLACE
+  FUNCTION SOUSREQ_PAIRIMPAIR(
+      Req       IN VARCHAR2,
+      libimpair IN VARCHAR2,
+      libpair   IN VARCHAR2)
+    RETURN VARCHAR2
+  IS
+  TYPE TCur
+IS
+  REF
+  CURSOR ;
+    cur TCur ;
+    RetourSelect VARCHAR2(80);
+    Retour       VARCHAR2(600);
+    i            INTEGER:=0;
+  BEGIN
+    OPEN cur FOR Req ;
+    LOOP
+      FETCH cur INTO RetourSelect ;
+    EXIT
+  WHEN cur%NOTFOUND ;
+    i         :=i+1;
+    IF MOD(i,2)=0 THEN
+      Retour  := Retour ||libpair;
+    ELSE
+      Retour := Retour ||libimpair;
+    END IF;
+    Retour := Retour || RetourSelect;
+  END LOOP ;
+  CLOSE cur ;
+  RETURN Retour;
+END ; 

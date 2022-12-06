@@ -1,0 +1,118 @@
+##
+TAG_CHARSET=@€éèç
+##
+ORG_S_ADRESSE_TO_ADR
+=SQL=
+create or replace
+TRIGGER "ORG_S_ADRESSE_TO_ADR" AFTER DELETE
+ON STD_ADRESSE FOR EACH ROW
+declare 
+-- trigger qui supprime dans la table adresse ou mets à blanc les infos si besoin
+  existeValeur  NUMBER :=0;
+ TYPE LIG_ADRESSE IS RECORD
+ ( derNiv NUMBER ,
+      codts NUMBER ,
+      entite  VARCHAR2(25) ,
+      siren VARCHAR2(14) ,
+      nic  VARCHAR2(5)
+     );
+    rec_adr LIG_ADRESSE ;
+   Cursor C_Adr is select SN.NIVEAU ,SN.CODTS,SE.CODE_ENTITE,SE.SIREN,SE.NIC  from  std_struc_entite se, std_struc_niv sn ,STD_STRUC_ARBRE SA
+    where sn.codts=SA.CODTS and se.type_entite=sn.type_entite and se.code_entite=SA.CODE_ENTITE
+     and to_char(SYSDATE,'yyyymmdd') between se.date_eff and se.date_fin 
+    and to_char(SYSDATE,'yyyymmdd') between sn.date_eff and sn.date_fin 
+    and to_char(SYSDATE,'yyyymmdd') between SA.date_eff and SA.date_fin 
+    and se.ID_ADRESSE=:old.ID_ADRESSE;
+ Begin
+  --dbms_output.put_line('début curseur ');
+  --FIXME utiliser la procédure trace_dbms_output() 
+    Open C_Adr ;
+    Loop
+   Fetch C_Adr into rec_adr ;
+     Exit when C_Adr%NOTFOUND ;
+       begin 
+        --dbms_output.put_line('enregistrement ');
+        --FIXME utiliser la procédure trace_dbms_output() 
+          if rec_adr.derNiv=1 then 
+        --mise à jour dans NIV1
+               --dbms_output.put_line('Avant mise à jour adresse : '||:old.ID_ADRESSE);
+               --FIXME utiliser la procédure trace_dbms_output()
+              --suppression ou mise à blanc des champs autres que siren ou nic
+                if (rec_adr.siren is null and rec_adr.nic is null ) then 
+                     delete from STD_ADRSTR where CODTS=rec_adr.codts and CODNIV1=rec_adr.entite and (codniv2 ='' or codniv2 is null) ;            
+                else
+                    update STD_ADRSTR set SIGLE='',CPLADR='',NUMV='',BTQ='',TYPV='',NOMV='',INSEE='',COM='',CP='',DISTRI='',TEL='',SIREN=rec_adr.siren,NIC=rec_adr.nic,FAX='',EMAIL='',CODP='',TYPSTR=''  where CODTS=rec_adr.codts and CODNIV1=rec_adr.entite and (codniv2 ='' or codniv2 is null) ;            
+                  end if;
+              end if;
+          if rec_adr.derNiv=2 then 
+         --mise à jour de adresse pour niveau 2
+               --dbms_output.put_line('Avant mise à jour adresse niveau 2 : '||:old.ID_ADRESSE);
+               --FIXME utiliser la procédure trace_dbms_output()
+              --suppression ou mise à blanc des champs autres que siren ou nic
+                if (rec_adr.siren is null and rec_adr.nic is null ) then 
+                     delete from STD_ADRSTR where CODTS=rec_adr.codts and CODNIV2=rec_adr.entite and (codniv3 ='' or codniv3 is null) ;            
+                else
+                    update STD_ADRSTR set SIGLE='',CPLADR='',NUMV='',BTQ='',TYPV='',NOMV='',INSEE='',COM='',CP='',DISTRI='',TEL='',SIREN=rec_adr.siren,NIC=rec_adr.nic,FAX='',EMAIL='',CODP='',TYPSTR=''  where CODTS=rec_adr.codts and CODNIV2=rec_adr.entite and (codniv3 ='' or codniv3 is null) ;            
+                  end if;
+              end if;
+          if rec_adr.derNiv=3 then 
+           --mise à jour de adresse pour niveau 3
+               --dbms_output.put_line('Avant mise à jour adresse niv 3: '||:old.ID_ADRESSE);
+               --FIXME utiliser la procédure trace_dbms_output()
+              --suppression ou mise à blanc des champs autres que siren ou nic
+                if (rec_adr.siren is null and rec_adr.nic is null ) then 
+                     delete from STD_ADRSTR where CODTS=rec_adr.codts and CODNIV3=rec_adr.entite and (codniv4 ='' or codniv4 is null) ;            
+                else
+                    update STD_ADRSTR set SIGLE='',CPLADR='',NUMV='',BTQ='',TYPV='',NOMV='',INSEE='',COM='',CP='',DISTRI='',TEL='',SIREN=rec_adr.siren,NIC=rec_adr.nic,FAX='',EMAIL='',CODP='',TYPSTR=''  where CODTS=rec_adr.codts and CODNIV3=rec_adr.entite and (codniv4 ='' or codniv4 is null) ;            
+                  end if;
+              end if;
+         if rec_adr.derNiv=4 then 
+           --mise à jour de adresse pour niveau 4
+               --dbms_output.put_line('Avant mise à jour adresse niv4: '||:old.ID_ADRESSE);
+               --FIXME utiliser la procédure trace_dbms_output()
+              --suppression ou mise à blanc des champs autres que siren ou nic
+                if (rec_adr.siren is null and rec_adr.nic is null ) then 
+                     delete from STD_ADRSTR where CODTS=rec_adr.codts and CODNIV4=rec_adr.entite and (codniv5 ='' or codniv5 is null) ;            
+                else
+                    update STD_ADRSTR set SIGLE='',CPLADR='',NUMV='',BTQ='',TYPV='',NOMV='',INSEE='',COM='',CP='',DISTRI='',TEL='',SIREN=rec_adr.siren,NIC=rec_adr.nic,FAX='',EMAIL='',CODP='',TYPSTR=''  where CODTS=rec_adr.codts and CODNIV4=rec_adr.entite and (codniv5 ='' or codniv5 is null) ;            
+                  end if;
+              end if;
+         if rec_adr.derNiv=5 then 
+          --mise à jour de adresse pour niveau 5
+               --dbms_output.put_line('Avant mise à jour adresse niv5 : '||:old.ID_ADRESSE);
+               --FIXME utiliser la procédure trace_dbms_output()
+              --suppression ou mise à blanc des champs autres que siren ou nic
+                if (rec_adr.siren is null and rec_adr.nic is null ) then 
+                     delete from STD_ADRSTR where CODTS=rec_adr.codts and CODNIV5=rec_adr.entite and (codniv6 ='' or codniv6 is null) ;            
+                else
+                    update STD_ADRSTR set SIGLE='',CPLADR='',NUMV='',BTQ='',TYPV='',NOMV='',INSEE='',COM='',CP='',DISTRI='',TEL='',SIREN=rec_adr.siren,NIC=rec_adr.nic,FAX='',EMAIL='',CODP='',TYPSTR=''  where CODTS=rec_adr.codts and CODNIV5=rec_adr.entite and (codniv6 ='' or codniv6 is null) ;            
+                  end if;
+              end if;
+         if rec_adr.derNiv=6 then 
+        --mise à jour de adresse pour niveau 6
+               --dbms_output.put_line('Avant mise à jour adresse niv6 : '||:old.ID_ADRESSE);
+               --FIXME utiliser la procédure trace_dbms_output()
+              --suppression ou mise à blanc des champs autres que siren ou nic
+                if (rec_adr.siren is null and rec_adr.nic is null ) then 
+                     delete from STD_ADRSTR where CODTS=rec_adr.codts and CODNIV6=rec_adr.entite ;            
+                else
+                    update STD_ADRSTR set SIGLE='',CPLADR='',NUMV='',BTQ='',TYPV='',NOMV='',INSEE='',COM='',CP='',DISTRI='',TEL='',SIREN=rec_adr.siren,NIC=rec_adr.nic,FAX='',EMAIL='',CODP='',TYPSTR=''  where CODTS=rec_adr.codts and CODNIV6=rec_adr.entite ;            
+                  end if;
+              end if;
+    exception
+      When OTHERS then
+          --dbms_output.put_line('Code type structure existe dans adresse : '||existeValeur);
+          --dbms_output.put_line( 'Code    erreur : ' || to_char( SQLCODE )) ;
+          --dbms_output.put_line( 'libellé erreur : ' || to_char( SQLERRM )) ; 
+          --dbms_output.put_line('problème de mise à jour de l''adresse');
+          --FIXME utiliser la procédure trace_dbms_output()
+          NULL;
+      end;
+    End loop ;
+         --dbms_output.put_line('fin curseur ');
+         --FIXME utiliser la procédure trace_dbms_output() 
+  End ;
+##
+ORG_S_ADRESSE_TO_ADR
+=SQL=
+DROP TRIGGER ORG_S_ADRESSE_TO_ADR
